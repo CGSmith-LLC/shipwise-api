@@ -1,27 +1,30 @@
 # Ship Wise REST API
 
 Ship Wise REST API is based on Yii 2 Advanced Project Template with few modifications on layers.
+
 The API layer is introduced as main application entry point for RESTful API calls.
 
-Console layer is kept for database migrations. 
+
+Console layer is kept for database migrations.
 And the common folder to have all data models shared by API versions in one place.
 
-Data models under api/ namespace must extend from their parent class from common.
+
+Data models under api/ namespace MUST extend from their parent class from common/.
+
 
 Yii 2 Advanced Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
 developing complex Web applications with multiple tiers.
 
-The template includes two tiers: api and console, each of which
+
+This template includes two tiers: api and console, each of which
 is a separate Yii application.
+
 
 The template is designed to work in a team development environment. It supports
 deploying the application in different environments.
 
 Documentation is at [docs/guide/README.md](docs/guide/README.md).
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Total Downloads](https://img.shields.io/packagist/dt/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Build Status](https://travis-ci.org/yiisoft/yii2-app-advanced.svg?branch=master)](https://travis-ci.org/yiisoft/yii2-app-advanced)
 
 DIRECTORY STRUCTURE
 -------------------
