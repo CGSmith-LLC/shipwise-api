@@ -1,15 +1,17 @@
-<p align="center">
-    <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
-    </a>
-    <h1 align="center">Yii 2 Advanced Project Template</h1>
-    <br>
-</p>
+# Ship Wise REST API
+
+Ship Wise REST API is based on Yii 2 Advanced Project Template with few modifications on layers.
+The API layer is introduced as main application entry point for RESTful API calls.
+
+Console layer is kept for database migrations. 
+And the common folder to have all data models shared by API versions in one place.
+
+Data models under api/ namespace must extend from their parent class from common.
 
 Yii 2 Advanced Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
 developing complex Web applications with multiple tiers.
 
-The template includes three tiers: front end, back end, and console, each of which
+The template includes two tiers: api and console, each of which
 is a separate Yii application.
 
 The template is designed to work in a team development environment. It supports
@@ -25,10 +27,23 @@ DIRECTORY STRUCTURE
 -------------------
 
 ```
+api
+    config/              contains api configurations
+    controllers/         not used
+    models/              not used
+    modules/             contains API versions, this is the main folder for API source code.
+                         each folder is an API version, example: v1/
+                         each version folder contains controller and models specific to that version.
+                         data models extend from common/models
+    runtime/             contains files generated during runtime
+    tests/               contains tests for api application
+    views/               not used
+    web/                 contains the entry script and Web resources
+    widgets/             not used
 common
     config/              contains shared configurations
     mail/                contains view files for e-mails
-    models/              contains model classes used in both backend and frontend
+    models/              contains model classes used in api versions
     tests/               contains tests for common classes    
 console
     config/              contains console configurations
@@ -36,25 +51,6 @@ console
     migrations/          contains database migrations
     models/              contains console-specific model classes
     runtime/             contains files generated during runtime
-backend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains backend configurations
-    controllers/         contains Web controller classes
-    models/              contains backend-specific model classes
-    runtime/             contains files generated during runtime
-    tests/               contains tests for backend application    
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
-frontend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains frontend configurations
-    controllers/         contains Web controller classes
-    models/              contains frontend-specific model classes
-    runtime/             contains files generated during runtime
-    tests/               contains tests for frontend application
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
-    widgets/             contains frontend widgets
 vendor/                  contains dependent 3rd-party packages
 environments/            contains environment-based overrides
 ```
