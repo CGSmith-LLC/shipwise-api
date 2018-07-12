@@ -2,6 +2,10 @@
 defined('YII_DEBUG') or define('YII_DEBUG', false);
 defined('YII_ENV') or define('YII_ENV', 'prod');
 
+// These constants are needed for swagger documentation
+defined('SWAGGER_API_HOST') or define('SWAGGER_API_HOST', 'production_url_here');
+defined('SWAGGER_API_SCHEMES') or define('SWAGGER_API_SCHEMES', 'https');
+
 require(__DIR__ . '/../../vendor/autoload.php');
 require(__DIR__ . '/../../vendor/yiisoft/yii2/Yii.php');
 require(__DIR__ . '/../../common/config/bootstrap.php');

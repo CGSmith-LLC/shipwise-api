@@ -4,9 +4,9 @@ namespace api\modules\v1\swagger;
 
 /**
  * @SWG\Swagger(
- *     schemes={"http","https"},
- *     host="local.shipwise.com",
- *     basePath="/v1",
+ *     host = SWAGGER_API_HOST,
+ *     schemes = {SWAGGER_API_SCHEMES},
+ *     basePath = "/v1",
  *
  *     @SWG\Info(
  *         version="1.0.0",
