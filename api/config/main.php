@@ -16,7 +16,7 @@ return [
 	'basePath'            => dirname(__DIR__),
 	'controllerNamespace' => 'api\controllers',
 	'modules'             => [
-		'v2' => [
+		'v1' => [
 			'class' => 'api\modules\v1\Module',
 		],
 	],

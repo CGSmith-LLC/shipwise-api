@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91af26baa0f656a97ed0846476a0a206",
+    "content-hash": "ce9faf38e11b412d3e9422dbba197b2a",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -87,24 +87,19 @@
         },
         {
             "name": "bower-asset/swagger-ui",
-            "version": "v2.2.10",
+            "version": "v3.17.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swagger-api/swagger-ui.git",
-                "reference": "64dc3060b3700b12e466f8d67b7d7ec3574b015f"
+                "reference": "9709df82d363060e55c0bb92008911ab5a5975dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swagger-api/swagger-ui/zipball/64dc3060b3700b12e466f8d67b7d7ec3574b015f",
-                "reference": "64dc3060b3700b12e466f8d67b7d7ec3574b015f",
+                "url": "https://api.github.com/repos/swagger-api/swagger-ui/zipball/9709df82d363060e55c0bb92008911ab5a5975dd",
+                "reference": "9709df82d363060e55c0bb92008911ab5a5975dd",
                 "shasum": null
             },
-            "type": "bower-asset",
-            "license": [
-                "Apache-2.0",
-                "Copyright 2016 SmartBear Software",
-                "./LICENSE"
-            ]
+            "type": "bower-asset"
         },
         {
             "name": "bower-asset/yii2-pjax",
@@ -416,27 +411,27 @@
         },
         {
             "name": "light/yii2-swagger",
-            "version": "1.0.7",
+            "version": "2.0.0-alpha",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lichunqiang/yii2-swagger.git",
-                "reference": "0a9d37204398df245ec1420b07296fd78b6a2a8c"
+                "reference": "54fe1c97a27178cca954d62b2a7a8f3ad02b3ad5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lichunqiang/yii2-swagger/zipball/0a9d37204398df245ec1420b07296fd78b6a2a8c",
-                "reference": "0a9d37204398df245ec1420b07296fd78b6a2a8c",
+                "url": "https://api.github.com/repos/lichunqiang/yii2-swagger/zipball/54fe1c97a27178cca954d62b2a7a8f3ad02b3ad5",
+                "reference": "54fe1c97a27178cca954d62b2a7a8f3ad02b3ad5",
                 "shasum": ""
             },
             "require": {
-                "bower-asset/swagger-ui": "2.2.10",
+                "bower-asset/swagger-ui": "^3.0",
                 "yiisoft/yii2": "^2.0.0",
                 "zircote/swagger-php": "^2.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-master": "2.0.x-dev"
                 }
             },
             "autoload": {
@@ -462,7 +457,7 @@
                 "swagger",
                 "yii2"
             ],
-            "time": "2018-02-07T02:40:19+00:00"
+            "time": "2018-03-30T15:41:30+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -3460,7 +3455,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "light/yii2-swagger": 15
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

@@ -10,9 +10,9 @@ return [
 
 	// API Documentation
 
-	""                      => "$version/default/doc", // Swagger UI with "Try it out" button
-	"/$version/doc"         => "$version/default/doc", // Swagger UI with "Try it out" button
-	"/$version/schema"      => "$version/default/schema", // Swagger JSON spec file
+	""                 => "$version/default/doc", // Swagger UI with "Try it out" button
+	"/$version/doc"    => "$version/default/doc", // Swagger UI with "Try it out" button
+	"/$version/schema" => "$version/default/schema", // Swagger JSON spec file
 
 	// Authentication
 
