@@ -28,16 +28,15 @@ class DefaultController extends Controller
 		return [
 			"doc"    => [
 				"class"   => 'light\swagger\SwaggerAction',
-				"restUrl" => Url::to(["/v1/schema"], true),
 				"restUrl" => [
 					[
 						'name' => "Ship Wise API V1",
-						'url'  => Url::to([ "/v1/schema" ], true),
+						'url'  => Url::to(["/v1/schema"], true),
 					],
 					/* Example of adding doc for another version */
 					/*[
 						'name' => "Ship Wise API V2",
-						'url'  => Url::to([ "/v2/schema" ], true),
+						'url'  => Url::to(["/v2/schema"], true),
 					],*/
 				],
 			],
