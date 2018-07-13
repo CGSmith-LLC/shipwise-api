@@ -2,36 +2,43 @@
 
 use yii\db\Migration;
 
+/**
+ * Class m130524_201442_init
+ *
+ * This migration is to create a table for the list of API consumers.
+ *
+ */
 class m130524_201442_init extends Migration
 {
-    public function up()
-    {
-        echo "DO NOT RUN. THIS HAS NOT BEEN DEVELOPED YET.";
+	/** {@inheritdoc} */
+	public function safeUp()
+	{
+		$tableOptions = null;
+		if ($this->db->driverName === 'mysql') {
+			$tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+		}
 
-    	/*
-    	$tableOptions = null;
-        if ($this->db->driverName === 'mysql') {
-            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
-            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
-        }
+		$this->createTable('{{%api_consumer}}', [
+			'id'                 => $this->primaryKey(),
+			'auth_key'           => $this->string(6)->notNull()->unique()
+				->comment('API consumer key. Used for authentication'),
+			'auth_secret'        => $this->string(32)->notNull()->unique()
+				->comment('API consumer secret. Used for authentication'),
+			'auth_token'         => $this->string(32)->defaultValue(null)
+				->comment('The API token obtained during authentication'),
+			'token_generated_on' => $this->dateTime()->defaultValue(null),
+			'customer_id'        => $this->integer(11)->defaultValue(null),
+			'status'             => $this->smallInteger()->notNull()->defaultValue(1)
+				->comment('API consumer status. 1:active, 0:inactive'),
+			'created_date'       => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
+		], $tableOptions . " COMMENT 'List of API consumers'");
 
-        $this->createTable('{{%user}}', [
-            'id' => $this->primaryKey(),
-            'username' => $this->string()->notNull()->unique(),
-            'auth_key' => $this->string(32)->notNull(),
-            'password_hash' => $this->string()->notNull(),
-            'password_reset_token' => $this->string()->unique(),
-            'email' => $this->string()->notNull()->unique(),
+		$this->createIndex('api_consumer_auth_token_idx', '{{%api_consumer}}', 'auth_token');
+	}
 
-            'status' => $this->smallInteger()->notNull()->defaultValue(10),
-            'created_at' => $this->integer()->notNull(),
-            'updated_at' => $this->integer()->notNull(),
-        ], $tableOptions);
-        */
-    }
-
-    public function down()
-    {
-        $this->dropTable('{{%user}}');
-    }
+	/** {@inheritdoc} */
+	public function safeDown()
+	{
+		$this->dropTable('{{%api_consumer}}');
+	}
 }
