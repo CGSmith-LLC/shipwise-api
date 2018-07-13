@@ -11,6 +11,9 @@ use common\models\core\base\BaseApiConsumer;
  */
 class ApiConsumer extends BaseApiConsumer
 {
+	const STATUS_ACTIVE   = 1;
+	const STATUS_INACTIVE = 0;
+
 	/**
 	 * Find Api Consumer by auth token
 	 *
