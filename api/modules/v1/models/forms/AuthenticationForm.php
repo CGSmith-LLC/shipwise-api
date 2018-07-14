@@ -20,9 +20,9 @@ use yii\base\Model;
 class AuthenticationForm extends Model
 {
 	const SUCCESS            = 1;
-	const ERR_MISSING_FIELDS = "ERR_MISSING_FIELDS";
-	const ERR_AUTH_FAILURE   = "ERR_AUTH_FAILURE";
-	const ERR_INACTIVE       = "ERR_USER_INACTIVE";
+	const ERR_MISSING_FIELDS = 2;
+	const ERR_AUTH_FAILURE   = 3;
+	const ERR_INACTIVE       = 4;
 
 	public $key;
 	public $secret;
@@ -41,7 +41,7 @@ class AuthenticationForm extends Model
 	}
 
 	/**
-	 * @inheritdoc
+	 * {@inheritdoc}
 	 */
 	public function rules()
 	{
@@ -53,7 +53,6 @@ class AuthenticationForm extends Model
 
 	/**
 	 * @return int|string
-	 * @throws \yii\web\ServerErrorHttpException
 	 */
 	public function authenticate()
 	{
@@ -61,14 +60,16 @@ class AuthenticationForm extends Model
 		if (($this->_apiConsumer = ApiConsumerEx::findByKeySecret($this->key, $this->secret)) === null) {
 			return self::ERR_AUTH_FAILURE;
 		}
-		
+
 		// Check if user is active, if not, then throw an error
 		if (!$this->_apiConsumer->isActive()) {
 			return self::ERR_INACTIVE;
 		}
 
 		// Generate and save auth token
-		$this->_apiConsumer->generateToken()->save();
+		$this->_apiConsumer
+			->generateToken()
+			->save();
 
 		// Return success
 		return self::SUCCESS;

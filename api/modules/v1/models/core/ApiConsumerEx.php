@@ -51,6 +51,8 @@ class ApiConsumerEx extends ApiConsumer implements IdentityInterface
 	{
 		$this->auth_token = Yii::$app->security->generateRandomString();
 		$this->token_generated_on = date('Y-m-d H:i:s');
+
+		return $this;
 	}
 
 	/** @inheritdoc */

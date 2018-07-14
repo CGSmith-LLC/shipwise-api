@@ -2,6 +2,8 @@
 
 namespace api\modules\v1\models;
 
+use yii\base\Model;
+
 /**
  * @SWG\Definition(
  *     definition = "AuthenticationResponse",
@@ -13,17 +15,7 @@ namespace api\modules\v1\models;
  *        ),
  * )
  */
-class AuthenticationResponse
+class AuthenticationResponse extends Model
 {
-	private $token;
-
-	/**
-	 * AuthenticationResponse constructor
-	 *
-	 * @param string $token
-	 */
-	function __construct($token)
-	{
-		$this->token = $token;
-	}
+	public $token;
 }

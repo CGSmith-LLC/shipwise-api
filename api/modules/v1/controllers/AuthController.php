@@ -140,7 +140,9 @@ class AuthController extends Controller
 		}
 
 		// Return response containing authentication token
-		return new AuthenticationResponse($userAuth->getApiConsumer()->getAuthKey());
+		return new AuthenticationResponse([
+			'token' => $userAuth->getApiConsumer()->getAuthKey(),
+		]);
 	}
 
 	/**
