@@ -46,8 +46,8 @@ class AuthenticationForm extends Model
 	public function rules()
 	{
 		return [
-			["key", "required", "message" => 'Required fields are missing. "{attribute}"'],
-			["secret", "required", "message" => 'Required fields are missing. "{attribute}"'],
+			["key", "required", "message" => 'Field "{attribute}" is required.'],
+			["secret", "required", "message" => 'Field "{attribute}" is required.'],
 		];
 	}
 
@@ -61,7 +61,7 @@ class AuthenticationForm extends Model
 		if (($this->_apiConsumer = ApiConsumerEx::findByKeySecret($this->key, $this->secret)) === null) {
 			return self::ERR_AUTH_FAILURE;
 		}
-
+		
 		// Check if user is active, if not, then throw an error
 		if (!$this->_apiConsumer->isActive()) {
 			return self::ERR_INACTIVE;

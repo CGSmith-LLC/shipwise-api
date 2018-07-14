@@ -50,7 +50,7 @@ class ApiConsumer extends BaseApiConsumer
 	 */
 	protected static function findByKeySecret($key, $secret)
 	{
-		return static::findOne(['key' => $key, 'secret' => $secret]);
+		return static::findOne(['auth_key' => $key, 'auth_secret' => $secret]);
 	}
 
 	/**

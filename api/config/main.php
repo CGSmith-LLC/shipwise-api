@@ -74,7 +74,7 @@ return [
 		"response"   => [
 			"class"         => '\yii\web\Response',
 			"on beforeSend" => function ($event) {
-				//  get sender object
+				// get sender object
 				$response = $event->sender;
 
 				if (!is_null($response->data)) {

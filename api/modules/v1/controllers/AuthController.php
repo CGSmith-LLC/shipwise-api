@@ -47,7 +47,7 @@ class AuthController extends Controller
 	{
 		return ArrayHelper::merge(parent::behaviors(), [
 			'AuthConsumer' => [
-				'class'  => 'ApiConsumerSecurity',
+				'class'  => 'api\modules\v1\components\security\ApiConsumerSecurity',
 				'except' => ['login'], // behavior isn't executed for these actions
 			],
 		]);
@@ -123,8 +123,7 @@ class AuthController extends Controller
 		//  validate fields
 		if (!$userAuth->validate()) {
 			$this->response->setStatusCode(422);
-
-			return $userAuth->getErrors();
+			return ['errors' => $userAuth->getErrors()];
 		}
 
 		/*

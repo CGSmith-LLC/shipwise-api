@@ -4,7 +4,6 @@ namespace api\modules\v1\models\core;
 
 use common\models\core\ApiConsumer;
 use yii\web\IdentityInterface;
-use yii\base\NotSupportedException;
 use Yii;
 
 /**
@@ -57,7 +56,7 @@ class ApiConsumerEx extends ApiConsumer implements IdentityInterface
 	/** @inheritdoc */
 	public static function findByKeySecret($key, $secret)
 	{
-		return static::findByKeySecret($key, $secret);
+		return parent::findByKeySecret($key, $secret);
 	}
 
 	/** @inheritdoc */

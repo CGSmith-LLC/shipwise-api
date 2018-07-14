@@ -17,7 +17,7 @@ namespace api\modules\v1\swagger;
  *
  *     @SWG\Property( property = "code", type = "integer" ),
  *     @SWG\Property(
- *            property = "error",
+ *            property = "errors",
  *            type = "object",
  *            description = "Validation errors or several error messages"
  *        ),
