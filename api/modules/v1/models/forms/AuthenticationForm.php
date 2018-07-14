@@ -11,10 +11,10 @@ use yii\base\Model;
  * @package api\modules\v1\models
  *
  * @SWG\Definition(
- *     definition = "AuthenticationForm",
+ *     definition = "AuthenticationRequest",
  *     required   = { "key", "secret" },
- *     @SWG\Property( property = "key", type = "string", ),
- *     @SWG\Property( property = "secret", type = "string" ),
+ *     @SWG\Property( property = "key", type = "string", description = "Your API key" ),
+ *     @SWG\Property( property = "secret", type = "string", description = "Your API secret" ),
  * )
  */
 class AuthenticationForm extends Model
