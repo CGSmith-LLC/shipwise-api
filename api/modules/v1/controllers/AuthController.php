@@ -84,6 +84,16 @@ class AuthController extends Controller
 	 *          response = 200,
 	 *          description = "Authentication successful. Response contains API token.",
 	 *          @SWG\Schema( ref = "#/definitions/AuthenticationResponse" ),
+	 *
+	 *     		@SWG\Header(
+	 *       		header = "X-Expires-After",
+	 *     			description = "Date in UTC when token expires",
+	 *     			type = "string",
+	 *       		@SWG\Schema(
+	 *          		type = "string",
+	 *          		format = "date-time",
+	 *       		),
+	 *     		),
 	 *     ),
 	 *
 	 *     @SWG\Response(
@@ -136,12 +146,20 @@ class AuthController extends Controller
 
 			case AuthenticationForm::ERR_INACTIVE :
 				throw new ForbiddenHttpException('User is inactive.');
-
 		}
+
+		// Get authenticated user
+		$apiConsumer = $userAuth->getApiConsumer();
+
+		// Set response headers
+		Yii::$app->response->headers->add(
+			'X-Expires-After',
+			$apiConsumer->getTokenExpiration()
+		);
 
 		// Return response containing authentication token
 		return new AuthenticationResponse([
-			'token' => $userAuth->getApiConsumer()->getAuthKey(),
+			'token' => $apiConsumer->getAuthKey(),
 		]);
 	}
 
