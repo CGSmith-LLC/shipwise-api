@@ -49,11 +49,15 @@ class ApiConsumerEx extends ApiConsumer implements IdentityInterface
 
 	/**
 	 * Generates authentication token
+	 *
+	 * @return $this
+	 * @throws \yii\base\Exception
 	 */
 	public function generateToken()
 	{
-		$this->auth_token         = Yii::$app->security->generateRandomString();
-		$this->token_generated_on = date(self::DATETIME_FORMAT);
+		// Generate random string for auth token
+		$this->auth_token = Yii::$app->security->generateRandomString();
+		$this->updateLastActivity();
 
 		return $this;
 	}
@@ -67,7 +71,10 @@ class ApiConsumerEx extends ApiConsumer implements IdentityInterface
 	/** @inheritdoc */
 	public function resetToken()
 	{
-		return parent::resetToken();
+		$this->auth_token = null;
+		$this->updateLastActivity();
+
+		return $this;
 	}
 
 	/** @inheritdoc */
@@ -77,14 +84,49 @@ class ApiConsumerEx extends ApiConsumer implements IdentityInterface
 	}
 
 	/**
-	 * Get Token Expiration datetime
+	 * Get Token Expiration date-time
+	 *
+	 * @param bool $formatted Whether to format the returned DateTime object
+	 *
+	 *
+	 * @return string|\DateTime
+	 * @throws \Exception
 	 */
-	public function getTokenExpiration()
+	public function getTokenExpiration($formatted = true)
 	{
-		date_default_timezone_set('UTC');
-		return date(
-			self::DATETIME_FORMAT,
-			strtotime($this->token_generated_on . ' +' . self::EXPIRE_TOKEN_AFTER . ' minutes')
-		);
+		$lastActivity = new \DateTime($this->last_activity, new \DateTimeZone("UTC"));
+		$expiresOn    = $lastActivity->add(new \DateInterval('PT' . self::EXPIRE_TOKEN_AFTER . 'M'));
+
+		return ($formatted ? $expiresOn->format(self::DATETIME_FORMAT) : $expiresOn);
+	}
+
+	/**
+	 * Is token expired
+	 *
+	 * Checks whether current date-time is greater than the
+	 * last activity date-time plus expiration interval
+	 *
+	 * @see getTokenExpiration()
+	 *
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function isTokenExpired()
+	{
+		$now = new \DateTime("now", new \DateTimeZone("UTC"));
+		return ($now > $this->getTokenExpiration(false));
+	}
+
+	/**
+	 * Update last activity date-time
+	 *
+	 * @return $this
+	 */
+	public function updateLastActivity()
+	{
+		$this->last_activity =
+			(new \DateTime("now", new \DateTimeZone("UTC")))->format(self::DATETIME_FORMAT);
+
+		return $this;
 	}
 }

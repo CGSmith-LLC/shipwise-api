@@ -52,7 +52,10 @@ class AuthenticationForm extends Model
 	}
 
 	/**
+	 * Authenticate user
+	 *
 	 * @return int|string
+	 * @throws \yii\base\Exception
 	 */
 	public function authenticate()
 	{
@@ -67,9 +70,7 @@ class AuthenticationForm extends Model
 		}
 
 		// Generate and save auth token
-		$this->_apiConsumer
-			->generateToken()
-			->save();
+		$this->_apiConsumer->generateToken()->save();
 
 		// Return success
 		return self::SUCCESS;

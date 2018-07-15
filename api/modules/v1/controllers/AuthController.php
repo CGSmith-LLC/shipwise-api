@@ -96,6 +96,12 @@ class AuthController extends Controller
 	 *     		),
 	 *     ),
 	 *
+	 *	   @SWG\Response(
+	 *          response = 400,
+	 *          description = "Bad request",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *     ),
+	 *
 	 *     @SWG\Response(
 	 *          response = 401,
 	 *          description = "Authentication failed",
@@ -183,17 +189,23 @@ class AuthController extends Controller
 	 *          description = "Unexpected error",
 	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
 	 *       ),
+	 *     security = {{
+	 *     	    "apiTokenAuth": {},
+	 *     }}
 	 * )
+	 */
+	/**
+	 * Action Logout
+	 *
+	 * Logout current authenticated user
+	 *
+	 * @see ApiConsumerSecurity::$apiConsumer
 	 */
 	public function actionLogout()
 	{
+		$this->apiConsumer->resetToken()->save();
+		Yii::$app->user->identity = null;
 
-		$user = ApiConsumerEx::findIdentityByAccessToken($this->token);
-
-		$user->resetToken();
-		$user->save();
-
-		//  set status code to 204
 		$this->response->setStatusCode(204);
 	}
 }

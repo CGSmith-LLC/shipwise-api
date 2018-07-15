@@ -38,8 +38,9 @@ return [
 			],
 		],
 
-		'user' => [
-			'identityClass'   => 'api\modules\v1\models\ApiUser',
+		// User (API consumer)
+		'user'    => [
+			'identityClass'   => 'api\modules\v1\models\core\ApiConsumerEx',
 			'enableSession'   => false,
 			'enableAutoLogin' => false,
 			'loginUrl'        => null,

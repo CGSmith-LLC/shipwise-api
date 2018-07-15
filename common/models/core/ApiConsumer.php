@@ -62,15 +62,4 @@ class ApiConsumer extends BaseApiConsumer
 	{
 		return (bool)($this->status == self::STATUS_ACTIVE);
 	}
-
-	/**
-	 * Reset Token
-	 */
-	protected function resetToken()
-	{
-		$this->auth_token         = null;
-		$this->token_generated_on = null;
-	}
-
-
 }

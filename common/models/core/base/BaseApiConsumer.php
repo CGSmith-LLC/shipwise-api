@@ -9,7 +9,7 @@ namespace common\models\core\base;
  * @property string $auth_key            API consumer key. Used for authentication
  * @property string $auth_secret         API consumer secret. Used for authentication
  * @property string $auth_token          The API token obtained during authentication
- * @property string $token_generated_on  Token generation datetime
+ * @property string $last_activity       Last user activity date-time
  * @property int    $customer_id         Customer ID
  * @property int    $status              API consumer status. 1:active, 0:inactive
  * @property string $created_date        API consumer creation date
@@ -31,7 +31,7 @@ class BaseApiConsumer extends \yii\db\ActiveRecord
 	{
 		return [
 			[['auth_key', 'auth_secret'], 'required'],
-			[['token_generated_on', 'created_date'], 'safe'],
+			[['last_activity', 'created_date'], 'safe'],
 			[['customer_id', 'status'], 'integer'],
 			[['auth_key'], 'string', 'max' => 6],
 			[['auth_secret', 'auth_token'], 'string', 'max' => 32],

@@ -6,6 +6,7 @@ use api\modules\v1\models\core\ApiConsumerEx;
 use yii\helpers\ArrayHelper;
 use yii\base\Behavior;
 use yii\web\UnauthorizedHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\rest\Controller;
 use Yii;
 
@@ -51,6 +52,7 @@ class ApiConsumerSecurity extends Behavior
 	 * @param $event
 	 *
 	 * @throws \yii\web\UnauthorizedHttpException
+	 * @throws \yii\web\ForbiddenHttpException
 	 */
 	public function beforeAction($event)
 	{
@@ -63,33 +65,48 @@ class ApiConsumerSecurity extends Behavior
 
 		$this->token = $headers->get("X-API-TOKEN");
 
-		echo 'X-API-TOKEN:' . $this->token;
-		exit;
-
 		if (is_null($this->token) || empty($this->token)) {
 			throw new UnauthorizedHttpException(
-				'X-API-TOKEN key must be provided with urls requiring an authenticated user.'
+				'X-API-TOKEN header must be provided with urls requiring an authenticated user.'
 			);
 		}
 
 		// Attempt to find api consumer
-		$this->apiConsumer = ApiConsumerEx::findIdentityByAccount($this->authAccountNumber);
-
-		if (empty($this->apiConsumer)) {
-			throw new UnauthorizedHttpException('Authentication failure. Empty or invalid credentials.');
+		if (($this->apiConsumer = ApiConsumerEx::findIdentityByAccessToken($this->token)) === null) {
+			throw new UnauthorizedHttpException(
+				'X-API-TOKEN provided is invalid, please authenticate again.'
+			);
 		}
 
-		// search for api client
-		$this->apiUser = ApiUser::findIdentityByAccessToken($this->token);
-
-		if (empty($this->apiUser)) {
-			throw new UnauthorizedHttpException(Yii::t('api.error', 'API-TOKEN provided is invalid, please login again.'));
+		// Check for token expiration
+		if ($this->apiConsumer->isTokenExpired()) {
+			throw new UnauthorizedHttpException(
+				'X-API-TOKEN provided is expired, please authenticate again.'
+			);
 		}
 
-		//  log user activity
-		Yii::$app->user->login($this->apiUser);
+		// Check if user is active
+		if (!$this->apiConsumer->isActive()) {
+			throw new ForbiddenHttpException('User is inactive.');
+		}
 
-		$this->apiUser->logActivity();
+		/**
+		 * Set user identity without touching session or cookie.
+		 * (this is preferred use in stateless RESTful API implementation)
+		 */
+		Yii::$app->user->setIdentity($this->apiConsumer);
 
+		/**
+		 * Yuhuu! User authenticated.
+		 *
+		 * @see yii\web\User
+		 *
+		 * Yii::$app->user->identity to access currently authenticated user.
+		 * Yii::$app->user->identity->customer to access currently authenticated customer if any.
+		 *
+		 */
+
+		// Log user activity
+		$this->apiConsumer->updateLastActivity()->save();
 	}
 }
