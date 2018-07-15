@@ -95,7 +95,9 @@ class ApiConsumerEx extends ApiConsumer implements IdentityInterface
 	public function getTokenExpiration($formatted = true)
 	{
 		$lastActivity = new \DateTime($this->last_activity, new \DateTimeZone("UTC"));
-		$expiresOn    = $lastActivity->add(new \DateInterval('PT' . self::EXPIRE_TOKEN_AFTER . 'M'));
+		$expiresOn    = $lastActivity->add(
+			new \DateInterval('PT' . self::EXPIRE_TOKEN_AFTER . 'M')
+		);
 
 		return ($formatted ? $expiresOn->format(self::DATETIME_FORMAT) : $expiresOn);
 	}

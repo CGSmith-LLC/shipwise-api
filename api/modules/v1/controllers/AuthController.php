@@ -3,18 +3,13 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\security\ApiConsumerSecurity;
-
 use api\modules\v1\models\forms\AuthenticationForm;
 use api\modules\v1\models\AuthenticationResponse;
-use api\modules\v1\models\core\ApiConsumerEx;
 use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use Yii;
 use yii\web\UnauthorizedHttpException;
-use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
-use yii\web\NotFoundHttpException;
-use yii\web\ServerErrorHttpException;
 
 /**
  * Class AuthController
