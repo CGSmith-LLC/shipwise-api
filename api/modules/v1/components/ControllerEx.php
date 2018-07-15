@@ -33,8 +33,7 @@ class ControllerEx extends Controller
 	{
 		return ArrayHelper::merge(parent::behaviors(), [
 			'AuthConsumer' => [
-				'class'  => 'api\modules\v1\components\security\ApiConsumerSecurity',
-				'except' => ['login'], // behavior isn't executed for these actions
+				'class' => 'api\modules\v1\components\security\ApiConsumerSecurity',
 			],
 		]);
 	}

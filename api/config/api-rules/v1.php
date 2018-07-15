@@ -20,6 +20,11 @@ return [
 	"DELETE  $version/auth" => "$version/auth/logout",
 
 	// Orders
+	// @todo
 
 	// Customers
+	[
+		"class"      => 'yii\rest\UrlRule',
+		"controller" => ["$version/customer"],
+	],
 ];
