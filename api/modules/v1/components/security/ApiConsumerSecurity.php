@@ -97,7 +97,7 @@ class ApiConsumerSecurity extends Behavior
 		Yii::$app->user->setIdentity($this->apiConsumer);
 
 		/**
-		 * Yuhuu! User authenticated.
+		 * User successfully authenticated.
 		 *
 		 * @see yii\web\User
 		 *

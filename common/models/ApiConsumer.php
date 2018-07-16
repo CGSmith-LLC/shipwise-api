@@ -19,14 +19,12 @@ class ApiConsumer extends BaseApiConsumer
 	 *
 	 * ApiConsumer relation to Customer
 	 *
-	 * @todo Pending customer model generation
-	 *
 	 * @return \yii\db\ActiveQuery
 	 */
-	/*public function getCustomer()
+	public function getCustomer()
 	{
-		return $this->hasOne('common\models\customer\Customer', ['id' => 'customer_id']);
-	}*/
+		return $this->hasOne('common\models\Customer', ['id' => 'customer_id']);
+	}
 
 	/**
 	 * Find Api Consumer by auth token

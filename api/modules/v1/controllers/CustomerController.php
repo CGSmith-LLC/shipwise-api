@@ -30,7 +30,8 @@ class CustomerController extends ControllerEx
 	{
 		echo 'actionIndex ';
 		print_r($this->apiConsumer->attributes);
-		exit;
+		print_r($this->apiConsumer->customer->attributes);
+
 	}
 
 	/** @inheritdoc */
