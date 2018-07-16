@@ -3,6 +3,7 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
+use api\modules\v1\models\customer\CustomerEx;
 
 // use api\modules\v1\models\customer\form\CustomerForm;
 
@@ -25,13 +26,52 @@ class CustomerController extends ControllerEx
 		];
 	}
 
-	/** @inheritdoc */
+	/**
+	 * Fetch all customers
+	 *
+	 * @return \api\modules\v1\models\customer\CustomerEx[]
+	 *
+	 * @SWG\Get(
+	 *     path = "/customers",
+	 *     tags = { "Customers" },
+	 *     summary = "Fetch all customers",
+	 *     description = "Get all customers",
+	 *
+	 *     @SWG\Response(
+	 *          response = 200,
+	 *          description = "Successful operation. Response contains a list of customers.",
+	 *          @SWG\Schema(
+	 *              type = "array",
+	 *     			@SWG\Items( ref = "#/definitions/Customer" )
+	 *            ),
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 401,
+	 *          description = "Impossible to authenticate user",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 403,
+	 *          description = "User is inactive",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 500,
+	 *          description = "Unexpected error",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     security = {{
+	 *            "apiTokenAuth": {},
+	 *     }}
+	 * )
+	 */
 	public function actionIndex()
 	{
-		echo 'actionIndex ';
-		print_r($this->apiConsumer->attributes);
-		print_r($this->apiConsumer->customer->attributes);
-
+		return CustomerEx::find()->all();
 	}
 
 	/** @inheritdoc */

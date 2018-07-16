@@ -37,4 +37,18 @@ class ControllerEx extends Controller
 			],
 		]);
 	}
+
+	/**
+	 * Successful response
+	 *
+	 * @param $response
+	 *
+	 * @return array
+	 */
+	public function success($response)
+	{
+		$this->response->setStatusCode(200);
+
+		return $response;
+	}
 }
