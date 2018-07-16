@@ -41,6 +41,9 @@ class ControllerEx extends Controller
 	/**
 	 * Successful response
 	 *
+	 * This function sets the response status code 200
+	 * and returns the response.
+	 *
 	 * @param $response
 	 *
 	 * @return array
@@ -50,5 +53,20 @@ class ControllerEx extends Controller
 		$this->response->setStatusCode(200);
 
 		return $response;
+	}
+
+	/**
+	 * Error response
+	 *
+	 * @param int    $code    HTTP code
+	 * @param string $message Error message
+	 *
+	 * @return array
+	 */
+	public function errorMessage($code, $message)
+	{
+		$this->response->setStatusCode($code);
+
+		return ['message' => $message];
 	}
 }
