@@ -1,13 +1,13 @@
 <?php
 
-namespace common\models\core;
+namespace common\models;
 
-use common\models\core\base\BaseApiConsumer;
+use common\models\base\BaseApiConsumer;
 
 /**
  * Class ApiConsumer
  *
- * @package common\models\core
+ * @package common\models
  */
 class ApiConsumer extends BaseApiConsumer
 {

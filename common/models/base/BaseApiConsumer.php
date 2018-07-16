@@ -1,6 +1,6 @@
 <?php
 
-namespace common\models\core\base;
+namespace common\models\base;
 
 /**
  * This is the model class for table "api_consumer".

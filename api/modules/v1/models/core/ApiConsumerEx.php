@@ -2,7 +2,7 @@
 
 namespace api\modules\v1\models\core;
 
-use common\models\core\ApiConsumer;
+use common\models\ApiConsumer;
 use yii\web\IdentityInterface;
 use Yii;
 
