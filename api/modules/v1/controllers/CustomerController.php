@@ -4,8 +4,7 @@ namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
 use api\modules\v1\models\customer\CustomerEx;
-
-// use api\modules\v1\models\customer\form\CustomerForm;
+use api\modules\v1\models\forms\CustomerForm;
 
 /**
  * Class Customer
@@ -77,12 +76,84 @@ class CustomerController extends ControllerEx
 		);
 	}
 
-	/** @inheritdoc */
+	/**
+	 * Create new customer
+	 *
+	 * @return array|\api\modules\v1\models\customer\CustomerEx
+	 * @throws \yii\base\InvalidConfigException
+	 *
+	 * @SWG\Post(
+	 *     path = "/customers",
+	 *     tags = { "Customers" },
+	 *     summary = "Create new customer",
+	 *     description = "Creates new customer",
+	 *
+	 *     @SWG\Parameter(
+	 *          name = "Customer", in = "body", required = true,
+	 *          @SWG\Schema( ref = "#/definitions/CustomerForm" ),
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 201,
+	 *          description = "Customer created successfully",
+	 *          @SWG\Schema(
+	 *              ref = "#/definitions/Customer"
+	 *            ),
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 400,
+	 *          description = "Error while creating customer",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 401,
+	 *          description = "Impossible to authenticate user",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 403,
+	 *          description = "User is inactive",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 422,
+	 *          description = "Fields are missing or invalid",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorData" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 500,
+	 *          description = "Unexpected error",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     security = {{
+	 *            "apiTokenAuth": {}
+	 *     }}
+	 * )
+	 */
 	public function actionCreate()
 	{
-		echo 'actionCreate ';
-		print_r($this->apiConsumer->attributes);
-		exit;
+		$form             = new CustomerForm();
+		$form->attributes = $this->request->getBodyParams();
+
+		// Validate that all rules are respected
+		if (!$form->validate()) {
+			return $this->unprocessableError($form->getErrors());
+		}
+
+		// Create new customer
+		$customer = new CustomerEx(['name' => $form->name]);
+		if ($customer->validate() && $customer->save()) {
+			$customer->refresh();
+			return $this->success($customer);
+		} else {
+			return $this->errorMessage(400, 'Could not save customer');
+		}
 	}
 
 	/**

@@ -8,7 +8,7 @@ use yii\base\Model;
 /**
  * Class AuthenticationForm
  *
- * @package api\modules\v1\models
+ * @package api\modules\v1\models\forms
  *
  * @SWG\Definition(
  *     definition = "AuthenticationRequest",

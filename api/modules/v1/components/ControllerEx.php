@@ -69,4 +69,18 @@ class ControllerEx extends Controller
 
 		return ['message' => $message];
 	}
+
+	/**
+	 * Define the response status code to 422 (unprocessable entity) and return the errors.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function unprocessableError ( $data )
+	{
+		$this->response->setStatusCode(422);
+
+		return [ "errors" => $data ];
+	}
 }
