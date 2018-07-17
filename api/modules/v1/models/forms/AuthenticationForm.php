@@ -46,7 +46,7 @@ class AuthenticationForm extends Model
 	public function rules()
 	{
 		return [
-			["key", "required", "message" => 'Field "{attribute}" is required.'],
+			["key", "required", "message" => '{attribute} is required.'],
 			["secret", "required", "message" => 'Field "{attribute}" is required.'],
 		];
 	}

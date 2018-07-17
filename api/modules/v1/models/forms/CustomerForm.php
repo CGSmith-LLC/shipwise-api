@@ -31,7 +31,7 @@ class CustomerForm extends Model
 	public function rules()
 	{
 		return [
-			["name", "required", "message" => 'Field "{attribute}" is required.'],
+			["name", "required", "message" => '{attribute} is required.'],
 			["name", "string", 'length' => [2, 45]],
 		];
 	}
