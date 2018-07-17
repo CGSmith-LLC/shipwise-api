@@ -77,10 +77,10 @@ class ControllerEx extends Controller
 	 *
 	 * @return array
 	 */
-	public function unprocessableError ( $data )
+	public function unprocessableError($data)
 	{
 		$this->response->setStatusCode(422);
 
-		return [ "errors" => $data ];
+		return ['errors' => $data];
 	}
 }
