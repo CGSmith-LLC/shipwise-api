@@ -43,5 +43,3 @@ class BaseState extends \yii\db\ActiveRecord
 		];
 	}
 }
-
-A Product of Yii Software LLC
