@@ -221,6 +221,8 @@ class CustomerController extends ControllerEx
 	/**
 	 * Update customer
 	 *
+	 * @param int $id Customer ID
+	 *
 	 * @return array|\api\modules\v1\models\customer\CustomerEx
 	 * @throws \yii\base\InvalidConfigException
 	 *
@@ -298,7 +300,7 @@ class CustomerController extends ControllerEx
 		}
 
 		// Find the customer to update
-		if (($customer = CustomerEx::findOne((int)$id)) == null) {
+		if (($customer = CustomerEx::findOne((int)$id)) === null) {
 			return $this->errorMessage(404, 'Customer not found');
 		}
 
@@ -312,11 +314,81 @@ class CustomerController extends ControllerEx
 		}
 	}
 
-	/** @inheritdoc */
+	/**
+	 * Delete customer
+	 *
+	 * @param int $id Customer ID
+	 *
+	 * @return array
+	 * @throws \Throwable
+	 * @throws \yii\db\StaleObjectException
+	 *
+	 * @SWG\Delete(
+	 *     path = "/customers/{id}",
+	 *     tags = { "Customers" },
+	 *     summary = "Delete a customer",
+	 *     description = "Deletes a specific customer",
+	 *
+	 *     @SWG\Parameter( name = "id", in = "path", type = "integer", required = true ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 204,
+	 *          description = "Customer deleted successfully",
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 400,
+	 *          description = "Error while deleting customer",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 401,
+	 *          description = "Impossible to authenticate user",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 403,
+	 *          description = "User is inactive",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 404,
+	 *          description = "Customer not found",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 422,
+	 *          description = "Fields are missing or invalid",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorData" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 500,
+	 *          description = "Unexpected error",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     security = {{
+	 *            "apiTokenAuth": {}
+	 *     }}
+	 * )
+	 */
 	public function actionDelete($id)
 	{
-		echo 'actionDelete id: ' . $id;
-		print_r($this->apiConsumer->attributes);
-		exit;
+		// Find the customer to delete
+		if (($customer = CustomerEx::findOne((int)$id)) === null) {
+			return $this->errorMessage(404, 'Customer not found');
+		}
+
+		// Delete customer
+		if (!$customer->delete()) {
+			return $this->errorMessage(400, 'Could not delete customer');
+		}
+
+		$this->response->setStatusCode(204);
 	}
 }
