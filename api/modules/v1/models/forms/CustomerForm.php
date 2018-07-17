@@ -23,9 +23,6 @@ use yii\base\Model;
  */
 class CustomerForm extends Model
 {
-	const SUCCESS            = 1;
-	const ERR_MISSING_FIELDS = 2;
-
 	public $name;
 
 	/**
