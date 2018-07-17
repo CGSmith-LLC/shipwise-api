@@ -69,10 +69,10 @@ class AuthController extends Controller
 	 *
 	 *     @SWG\Parameter(
 	 *          in = "body",
-	 *          name = "AuthenticationRequest",
+	 *          name = "AuthenticationForm",
 	 *          description = "Authentication request form",
 	 *          required = true,
-	 *          @SWG\Schema( ref = "#/definitions/AuthenticationRequest" ),
+	 *          @SWG\Schema( ref = "#/definitions/AuthenticationForm" ),
 	 *     ),
 	 *
 	 *     @SWG\Response(

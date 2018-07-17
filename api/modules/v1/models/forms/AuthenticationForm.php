@@ -11,7 +11,7 @@ use yii\base\Model;
  * @package api\modules\v1\models\forms
  *
  * @SWG\Definition(
- *     definition = "AuthenticationRequest",
+ *     definition = "AuthenticationForm",
  *     required   = { "key", "secret" },
  *     @SWG\Property( property = "key", type = "string", description = "Your API key" ),
  *     @SWG\Property( property = "secret", type = "string", description = "Your API secret" ),

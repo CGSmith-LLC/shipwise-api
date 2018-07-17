@@ -89,7 +89,7 @@ class CustomerController extends ControllerEx
 	 *     description = "Creates new customer",
 	 *
 	 *     @SWG\Parameter(
-	 *          name = "Customer", in = "body", required = true,
+	 *          name = "CustomerForm", in = "body", required = true,
 	 *          @SWG\Schema( ref = "#/definitions/CustomerForm" ),
 	 *     ),
 	 *
