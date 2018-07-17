@@ -7,11 +7,17 @@ use common\models\base\BaseService;
 /**
  * Class Service
  *
- * @todo Generate relations
- *
  * @package common\models
  */
 class Service extends BaseService
 {
-
+	/**
+	 * Get Carrier
+	 *
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getCarrier()
+	{
+		return $this->hasOne('common\models\Carrier', ['id' => 'carrier_id']);
+	}
 }

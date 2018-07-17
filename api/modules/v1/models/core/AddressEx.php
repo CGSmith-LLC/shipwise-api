@@ -22,7 +22,7 @@ class AddressEx extends Address
 	 *     @SWG\Property( property = "address1", type = "string",  description = "Address line 1" ),
 	 *     @SWG\Property( property = "address2", type = "string",  description = "Address line 2" ),
 	 *     @SWG\Property( property = "city", type = "string",  description = "City" ),
-	 *     @SWG\Property( property = "status", ref = "#/definitions/State" ),
+	 *     @SWG\Property( property = "state", ref = "#/definitions/State" ),
 	 *     @SWG\Property( property = "zip", type = "string",  description = "ZIP / Postal Code" ),
 	 *     @SWG\Property( property = "phone", type = "string",  description = "Phone number" ),
 	 *     @SWG\Property( property = "notes", type = "string",  description = "Notes" ),
