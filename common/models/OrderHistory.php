@@ -7,11 +7,17 @@ use common\models\base\BaseOrderHistory;
 /**
  * Class OrderHistory
  *
- * @todo Generate relations
- *
  * @package common\models
  */
 class OrderHistory extends BaseOrderHistory
 {
-
+	/**
+	 * Get Carrier
+	 *
+	 * @return \yii\db\ActiveQuery
+	 */
+	public function getStatus()
+	{
+		return $this->hasOne('common\models\Status', ['id' => 'status_id']);
+	}
 }

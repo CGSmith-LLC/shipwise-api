@@ -46,7 +46,6 @@ class DefaultController extends Controller
 					Yii::getAlias("@api/modules/v1/swagger"),
 					Yii::getAlias("@api/modules/v1/controllers"),
 					Yii::getAlias("@api/modules/v1/models"),
-					Yii::getAlias("@common/models"),
 				],
 			],
 		];
