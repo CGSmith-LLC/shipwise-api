@@ -5,9 +5,7 @@ namespace common\models;
 use common\models\base\BaseItem;
 
 /**
- * Class Item`
- *
- * @todo Generate relations
+ * Class Item
  *
  * @package common\models
  */
