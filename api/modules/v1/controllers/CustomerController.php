@@ -138,6 +138,7 @@ class CustomerController extends ControllerEx
 	 */
 	public function actionCreate()
 	{
+		// Build the Customer Form with the attributes sent in request
 		$form             = new CustomerForm();
 		$form->attributes = $this->request->getBodyParams();
 
@@ -217,12 +218,98 @@ class CustomerController extends ControllerEx
 		}
 	}
 
-	/** @inheritdoc */
+	/**
+	 * Update customer
+	 *
+	 * @return array|\api\modules\v1\models\customer\CustomerEx
+	 * @throws \yii\base\InvalidConfigException
+	 *
+	 * @SWG\Put(
+	 *     path = "/customers/{id}",
+	 *     tags = { "Customers" },
+	 *     summary = "Update a specific customer",
+	 *     description = "Updates an existing customer",
+	 *
+	 *     @SWG\Parameter( name = "id", in = "path", type = "integer", required = true ),
+	 *
+	 *     @SWG\Parameter(
+	 *          name = "CustomerForm", in = "body", required = true,
+	 *          @SWG\Schema( ref = "#/definitions/CustomerForm" ),
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 200,
+	 *          description = "Successful operation. Response contains updated customer.",
+	 *          @SWG\Schema(
+	 *              ref = "#/definitions/Customer"
+	 *            ),
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 400,
+	 *          description = "Error while updating customer",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 401,
+	 *          description = "Impossible to authenticate user",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 403,
+	 *          description = "User is inactive",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 404,
+	 *          description = "Customer not found",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 422,
+	 *          description = "Fields are missing or invalid",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorData" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 500,
+	 *          description = "Unexpected error",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     security = {{
+	 *            "apiTokenAuth": {}
+	 *     }}
+	 * )
+	 */
 	public function actionUpdate($id)
 	{
-		echo 'actionUpdate id: ' . $id;
-		print_r($this->apiConsumer->attributes);
-		exit;
+		// Build the Customer Form with the attributes sent in request
+		$form             = new CustomerForm();
+		$form->attributes = $this->request->getBodyParams();
+
+		// Validate that all rules are respected
+		if (!$form->validate()) {
+			return $this->unprocessableError($form->getErrors());
+		}
+
+		// Find the customer to update
+		if (($customer = CustomerEx::findOne((int)$id)) == null) {
+			return $this->errorMessage(404, 'Customer not found');
+		}
+
+		// Save customer
+		$customer->setAttributes($form->attributes);
+		if ($customer->validate() && $customer->save()) {
+			$customer->refresh();
+			return $this->success($customer);
+		} else {
+			return $this->errorMessage(400, 'Could not save customer');
+		}
 	}
 
 	/** @inheritdoc */

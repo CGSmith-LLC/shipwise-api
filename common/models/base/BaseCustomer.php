@@ -25,7 +25,7 @@ class BaseCustomer extends \yii\db\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['created_date'], 'safe'],
+			[['name', 'created_date'], 'safe'],
 			[['name'], 'string', 'max' => 45],
 		];
 	}
