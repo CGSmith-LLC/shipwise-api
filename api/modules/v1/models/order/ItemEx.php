@@ -19,7 +19,7 @@ class ItemEx extends Item
 	 *
 	 *     @SWG\Property( property = "id",   type = "integer", description = "Item ID" ),
 	 *     @SWG\Property( property = "quantity", type = "integer", description = "Quantity" ),
-	 *     @SWG\Property( property = "sku", type = "integer", description = "SKU" ),
+	 *     @SWG\Property( property = "sku", type = "string", description = "SKU" ),
 	 *     @SWG\Property( property = "name", type = "string", description = "Item name" ),
 	 * )
 	 */
