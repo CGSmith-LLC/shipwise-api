@@ -71,10 +71,13 @@ class OrderController extends ControllerEx
 	 */
 	public function actionIndex()
 	{
-		// @todo Authorization: Retrieve orders that only belong to api user customer
-
+		// @todo Paginate results
+		
 		return $this->success(
-			OrderEx::find()->limit(10)->all()
+			OrderEx::find()
+				->forCustomer($this->apiConsumer->customer->id)
+				->limit(10)
+				->all()
 		);
 	}
 
@@ -217,11 +220,11 @@ class OrderController extends ControllerEx
 	{
 		// @todo Authorization: Check order ownership
 
-		if (($order = OrderEx::findOne((int)$id)) !== null) {
-			return $this->success($order);
-		} else {
+		if (($order = OrderEx::findOne((int)$id)) === null) {
 			return $this->errorMessage(404, 'Order not found');
 		}
+
+		return $this->success($order);
 	}
 
 	/**

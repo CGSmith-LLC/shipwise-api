@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseOrder;
+use common\models\query\OrderQuery;
 
 /**
  * Class Order
@@ -11,6 +12,15 @@ use common\models\base\BaseOrder;
  */
 class Order extends BaseOrder
 {
+	/**
+	 * @inheritdoc
+	 * @return OrderQuery the active query used by this AR class.
+	 */
+	public static function find()
+	{
+		return new OrderQuery(get_called_class());
+	}
+
 	/**
 	 * Get Customer
 	 *

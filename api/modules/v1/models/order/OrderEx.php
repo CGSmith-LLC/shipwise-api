@@ -122,7 +122,7 @@ class OrderEx extends Order
 	 */
 	public function getTrackingInfo()
 	{
-		// Uncomment this line to return TrackingInfo relation, and remove everything after this line.
+		// Uncomment this line to return TrackingInfoEx relation, and remove everything after this line.
 		// return $this->hasOne('api\modules\v1\models\order\TrackingInfoEx', ['id' => 'tracking_id']);
 
 		$trackingInfo           = new TrackingInfoEx();
