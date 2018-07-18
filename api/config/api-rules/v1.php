@@ -20,7 +20,13 @@ return [
 	"DELETE  $version/auth" => "$version/auth/logout",
 
 	// Orders
-	// @todo
+	[
+		"class"      => 'yii\rest\UrlRule',
+		"controller" => ["$version/order"],
+	],
+	// @todo Add two missing endpoints for Orders:
+	// `/orders/{orderID}/items` - Fetch order items
+	// `/orders/findByStatus` - Fetch orders by status
 
 	// Customers
 	[
