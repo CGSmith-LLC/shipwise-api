@@ -3,15 +3,15 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
-use api\modules\v1\models\customer\CustomerEx;
-use api\modules\v1\models\forms\CustomerForm;
+use api\modules\v1\models\order\OrderEx;
+use api\modules\v1\models\forms\OrderForm;
 
 /**
- * Class CustomerController
+ * Class OrderController
  *
  * @package api\modules\v1\controllers
  */
-class CustomerController extends ControllerEx
+class OrderController extends ControllerEx
 {
 	/** @inheritdoc */
 	protected function verbs()
@@ -26,23 +26,23 @@ class CustomerController extends ControllerEx
 	}
 
 	/**
-	 * Get all customers
-	 * @todo Paginate results?
+	 * Get all orders
+	 * @todo Pagination
 	 *
-	 * @return \api\modules\v1\models\customer\CustomerEx[]
+	 * @return \api\modules\v1\models\order\OrderEx[]
 	 *
 	 * @SWG\Get(
-	 *     path = "/customers",
-	 *     tags = { "Customers" },
-	 *     summary = "Fetch all customers",
-	 *     description = "Get all customers",
+	 *     path = "/orders",
+	 *     tags = { "Orders" },
+	 *     summary = "Fetch all orders",
+	 *     description = "Fetch all orders for authenticated user",
 	 *
 	 *     @SWG\Response(
 	 *          response = 200,
-	 *          description = "Successful operation. Response contains a list of customers.",
+	 *          description = "Successful operation. Response contains a list of orders.",
 	 *          @SWG\Schema(
 	 *              type = "array",
-	 *     			@SWG\Items( ref = "#/definitions/Customer" )
+	 *     			@SWG\Items( ref = "#/definitions/Order" )
 	 *            ),
 	 *     ),
 	 *
@@ -71,39 +71,41 @@ class CustomerController extends ControllerEx
 	 */
 	public function actionIndex()
 	{
+		// @todo Authorization: Retrieve orders that only belong to api user customer
+
 		return $this->success(
-			CustomerEx::find()->all()
+			OrderEx::find()->limit(10)->all()
 		);
 	}
 
 	/**
-	 * Create new customer
+	 * Create new order
 	 *
-	 * @return array|\api\modules\v1\models\customer\CustomerEx
+	 * @return array|\api\modules\v1\models\order\OrderEx
 	 * @throws \yii\base\InvalidConfigException
 	 *
 	 * @SWG\Post(
-	 *     path = "/customers",
-	 *     tags = { "Customers" },
-	 *     summary = "Create new customer",
-	 *     description = "Creates new customer",
+	 *     path = "/orders",
+	 *     tags = { "Orders" },
+	 *     summary = "Create new order",
+	 *     description = "Creates new order",
 	 *
 	 *     @SWG\Parameter(
-	 *          name = "CustomerForm", in = "body", required = true,
-	 *          @SWG\Schema( ref = "#/definitions/CustomerForm" ),
+	 *          name = "OrderForm", in = "body", required = true,
+	 *          @SWG\Schema( ref = "#/definitions/OrderForm" ),
 	 *     ),
 	 *
 	 *     @SWG\Response(
 	 *          response = 201,
-	 *          description = "Customer created successfully",
+	 *          description = "Order created successfully",
 	 *          @SWG\Schema(
-	 *              ref = "#/definitions/Customer"
+	 *              ref = "#/definitions/Order"
 	 *            ),
 	 *     ),
 	 *
 	 *     @SWG\Response(
 	 *          response = 400,
-	 *          description = "Error while creating customer",
+	 *          description = "Error while creating order",
 	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
 	 *       ),
 	 *
@@ -138,8 +140,8 @@ class CustomerController extends ControllerEx
 	 */
 	public function actionCreate()
 	{
-		// Build the Customer Form with the attributes sent in request
-		$form             = new CustomerForm();
+		// Build the Order Form with the attributes sent in request
+		$form             = new OrderForm();
 		$form->attributes = $this->request->getBodyParams();
 
 		// Validate that all rules are respected
@@ -147,36 +149,38 @@ class CustomerController extends ControllerEx
 			return $this->unprocessableError($form->getErrors());
 		}
 
-		// Create new customer
-		$customer = new CustomerEx(['name' => $form->name]);
-		if ($customer->validate() && $customer->save()) {
-			$customer->refresh();
-			return $this->success($customer);
+		// @todo Create Order with all related entities.
+
+		// Create new order
+		/*$order = new OrderEx(['name' => $form->name]);
+		if ($order->validate() && $order->save()) {
+			$order->refresh();
+			return $this->success($order);
 		} else {
-			return $this->errorMessage(400, 'Could not save customer');
-		}
+			return $this->errorMessage(400, 'Could not save order');
+		}*/
 	}
 
 	/**
-	 * Get a specific customer
+	 * Get a specific order
 	 *
-	 * @param int $id Customer ID
+	 * @param int $id Order ID
 	 *
-	 * @return array|\api\modules\v1\models\customer\CustomerEx
+	 * @return array|\api\modules\v1\models\order\OrderEx
 	 *
 	 * @SWG\Get(
-	 *     path = "/customers/{id}",
-	 *     tags = { "Customers" },
-	 *     summary = "Fetch a specific customer",
-	 *     description = "Fetch a specific customer with full details by ID",
+	 *     path = "/orders/{id}",
+	 *     tags = { "Orders" },
+	 *     summary = "Fetch a specific order",
+	 *     description = "Fetch a specific order with full details by order ID",
 	 *
 	 *     @SWG\Parameter( name = "id", in = "path", type = "integer", required = true ),
 	 *
 	 *     @SWG\Response(
 	 *          response = 200,
-	 *          description = "Successful operation. Response contains the customer found.",
+	 *          description = "Successful operation. Response contains the order found.",
 	 *          @SWG\Schema(
-	 *              ref = "#/definitions/Customer"
+	 *              ref = "#/definitions/Order"
 	 *            ),
 	 *     ),
 	 *
@@ -194,7 +198,7 @@ class CustomerController extends ControllerEx
 	 *
 	 *     @SWG\Response(
 	 *          response = 404,
-	 *          description = "Customer not found",
+	 *          description = "Order not found",
 	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
 	 *     ),
 	 *
@@ -211,45 +215,47 @@ class CustomerController extends ControllerEx
 	 */
 	public function actionView($id)
 	{
-		if (($customer = CustomerEx::findOne((int)$id)) !== null) {
-			return $this->success($customer);
+		// @todo Authorization: Check order ownership
+
+		if (($order = OrderEx::findOne((int)$id)) !== null) {
+			return $this->success($order);
 		} else {
-			return $this->errorMessage(404, 'Customer not found');
+			return $this->errorMessage(404, 'Order not found');
 		}
 	}
 
 	/**
-	 * Update customer
+	 * Update order
 	 *
-	 * @param int $id Customer ID
+	 * @param int $id Order ID
 	 *
-	 * @return array|\api\modules\v1\models\customer\CustomerEx
+	 * @return array|\api\modules\v1\models\order\OrderEx
 	 * @throws \yii\base\InvalidConfigException
 	 *
 	 * @SWG\Put(
-	 *     path = "/customers/{id}",
-	 *     tags = { "Customers" },
-	 *     summary = "Update a specific customer",
-	 *     description = "Updates an existing customer",
+	 *     path = "/orders/{id}",
+	 *     tags = { "Orders" },
+	 *     summary = "Update a specific order",
+	 *     description = "Updates an existing order",
 	 *
 	 *     @SWG\Parameter( name = "id", in = "path", type = "integer", required = true ),
 	 *
 	 *     @SWG\Parameter(
-	 *          name = "CustomerForm", in = "body", required = true,
-	 *          @SWG\Schema( ref = "#/definitions/CustomerForm" ),
+	 *          name = "OrderForm", in = "body", required = true,
+	 *          @SWG\Schema( ref = "#/definitions/OrderForm" ),
 	 *     ),
 	 *
 	 *     @SWG\Response(
 	 *          response = 200,
-	 *          description = "Successful operation. Response contains updated customer.",
+	 *          description = "Successful operation. Response contains updated order.",
 	 *          @SWG\Schema(
-	 *              ref = "#/definitions/Customer"
+	 *              ref = "#/definitions/Order"
 	 *            ),
 	 *     ),
 	 *
 	 *     @SWG\Response(
 	 *          response = 400,
-	 *          description = "Error while updating customer",
+	 *          description = "Error while updating order",
 	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
 	 *       ),
 	 *
@@ -267,7 +273,7 @@ class CustomerController extends ControllerEx
 	 *
 	 *     @SWG\Response(
 	 *          response = 404,
-	 *          description = "Customer not found",
+	 *          description = "Order not found",
 	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
 	 *     ),
 	 *
@@ -290,8 +296,8 @@ class CustomerController extends ControllerEx
 	 */
 	public function actionUpdate($id)
 	{
-		// Build the Customer Form with the attributes sent in request
-		$form             = new CustomerForm();
+		// Build the Order Form with the attributes sent in request
+		$form             = new OrderForm();
 		$form->attributes = $this->request->getBodyParams();
 
 		// Validate that all rules are respected
@@ -299,46 +305,49 @@ class CustomerController extends ControllerEx
 			return $this->unprocessableError($form->getErrors());
 		}
 
-		// Find the customer to update
-		if (($customer = CustomerEx::findOne((int)$id)) === null) {
-			return $this->errorMessage(404, 'Customer not found');
+		// Find the order to update
+		if (($order = OrderEx::findOne((int)$id)) === null) {
+			return $this->errorMessage(404, 'Order not found');
 		}
 
-		// Save customer
-		$customer->setAttributes($form->attributes);
-		if ($customer->validate() && $customer->save()) {
-			$customer->refresh();
-			return $this->success($customer);
+		// @todo Authorization: Check order ownership
+		// @todo Update order with all related entities.
+
+		// Save order
+		/*$order->setAttributes($form->attributes);
+		if ($order->validate() && $order->save()) {
+			$order->refresh();
+			return $this->success($order);
 		} else {
-			return $this->errorMessage(400, 'Could not save customer');
-		}
+			return $this->errorMessage(400, 'Could not save order');
+		}*/
 	}
 
 	/**
-	 * Delete customer
+	 * Delete order
 	 *
-	 * @param int $id Customer ID
+	 * @param int $id Order ID
 	 *
 	 * @return array
 	 * @throws \Throwable
 	 * @throws \yii\db\StaleObjectException
 	 *
 	 * @SWG\Delete(
-	 *     path = "/customers/{id}",
-	 *     tags = { "Customers" },
-	 *     summary = "Delete a customer",
-	 *     description = "Deletes a specific customer",
+	 *     path = "/orders/{id}",
+	 *     tags = { "Orders" },
+	 *     summary = "Delete an order",
+	 *     description = "Deletes a specific order",
 	 *
 	 *     @SWG\Parameter( name = "id", in = "path", type = "integer", required = true ),
 	 *
 	 *     @SWG\Response(
 	 *          response = 204,
-	 *          description = "Customer deleted successfully",
+	 *          description = "Order deleted successfully",
 	 *     ),
 	 *
 	 *     @SWG\Response(
 	 *          response = 400,
-	 *          description = "Error while deleting customer",
+	 *          description = "Error while deleting order",
 	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
 	 *       ),
 	 *
@@ -356,7 +365,7 @@ class CustomerController extends ControllerEx
 	 *
 	 *     @SWG\Response(
 	 *          response = 404,
-	 *          description = "Customer not found",
+	 *          description = "Order not found",
 	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
 	 *     ),
 	 *
@@ -379,14 +388,17 @@ class CustomerController extends ControllerEx
 	 */
 	public function actionDelete($id)
 	{
-		// Find the customer to delete
-		if (($customer = CustomerEx::findOne((int)$id)) === null) {
-			return $this->errorMessage(404, 'Customer not found');
+		// Find the order to delete
+		if (($order = OrderEx::findOne((int)$id)) === null) {
+			return $this->errorMessage(404, 'Order not found');
 		}
 
-		// Delete customer
-		if (!$customer->delete()) {
-			return $this->errorMessage(400, 'Could not delete customer');
+		// @todo Authorization: Check order ownership
+		// @todo Delete order with all related entities which should be deleted
+
+		// Delete order
+		if (!$order->delete()) {
+			return $this->errorMessage(400, 'Could not delete order');
 		}
 
 		$this->response->setStatusCode(204);
