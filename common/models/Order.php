@@ -34,20 +34,11 @@ class Order extends BaseOrder
 	/**
 	 * Get Tracking Info
 	 *
-	 * @todo This method is done in prevision of the future implementation of TrackingInfo relation.
-	 *       As for now, and before that transition happen, this method will imitate the return of a TrackingInfo object
-	 *       but only `TrackingInfo.tracking` property will be populated.
-	 *
 	 * @return \yii\db\ActiveQuery
 	 */
 	public function getTrackingInfo()
 	{
-		// Uncomment this line to return TrackingInfo relation, and remove everything after this line.
-		// return $this->hasOne('common\models\TrackingInfo', ['id' => 'tracking_id']);
-
-		$trackingInfo           = new TrackingInfo();
-		$trackingInfo->tracking = $this->tracking;
-		return $trackingInfo;
+		return $this->hasOne('common\models\TrackingInfo', ['id' => 'tracking_id']);
 	}
 
 	/**
