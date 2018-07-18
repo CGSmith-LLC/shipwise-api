@@ -12,7 +12,7 @@ use common\models\base\BaseOrderHistory;
 class OrderHistory extends BaseOrderHistory
 {
 	/**
-	 * Get Carrier
+	 * Get Status
 	 *
 	 * @return \yii\db\ActiveQuery
 	 */

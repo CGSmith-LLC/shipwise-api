@@ -17,7 +17,7 @@ class OrderHistoryEx extends OrderHistory
 	 * @SWG\Definition(
 	 *     definition = "OrderHistory",
 	 *
-	 *     @SWG\Property( property = "id",   type = "integer", description = "Order history ID" ),
+	 *     @SWG\Property( property = "id", type = "integer", description = "Order history ID" ),
 	 *     @SWG\Property( property = "status", ref = "#/definitions/Status" ),
 	 *     @SWG\Property( property = "createdDate", type = "string", format = "date-time" ),
 	 *     @SWG\Property( property = "comment", type = "string", description = "Order history comment" ),
