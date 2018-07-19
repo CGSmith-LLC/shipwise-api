@@ -3,6 +3,8 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
+use yii\helpers\ArrayHelper;
+use yii\data\ActiveDataProvider;
 use api\modules\v1\models\order\OrderEx;
 use api\modules\v1\models\forms\OrderForm;
 
@@ -26,8 +28,22 @@ class OrderController extends ControllerEx
 	}
 
 	/**
+	 * @inheritdoc
+	 * @return array
+	 */
+	public function behaviors()
+	{
+		return ArrayHelper::merge(parent::behaviors(), [
+			'Pagination' => [
+				'class' => 'api\modules\v1\components\parameters\Pagination',
+			],
+			'Search'     => 'api\modules\v1\components\parameters\Search',
+			'Limit'      => 'api\modules\v1\components\parameters\Limit',
+		]);
+	}
+
+	/**
 	 * Get all orders
-	 * @todo Pagination
 	 *
 	 * @return \api\modules\v1\models\order\OrderEx[]
 	 *
@@ -36,10 +52,45 @@ class OrderController extends ControllerEx
 	 *     tags = { "Orders" },
 	 *     summary = "Fetch all orders",
 	 *     description = "Fetch all orders for authenticated user",
+	 *     @SWG\Parameter(
+	 *                name = "page",
+	 *                in = "query",
+	 *                type = "integer",
+	 *                description = "The zero-based current page number", default = 0
+	 *            ),
+	 *     @SWG\Parameter(
+	 *                name = "per-page",
+	 *                in = "query",
+	 *                type = "integer",
+	 *                description = "The number of items per page",
+	 *                default = 10
+	 *            ),
 	 *
 	 *     @SWG\Response(
 	 *          response = 200,
 	 *          description = "Successful operation. Response contains a list of orders.",
+	 *          headers = {
+	 *              @SWG\Header(
+	 *                    header = "X-Pagination-Total-Count",
+	 *                    description = "The total number of resources",
+	 *                    type = "integer",
+	 *                ),
+	 *              @SWG\Header(
+	 *                      header = "X-Pagination-Page-Count",
+	 *                      description = "The number of pages",
+	 *                      type = "integer",
+	 *                ),
+	 *              @SWG\Header(
+	 *                      header = "X-Pagination-Current-Page",
+	 *                      description = "The current page (1-based)",
+	 *                      type = "integer",
+	 *                ),
+	 *              @SWG\Header(
+	 *                      header = "X-Pagination-Per-Page",
+	 *                      description = "The number of resources in each page",
+	 *                    type = "integer",
+	 *                ),
+	 *            },
 	 *          @SWG\Schema(
 	 *              type = "array",
 	 *     			@SWG\Items( ref = "#/definitions/Order" )
@@ -81,14 +132,13 @@ class OrderController extends ControllerEx
 			? $this->apiConsumer->customer->id
 			: null;
 
-		// @todo Paginate results
+		// Get paginated results
+		$provider = new ActiveDataProvider([
+			'query'      => OrderEx::find()->forCustomer($customerId),
+			'pagination' => $this->pagination,
+		]);
 
-		$orders = OrderEx::find()
-			->forCustomer($customerId)
-			->limit(100)
-			->all();
-
-		return $this->success($orders);
+		return $this->success($provider);
 	}
 
 	/**
