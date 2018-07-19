@@ -27,7 +27,7 @@ class CustomerController extends ControllerEx
 
 	/**
 	 * Get all customers
-	 * @todo Paginate results?
+	 * @todo Paginate results? If so, @see OrderController::actionIndex() for reference.
 	 *
 	 * @return \api\modules\v1\models\customer\CustomerEx[]
 	 *
@@ -148,8 +148,16 @@ class CustomerController extends ControllerEx
 		}
 
 		// Create new customer
-		$customer = new CustomerEx(['name' => $form->name]);
-		if ($customer->validate() && $customer->save()) {
+		$customer = new CustomerEx();
+		$customer->setAttributes($form->attributes);
+
+		// Validate the customer model itself
+		if (!$customer->validate()) {
+			// if you get here then you should add more validation rules to CustomerForm
+			return $this->unprocessableError($customer->getErrors());
+		}
+
+		if ($customer->save()) {
 			$customer->refresh();
 			return $this->success($customer);
 		} else {
@@ -303,10 +311,16 @@ class CustomerController extends ControllerEx
 		if (($customer = CustomerEx::findOne((int)$id)) === null) {
 			return $this->errorMessage(404, 'Customer not found');
 		}
+		$customer->setAttributes($form->attributes);
+
+		// Validate the customer model itself
+		if (!$customer->validate()) {
+			// if you get here then you should add more validation rules to CustomerForm
+			return $this->unprocessableError($customer->getErrors());
+		}
 
 		// Save customer
-		$customer->setAttributes($form->attributes);
-		if ($customer->validate() && $customer->save()) {
+		if ($customer->save()) {
 			$customer->refresh();
 			return $this->success($customer);
 		} else {

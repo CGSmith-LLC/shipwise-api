@@ -215,8 +215,16 @@ class OrderController extends ControllerEx
 		// @todo Create Order with all related entities.
 
 		// Create new order
-		/*$order = new OrderEx(['name' => $form->name]);
-		if ($order->validate() && $order->save()) {
+		/*$order = new OrderEx();
+		$order->setAttributes($form->attributes);
+
+		// Validate the order model itself
+		if (!$order->validate()) {
+			// if you get here then you should add more validation rules to OrderForm
+			return $this->unprocessableError($order->getErrors());
+		}
+
+		if ($order->save()) {
 			$order->refresh();
 			return $this->success($order);
 		} else {
@@ -376,9 +384,16 @@ class OrderController extends ControllerEx
 		// @todo Authorization: Check order ownership
 		// @todo Update order with all related entities.
 
+		$order->setAttributes($form->attributes);
+
+		// Validate the order model itself
+		/*if (!$order->validate()) {
+			// if you get here then you should add more validation rules to OrderForm
+			return $this->unprocessableError($order->getErrors());
+		}
+
 		// Save order
-		/*$order->setAttributes($form->attributes);
-		if ($order->validate() && $order->save()) {
+		if (!$order->save()) {
 			$order->refresh();
 			return $this->success($order);
 		} else {
