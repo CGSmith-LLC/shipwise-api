@@ -32,13 +32,17 @@ class OrderQuery extends \yii\db\ActiveQuery
 	/**
 	 * Query condition to get orders for given customer id
 	 *
+	 * We assume that if $id passed is null then no condition to apply
+	 *
 	 * @param int $id Customer Id
 	 *
 	 * @return OrderQuery
 	 */
 	public function forCustomer($id)
 	{
-		return $this->andOnCondition([Order::tableName() .  '.customer_id' => $id]);
+		return is_numeric($id)
+			? $this->andOnCondition([Order::tableName() . '.customer_id' => $id])
+			: $this;
 	}
 
 	/**
@@ -50,6 +54,6 @@ class OrderQuery extends \yii\db\ActiveQuery
 	 */
 	public function byStatus($id)
 	{
-		return $this->andOnCondition([Order::tableName() .  '.status_id' => $id]);
+		return $this->andOnCondition([Order::tableName() . '.status_id' => $id]);
 	}
 }

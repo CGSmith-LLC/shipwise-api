@@ -60,4 +60,14 @@ class ApiConsumer extends BaseApiConsumer
 	{
 		return (bool)($this->status == self::STATUS_ACTIVE);
 	}
+
+	/**
+	 * Whether this Api consumer is a customer
+	 *
+	 * @return bool
+	 */
+	public function isCustomer()
+	{
+		return (bool)isset($this->customer);
+	}
 }

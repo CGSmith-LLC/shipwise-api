@@ -71,14 +71,24 @@ class OrderController extends ControllerEx
 	 */
 	public function actionIndex()
 	{
+		/**
+		 * If Api consumer is a customer, then retrieve his orders,
+		 * if not, we assume that the Api consumer is a superuser and return all orders
+		 * @see \api\modules\v1\components\security\ApiConsumerSecurity
+		 * @see \common\models\ApiConsumer
+		 */
+		$customerId = $this->apiConsumer->isCustomer()
+			? $this->apiConsumer->customer->id
+			: null;
+
 		// @todo Paginate results
-		
-		return $this->success(
-			OrderEx::find()
-				->forCustomer($this->apiConsumer->customer->id)
-				->limit(10)
-				->all()
-		);
+
+		$orders = OrderEx::find()
+			->forCustomer($customerId)
+			->limit(100)
+			->all();
+
+		return $this->success($orders);
 	}
 
 	/**
