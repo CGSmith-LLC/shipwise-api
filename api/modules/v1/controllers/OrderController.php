@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use api\modules\v1\models\order\OrderEx;
 use api\modules\v1\models\forms\OrderForm;
+use api\modules\v1\models\forms\AddressForm;
 
 /**
  * Class OrderController
@@ -204,19 +205,28 @@ class OrderController extends ControllerEx
 	public function actionCreate()
 	{
 		// Build the Order Form with the attributes sent in request
-		$form             = new OrderForm();
-		$form->attributes = $this->request->getBodyParams();
+		$orderForm           = new OrderForm();
+		$orderForm->scenario = OrderForm::SCENARIO_DEFAULT;
+		$orderForm->setAttributes($this->request->getBodyParams());
 
-		// Validate that all rules are respected
-		if (!$form->validate()) {
-			return $this->unprocessableError($form->getErrors());
+		// Validate all related models and return errors if any
+		if (!$orderForm->validateAll()) {
+			$errors = $orderForm->getErrors();
+			if (isset($orderForm->shipTo) && $orderForm->shipTo->hasErrors()) {
+				$errors = ArrayHelper::merge($errors, ['shipTo' => $orderForm->shipTo->getErrors()]);
+			}
+			if (isset($orderForm->tracking) && $orderForm->tracking->hasErrors()) {
+				$errors = ArrayHelper::merge($errors, ['tracking' => $orderForm->tracking->getErrors()]);
+			}
+			return $this->unprocessableError($errors);
 		}
 
 		// @todo Create Order with all related entities.
 
 		// Create new order
 		/*$order = new OrderEx();
-		$order->setAttributes($form->attributes);
+		$order->setAttributes($orderForm->attributes);
+		$order->customer_id = $this->apiConsumer->customer->id;
 
 		// Validate the order model itself
 		if (!$order->validate()) {

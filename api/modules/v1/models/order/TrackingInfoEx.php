@@ -19,7 +19,7 @@ class TrackingInfoEx extends TrackingInfo
 	 *
 	 *     @SWG\Property( property = "id", type = "integer", description = "Tracking Info ID" ),
 	 *     @SWG\Property( property = "service", ref = "#/definitions/Service" ),
-	 *     @SWG\Property( property = "trackingNumber", type = "string", description = "Carrier's tracking number" ),
+	 *     @SWG\Property( property = "trackingNumber", type = "string", description = "Tracking number" ),
 	 *     @SWG\Property( property = "createdDate", type = "string", format = "date-time" ),
 	 * )
 	 */

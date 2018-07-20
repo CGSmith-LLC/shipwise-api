@@ -13,7 +13,6 @@ class StatusEx extends Status
 {
 	/**
 	 * @inheritdoc
-	 * @todo Add constants with status codes (enum)
 	 *
 	 * @SWG\Definition(
 	 *     definition = "Status",
