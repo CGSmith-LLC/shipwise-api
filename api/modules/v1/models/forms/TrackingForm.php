@@ -3,6 +3,7 @@
 namespace api\modules\v1\models\forms;
 
 use yii\base\Model;
+use api\modules\v1\models\core\ServiceEx;
 
 /**
  * Class TrackingForm
@@ -54,8 +55,15 @@ class TrackingForm extends Model
 	{
 		return [
 			[['serviceId', 'trackingNumber'], 'required', 'message' => '{attribute} is required.'],
-			['serviceId', 'integer'],
 			['trackingNumber', 'string', 'length' => [2, 100]],
+			['serviceId', 'integer'],
+			[
+				'serviceId',
+				'in',
+				'range'   => ServiceEx::getIdsAsArray(),
+				'message' => '{attribute} value is incorrect. Valid values are: ' .
+					implode(ServiceEx::getIdsAsArray(), ', '),
+			],
 		];
 	}
 }

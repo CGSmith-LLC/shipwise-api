@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseService;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Service
@@ -19,5 +20,15 @@ class Service extends BaseService
 	public function getCarrier()
 	{
 		return $this->hasOne('common\models\Carrier', ['id' => 'carrier_id']);
+	}
+
+	/**
+	 * Get array of Service ids
+	 *
+	 * @return array
+	 */
+	public static function getIdsAsArray()
+	{
+		return ArrayHelper::getColumn(self::find()->select('id')->asArray()->all(), 'id');
 	}
 }

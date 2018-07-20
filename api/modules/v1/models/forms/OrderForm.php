@@ -118,8 +118,6 @@ class OrderForm extends Model
 			$trackingValidated = $this->tracking->validate();
 		}
 
-		// \yii\helpers\VarDumper::dump($shipTo->attributes);exit;
-
 		return ($orderValidated && $shipToValidated && $trackingValidated);
 	}
 
@@ -132,10 +130,10 @@ class OrderForm extends Model
 	{
 		$errors = $this->getErrors();
 
-		if (isset($this->shipTo) && $this->shipTo->hasErrors()) {
+		if (is_object($this->shipTo) && $this->shipTo->hasErrors()) {
 			$errors = ArrayHelper::merge($errors, ['shipTo' => $this->shipTo->getErrors()]);
 		}
-		if (isset($this->tracking) && $this->tracking->hasErrors()) {
+		if (is_object($this->tracking) && $this->tracking->hasErrors()) {
 			$errors = ArrayHelper::merge($errors, ['tracking' => $this->tracking->getErrors()]);
 		}
 
