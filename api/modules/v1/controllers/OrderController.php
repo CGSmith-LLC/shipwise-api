@@ -209,16 +209,9 @@ class OrderController extends ControllerEx
 		$orderForm->scenario = OrderForm::SCENARIO_DEFAULT;
 		$orderForm->setAttributes($this->request->getBodyParams());
 
-		// Validate all related models and return errors if any
+		// Validate OrderForm and its related models, return errors if any
 		if (!$orderForm->validateAll()) {
-			$errors = $orderForm->getErrors();
-			if (isset($orderForm->shipTo) && $orderForm->shipTo->hasErrors()) {
-				$errors = ArrayHelper::merge($errors, ['shipTo' => $orderForm->shipTo->getErrors()]);
-			}
-			if (isset($orderForm->tracking) && $orderForm->tracking->hasErrors()) {
-				$errors = ArrayHelper::merge($errors, ['tracking' => $orderForm->tracking->getErrors()]);
-			}
-			return $this->unprocessableError($errors);
+			return $this->unprocessableError($orderForm->getErrorsAll());
 		}
 
 		// @todo Create Order with all related entities.

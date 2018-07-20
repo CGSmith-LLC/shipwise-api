@@ -3,6 +3,7 @@
 namespace api\modules\v1\models\forms;
 
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 use api\modules\v1\models\order\StatusEx;
 
 /**
@@ -120,6 +121,25 @@ class OrderForm extends Model
 		// \yii\helpers\VarDumper::dump($shipTo->attributes);exit;
 
 		return ($orderValidated && $shipToValidated && $trackingValidated);
+	}
+
+	/**
+	 * Returns the errors for all attributes of this model and its related models
+	 *
+	 * @return array
+	 */
+	public function getErrorsAll()
+	{
+		$errors = $this->getErrors();
+
+		if (isset($this->shipTo) && $this->shipTo->hasErrors()) {
+			$errors = ArrayHelper::merge($errors, ['shipTo' => $this->shipTo->getErrors()]);
+		}
+		if (isset($this->tracking) && $this->tracking->hasErrors()) {
+			$errors = ArrayHelper::merge($errors, ['tracking' => $this->tracking->getErrors()]);
+		}
+
+		return $errors;
 	}
 
 }

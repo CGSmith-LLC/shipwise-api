@@ -13,7 +13,7 @@ use yii\helpers\ArrayHelper;
 class Status extends BaseStatus
 {
 	/**
-	 * Get array of State ids
+	 * Get array of Status ids
 	 *
 	 * @return array
 	 */
