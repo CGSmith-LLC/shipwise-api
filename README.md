@@ -34,8 +34,8 @@ api
     config/              contains api configurations
     controllers/         not used
     models/              not used
-    modules/             contains API versions, this is the main folder for API source code.
-                         each module is an API version, example: v1/
+    modules/             contains api versions, this is the main folder for api source code.
+                         each module is an api version, example: v1/
                          each version module contains controller and models specific to that version.
                          data models extend from common/models
                          
