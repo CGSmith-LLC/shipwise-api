@@ -25,7 +25,7 @@ return [
 		"controller"    => ["$version/order"],
 		"extraPatterns" => [
 			"GET  {id}/items"   => "items",
-			"GET  findByStatus" => "findByStatus",
+			"GET  findbystatus" => "findbystatus",
 		],
 	],
 

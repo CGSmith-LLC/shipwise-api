@@ -6,6 +6,7 @@ use api\modules\v1\components\ControllerEx;
 use api\modules\v1\models\core\AddressEx;
 use api\modules\v1\models\order\TrackingInfoEx;
 use api\modules\v1\models\order\ItemEx;
+use api\modules\v1\models\order\StatusEx;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use api\modules\v1\models\order\OrderEx;
@@ -28,7 +29,7 @@ class OrderController extends ControllerEx
 			'view'         => ['GET'],
 			'delete'       => ['DELETE'],
 			'items'        => ['GET'],
-			'findByStatus' => ['GET'],
+			'findbystatus' => ['GET'],
 		];
 	}
 
@@ -56,7 +57,8 @@ class OrderController extends ControllerEx
 	 *                name = "page",
 	 *                in = "query",
 	 *                type = "integer",
-	 *                description = "The zero-based current page number", default = 0
+	 *                description = "The zero-based current page number",
+	 *                default = 0
 	 *            ),
 	 *     @SWG\Parameter(
 	 *                name = "per-page",
@@ -751,5 +753,134 @@ class OrderController extends ControllerEx
 		}
 
 		return $this->success($order->items);
+	}
+
+	/**
+	 * @SWG\Get(
+	 *     path = "/orders/findbystatus",
+	 *     tags = { "Orders" },
+	 *     summary = "Fetch orders by status",
+	 *     description = "Fetch orders by status for authenticated user",
+	 *     @SWG\Parameter(
+	 *                name = "status",
+	 *                in = "query",
+	 *                type = "integer",
+	 *                required = true,
+	 *                enum = {1,9},
+	 *                description = "Status value that need to be considered for filter
+							1 - Shipped
+							9 - Open"
+	 *            ),
+	 *     @SWG\Parameter(
+	 *                name = "page",
+	 *                in = "query",
+	 *                type = "integer",
+	 *                description = "The zero-based current page number",
+	 *                default = 0
+	 *            ),
+	 *     @SWG\Parameter(
+	 *                name = "per-page",
+	 *                in = "query",
+	 *                type = "integer",
+	 *                description = "The number of items per page",
+	 *                default = 10
+	 *            ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 200,
+	 *          description = "Successful operation. Response contains a list of orders.",
+	 *          headers = {
+	 *              @SWG\Header(
+	 *                    header = "X-Pagination-Total-Count",
+	 *                    description = "The total number of resources",
+	 *                    type = "integer",
+	 *                ),
+	 *              @SWG\Header(
+	 *                      header = "X-Pagination-Page-Count",
+	 *                      description = "The number of pages",
+	 *                      type = "integer",
+	 *                ),
+	 *              @SWG\Header(
+	 *                      header = "X-Pagination-Current-Page",
+	 *                      description = "The current page (1-based)",
+	 *                      type = "integer",
+	 *                ),
+	 *              @SWG\Header(
+	 *                      header = "X-Pagination-Per-Page",
+	 *                      description = "The number of resources in each page",
+	 *                    type = "integer",
+	 *                ),
+	 *            },
+	 *          @SWG\Schema(
+	 *              type = "array",
+	 *     			@SWG\Items( ref = "#/definitions/Order" )
+	 *            ),
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 401,
+	 *          description = "Impossible to authenticate user",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 403,
+	 *          description = "User is inactive",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 400,
+	 *          description = "Bad request",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 500,
+	 *          description = "Unexpected error",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     security = {{
+	 *            "apiTokenAuth": {},
+	 *     }}
+	 * )
+	 */
+
+	/**
+	 * Find orders by status
+	 *
+	 * @return \api\modules\v1\models\order\OrderEx[]
+	 */
+	public function actionFindbystatus()
+	{
+		/**
+		 * If Api consumer is a customer, then retrieve his orders,
+		 * if not, we assume that the Api consumer is a superuser and return all orders
+		 * @see \api\modules\v1\components\security\ApiConsumerSecurity
+		 * @see \common\models\ApiConsumer
+		 */
+		$customerId = $this->apiConsumer->isCustomer()
+			? $this->apiConsumer->customer->id
+			: null;
+
+		// Validate status parameter
+		$statusId = (int)$this->request->get('status');
+		if (!StatusEx::find()->where(['id' => $statusId])->exists()) {
+			return $this->errorMessage(
+				400,
+				'Incorrect status value. Valid values are: ' .
+				implode(StatusEx::getIdsAsArray(), ', '));
+		}
+
+		// Get paginated results
+		$provider = new ActiveDataProvider([
+			'query' => OrderEx::find()
+				->forCustomer($customerId)
+				->byStatus($statusId),
+			'pagination' => $this->pagination,
+		]);
+
+		return $this->success($provider);
 	}
 }
