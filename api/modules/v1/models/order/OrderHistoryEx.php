@@ -12,8 +12,6 @@ use common\models\OrderHistory;
 class OrderHistoryEx extends OrderHistory
 {
 	/**
-	 * @inheritdoc
-	 *
 	 * @SWG\Definition(
 	 *     definition = "OrderHistory",
 	 *
@@ -22,6 +20,10 @@ class OrderHistoryEx extends OrderHistory
 	 *     @SWG\Property( property = "createdDate", type = "string", format = "date-time" ),
 	 *     @SWG\Property( property = "comment", type = "string", description = "Order history comment" ),
 	 * )
+	 */
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function fields()
 	{

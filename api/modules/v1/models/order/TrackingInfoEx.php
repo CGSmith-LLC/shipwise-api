@@ -12,8 +12,6 @@ use common\models\TrackingInfo;
 class TrackingInfoEx extends TrackingInfo
 {
 	/**
-	 * @inheritdoc
-	 *
 	 * @SWG\Definition(
 	 *     definition = "TrackingInfo",
 	 *
@@ -22,6 +20,10 @@ class TrackingInfoEx extends TrackingInfo
 	 *     @SWG\Property( property = "trackingNumber", type = "string", description = "Tracking number" ),
 	 *     @SWG\Property( property = "createdDate", type = "string", format = "date-time" ),
 	 * )
+	 */
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function fields()
 	{

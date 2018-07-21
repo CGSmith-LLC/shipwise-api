@@ -77,11 +77,6 @@ class CustomerController extends ControllerEx
 	}
 
 	/**
-	 * Create new customer
-	 *
-	 * @return array|\api\modules\v1\models\customer\CustomerEx
-	 * @throws \yii\base\InvalidConfigException
-	 *
 	 * @SWG\Post(
 	 *     path = "/customers",
 	 *     tags = { "Customers" },
@@ -136,6 +131,13 @@ class CustomerController extends ControllerEx
 	 *     }}
 	 * )
 	 */
+
+	/**
+	 * Create new customer
+	 *
+	 * @return array|\api\modules\v1\models\customer\CustomerEx
+	 * @throws \yii\base\InvalidConfigException
+	 */
 	public function actionCreate()
 	{
 		// Build the Customer Form with the attributes sent in request
@@ -166,12 +168,6 @@ class CustomerController extends ControllerEx
 	}
 
 	/**
-	 * Get a specific customer
-	 *
-	 * @param int $id Customer ID
-	 *
-	 * @return array|\api\modules\v1\models\customer\CustomerEx
-	 *
 	 * @SWG\Get(
 	 *     path = "/customers/{id}",
 	 *     tags = { "Customers" },
@@ -217,6 +213,14 @@ class CustomerController extends ControllerEx
 	 *     }}
 	 * )
 	 */
+
+	/**
+	 * Get a specific customer
+	 *
+	 * @param int $id Customer ID
+	 *
+	 * @return array|\api\modules\v1\models\customer\CustomerEx
+	 */
 	public function actionView($id)
 	{
 		if (($customer = CustomerEx::findOne((int)$id)) !== null) {
@@ -227,13 +231,6 @@ class CustomerController extends ControllerEx
 	}
 
 	/**
-	 * Update customer
-	 *
-	 * @param int $id Customer ID
-	 *
-	 * @return array|\api\modules\v1\models\customer\CustomerEx
-	 * @throws \yii\base\InvalidConfigException
-	 *
 	 * @SWG\Put(
 	 *     path = "/customers/{id}",
 	 *     tags = { "Customers" },
@@ -296,6 +293,15 @@ class CustomerController extends ControllerEx
 	 *     }}
 	 * )
 	 */
+
+	/**
+	 * Update customer
+	 *
+	 * @param int $id Customer ID
+	 *
+	 * @return array|\api\modules\v1\models\customer\CustomerEx
+	 * @throws \yii\base\InvalidConfigException
+	 */
 	public function actionUpdate($id)
 	{
 		// Build the Customer Form with the attributes sent in request
@@ -329,14 +335,6 @@ class CustomerController extends ControllerEx
 	}
 
 	/**
-	 * Delete customer
-	 *
-	 * @param int $id Customer ID
-	 *
-	 * @return array
-	 * @throws \Throwable
-	 * @throws \yii\db\StaleObjectException
-	 *
 	 * @SWG\Delete(
 	 *     path = "/customers/{id}",
 	 *     tags = { "Customers" },
@@ -390,6 +388,16 @@ class CustomerController extends ControllerEx
 	 *            "apiTokenAuth": {}
 	 *     }}
 	 * )
+	 */
+
+	/**
+	 * Delete customer
+	 *
+	 * @param int $id Customer ID
+	 *
+	 * @return array
+	 * @throws \Throwable
+	 * @throws \yii\db\StaleObjectException
 	 */
 	public function actionDelete($id)
 	{

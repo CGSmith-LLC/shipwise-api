@@ -81,14 +81,14 @@ class AuthController extends Controller
 	 *          @SWG\Schema( ref = "#/definitions/AuthenticationResponse" ),
 	 *
 	 *     		@SWG\Header(
-	 *       		header = "X-Expires-After",
-	 *     			description = "Date in UTC when token expires",
-	 *     			type = "string",
+	 *            header = "X-Expires-After",
+	 *                description = "Date in UTC when token expires",
+	 *                type = "string",
 	 *       		@SWG\Schema(
-	 *          		type = "string",
-	 *          		format = "date-time",
-	 *       		),
-	 *     		),
+	 *                type = "string",
+	 *                format = "date-time",
+	 *            ),
+	 *            ),
 	 *     ),
 	 *
 	 *	   @SWG\Response(
@@ -121,6 +121,15 @@ class AuthController extends Controller
 	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
 	 *       ),
 	 * )
+	 */
+
+	/**
+	 * Action Login
+	 *
+	 * @return AuthenticationResponse|array
+	 * @throws ForbiddenHttpException
+	 * @throws UnauthorizedHttpException
+	 * @throws \yii\base\Exception
 	 */
 	public function actionLogin()
 	{
@@ -185,10 +194,11 @@ class AuthController extends Controller
 	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
 	 *       ),
 	 *     security = {{
-	 *     	    "apiTokenAuth": {},
+	 *            "apiTokenAuth": {},
 	 *     }}
 	 * )
 	 */
+
 	/**
 	 * Action Logout
 	 *

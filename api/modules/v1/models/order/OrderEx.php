@@ -12,8 +12,6 @@ use common\models\Order;
 class OrderEx extends Order
 {
 	/**
-	 * @inheritdoc
-	 *
 	 * @SWG\Definition(
 	 *     definition = "Order",
 	 *
@@ -33,6 +31,10 @@ class OrderEx extends Order
 	 *     @SWG\Property( property = "history", ref = "#/definitions/OrderHistory" ),
 	 *     @SWG\Property( property = "customer", ref = "#/definitions/Customer" ),
 	 * )
+	 */
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function fields()
 	{
@@ -115,8 +117,8 @@ class OrderEx extends Order
 	 * Get Tracking Info
 	 *
 	 * @todo This method is done in prevision of the future implementation of TrackingInfo relation.
-	 *       As for now, and before that transition happen, this method will imitate the return of a TrackingInfoEx object
-	 *       but only `TrackingInfoEx.trackingNumber` property will be populated.
+	 *       As for now, and before that transition happen, this method will imitate the return of a TrackingInfoEx
+	 *       object but only `TrackingInfoEx.trackingNumber` property will be populated.
 	 *
 	 * @return \yii\db\ActiveQuery
 	 */

@@ -15,6 +15,12 @@ use yii\base\Model;
  *        ),
  * )
  */
+
+/**
+ * Class AuthenticationResponse
+ *
+ * @package api\modules\v1\models
+ */
 class AuthenticationResponse extends Model
 {
 	public $token;

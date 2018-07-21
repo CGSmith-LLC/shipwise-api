@@ -12,8 +12,6 @@ use common\models\State;
 class StateEx extends State
 {
 	/**
-	 * @inheritdoc
-	 *
 	 * @SWG\Definition(
 	 *     definition = "State",
 	 *
@@ -21,6 +19,10 @@ class StateEx extends State
 	 *     @SWG\Property( property = "name", type = "string", description = "State name" ),
 	 *     @SWG\Property( property = "abbreviation", type = "string",  description = "State abbreviation" ),
 	 * )
+	 */
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function fields()
 	{

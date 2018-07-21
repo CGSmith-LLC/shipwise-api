@@ -6,10 +6,6 @@ use yii\base\Model;
 use api\modules\v1\models\core\ServiceEx;
 
 /**
- * Class TrackingForm
- *
- * @package api\modules\v1\models\forms
- *
  * @SWG\Definition(
  *     definition = "TrackingForm",
  *     required   = { "service", "trackingNumber" },
@@ -40,6 +36,12 @@ use api\modules\v1\models\core\ServiceEx;
  *            maxLength = 100
  *        ),
  * )
+ */
+
+/**
+ * Class TrackingForm
+ *
+ * @package api\modules\v1\models\forms
  */
 class TrackingForm extends Model
 {

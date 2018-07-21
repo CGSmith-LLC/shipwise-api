@@ -6,10 +6,6 @@ use yii\base\Model;
 use api\modules\v1\models\core\StateEx;
 
 /**
- * Class AddressForm
- *
- * @package api\modules\v1\models\forms
- *
  * @SWG\Definition(
  *     definition = "AddressForm",
  *     required   = { "name", "address1", "city", "stateId", "zip" },
@@ -123,6 +119,12 @@ use api\modules\v1\models\core\StateEx;
  *            maxLength = 140
  *        ),
  * )
+ */
+
+/**
+ * Class AddressForm
+ *
+ * @package api\modules\v1\models\forms
  */
 class AddressForm extends Model
 {

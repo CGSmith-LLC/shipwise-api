@@ -6,16 +6,18 @@ use api\modules\v1\models\core\ApiConsumerEx;
 use yii\base\Model;
 
 /**
- * Class AuthenticationForm
- *
- * @package api\modules\v1\models\forms
- *
  * @SWG\Definition(
  *     definition = "AuthenticationForm",
  *     required   = { "key", "secret" },
  *     @SWG\Property( property = "key", type = "string", description = "Your API key" ),
  *     @SWG\Property( property = "secret", type = "string", description = "Your API secret" ),
  * )
+ */
+
+/**
+ * Class AuthenticationForm
+ *
+ * @package api\modules\v1\models\forms
  */
 class AuthenticationForm extends Model
 {

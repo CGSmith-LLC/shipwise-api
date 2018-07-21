@@ -12,8 +12,6 @@ use common\models\Service;
 class ServiceEx extends Service
 {
 	/**
-	 * @inheritdoc
-	 *
 	 * @SWG\Definition(
 	 *     definition = "Service",
 	 *
@@ -21,6 +19,10 @@ class ServiceEx extends Service
 	 *     @SWG\Property( property = "name", type = "string", description = "Service name" ),
 	 *     @SWG\Property( property = "carrier", ref = "#/definitions/Carrier" ),
 	 * )
+	 */
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function fields()
 	{

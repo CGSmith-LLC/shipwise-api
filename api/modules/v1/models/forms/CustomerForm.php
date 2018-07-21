@@ -5,10 +5,6 @@ namespace api\modules\v1\models\forms;
 use yii\base\Model;
 
 /**
- * Class CustomerForm
- *
- * @package api\modules\v1\models\forms
- *
  * @SWG\Definition(
  *     definition = "CustomerForm",
  *     required   = { "name" },
@@ -21,6 +17,12 @@ use yii\base\Model;
  *        ),
  * )
  */
+
+/**
+ * Class CustomerForm
+ *
+ * @package api\modules\v1\models\forms
+ */
 class CustomerForm extends Model
 {
 	public $name;
@@ -31,8 +33,8 @@ class CustomerForm extends Model
 	public function rules()
 	{
 		return [
-			["name", "required", "message" => '{attribute} is required.'],
-			["name", "string", 'length' => [2, 45]],
+			['name', 'required', 'message' => '{attribute} is required.'],
+			['name', 'string', 'length' => [2, 45]],
 		];
 	}
 }

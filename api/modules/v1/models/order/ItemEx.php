@@ -12,8 +12,6 @@ use common\models\Item;
 class ItemEx extends Item
 {
 	/**
-	 * @inheritdoc
-	 *
 	 * @SWG\Definition(
 	 *     definition = "Item",
 	 *
@@ -22,6 +20,10 @@ class ItemEx extends Item
 	 *     @SWG\Property( property = "sku", type = "string", description = "SKU" ),
 	 *     @SWG\Property( property = "name", type = "string", description = "Item name" ),
 	 * )
+	 */
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function fields()
 	{

@@ -12,14 +12,16 @@ use common\models\Carrier;
 class CarrierEx extends Carrier
 {
 	/**
-	 * @inheritdoc
-	 *
 	 * @SWG\Definition(
 	 *     definition = "Carrier",
 	 *
 	 *     @SWG\Property( property = "id",   type = "integer", description = "Carrier ID" ),
 	 *     @SWG\Property( property = "name", type = "string", description = "Carrier name" ),
 	 * )
+	 */
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function fields()
 	{

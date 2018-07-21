@@ -3,11 +3,13 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
+use api\modules\v1\models\core\AddressEx;
+use api\modules\v1\models\order\TrackingInfoEx;
+use api\modules\v1\models\order\ItemEx;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use api\modules\v1\models\order\OrderEx;
 use api\modules\v1\models\forms\OrderForm;
-use api\modules\v1\models\forms\AddressForm;
 
 /**
  * Class OrderController
@@ -29,8 +31,7 @@ class OrderController extends ControllerEx
 	}
 
 	/**
-	 * @inheritdoc
-	 * @return array
+	 * {@inheritdoc}
 	 */
 	public function behaviors()
 	{
@@ -44,10 +45,6 @@ class OrderController extends ControllerEx
 	}
 
 	/**
-	 * Get all orders
-	 *
-	 * @return \api\modules\v1\models\order\OrderEx[]
-	 *
 	 * @SWG\Get(
 	 *     path = "/orders",
 	 *     tags = { "Orders" },
@@ -121,6 +118,12 @@ class OrderController extends ControllerEx
 	 *     }}
 	 * )
 	 */
+
+	/**
+	 * Get all orders
+	 *
+	 * @return \api\modules\v1\models\order\OrderEx[]
+	 */
 	public function actionIndex()
 	{
 		/**
@@ -143,11 +146,6 @@ class OrderController extends ControllerEx
 	}
 
 	/**
-	 * Create new order
-	 *
-	 * @return array|\api\modules\v1\models\order\OrderEx
-	 * @throws \yii\base\InvalidConfigException
-	 *
 	 * @SWG\Post(
 	 *     path = "/orders",
 	 *     tags = { "Orders" },
@@ -202,6 +200,14 @@ class OrderController extends ControllerEx
 	 *     }}
 	 * )
 	 */
+
+	/**
+	 * Create new order
+	 *
+	 * @return array|\api\modules\v1\models\order\OrderEx
+	 * @throws \yii\base\InvalidConfigException
+	 * @throws \yii\db\Exception
+	 */
 	public function actionCreate()
 	{
 		// Build the Order Form with the attributes sent in request
@@ -214,34 +220,98 @@ class OrderController extends ControllerEx
 			return $this->unprocessableError($orderForm->getErrorsAll());
 		}
 
-		// @todo Create Order with all related entities.
+		// Begin DB transaction
+		$transaction = \Yii::$app->db->beginTransaction();
 
-		// Create new order
-		/*$order = new OrderEx();
-		$order->setAttributes($orderForm->attributes);
-		$order->customer_id = $this->apiConsumer->customer->id;
+		try {
 
-		// Validate the order model itself
-		if (!$order->validate()) {
-			// if you get here then you should add more validation rules to OrderForm
-			return $this->unprocessableError($order->getErrors());
+			/**
+			 * Create Address.
+			 * At this stage the required shipTo object should be fully validated.
+			 */
+			$address           = new AddressEx();
+			$address->name     = $orderForm->shipTo->name;
+			$address->address1 = $orderForm->shipTo->address1;
+			$address->address2 = $orderForm->shipTo->address2;
+			$address->city     = $orderForm->shipTo->city;
+			$address->state_id = $orderForm->shipTo->stateId;
+			$address->zip      = $orderForm->shipTo->zip;
+			$address->phone    = $orderForm->shipTo->phone;
+			$address->notes    = $orderForm->shipTo->notes;
+			$address->save();
+
+			// Create Order
+			$order                     = new OrderEx();
+			$order->customer_id        = $this->apiConsumer->customer->id;
+			$order->order_reference    = $orderForm->orderReference;
+			$order->customer_reference = $orderForm->customerReference;
+			$order->status_id          = isset($orderForm->status) ? $orderForm->status : null;
+			$order->address_id         = $address->id;
+
+			// Validate the order model itself
+			if (!$order->validate()) {
+				// if you get here then you should check if you have enough OrderForm validation rules
+				$transaction->rollBack();
+				return $this->unprocessableError($order->getErrors());
+			}
+
+			// Create TrackingInfo
+			if (!empty($orderForm->tracking)) {
+				/**
+				 * This is in preparation of the future transition of
+				 * tracking details into tracking_info DB table:
+				 *
+				 * Until the transition not happened, we save tracking number into orders.tracking field.
+				 * Once the transition happens, save the full tracking object into tracking_info DB table.
+				 * See below.
+				 *
+				 */
+				// The actual "before transition" behaviour:
+				$order->tracking = $orderForm->tracking->trackingNumber;
+
+				// The behaviour to implement after transition:
+				/*
+				$tracking             = new TrackingInfoEx();
+				$tracking->service_id = $orderForm->tracking->serviceId;
+				$tracking->tracking   = $orderForm->tracking->trackingNumber;
+				if ($tracking->save()) {
+					$order->tracking_id = $tracking;
+				}
+				*/
+			}
+
+			// Save Order model
+			if (!$order->save()) {
+				$transaction->rollBack();
+				return $this->errorMessage(400, 'Could not save order');
+			}
+
+			/**
+			 * Create Items.
+			 * At this stage the required items array should be fully validated.
+			 */
+			foreach ($orderForm->items as $formItem) {
+				$item           = new ItemEx();
+				$item->order_id = $order->id;
+				$item->sku      = $formItem->sku;
+				$item->quantity = $formItem->quantity;
+				$item->name     = $formItem->name;
+				$item->save();
+			}
+
+			// Commit DB transaction
+			$transaction->commit();
+
+		} catch (\Exception $e) {
+			$transaction->rollBack();
+			return $this->errorMessage(400, 'Could not save order');
 		}
 
-		if ($order->save()) {
-			$order->refresh();
-			return $this->success($order);
-		} else {
-			return $this->errorMessage(400, 'Could not save order');
-		}*/
+		$order->refresh();
+		return $this->success($order, 201);
 	}
 
 	/**
-	 * Get a specific order
-	 *
-	 * @param int $id Order ID
-	 *
-	 * @return array|\api\modules\v1\models\order\OrderEx
-	 *
 	 * @SWG\Get(
 	 *     path = "/orders/{id}",
 	 *     tags = { "Orders" },
@@ -287,6 +357,14 @@ class OrderController extends ControllerEx
 	 *     }}
 	 * )
 	 */
+
+	/**
+	 * Get a specific order
+	 *
+	 * @param int $id Order ID
+	 *
+	 * @return array|\api\modules\v1\models\order\OrderEx
+	 */
 	public function actionView($id)
 	{
 		// @todo Authorization: Check order ownership
@@ -299,13 +377,6 @@ class OrderController extends ControllerEx
 	}
 
 	/**
-	 * Update order
-	 *
-	 * @param int $id Order ID
-	 *
-	 * @return array|\api\modules\v1\models\order\OrderEx
-	 * @throws \yii\base\InvalidConfigException
-	 *
 	 * @SWG\Put(
 	 *     path = "/orders/{id}",
 	 *     tags = { "Orders" },
@@ -368,6 +439,15 @@ class OrderController extends ControllerEx
 	 *     }}
 	 * )
 	 */
+
+	/**
+	 * Update order
+	 *
+	 * @param int $id Order ID
+	 *
+	 * @return array|\api\modules\v1\models\order\OrderEx
+	 * @throws \yii\base\InvalidConfigException
+	 */
 	public function actionUpdate($id)
 	{
 		// Build the Order Form with the attributes sent in request
@@ -405,14 +485,6 @@ class OrderController extends ControllerEx
 	}
 
 	/**
-	 * Delete order
-	 *
-	 * @param int $id Order ID
-	 *
-	 * @return array
-	 * @throws \Throwable
-	 * @throws \yii\db\StaleObjectException
-	 *
 	 * @SWG\Delete(
 	 *     path = "/orders/{id}",
 	 *     tags = { "Orders" },
@@ -466,6 +538,16 @@ class OrderController extends ControllerEx
 	 *            "apiTokenAuth": {}
 	 *     }}
 	 * )
+	 */
+
+	/**
+	 * Delete order
+	 *
+	 * @param int $id Order ID
+	 *
+	 * @return array
+	 * @throws \Throwable
+	 * @throws \yii\db\StaleObjectException
 	 */
 	public function actionDelete($id)
 	{

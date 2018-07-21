@@ -12,8 +12,6 @@ use common\models\Address;
 class AddressEx extends Address
 {
 	/**
-	 * @inheritdoc
-	 *
 	 * @SWG\Definition(
 	 *     definition = "Address",
 	 *
@@ -27,6 +25,10 @@ class AddressEx extends Address
 	 *     @SWG\Property( property = "phone", type = "string",  description = "Phone number" ),
 	 *     @SWG\Property( property = "notes", type = "string",  description = "Notes" ),
 	 * )
+	 */
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function fields()
 	{

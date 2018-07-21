@@ -5,15 +5,13 @@ namespace api\modules\v1\models\customer;
 use common\models\Customer;
 
 /**
- * Class ProjectStatusEx
+ * Class CustomerEx
  *
  * @package api\modules\v1\models\customer
  */
 class CustomerEx extends Customer
 {
 	/**
-	 * @inheritdoc
-	 *
 	 * @SWG\Definition(
 	 *     definition = "Customer",
 	 *
@@ -26,6 +24,10 @@ class CustomerEx extends Customer
 	 *            description = "Customer creation date-time"
 	 *        ),
 	 * )
+	 */
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function fields()
 	{

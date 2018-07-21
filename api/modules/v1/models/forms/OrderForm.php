@@ -7,13 +7,9 @@ use yii\helpers\ArrayHelper;
 use api\modules\v1\models\order\StatusEx;
 
 /**
- * Class OrderForm
- *
- * @package api\modules\v1\models\forms
- *
  * @SWG\Definition(
  *     definition = "OrderForm",
- *     required   = { "orderReference", "customerReference", "shipTo" },
+ *     required   = { "orderReference", "customerReference", "shipTo", "items" },
  *     @SWG\Property(
  *            property = "orderReference",
  *            type = "string",
@@ -45,7 +41,18 @@ use api\modules\v1\models\order\StatusEx;
 					1 - Shipped
 					9 - Open",
  *       ),
+ *     @SWG\Property(
+ *            property = "items",
+ *            type = "array",
+ *     		  @SWG\Items( ref = "#/definitions/ItemForm" )
+ *        ),
  * )
+ */
+
+/**
+ * Class OrderForm
+ *
+ * @package api\modules\v1\models\forms
  */
 class OrderForm extends Model
 {
@@ -61,10 +68,10 @@ class OrderForm extends Model
 	public $shipTo;
 	/** @var TrackingForm */
 	public $tracking;
-	/** @var @todo */
-	//public $items;
 	/** @var string */
 	public $status;
+	/** @var ItemForm[] */
+	public $items;
 
 	/**
 	 * {@inheritdoc}
@@ -72,7 +79,10 @@ class OrderForm extends Model
 	public function rules()
 	{
 		return [
-			[['orderReference', 'customerReference', 'shipTo'], 'required', 'message' => '{attribute} is required.'],
+			[
+				['orderReference', 'customerReference', 'shipTo', 'items'],
+				'required', 'message' => '{attribute} is required.',
+			],
 			['orderReference', 'string', 'length' => [2, 45]],
 			['customerReference', 'string', 'length' => [2, 64]],
 			['tracking', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
@@ -85,40 +95,69 @@ class OrderForm extends Model
 				'message' => '{attribute} value is incorrect. Valid values are: ' .
 					implode(StatusEx::getIdsAsArray(), ', '),
 			],
+			['items', 'checkIsArray'],
+			['tracking', 'safe'],
 		];
 	}
 
 	/**
-	 * Performs the data validation for this model and its related models
+	 * Custom validator
+	 * Checks if attribute is an array and has at least one item
 	 *
-	 * Errors found during the validation can be retrieved via getErrors()
+	 * @param $attribute
+	 * @param $params
+	 * @param $validator
+	 */
+	public function checkIsArray($attribute, $params, $validator)
+	{
+		if (!(is_array($this->$attribute) && count($this->$attribute) > 0)) {
+			$this->addError($attribute, '{attribute} must be an array and have at least one item.');
+		}
+	}
+
+	/**
+	 * Performs data validation for this model and its related models
+	 *
+	 * Errors found during the validation can be retrieved via getErrorsAll()
+	 * @see getErrorsAll()
 	 *
 	 * @return bool whether the validation is successful without any error.
 	 */
 	public function validateAll()
 	{
-		$shipToValidated = $trackingValidated = true; // Initial value
-
 		// Validate this model
-		$orderValidated = $this->validate();
+		$allValidated = $this->validate();
 
 		// Initialize and validate AddressForm object
 		if (isset($this->shipTo)) {
-			$shipToValues = (array)$this->shipTo;
+			$values       = (array)$this->shipTo;
 			$this->shipTo = new AddressForm();
-			$this->shipTo->setAttributes($shipToValues);
-			$shipToValidated = $this->shipTo->validate();
+			$this->shipTo->setAttributes($values);
+			$allValidated = $allValidated && $this->shipTo->validate();
 		}
 
 		// Initialize and validate TrackingForm object
-		if (isset($this->tracking) && $this->scenario == self::SCENARIO_UPDATE) {
-			$trackingValues = (array)$this->tracking;
+		if (isset($this->tracking)) {
+			$values         = (array)$this->tracking;
 			$this->tracking = new TrackingForm();
-			$this->tracking->setAttributes($trackingValues);
-			$trackingValidated = $this->tracking->validate();
+			$this->tracking->setAttributes($values);
+			if ($this->scenario == self::SCENARIO_UPDATE) {
+				$allValidated = $allValidated && $this->tracking->validate();
+			}
 		}
 
-		return ($orderValidated && $shipToValidated && $trackingValidated);
+		// Initialize and validate ItemForm objects
+		if (isset($this->items) && is_array($this->items)) {
+			$params      = $this->items;
+			$this->items = [];
+			foreach ($params as $idx => $values) {
+				$this->items[$idx] = new ItemForm();
+				$this->items[$idx]->setAttributes((array)$values);
+				$allValidated = $allValidated && $this->items[$idx]->validate();
+			}
+		}
+
+		return $allValidated;
 	}
 
 	/**
@@ -130,11 +169,27 @@ class OrderForm extends Model
 	{
 		$errors = $this->getErrors();
 
+		// shipTo
 		if (is_object($this->shipTo) && $this->shipTo->hasErrors()) {
 			$errors = ArrayHelper::merge($errors, ['shipTo' => $this->shipTo->getErrors()]);
 		}
+
+		// tracking
 		if (is_object($this->tracking) && $this->tracking->hasErrors()) {
 			$errors = ArrayHelper::merge($errors, ['tracking' => $this->tracking->getErrors()]);
+		}
+
+		// items
+		if (is_array($this->items) && count($this->items) > 0) {
+			$itemsErrors = [];
+			foreach ($this->items as $idx => $item) {
+				if ($item->hasErrors()) {
+					$itemsErrors["item_$idx"] = $item->getErrors();
+				}
+			}
+			if (!empty($itemsErrors)) {
+				$errors = ArrayHelper::merge($errors, ['items' => $itemsErrors]);
+			}
 		}
 
 		return $errors;

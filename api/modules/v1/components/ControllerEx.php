@@ -45,12 +45,13 @@ class ControllerEx extends Controller
 	 * and returns the response.
 	 *
 	 * @param $response
+	 * @param $code
 	 *
 	 * @return array
 	 */
-	public function success($response)
+	public function success($response, $code = 200)
 	{
-		$this->response->setStatusCode(200);
+		$this->response->setStatusCode($code);
 
 		return $response;
 	}
