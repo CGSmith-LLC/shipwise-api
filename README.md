@@ -32,8 +32,6 @@ DIRECTORY STRUCTURE
 ```
 api
     config/              contains api configurations
-    controllers/         not used
-    models/              not used
     modules/             contains api versions, this is the main folder for api source code.
                          each module is an api version, example: v1/
                          each version module contains controller and models specific to that version.
@@ -56,7 +54,6 @@ api
     tests/               contains tests for api application
     views/               not used
     web/                 contains the entry script and Web resources
-    widgets/             not used
 common
     config/              contains shared configurations
     mail/                contains view files for e-mails
