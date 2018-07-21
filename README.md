@@ -35,9 +35,23 @@ api
     controllers/         not used
     models/              not used
     modules/             contains API versions, this is the main folder for API source code.
-                         each folder is an API version, example: v1/
-                         each version folder contains controller and models specific to that version.
+                         each module is an API version, example: v1/
+                         each version module contains controller and models specific to that version.
                          data models extend from common/models
+                         
+                         v1/
+                            components/
+                                parameters/         contains pagination, limit and search behaviours
+                                security/           contains the aou consumer security behaviour
+                                ControllerEx.php    base controller with attached behaviours
+                            controllers/            contains controllers per api ressource
+                            models/
+                                core/               extended models with core functionality
+                                customer/           extended models regrouped by customer entity
+                                forms/              models representing the api request forms
+                                order/              extended models regrouped by order entity
+                                swagger/            swagger related definitions
+                            
     runtime/             contains files generated during runtime
     tests/               contains tests for api application
     views/               not used
