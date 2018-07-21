@@ -40,15 +40,15 @@ api
                          v1/
                             components/
                                 parameters/         contains pagination, limit and search behaviours
-                                security/           contains the aou consumer security behaviour
+                                security/           contains the api consumer security behaviour
                                 ControllerEx.php    base controller with attached behaviours
                             controllers/            contains controllers per api ressource
                             models/
                                 core/               extended models with core functionality
-                                customer/           extended models regrouped by customer entity
+                                customer/           extended models grouped by customer entity
                                 forms/              models representing the api request forms
-                                order/              extended models regrouped by order entity
-                                swagger/            swagger related definitions
+                                order/              extended models grouped by order entity
+                                swagger/            swagger definitions
                             
     runtime/             contains files generated during runtime
     tests/               contains tests for api application
