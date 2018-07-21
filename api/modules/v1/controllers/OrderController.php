@@ -564,11 +564,11 @@ class OrderController extends ControllerEx
 			) === null) {
 			return $this->errorMessage(404, 'Order not found');
 		}
-		
-		// @todo Delete order with all related entities which should be deleted
 
-		// Delete order
-		if (!$order->delete()) {
+		// Delete order and items
+		if ($order->delete()) {
+			ItemEx::deleteAll(['order_id' => (int)$id]);
+		} else {
 			return $this->errorMessage(400, 'Could not delete order');
 		}
 
