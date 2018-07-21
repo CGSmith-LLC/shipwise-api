@@ -651,10 +651,23 @@ class OrderController extends ControllerEx
 			return $this->errorMessage(404, 'Order not found');
 		}
 
-		// Delete order and items
-		if ($order->delete()) {
-			ItemEx::deleteAll(['order_id' => (int)$id]);
-		} else {
+		// Begin DB transaction
+		$transaction = \Yii::$app->db->beginTransaction();
+
+		try {
+
+			// Delete order and items
+			if ($order->delete()) {
+				ItemEx::deleteAll(['order_id' => (int)$id]);
+			} else {
+				$transaction->rollBack();
+				return $this->errorMessage(400, 'Could not delete order');
+			}
+
+			$transaction->commit();
+
+		} catch (\Exception $e) {
+			$transaction->rollBack();
 			return $this->errorMessage(400, 'Could not delete order');
 		}
 
