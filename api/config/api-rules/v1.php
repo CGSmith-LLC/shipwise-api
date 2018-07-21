@@ -21,12 +21,13 @@ return [
 
 	// Orders
 	[
-		"class"      => 'yii\rest\UrlRule',
-		"controller" => ["$version/order"],
+		"class"         => 'yii\rest\UrlRule',
+		"controller"    => ["$version/order"],
+		"extraPatterns" => [
+			"GET  {id}/items"   => "items",
+			"GET  findByStatus" => "findByStatus",
+		],
 	],
-	// @todo Add two missing endpoints for Orders:
-	// `/orders/{orderID}/items` - Fetch order items
-	// `/orders/findByStatus` - Fetch orders by status
 
 	// Customers
 	[

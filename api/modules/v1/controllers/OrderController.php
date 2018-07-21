@@ -22,11 +22,13 @@ class OrderController extends ControllerEx
 	protected function verbs()
 	{
 		return [
-			'index'  => ['GET'],
-			'create' => ['POST'],
-			'update' => ['PUT'],
-			'view'   => ['GET'],
-			'delete' => ['DELETE'],
+			'index'        => ['GET'],
+			'create'       => ['POST'],
+			'update'       => ['PUT'],
+			'view'         => ['GET'],
+			'delete'       => ['DELETE'],
+			'items'        => ['GET'],
+			'findByStatus' => ['GET'],
 		];
 	}
 
@@ -305,6 +307,9 @@ class OrderController extends ControllerEx
 		} catch (\Exception $e) {
 			$transaction->rollBack();
 			return $this->errorMessage(400, 'Could not save order');
+		} catch (\Throwable $e) {
+			$transaction->rollBack();
+			return $this->errorMessage(400, 'Could not save order');
 		}
 
 		$order->refresh();
@@ -569,6 +574,9 @@ class OrderController extends ControllerEx
 		} catch (\Exception $e) {
 			$transaction->rollBack();
 			return $this->errorMessage(400, 'Could not save order');
+		} catch (\Throwable $e) {
+			$transaction->rollBack();
+			return $this->errorMessage(400, 'Could not save order');
 		}
 
 		$order->refresh();
@@ -637,8 +645,8 @@ class OrderController extends ControllerEx
 	 * @param int $id Order ID
 	 *
 	 * @return array
+	 * @throws \Exception
 	 * @throws \Throwable
-	 * @throws \yii\db\StaleObjectException
 	 */
 	public function actionDelete($id)
 	{
@@ -669,8 +677,79 @@ class OrderController extends ControllerEx
 		} catch (\Exception $e) {
 			$transaction->rollBack();
 			return $this->errorMessage(400, 'Could not delete order');
+		} catch (\Throwable $e) {
+			$transaction->rollBack();
+			return $this->errorMessage(400, 'Could not delete order');
 		}
 
 		$this->response->setStatusCode(204);
+	}
+
+	/**
+	 * @SWG\Get(
+	 *     path = "/orders/{id}/items",
+	 *     tags = { "Orders" },
+	 *     summary = "Fetch order items",
+	 *     description = "Get all items associated with order ID",
+	 *
+	 *     @SWG\Parameter( name = "id", in = "path", type = "integer", required = true, description = "Order ID" ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 200,
+	 *          description = "Successful operation. Response contains a list of order items.",
+	 *          @SWG\Schema(
+	 *              type = "array",
+	 *     			@SWG\Items( ref = "#/definitions/Item" )
+	 *            ),
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 401,
+	 *          description = "Impossible to authenticate user",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 403,
+	 *          description = "User is inactive",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 404,
+	 *          description = "Order not found",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *     ),
+	 *
+	 *     @SWG\Response(
+	 *          response = 500,
+	 *          description = "Unexpected error",
+	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+	 *       ),
+	 *
+	 *     security = {{
+	 *            "apiTokenAuth": {}
+	 *     }}
+	 * )
+	 */
+
+	/**
+	 * Get items of a specific order
+	 *
+	 * @param int $id Order ID
+	 *
+	 * @return array|\api\modules\v1\models\order\ItemEx
+	 */
+	public function actionItems($id)
+	{
+		if (($order = OrderEx::find()
+				->byId($id)
+				->forCustomer($this->apiConsumer->customer->id)
+				->one()
+			) === null) {
+			return $this->errorMessage(404, 'Order not found');
+		}
+
+		return $this->success($order->items);
 	}
 }
