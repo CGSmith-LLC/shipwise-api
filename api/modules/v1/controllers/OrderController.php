@@ -367,9 +367,11 @@ class OrderController extends ControllerEx
 	 */
 	public function actionView($id)
 	{
-		// @todo Authorization: Check order ownership
-
-		if (($order = OrderEx::findOne((int)$id)) === null) {
+		if (($order = OrderEx::find()
+				->byId($id)
+				->forCustomer($this->apiConsumer->customer->id)
+				->one()
+			) === null) {
 			return $this->errorMessage(404, 'Order not found');
 		}
 
@@ -460,11 +462,14 @@ class OrderController extends ControllerEx
 		}
 
 		// Find the order to update
-		if (($order = OrderEx::findOne((int)$id)) === null) {
+		if (($order = OrderEx::find()
+				->byId($id)
+				->forCustomer($this->apiConsumer->customer->id)
+				->one()
+			) === null) {
 			return $this->errorMessage(404, 'Order not found');
 		}
 
-		// @todo Authorization: Check order ownership
 		// @todo Update order with all related entities.
 
 		$order->setAttributes($form->attributes);
@@ -552,11 +557,14 @@ class OrderController extends ControllerEx
 	public function actionDelete($id)
 	{
 		// Find the order to delete
-		if (($order = OrderEx::findOne((int)$id)) === null) {
+		if (($order = OrderEx::find()
+				->byId($id)
+				->forCustomer($this->apiConsumer->customer->id)
+				->one()
+			) === null) {
 			return $this->errorMessage(404, 'Order not found');
 		}
-
-		// @todo Authorization: Check order ownership
+		
 		// @todo Delete order with all related entities which should be deleted
 
 		// Delete order
