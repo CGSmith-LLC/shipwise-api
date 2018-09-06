@@ -11,9 +11,16 @@ use api\modules\v1\models\order\StatusEx;
  *     definition = "OrderForm",
  *     required   = { "orderReference", "customerReference", "shipTo", "items" },
  *     @SWG\Property(
+ *            property = "uuid",
+ *            type = "string",
+ *            description = "Unique identifier from ecommerce platform",
+ *            minLength = 2,
+ *            maxLength = 64
+ *        ),
+ *     @SWG\Property(
  *            property = "orderReference",
  *            type = "string",
- *            description = "Order reference",
+ *            description = "Order reference - typically Order Number from ecommerce side",
  *            minLength = 2,
  *            maxLength = 45
  *        ),
@@ -61,6 +68,8 @@ class OrderForm extends Model
 	const SCENARIO_DELETE  = 'delete';  // the delete scenario
 
 	/** @var string */
+	public $uuid;
+	/** @var string */
 	public $orderReference;
 	/** @var string */
 	public $customerReference;
@@ -83,6 +92,7 @@ class OrderForm extends Model
 				['orderReference', 'customerReference', 'shipTo', 'items'],
 				'required', 'message' => '{attribute} is required.',
 			],
+			['uuid', 'string', 'length' => [2, 64]],
 			['orderReference', 'string', 'length' => [2, 45]],
 			['customerReference', 'string', 'length' => [2, 64]],
 			['tracking', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],

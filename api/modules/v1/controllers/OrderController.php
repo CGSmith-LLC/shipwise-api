@@ -247,6 +247,7 @@ class OrderController extends ControllerEx
 			// Create Order
 			$order                     = new OrderEx();
 			$order->customer_id        = $this->apiConsumer->customer->id;
+			$order->uuid               = $orderForm->uuid;
 			$order->order_reference    = $orderForm->orderReference;
 			$order->customer_reference = $orderForm->customerReference;
 			$order->status_id          = isset($orderForm->status) ? $orderForm->status : null;
