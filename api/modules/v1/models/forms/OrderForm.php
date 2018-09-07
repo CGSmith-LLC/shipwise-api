@@ -89,7 +89,7 @@ class OrderForm extends Model
 	{
 		return [
 			[
-				['orderReference', 'customerReference', 'shipTo', 'items'],
+				['customerReference', 'shipTo', 'items'],
 				'required', 'message' => '{attribute} is required.',
 			],
 			['uuid', 'string', 'length' => [1, 64]],
