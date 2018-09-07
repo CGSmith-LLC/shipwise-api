@@ -21,14 +21,14 @@ use api\modules\v1\models\order\StatusEx;
  *            property = "orderReference",
  *            type = "string",
  *            description = "Order reference - typically Order Number from ecommerce side",
- *            minLength = 2,
+ *            minLength = 1,
  *            maxLength = 45
  *        ),
  *     @SWG\Property(
  *            property = "customerReference",
  *            type = "string",
  *            description = "Customer reference",
- *            minLength = 2,
+ *            minLength = 1,
  *            maxLength = 64
  *        ),
  *     @SWG\Property(
