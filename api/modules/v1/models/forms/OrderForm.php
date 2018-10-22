@@ -89,13 +89,11 @@ class OrderForm extends Model
 	{
 		return [
 			[
-				['customerReference', 'shipTo', 'items'],
-				'required', 'message' => '{attribute} is required.',
+				['customerReference', 'shipTo', 'items'], 'required', 'message' => '{attribute} is required.',
 			],
 			['uuid', 'string', 'length' => [1, 64]],
 			['orderReference', 'string', 'length' => [1, 45]],
 			['customerReference', 'string', 'length' => [1, 64]],
-			['tracking', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
 			['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
 			['status', 'integer', 'on' => self::SCENARIO_UPDATE],
 			[
