@@ -19,6 +19,7 @@ class OrderEx extends Order
 	 *     @SWG\Property( property = "uuid", type = "string", description = "Reference to ecommerce UUID" ),
 	 *     @SWG\Property( property = "orderReference", type = "string", description = "Order reference - Order number from fulfillment side" ),
 	 *     @SWG\Property( property = "customerReference", type = "string", description = "Customer reference - Order Number from ecommerce side" ),
+	 *     @SWG\Property( property = "requestedShipDate", type = "string", format = "date-time", description = "When the order should ship and be fulfilled" ),
 	 *     @SWG\Property( property = "shipTo", ref = "#/definitions/Address" ),
 	 *     @SWG\Property( property = "tracking", ref = "#/definitions/TrackingInfo" ),
 	 *	   @SWG\Property(
@@ -44,6 +45,7 @@ class OrderEx extends Order
 			'uuid'              => 'uuid',
 			'orderReference'    => 'order_reference',
 			'customerReference' => 'customer_reference',
+			'requestedShipDate' => 'requested_ship_date',
 			'shipTo'            => 'address',
 			'tracking'          => 'trackingInfo',
 			'items'             => 'items',

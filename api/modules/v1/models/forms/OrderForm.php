@@ -32,6 +32,11 @@ use api\modules\v1\models\order\StatusEx;
  *            maxLength = 64
  *        ),
  *     @SWG\Property(
+ *            property = "requestedShipDate",
+ *            type = "string",
+ *            description = "When the order should ship and be fulfilled",
+ *        ),
+ *     @SWG\Property(
  *            property = "shipTo",
  *            ref = "#/definitions/AddressForm"
  *        ),
@@ -73,6 +78,8 @@ class OrderForm extends Model
 	public $orderReference;
 	/** @var string */
 	public $customerReference;
+	/** @var string */
+	public $requestedShipDate;
 	/** @var AddressForm */
 	public $shipTo;
 	/** @var TrackingForm */
