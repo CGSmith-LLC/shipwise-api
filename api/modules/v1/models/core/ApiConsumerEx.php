@@ -83,7 +83,13 @@ class ApiConsumerEx extends ApiConsumer implements IdentityInterface
 		return parent::isActive();
 	}
 
-	/**
+	/** @inheritdoc */
+	public function isSuperuser()
+    {
+        return parent::isSuperuser();
+    }
+
+    /**
 	 * Get Token Expiration date-time
 	 *
 	 * @param bool $formatted Whether to format the returned DateTime object

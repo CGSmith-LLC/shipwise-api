@@ -13,6 +13,8 @@ class ApiConsumer extends BaseApiConsumer
 {
 	const STATUS_ACTIVE   = 1;
 	const STATUS_INACTIVE = 0;
+	const SUPERUSER_ACTIVE = 1;
+	const SUPERUSER_INACTIVE = 0;
 
 	/**
 	 * Get Customer
@@ -60,6 +62,11 @@ class ApiConsumer extends BaseApiConsumer
 	{
 		return (bool)($this->status == self::STATUS_ACTIVE);
 	}
+
+	protected function isSuperuser()
+    {
+        return (bool)($this->superuser == self::SUPERUSER_ACTIVE);
+    }
 
 	/**
 	 * Whether this Api consumer is a customer

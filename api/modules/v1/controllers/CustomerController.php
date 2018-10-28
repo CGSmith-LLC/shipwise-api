@@ -5,6 +5,7 @@ namespace api\modules\v1\controllers;
 use api\modules\v1\components\ControllerEx;
 use api\modules\v1\models\customer\CustomerEx;
 use api\modules\v1\models\forms\CustomerForm;
+use yii\web\ForbiddenHttpException;
 
 /**
  * Class CustomerController
@@ -30,6 +31,7 @@ class CustomerController extends ControllerEx
 	 * @todo Paginate results? If so, @see OrderController::actionIndex() for reference.
 	 *
 	 * @return \api\modules\v1\models\customer\CustomerEx[]
+     * @throws ForbiddenHttpException
 	 *
 	 * @SWG\Get(
 	 *     path = "/customers",
@@ -71,6 +73,11 @@ class CustomerController extends ControllerEx
 	 */
 	public function actionIndex()
 	{
+        // Check if user is active
+        if (!$this->apiConsumer->isSuperuser()) {
+            throw new ForbiddenHttpException('Access Denied.');
+        }
+
 		return $this->success(
 			CustomerEx::find()->all()
 		);
@@ -132,14 +139,20 @@ class CustomerController extends ControllerEx
 	 * )
 	 */
 
-	/**
-	 * Create new customer
-	 *
-	 * @return array|\api\modules\v1\models\customer\CustomerEx
-	 * @throws \yii\base\InvalidConfigException
-	 */
+    /**
+     * Create new customer
+     *
+     * @return array|\api\modules\v1\models\customer\CustomerEx
+     * @throws \yii\base\InvalidConfigException
+     * @throws ForbiddenHttpException
+     */
 	public function actionCreate()
 	{
+        // Check if user is active
+        if (!$this->apiConsumer->isSuperuser()) {
+            throw new ForbiddenHttpException('Access Denied.');
+        }
+
 		// Build the Customer Form with the attributes sent in request
 		$form             = new CustomerForm();
 		$form->attributes = $this->request->getBodyParams();
@@ -214,15 +227,21 @@ class CustomerController extends ControllerEx
 	 * )
 	 */
 
-	/**
-	 * Get a specific customer
-	 *
-	 * @param int $id Customer ID
-	 *
-	 * @return array|\api\modules\v1\models\customer\CustomerEx
-	 */
+    /**
+     * Get a specific customer
+     *
+     * @param int $id Customer ID
+     *
+     * @return array|\api\modules\v1\models\customer\CustomerEx
+     * @throws ForbiddenHttpException
+     */
 	public function actionView($id)
 	{
+        // Check if user is active
+        if (!$this->apiConsumer->isSuperuser()) {
+            throw new ForbiddenHttpException('Access Denied.');
+        }
+
 		if (($customer = CustomerEx::findOne((int)$id)) !== null) {
 			return $this->success($customer);
 		} else {
@@ -294,16 +313,23 @@ class CustomerController extends ControllerEx
 	 * )
 	 */
 
-	/**
-	 * Update customer
-	 *
-	 * @param int $id Customer ID
-	 *
-	 * @return array|\api\modules\v1\models\customer\CustomerEx
-	 * @throws \yii\base\InvalidConfigException
-	 */
+    /**
+     * Update customer
+     *
+     * @param int $id Customer ID
+     *
+     * @return array|\api\modules\v1\models\customer\CustomerEx
+     * @throws \yii\base\InvalidConfigException
+     * @throws ForbiddenHttpException
+     */
 	public function actionUpdate($id)
 	{
+
+        // Check if user is active
+        if (!$this->apiConsumer->isSuperuser()) {
+            throw new ForbiddenHttpException('Access Denied.');
+        }
+
 		// Build the Customer Form with the attributes sent in request
 		$form             = new CustomerForm();
 		$form->attributes = $this->request->getBodyParams();
@@ -401,6 +427,11 @@ class CustomerController extends ControllerEx
 	 */
 	public function actionDelete($id)
 	{
+        // Check if user is active
+        if (!$this->apiConsumer->isSuperuser()) {
+            throw new ForbiddenHttpException('Access Denied.');
+        }
+
 		// Find the customer to delete
 		if (($customer = CustomerEx::findOne((int)$id)) === null) {
 			return $this->errorMessage(404, 'Customer not found');
