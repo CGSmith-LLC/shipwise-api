@@ -29,7 +29,8 @@ class BaseItem extends \yii\db\ActiveRecord
 		return [
 			[['order_id', 'quantity', 'sku'], 'required'],
 			[['order_id', 'quantity'], 'integer'],
-			[['sku', 'name'], 'string', 'max' => 64],
+			['sku', 'string', 'max' => 64],
+			['sku', 'string', 'max' => 128],
 		];
 	}
 
