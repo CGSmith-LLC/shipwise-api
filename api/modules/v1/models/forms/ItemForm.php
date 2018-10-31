@@ -18,14 +18,14 @@ use yii\base\Model;
  *            type = "string",
  *            description = "SKU",
  *            minLength = 2,
- *            maxLength = 45
+ *            maxLength = 64
  *        ),
  *     @SWG\Property(
  *            property = "name",
  *            type = "string",
  *            description = "Item name",
  *            minLength = 2,
- *            maxLength = 64
+ *            maxLength = 128
  *        ),
  * )
  */
@@ -53,7 +53,8 @@ class ItemForm extends Model
 			[['quantity', 'sku'], 'required', 'message' => '{attribute} is required.'],
 			['quantity', 'integer'],
 			['quantity', 'compare', 'compareValue' => 0, 'operator' => '>'],
-			[['sku', 'name'], 'string', 'length' => [2, 64]],
+			['sku', 'string', 'length' => [2, 64]],
+			['name', 'string', 'length' => [2, 128]],
 		];
 	}
 }
