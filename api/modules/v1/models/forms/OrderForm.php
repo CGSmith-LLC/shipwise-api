@@ -51,6 +51,7 @@ use api\modules\v1\models\order\StatusEx;
  *            default = "9",
  *            description = "Order status
  *					1  - Shipped
+ *                  8  - Pending Fulfillment
  *					9  - Open
  *                  10 - WMS Error",
  *       ),
