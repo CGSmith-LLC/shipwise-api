@@ -770,10 +770,12 @@ class OrderController extends ControllerEx
 	 *                in = "query",
 	 *                type = "integer",
 	 *                required = true,
-	 *                enum = {1,9},
+	 *                enum = {1,8,9,10},
 	 *                description = "Status value that need to be considered for filter
 							1 - Shipped
-							9 - Open"
+							8 - Pending Fulfillment
+							9 - Open
+							10 - WMS Error"
 	 *            ),
 	 *     @SWG\Parameter(
 	 *                name = "page",

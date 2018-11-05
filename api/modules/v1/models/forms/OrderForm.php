@@ -47,13 +47,13 @@ use api\modules\v1\models\order\StatusEx;
  *     @SWG\Property(
  *            property = "status",
  *            type = "integer",
- *            enum = {1,9,10},
+ *            enum = {1,8,9,10},
  *            default = "9",
  *            description = "Order status
  *					1  - Shipped
- *                  8  - Pending Fulfillment
+ *					8  - Pending Fulfillment
  *					9  - Open
- *                  10 - WMS Error",
+ *					10 - WMS Error",
  *       ),
  *     @SWG\Property(
  *            property = "items",
