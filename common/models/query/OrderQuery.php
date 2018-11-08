@@ -57,6 +57,28 @@ class OrderQuery extends \yii\db\ActiveQuery
 		return $this->andOnCondition([Order::tableName() . '.status_id' => (int)$id]);
 	}
 
+    /**
+     * Query condition to get orders after an updated date
+     *
+     * @param $date \DateTime
+     * @return OrderQuery
+     */
+	public function afterUpdatedDate($date)
+    {
+        return $this->andOnCondition('>=' , [Order::tableName() . '.updated_date' => $date->format('Y-m-d')]);
+    }
+
+    /**
+     * Query condition to get orders after an created date
+     *
+     * @param $date \DateTime
+     * @return OrderQuery
+     */
+	public function afterCreatedDate($date)
+    {
+        return $this->andOnCondition('>=' , [Order::tableName() . '.created_date' => $date->format('Y-m-d')]);
+    }
+
 	/**
 	 * Query condition to get order by order id
 	 *

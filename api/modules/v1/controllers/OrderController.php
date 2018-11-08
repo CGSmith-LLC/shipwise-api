@@ -879,11 +879,39 @@ class OrderController extends ControllerEx
 				implode(StatusEx::getIdsAsArray(), ', '));
 		}
 
+		$updatedDate = null;
+		$createdDate = null;
+		if (null !== $this->request->get('updatedDate')) {
+            $updatedDate = $this->request->get('updatedDate');
+        }
+		if (null !== $this->request->get('createdDate')) {
+            $createdDate = $this->request->get('createdDate');
+        }
+		if ($updatedDate !== null && $createdDate !== null) {
+            $query = OrderEx::find()
+                ->forCustomer($customerId)
+                ->byStatus($statusId)
+                ->afterUpdatedDate(new \DateTime($updatedDate))
+                ->afterCreatedDate(new \DateTime($createdDate));
+        }elseif ($updatedDate !== null && $createdDate === null) {
+		    $query = OrderEx::find()
+                ->forCustomer($customerId)
+                ->byStatus($statusId)
+                ->afterUpdatedDate(new \DateTime($updatedDate));
+        }elseif ($updatedDate === null && $createdDate !== null) {
+		    $query = OrderEx::find()
+                ->forCustomer($customerId)
+                ->byStatus($statusId)
+                ->afterCreatedDate(new \DateTime($createdDate));
+        }else {
+		    $query = OrderEx::find()
+                ->forCustomer($customerId)
+                ->byStatus($statusId);
+        }
+
 		// Get paginated results
 		$provider = new ActiveDataProvider([
-			'query' => OrderEx::find()
-				->forCustomer($customerId)
-				->byStatus($statusId),
+			'query' => $query,
 			'pagination' => $this->pagination,
 		]);
 
