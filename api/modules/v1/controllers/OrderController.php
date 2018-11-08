@@ -914,32 +914,24 @@ class OrderController extends ControllerEx
         }
 
 
+
+        $query = OrderEx::find()
+            ->forCustomer($customerId)
+            ->byStatus($statusId);
         /**
          * Select by updated date and/or created date
          */
-		if ($updatedDate !== null && $createdDate !== null) {
-            $query = OrderEx::find()
-                ->forCustomer($customerId)
-                ->byStatus($statusId)
-                ->afterUpdatedDate(new \DateTime($updatedDate))
-                ->afterCreatedDate(new \DateTime($createdDate));
-        }elseif ($updatedDate !== null && $createdDate === null) {
-		    $query = OrderEx::find()
-                ->forCustomer($customerId)
-                ->byStatus($statusId)
-                ->afterUpdatedDate(new \DateTime($updatedDate));
-        }elseif ($updatedDate === null && $createdDate !== null) {
-		    $query = OrderEx::find()
-                ->forCustomer($customerId)
-                ->byStatus($statusId)
-                ->afterCreatedDate(new \DateTime($createdDate));
-        }else {
-		    $query = OrderEx::find()
-                ->forCustomer($customerId)
-                ->byStatus($statusId);
+		if ($updatedDate !== null) {
+            $query->afterUpdatedDate(new \DateTime($updatedDate));
         }
 
-        $query->onRequestedDate($requestedShipDate);
+        if ($createdDate !== null) {
+		    $query->afterCreatedDate(new \DateTime($createdDate));
+        }
+
+        if ($requestedShipDate !== null) {
+            $query->onRequestedDate($requestedShipDate);
+        }
 
 		// Get paginated results
 		$provider = new ActiveDataProvider([
