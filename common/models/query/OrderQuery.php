@@ -65,7 +65,7 @@ class OrderQuery extends \yii\db\ActiveQuery
      */
 	public function afterUpdatedDate($date)
     {
-        return $this->andOnCondition('>=' , [Order::tableName() . '.updated_date' => $date->format('Y-m-d')]);
+        return $this->andWhere(['>=' , Order::tableName() . '.updated_date', $date->format('Y-m-d')]);
     }
 
     /**
@@ -76,7 +76,7 @@ class OrderQuery extends \yii\db\ActiveQuery
      */
 	public function afterCreatedDate($date)
     {
-        return $this->andOnCondition('>=' , [Order::tableName() . '.created_date' => $date->format('Y-m-d')]);
+        return $this->andWhere(['>=', Order::tableName() . '.created_date', $date->format('Y-m-d')]);
     }
 
 	/**

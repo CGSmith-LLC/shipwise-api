@@ -785,6 +785,20 @@ class OrderController extends ControllerEx
 	 *                default = 0
 	 *            ),
 	 *     @SWG\Parameter(
+	 *                name = "createdDate",
+	 *                in = "query",
+	 *                type = "string",
+	 *                description = "Search for orders after created date",
+     *                default = 0
+	 *            ),
+	 *     @SWG\Parameter(
+	 *                name = "updatedDate",
+	 *                in = "query",
+	 *                type = "string",
+	 *                description = "Search for orders after updated date",
+     *                default = 0
+	 *            ),
+	 *     @SWG\Parameter(
 	 *                name = "per-page",
 	 *                in = "query",
 	 *                type = "integer",
