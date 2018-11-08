@@ -799,6 +799,13 @@ class OrderController extends ControllerEx
      *                default = 0
 	 *            ),
 	 *     @SWG\Parameter(
+	 *                name = "requestedShipDate",
+	 *                in = "query",
+	 *                type = "string",
+	 *                description = "Search for orders on requested ship date",
+     *                default = 0
+	 *            ),
+	 *     @SWG\Parameter(
 	 *                name = "per-page",
 	 *                in = "query",
 	 *                type = "integer",
@@ -895,12 +902,21 @@ class OrderController extends ControllerEx
 
 		$updatedDate = null;
 		$createdDate = null;
+		$requestedShipDate = null;
 		if (null !== $this->request->get('updatedDate')) {
             $updatedDate = $this->request->get('updatedDate');
         }
 		if (null !== $this->request->get('createdDate')) {
             $createdDate = $this->request->get('createdDate');
         }
+        if (null !== $this->request->get('requestedShipDate')) {
+            $requestedShipDate = $this->request->get('requestedShipDate');
+        }
+
+
+        /**
+         * Select by updated date and/or created date
+         */
 		if ($updatedDate !== null && $createdDate !== null) {
             $query = OrderEx::find()
                 ->forCustomer($customerId)
@@ -922,6 +938,8 @@ class OrderController extends ControllerEx
                 ->forCustomer($customerId)
                 ->byStatus($statusId);
         }
+
+        $query->onRequestedDate($requestedShipDate);
 
 		// Get paginated results
 		$provider = new ActiveDataProvider([

@@ -58,6 +58,17 @@ class OrderQuery extends \yii\db\ActiveQuery
 	}
 
     /**
+     * Query condition to get requested ship date
+     *
+     * @param $date
+     * @return OrderQuery
+     */
+	public function onRequestedDate($date)
+    {
+        return $this->andOnCondition([Order::tableName() . '.requested_ship_date' => $date]);
+    }
+
+    /**
      * Query condition to get orders after an updated date
      *
      * @param $date \DateTime
