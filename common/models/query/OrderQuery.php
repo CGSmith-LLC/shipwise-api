@@ -63,9 +63,9 @@ class OrderQuery extends \yii\db\ActiveQuery
      * @param $date
      * @return OrderQuery
      */
-	public function onRequestedDate($date)
+	public function onOrBeforeRequestedDate($date)
     {
-        return $this->andOnCondition([Order::tableName() . '.requested_ship_date' => $date]);
+        return $this->andWhere('<=', [Order::tableName() . '.requested_ship_date', $date]);
     }
 
     /**
