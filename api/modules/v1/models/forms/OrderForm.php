@@ -103,7 +103,7 @@ class OrderForm extends Model
 			['uuid', 'string', 'length' => [1, 64]],
 			['orderReference', 'string', 'length' => [1, 45]],
 			['customerReference', 'string', 'length' => [1, 64]],
-            ['requestedShipDate', 'date', 'format' => 'Y-m-d'],
+            ['requestedShipDate', 'date', 'format' => 'php:Y-m-d'],
 			['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
 			['status', 'integer', 'on' => self::SCENARIO_UPDATE],
 			[
