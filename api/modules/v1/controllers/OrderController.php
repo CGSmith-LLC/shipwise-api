@@ -930,7 +930,7 @@ class OrderController extends ControllerEx
         }
 
         if ($requestedShipDate !== null) {
-            $query->onRequestedDate($requestedShipDate);
+            $query->onOrBeforeRequestedDate($requestedShipDate);
         }
 
 		// Get paginated results

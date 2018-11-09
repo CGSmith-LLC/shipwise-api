@@ -65,7 +65,7 @@ class OrderQuery extends \yii\db\ActiveQuery
      */
 	public function onOrBeforeRequestedDate($date)
     {
-        return $this->andWhere('<=', [Order::tableName() . '.requested_ship_date', $date]);
+        return $this->andWhere(['<=', Order::tableName() . '.requested_ship_date', $date]);
     }
 
     /**
