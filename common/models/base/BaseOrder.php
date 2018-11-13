@@ -15,6 +15,8 @@ namespace common\models\base;
  * @property string $updated_date
  * @property int    $address_id
  * @property string $notes
+ * @property string $uuid
+ * @property string $requested_ship_date
  */
 class BaseOrder extends \yii\db\ActiveRecord
 {

@@ -24,9 +24,9 @@ return [
 		"class"         => 'yii\rest\UrlRule',
 		"controller"    => ["$version/order"],
 		"extraPatterns" => [
-			"GET  {id}/items"              => "items",
-			"GET  findbystatus"            => "findbystatus",
-            "GET  findbycustomerreference" => "findbycustomerreference",
+            "GET  {id}/items"   => "items",
+            "GET  findbystatus" => "findbystatus",
+            "GET  find"         => "find",
 		],
 	],
 
