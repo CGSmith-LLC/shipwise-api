@@ -4,7 +4,6 @@ namespace common\models;
 
 use common\models\base\BaseOrder;
 use common\models\query\OrderQuery;
-use Symfony\Component\BrowserKit\History;
 
 /**
  * Class Order
@@ -16,7 +15,7 @@ use Symfony\Component\BrowserKit\History;
  * @property TrackingInfo $trackingInfo
  * @property Item[]       $items
  * @property Status       $status
- * @property History[]    $history
+ * @property OrderHistory[]    $history
  */
 class Order extends BaseOrder
 {
