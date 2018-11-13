@@ -23,13 +23,14 @@ class OrderController extends ControllerEx
 	protected function verbs()
 	{
 		return [
-			'index'        => ['GET'],
-			'create'       => ['POST'],
-			'update'       => ['PUT'],
-			'view'         => ['GET'],
-			'delete'       => ['DELETE'],
-			'items'        => ['GET'],
-			'findbystatus' => ['GET'],
+			'index'                   => ['GET'],
+			'create'                  => ['POST'],
+			'update'                  => ['PUT'],
+			'view'                    => ['GET'],
+			'delete'                  => ['DELETE'],
+			'items'                   => ['GET'],
+			'findbystatus'            => ['GET'],
+			'findbycustomerreference' => ['GET'],
 		];
 	}
 
@@ -913,8 +914,6 @@ class OrderController extends ControllerEx
             $requestedShipDate = $this->request->get('requestedShipDate');
         }
 
-
-
         $query = OrderEx::find()
             ->forCustomer($customerId)
             ->byStatus($statusId);
@@ -941,4 +940,72 @@ class OrderController extends ControllerEx
 
 		return $this->success($provider);
 	}
+
+
+
+    /**
+     * @SWG\Get(
+     *     path = "/orders/findbycustomerreference/{customerreference}",
+     *     tags = { "Orders" },
+     *     summary = "Fetch specific order by customer reference (order identifier in customer database)",
+     *     description = "Fetch specific order by customer reference (order identifier in customer database)",
+     *
+     *     @SWG\Parameter( name = "customerreference", in = "path", type = "string", required = true ),
+     *
+     *     @SWG\Response(
+     *          response = 200,
+     *          description = "Successful operation. Response contains the order found.",
+     *          @SWG\Schema(
+     *              ref = "#/definitions/Order"
+     *            ),
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 401,
+     *          description = "Impossible to authenticate user",
+     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 403,
+     *          description = "User is inactive",
+     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 404,
+     *          description = "Order not found",
+     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 500,
+     *          description = "Unexpected error",
+     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     security = {{
+     *            "apiTokenAuth": {}
+     *     }}
+     * )
+     */
+
+    /**
+     * Find order by customer reference number (from their database)
+     *
+     * @param $customerReference
+     * @return array|\api\modules\v1\models\order\OrderEx
+     */
+	public function actionFindbycustomerreference($customerReference)
+    {
+        if (($order = OrderEx::find()
+                ->byCustomerReference($customerReference)
+                ->forCustomer($this->apiConsumer->customer->id)
+                ->one()
+            ) === null) {
+            return $this->errorMessage(404, 'Order not found');
+        }
+
+        return $this->success($order);
+    }
 }

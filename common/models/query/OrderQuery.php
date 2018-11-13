@@ -45,6 +45,18 @@ class OrderQuery extends \yii\db\ActiveQuery
 			: $this;
 	}
 
+    /**
+     * Query condition to get order by customer reference ID - identifier in the customer database
+     *
+     * @param string $customerReference Identifier in customer database
+     *
+     * @return OrderQuery
+     */
+	public function byCustomerReference($customerReference)
+    {
+        return $this->andOnCondition([Order::tableName() . '.customer_reference' => $customerReference]);
+    }
+
 	/**
 	 * Query condition to get orders for given status id
 	 *
