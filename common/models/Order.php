@@ -9,6 +9,13 @@ use common\models\query\OrderQuery;
  * Class Order
  *
  * @package common\models
+ *
+ * @property Customer     $customer
+ * @property Address      $address
+ * @property TrackingInfo $trackingInfo
+ * @property Item[]       $items
+ * @property Status       $status
+ * @property OrderHistory[]    $history
  */
 class Order extends BaseOrder
 {

@@ -8,6 +8,8 @@ use common\models\base\BaseApiConsumer;
  * Class ApiConsumer
  *
  * @package common\models
+ *
+ * @property Customer $customer
  */
 class ApiConsumer extends BaseApiConsumer
 {

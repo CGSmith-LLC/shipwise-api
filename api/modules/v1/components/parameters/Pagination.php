@@ -13,7 +13,7 @@ use yii\helpers\ArrayHelper;
  * This behavior class will get pagination parameters that are available in GET methods
  * and will make them available to any class having this behavior attached.
  *
- * @package api\modules\v1\components\list
+ * @package api\modules\v1\components\parameters
  */
 class Pagination extends Behavior
 {
