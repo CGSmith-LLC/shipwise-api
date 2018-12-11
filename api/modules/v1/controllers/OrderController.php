@@ -241,6 +241,7 @@ class OrderController extends ControllerEx
              */
             $address           = new AddressEx();
             $address->name     = $orderForm->shipTo->name;
+            $address->email    = $orderForm->shipTo->email;
             $address->address1 = $orderForm->shipTo->address1;
             $address->address2 = $orderForm->shipTo->address2;
             $address->city     = $orderForm->shipTo->city;
