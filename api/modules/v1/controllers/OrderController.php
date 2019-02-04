@@ -255,6 +255,8 @@ class OrderController extends ControllerEx
             $order                      = new OrderEx();
             $order->customer_id         = $this->apiConsumer->customer->id;
             $order->uuid                = $orderForm->uuid;
+            $order->carrier_id          = $orderForm->carrier_id;
+            $order->service_id          = $orderForm->service_id;
             $order->order_reference     = $orderForm->orderReference;
             $order->customer_reference  = $orderForm->customerReference;
             $order->requested_ship_date = $orderForm->requestedShipDate;

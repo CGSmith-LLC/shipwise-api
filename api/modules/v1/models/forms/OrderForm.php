@@ -77,6 +77,10 @@ class OrderForm extends Model
 	/** @var string */
 	public $uuid;
 	/** @var string */
+	public $carrier_id;
+	/** @var string */
+	public $service_id;
+	/** @var string */
 	public $orderReference;
 	/** @var string */
 	public $customerReference;
@@ -114,7 +118,7 @@ class OrderForm extends Model
 					implode(StatusEx::getIdsAsArray(), ', '),
 			],
 			['items', 'checkIsArray'],
-			['tracking', 'safe'],
+			[['tracking','service_id','carrier_id'], 'safe'],
 		];
 	}
 
