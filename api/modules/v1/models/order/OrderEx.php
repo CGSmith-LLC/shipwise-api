@@ -16,7 +16,6 @@ class OrderEx extends Order
 	 *     definition = "Order",
 	 *
 	 *     @SWG\Property( property = "id", type = "integer", description = "Order ID" ),
-	 *     @SWG\Property( property = "uuid", type = "string", description = "Reference to ecommerce UUID" ),
 	 *     @SWG\Property( property = "carrier_id", type = "integer", description = "Specifies Carrier to ship through" ),
 	 *     @SWG\Property( property = "service_id", type = "integer", description = "Specifies Service level to ship through" ),
 	 *     @SWG\Property( property = "orderReference", type = "string", description = "Order reference - Order number from fulfillment side" ),
@@ -34,6 +33,8 @@ class OrderEx extends Order
 	 *     @SWG\Property( property = "status", ref = "#/definitions/Status" ),
 	 *     @SWG\Property( property = "history", ref = "#/definitions/OrderHistory" ),
 	 *     @SWG\Property( property = "customer", ref = "#/definitions/Customer" ),
+     *     @SWG\Property( property = "uuid", type = "string", description = "Reference to ecommerce UUID" ),
+     *     @SWG\Property( property = "origin", type = "string", description = "Origination of order. Such as SquareSpace or Zoho" ),
 	 * )
 	 */
 
@@ -44,7 +45,6 @@ class OrderEx extends Order
 	{
 		return [
 			'id'                => 'id',
-			'uuid'              => 'uuid',
 			'orderReference'    => 'order_reference',
 			'customerReference' => 'customer_reference',
 			'requestedShipDate' => 'requested_ship_date',
@@ -58,6 +58,8 @@ class OrderEx extends Order
 			'customer'          => 'customer',
 			'carrier_id'        => 'carrier_id',
 			'service_id'        => 'service_id',
+            'uuid'              => 'uuid',
+            'origin'            => 'origin',
 		];
 	}
 

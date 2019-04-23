@@ -11,23 +11,16 @@ use api\modules\v1\models\order\StatusEx;
  *     definition = "OrderForm",
  *     required   = { "customerReference", "shipTo", "items" },
  *     @SWG\Property(
- *            property = "uuid",
- *            type = "string",
- *            description = "Unique identifier from ecommerce platform",
- *            minLength = 1,
- *            maxLength = 64
- *        ),
- *     @SWG\Property(
  *            property = "orderReference",
  *            type = "string",
- *            description = "Order reference - typically Order Number from ecommerce side",
+ *            description = "Order reference - order number from fulfillment side",
  *            minLength = 1,
  *            maxLength = 45
  *        ),
  *     @SWG\Property(
  *            property = "customerReference",
  *            type = "string",
- *            description = "Customer reference",
+ *            description = "Customer reference - order number from Ecommerce or customer side",
  *            minLength = 1,
  *            maxLength = 64
  *        ),
@@ -60,6 +53,20 @@ use api\modules\v1\models\order\StatusEx;
  *            type = "array",
  *     		  @SWG\Items( ref = "#/definitions/ItemForm" )
  *        ),
+ *     @SWG\Property(
+ *            property = "uuid",
+ *            type = "string",
+ *            description = "Unique identifier from ecommerce platform",
+ *            minLength = 1,
+ *            maxLength = 64
+ *        ),
+ *     @SWG\Property(
+ *            property = "origin",
+ *            type = "string",
+ *            description = "Origination platform of the order. Such as SquareSpace, WooCommerce, Zoho, etc.",
+ *            minLength = 1,
+ *            maxLength = 64
+ *        ),
  * )
  */
 
@@ -76,6 +83,8 @@ class OrderForm extends Model
 
 	/** @var string */
 	public $uuid;
+	/** @var string */
+	public $origin;
 	/** @var string */
 	public $carrier_id;
 	/** @var string */
@@ -104,9 +113,8 @@ class OrderForm extends Model
 			[
 				['customerReference', 'shipTo', 'items'], 'required', 'message' => '{attribute} is required.',
 			],
-			['uuid', 'string', 'length' => [1, 64]],
-			['orderReference', 'string', 'length' => [1, 45]],
-			['customerReference', 'string', 'length' => [1, 64]],
+            [['uuid','origin','customerReference'], 'string', 'length' => [1, 64]],
+            ['orderReference', 'string', 'length' => [1, 45]],
             ['requestedShipDate', 'date', 'format' => 'php:Y-m-d'],
 			['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
 			['status', 'integer', 'on' => self::SCENARIO_UPDATE],
