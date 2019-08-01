@@ -524,6 +524,16 @@ class OrderController extends ControllerEx
             }
 
             /**
+             * Update carrier information
+             */
+            if (!empty($orderForm->carrier_id)) {
+                $order->carrier_id = $orderForm->carrier_id;
+            }
+            if (!empty($orderForm->service_id)) {
+                $order->service_id = $orderForm->service_id;
+            }
+
+            /**
              * Update TrackingInfo.
              * At this stage the required tracking object should be fully validated.
              */

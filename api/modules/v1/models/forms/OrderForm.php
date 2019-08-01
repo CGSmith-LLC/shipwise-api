@@ -67,6 +67,14 @@ use api\modules\v1\models\order\StatusEx;
  *            minLength = 1,
  *            maxLength = 64
  *        ),
+ *     @SWG\Property(
+ *            property = "carrier_id",
+ *            type = "integer",
+ *        ),
+ *     @SWG\Property(
+ *            property = "service_id",
+ *            type = "integer"
+ *        ),
  * )
  */
 
