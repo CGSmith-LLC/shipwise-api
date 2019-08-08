@@ -24,6 +24,6 @@ To request your API credentials please contact us.",
  *
  *     consumes={"application/json"},
  *     produces={"application/json"},
- *     security={"apiTokenAuth"}
+ *     security={{"apiTokenAuth":{}}}
  * )
  */
