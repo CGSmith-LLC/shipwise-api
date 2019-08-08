@@ -10,6 +10,7 @@ mv -v /var/builds/api/$1/ /var/www/api/ || { echo 'mv to backend failed' ; exit 
 # Copy local files to new deployment
 cp /var/builds/configs/api/api/web/index.php /var/www/api/api/web/index.php || { echo 'mv failed for environment settings' ; exit 1; }
 cp /var/builds/configs/api/common/config/main-local.php /var/www/api/common/config/main-local.php || { echo 'mv failed for environment settings' ; exit 1; }
+cp /var/builds/configs/api/common/config/params-local.php /var/www/api/common/config/params-local.php || { echo 'mv failed for environment settings' ; exit 1; }
 
 cp /var/builds/configs/api/console/config/main-local.php /var/www/api/console/config/main-local.php || { echo 'mv failed for environment settings' ; exit 1; }
 cp /var/builds/configs/api/console/config/params-local.php /var/www/api/console/config/params-local.php || { echo 'mv failed for environment settings' ; exit 1; }
