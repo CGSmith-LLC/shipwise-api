@@ -51,7 +51,10 @@ class ControllerEx extends Controller
 	}
 
 	/**
-	 * Authenticates user
+	 * Authenticates user.
+	 *
+	 * This function is used by HttpBasicAuth yii authenticator.
+	 * Finds user by username and password (db fields: auth_secret and auth_token)
 	 *
 	 * @param string $username
 	 * @param string $password
@@ -64,11 +67,6 @@ class ControllerEx extends Controller
 
 		// Find user
 		if (($this->apiConsumer = ApiConsumerEx::findByKeySecret($username, $password)) === null) {
-			return null;
-		}
-
-		// Check if user is active
-		if (!$this->apiConsumer->isActive()) {
 			return null;
 		}
 
