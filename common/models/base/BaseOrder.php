@@ -16,6 +16,7 @@ namespace common\models\base;
  * @property int    $address_id
  * @property string $notes
  * @property string $uuid
+ * @property string $origin
  * @property string $requested_ship_date
  */
 class BaseOrder extends \yii\db\ActiveRecord
@@ -35,10 +36,10 @@ class BaseOrder extends \yii\db\ActiveRecord
 	{
 		return [
 			[['customer_id', 'customer_reference', 'address_id'], 'required'],
-			[['customer_id', 'status_id', 'address_id'], 'integer'],
-			[['created_date', 'updated_date'], 'safe'],
+			[['customer_id', 'status_id', 'address_id', 'carrier_id', 'service_id'], 'integer'],
+			[['created_date', 'updated_date', 'carrier_id', 'service_id'], 'safe'],
 			[['order_reference', 'tracking'], 'string', 'max' => 45],
-			[['customer_reference'], 'string', 'max' => 64],
+			[['customer_reference', 'origin'], 'string', 'max' => 64],
 			[['notes'], 'string', 'max' => 140],
 		];
 	}
@@ -54,11 +55,14 @@ class BaseOrder extends \yii\db\ActiveRecord
 			'order_reference'    => 'Order Reference',
 			'customer_reference' => 'Customer Reference',
 			'status_id'          => 'Status ID',
+			'carrier_id'         => 'Carrier ID',
+			'service_id'         => 'Service ID',
 			'tracking'           => 'Tracking',
 			'created_date'       => 'Created Date',
 			'updated_date'       => 'Updated Date',
 			'address_id'         => 'Address ID',
 			'notes'              => 'Notes',
+            'origin'             => 'Origin of Order',
 		];
 	}
 }

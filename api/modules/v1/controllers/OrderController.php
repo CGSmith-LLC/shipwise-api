@@ -241,6 +241,7 @@ class OrderController extends ControllerEx
              */
             $address           = new AddressEx();
             $address->name     = $orderForm->shipTo->name;
+            $address->email    = $orderForm->shipTo->email;
             $address->address1 = $orderForm->shipTo->address1;
             $address->address2 = $orderForm->shipTo->address2;
             $address->city     = $orderForm->shipTo->city;
@@ -254,6 +255,9 @@ class OrderController extends ControllerEx
             $order                      = new OrderEx();
             $order->customer_id         = $this->apiConsumer->customer->id;
             $order->uuid                = $orderForm->uuid;
+            $order->origin              = $orderForm->origin;
+            $order->carrier_id          = $orderForm->carrier_id;
+            $order->service_id          = $orderForm->service_id;
             $order->order_reference     = $orderForm->orderReference;
             $order->customer_reference  = $orderForm->customerReference;
             $order->requested_ship_date = $orderForm->requestedShipDate;
@@ -517,6 +521,16 @@ class OrderController extends ControllerEx
                 }
 
                 $address->save();
+            }
+
+            /**
+             * Update carrier information
+             */
+            if (!empty($orderForm->carrier_id)) {
+                $order->carrier_id = $orderForm->carrier_id;
+            }
+            if (!empty($orderForm->service_id)) {
+                $order->service_id = $orderForm->service_id;
             }
 
             /**

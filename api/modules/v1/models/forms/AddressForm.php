@@ -17,6 +17,11 @@ use api\modules\v1\models\core\StateEx;
  *            maxLength = 64
  *        ),
  *     @SWG\Property(
+ *            property = "email",
+ *            type = "string",
+ *            description = "Email",
+ *        ),
+ *     @SWG\Property(
  *            property = "address1",
  *            type = "string",
  *            description = "Address line 1",
@@ -131,6 +136,8 @@ class AddressForm extends Model
 	/** @var string */
 	public $name;
 	/** @var string */
+	public $email;
+	/** @var string */
 	public $address1;
 	/** @var string */
 	public $address2;
@@ -153,6 +160,7 @@ class AddressForm extends Model
 		return [
 			[['name', 'address1', 'city', 'stateId', 'zip'], 'required', 'message' => '{attribute} is required.'],
 			[['name', 'address1', 'city'], 'string', 'length' => [2, 64]],
+            ['email', 'email'],
             ['address2', 'string', 'length' => [1, 64]],
 			['zip', 'string', 'length' => [2, 16]],
 			['phone', 'string', 'length' => [2, 32]],

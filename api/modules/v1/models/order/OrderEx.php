@@ -16,7 +16,10 @@ class OrderEx extends Order
 	 *     definition = "Order",
 	 *
 	 *     @SWG\Property( property = "id", type = "integer", description = "Order ID" ),
-	 *     @SWG\Property( property = "uuid", type = "string", description = "Reference to ecommerce UUID" ),
+	 *     @SWG\Property( property = "carrier_id", type = "integer", description = "Specifies Carrier to ship through" ),
+	 *     @SWG\Property( property = "carrier_name", type = "string", description = "Specifies Carrier name" ),
+	 *     @SWG\Property( property = "service_id", type = "integer", description = "Specifies Service level to ship through" ),
+     *     @SWG\Property( property = "service_name", type = "string", description = "Specifies Service name" ),
 	 *     @SWG\Property( property = "orderReference", type = "string", description = "Order reference - Order number from fulfillment side" ),
 	 *     @SWG\Property( property = "customerReference", type = "string", description = "Customer reference - Order Number from ecommerce side" ),
 	 *     @SWG\Property( property = "requestedShipDate", type = "string", format = "date-time", description = "When the order should ship and be fulfilled" ),
@@ -32,6 +35,8 @@ class OrderEx extends Order
 	 *     @SWG\Property( property = "status", ref = "#/definitions/Status" ),
 	 *     @SWG\Property( property = "history", ref = "#/definitions/OrderHistory" ),
 	 *     @SWG\Property( property = "customer", ref = "#/definitions/Customer" ),
+     *     @SWG\Property( property = "uuid", type = "string", description = "Reference to ecommerce UUID" ),
+     *     @SWG\Property( property = "origin", type = "string", description = "Origination of order. Such as SquareSpace or Zoho" ),
 	 * )
 	 */
 
@@ -42,7 +47,6 @@ class OrderEx extends Order
 	{
 		return [
 			'id'                => 'id',
-			'uuid'              => 'uuid',
 			'orderReference'    => 'order_reference',
 			'customerReference' => 'customer_reference',
 			'requestedShipDate' => 'requested_ship_date',
@@ -54,6 +58,12 @@ class OrderEx extends Order
 			'status'            => 'status',
 			'history'           => 'history',
 			'customer'          => 'customer',
+			'carrier_id'        => 'carrier_id',
+			'carrier_name'      =>  function () { return $this->carrier['name']; },
+			'service_id'        => 'service_id',
+            'service_name'      =>  function () { return $this->service['name']; },
+            'uuid'              => 'uuid',
+            'origin'            => 'origin',
 		];
 	}
 
@@ -116,6 +126,26 @@ class OrderEx extends Order
 	{
 		return $this->hasOne('api\modules\v1\models\core\AddressEx', ['id' => 'address_id']);
 	}
+
+    /**
+     * Get Carrier Name
+     *
+     * @return \yii\db\ActiveQuery
+     */
+	public function getCarrier()
+    {
+        return $this->hasOne('api\modules\v1\models\core\CarrierEx', ['id' => 'carrier_id']);
+    }
+
+    /**
+     * Get service name
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getService()
+    {
+        return $this->hasOne('api\modules\v1\models\core\ServiceEx', ['id' => 'service_id']);
+    }
 
 	/**
 	 * Get Tracking Info
