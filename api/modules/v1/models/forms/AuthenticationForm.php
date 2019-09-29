@@ -5,17 +5,20 @@ namespace api\modules\v1\models\forms;
 use api\modules\v1\models\core\ApiConsumerEx;
 use yii\base\Model;
 
-/**
- * @SWG\Definition(
- *     definition = "AuthenticationForm",
- *     required   = { "key", "secret" },
- *     @SWG\Property( property = "key", type = "string", description = "Your API key" ),
- *     @SWG\Property( property = "secret", type = "string", description = "Your API secret" ),
- * )
- */
+///**
+// * @deprecated Not used since Basic Auth was implemented to replace API authentication.
+// * @ SWG\Definition(
+// *     definition = "AuthenticationForm",
+// *     required   = { "key", "secret" },
+// *     @ SWG\Property( property = "key", type = "string", description = "Your API key" ),
+// *     @ SWG\Property( property = "secret", type = "string", description = "Your API secret" ),
+// * )
+// */
 
 /**
  * Class AuthenticationForm
+ *
+ * @deprecated Not used since Basic Auth was implemented to replace API authentication.
  *
  * @package api\modules\v1\models\forms
  */

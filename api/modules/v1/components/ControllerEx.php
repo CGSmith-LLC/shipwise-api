@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\components;
 
+use api\modules\v1\models\core\ApiConsumerEx;
 use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use Yii;
@@ -19,12 +20,19 @@ class ControllerEx extends Controller
 	/** @var  \yii\web\Response */
 	public $response;
 
+	/**
+	 * API Consumer
+	 *
+	 * @var \api\modules\v1\models\core\ApiConsumerEx
+	 */
+	public $apiConsumer;
+
 	/** @inheritdoc */
 	public function init()
 	{
 		parent::init();
 
-		$this->request  = Yii::$app->request;
+		$this->request = Yii::$app->request;
 		$this->response = Yii::$app->response;
 	}
 
@@ -32,10 +40,63 @@ class ControllerEx extends Controller
 	public function behaviors()
 	{
 		return ArrayHelper::merge(parent::behaviors(), [
-			'AuthConsumer' => [
+			/*'AuthConsumer' => [ // @deprecated Not used since Basic Auth was implemented to replace API authentication
 				'class' => 'api\modules\v1\components\security\ApiConsumerSecurity',
-			],
+			],*/
+			'authenticator' => [
+				'class' => 'yii\filters\auth\HttpBasicAuth',
+				'auth' => [$this, 'auth'],
+			]
 		]);
+	}
+
+	/**
+	 * Authenticates user
+	 *
+	 * @param string $username
+	 * @param string $password
+	 * @return static|null
+	 */
+	public function auth($username, $password)
+	{
+		if (empty($username) || empty($password))
+			return null;
+
+		// Find user
+		if (($this->apiConsumer = ApiConsumerEx::findByKeySecret($username, $password)) === null) {
+			return null;
+		}
+
+		// Check if user is active
+		if (!$this->apiConsumer->isActive()) {
+			return null;
+		}
+
+		// Check if user is active
+		if (!$this->apiConsumer->isActive()) {
+			return null;
+		}
+
+		/**
+		 * Set user identity without touching session or cookie.
+		 * (this is preferred use in stateless RESTful API implementation)
+		 */
+		Yii::$app->user->setIdentity($this->apiConsumer);
+
+		/**
+		 * User successfully authenticated.
+		 *
+		 * @see yii\web\User
+		 *
+		 * Yii::$app->user->identity to access currently authenticated user.
+		 * Yii::$app->user->identity->customer to access currently authenticated customer if any.
+		 *
+		 */
+
+		// Log user activity
+		$this->apiConsumer->updateLastActivity()->save();
+
+		return $this->apiConsumer;
 	}
 
 	/**
@@ -59,7 +120,7 @@ class ControllerEx extends Controller
 	/**
 	 * Error response
 	 *
-	 * @param int    $code    HTTP code
+	 * @param int $code       HTTP code
 	 * @param string $message Error message
 	 *
 	 * @return array

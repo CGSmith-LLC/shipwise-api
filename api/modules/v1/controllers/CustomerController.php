@@ -67,7 +67,7 @@ class CustomerController extends ControllerEx
 	 *       ),
 	 *
 	 *     security = {{
-	 *            "apiTokenAuth": {},
+	 *            "basicAuth": {},
 	 *     }}
 	 * )
 	 */
@@ -134,7 +134,7 @@ class CustomerController extends ControllerEx
 	 *       ),
 	 *
 	 *     security = {{
-	 *            "apiTokenAuth": {}
+	 *            "basicAuth": {}
 	 *     }}
 	 * )
 	 */
@@ -222,7 +222,7 @@ class CustomerController extends ControllerEx
 	 *       ),
 	 *
 	 *     security = {{
-	 *            "apiTokenAuth": {}
+	 *            "basicAuth": {}
 	 *     }}
 	 * )
 	 */
@@ -308,7 +308,7 @@ class CustomerController extends ControllerEx
 	 *       ),
 	 *
 	 *     security = {{
-	 *            "apiTokenAuth": {}
+	 *            "basicAuth": {}
 	 *     }}
 	 * )
 	 */
@@ -411,7 +411,7 @@ class CustomerController extends ControllerEx
 	 *       ),
 	 *
 	 *     security = {{
-	 *            "apiTokenAuth": {}
+	 *            "basicAuth": {}
 	 *     }}
 	 * )
 	 */

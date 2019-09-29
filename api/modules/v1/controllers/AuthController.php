@@ -14,6 +14,8 @@ use yii\web\ForbiddenHttpException;
 /**
  * Class AuthController
  *
+ * @deprecated Not used since Basic Auth was implemented to replace API authentication.
+ *
  * @package api\modules\v1\controllers
  */
 class AuthController extends Controller
@@ -61,67 +63,68 @@ class AuthController extends Controller
 		];
 	}
 
-	/**
-	 * @SWG\Post(
-	 *     path="/auth",
-	 *     tags={"Authentication"},
-	 *     summary="Authenticates a user into the API",
-	 *
-	 *     @SWG\Parameter(
-	 *          in = "body",
-	 *          name = "AuthenticationForm",
-	 *          description = "Authentication request form",
-	 *          required = true,
-	 *          @SWG\Schema( ref = "#/definitions/AuthenticationForm" ),
-	 *     ),
-	 *
-	 *     @SWG\Response(
-	 *          response = 200,
-	 *          description = "Authentication successful. Response contains API token.",
-	 *          @SWG\Schema( ref = "#/definitions/AuthenticationResponse" ),
-	 *
-	 *     		@SWG\Header(
-	 *            header = "X-Expires-After",
-	 *                description = "Date in UTC when token expires",
-	 *                type = "string",
-	 *       		@SWG\Schema(
-	 *                type = "string",
-	 *                format = "date-time",
-	 *            ),
-	 *            ),
-	 *     ),
-	 *
-	 *	   @SWG\Response(
-	 *          response = 400,
-	 *          description = "Bad request",
-	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
-	 *     ),
-	 *
-	 *     @SWG\Response(
-	 *          response = 401,
-	 *          description = "Authentication failed",
-	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
-	 *     ),
-	 *
-	 *     @SWG\Response(
-	 *          response = 403,
-	 *          description = "User is inactive",
-	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
-	 *     ),
-	 *
-	 *     @SWG\Response(
-	 *          response = 422,
-	 *          description = "Fields are missing or invalid",
-	 *     		@SWG\Schema( ref = "#/definitions/ErrorData" )
-	 *     ),
-	 *
-	 *     @SWG\Response(
-	 *          response = 500,
-	 *          description = "Unexpected error",
-	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
-	 *       ),
-	 * )
-	 */
+//	/**
+//     * // @deprecated Not used since Basic Auth was implemented to replace API authentication
+//	 * @ SWG\Post(
+//	 *     path="/auth",
+//	 *     tags={"Authentication"},
+//	 *     summary="Authenticates a user into the API",
+//	 *
+//	 *     @ SWG\Parameter(
+//	 *          in = "body",
+//	 *          name = "AuthenticationForm",
+//	 *          description = "Authentication request form",
+//	 *          required = true,
+//	 *          @ SWG\Schema( ref = "#/definitions/AuthenticationForm" ),
+//	 *     ),
+//	 *
+//	 *     @ SWG\Response(
+//	 *          response = 200,
+//	 *          description = "Authentication successful. Response contains API token.",
+//	 *          @S WG\Schema( ref = "#/definitions/AuthenticationResponse" ),
+//	 *
+//	 *     		@ SWG\Header(
+//	 *            header = "X-Expires-After",
+//	 *                description = "Date in UTC when token expires",
+//	 *                type = "string",
+//	 *       		@ SWG\Schema(
+//	 *                type = "string",
+//	 *                format = "date-time",
+//	 *            ),
+//	 *            ),
+//	 *     ),
+//	 *
+//	 *	   @ SWG\Response(
+//	 *          response = 400,
+//	 *          description = "Bad request",
+//	 *     		@ SWG\Schema( ref = "#/definitions/ErrorMessage" )
+//	 *     ),
+//	 *
+//	 *     @ SWG\Response(
+//	 *          response = 401,
+//	 *          description = "Authentication failed",
+//	 *     		@ SWG\Schema( ref = "#/definitions/ErrorMessage" )
+//	 *     ),
+//	 *
+//	 *     @ SWG\Response(
+//	 *          response = 403,
+//	 *          description = "User is inactive",
+//	 *     		@ SWG\Schema( ref = "#/definitions/ErrorMessage" )
+//	 *     ),
+//	 *
+//	 *     @ SWG\Response(
+//	 *          response = 422,
+//	 *          description = "Fields are missing or invalid",
+//	 *     		@ SWG\Schema( ref = "#/definitions/ErrorData" )
+//	 *     ),
+//	 *
+//	 *     @ SWG\Response(
+//	 *          response = 500,
+//	 *          description = "Unexpected error",
+//	 *     		@ SWG\Schema( ref = "#/definitions/ErrorMessage" )
+//	 *       ),
+//	 * )
+//	 */
 
 	/**
 	 * Action Login
@@ -173,31 +176,32 @@ class AuthController extends Controller
 		]);
 	}
 
-	/**
-	 * @SWG\Delete(
-	 *     path = "/auth",
-	 *     tags = { "Authentication" },
-	 *     summary = "Logout authenticated user",
-	 *     description = "Allows an authenticated user to log out",
-	 *
-	 *     @SWG\Response( response = 204, description = "Logout successful", ),
-	 *
-	 *     @SWG\Response(
-	 *          response = 401,
-	 *          description = "Impossible to authenticate user",
-	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
-	 *       ),
-	 *
-	 *     @SWG\Response(
-	 *          response = 500,
-	 *          description = "Unexpected error",
-	 *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
-	 *       ),
-	 *     security = {{
-	 *            "apiTokenAuth": {},
-	 *     }}
-	 * )
-	 */
+//	/**
+//     * // @deprecated Not used since Basic Auth was implemented to replace API authentication
+//	 *  @ SWG\Delete(
+//	 *     path = "/auth",
+//	 *     tags = { "Authentication" },
+//	 *     summary = "Logout authenticated user",
+//	 *     description = "Allows an authenticated user to log out",
+//	 *
+//	 *     @ SWG\Response( response = 204, description = "Logout successful", ),
+//	 *
+//	 *     @ SWG\Response(
+//	 *          response = 401,
+//	 *          description = "Impossible to authenticate user",
+//	 *     		@ SWG\Schema( ref = "#/definitions/ErrorMessage" )
+//	 *       ),
+//	 *
+//	 *     @ SWG\Response(
+//	 *          response = 500,
+//	 *          description = "Unexpected error",
+//	 *     		@ SWG\Schema( ref = "#/definitions/ErrorMessage" )
+//	 *       ),
+//	 *     security = {{
+//	 *            "apiTokenAuth": {},
+//	 *     }}
+//	 * )
+//	 */
 
 	/**
 	 * Action Logout

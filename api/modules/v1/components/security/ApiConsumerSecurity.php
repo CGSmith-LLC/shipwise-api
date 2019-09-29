@@ -10,6 +10,13 @@ use yii\web\ForbiddenHttpException;
 use yii\rest\Controller;
 use Yii;
 
+/**
+ * Class ApiConsumerSecurity
+ *
+ * @deprecated Not used since Basic Auth was implemented to replace API authentication.
+ *
+ * @package api\modules\v1\components\security
+ */
 class ApiConsumerSecurity extends Behavior
 {
 	/**

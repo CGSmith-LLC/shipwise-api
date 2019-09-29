@@ -15,9 +15,9 @@ return [
 	"/$version/schema" => "$version/default/schema", // Swagger JSON spec file
 
 	// Authentication
-
-	"POST    $version/auth" => "$version/auth/login",
-	"DELETE  $version/auth" => "$version/auth/logout",
+	// @deprecated Not used since Basic Auth was implemented to replace API authentication.
+	// "POST    $version/auth" => "$version/auth/login",
+	// "DELETE  $version/auth" => "$version/auth/logout",
 
 	// Orders
 	[
