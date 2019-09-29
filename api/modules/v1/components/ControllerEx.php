@@ -58,7 +58,7 @@ class ControllerEx extends Controller
 	 *
 	 * @param string $username
 	 * @param string $password
-	 * @return static|null
+	 * @return ApiConsumerEx|null
 	 */
 	public function auth($username, $password)
 	{
