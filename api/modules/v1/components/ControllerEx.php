@@ -40,9 +40,6 @@ class ControllerEx extends Controller
 	public function behaviors()
 	{
 		return ArrayHelper::merge(parent::behaviors(), [
-			/*'AuthConsumer' => [ // @deprecated Not used since Basic Auth was implemented to replace API authentication
-				'class' => 'api\modules\v1\components\security\ApiConsumerSecurity',
-			],*/
 			'authenticator' => [
 				'class' => 'yii\filters\auth\HttpBasicAuth',
 				'auth' => [$this, 'auth'],

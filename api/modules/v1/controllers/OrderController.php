@@ -904,7 +904,6 @@ class OrderController extends ControllerEx
         /**
          * If Api consumer is a customer, then retrieve his orders,
          * if not, we assume that the Api consumer is a superuser and return all orders
-         * @see \api\modules\v1\components\security\ApiConsumerSecurity
          * @see \common\models\ApiConsumer
          */
         $customerId = $this->apiConsumer->isCustomer()
