@@ -73,10 +73,10 @@ class CustomerController extends ControllerEx
 	 */
 	public function actionIndex()
 	{
-        // Check if user is active
-        if (!$this->apiConsumer->isSuperuser()) {
-            throw new ForbiddenHttpException('Access Denied.');
-        }
+		// Check permissions
+		if (!$this->apiConsumer->isSuperuser()) {
+			throw new ForbiddenHttpException('Access Denied.');
+		}
 
 		return $this->success(
 			CustomerEx::find()->all()
@@ -148,7 +148,7 @@ class CustomerController extends ControllerEx
      */
 	public function actionCreate()
 	{
-        // Check if user is active
+        // Check permissions
         if (!$this->apiConsumer->isSuperuser()) {
             throw new ForbiddenHttpException('Access Denied.');
         }
@@ -237,7 +237,7 @@ class CustomerController extends ControllerEx
      */
 	public function actionView($id)
 	{
-        // Check if user is active
+        // Check permissions
         if (!$this->apiConsumer->isSuperuser()) {
             throw new ForbiddenHttpException('Access Denied.');
         }
@@ -325,7 +325,7 @@ class CustomerController extends ControllerEx
 	public function actionUpdate($id)
 	{
 
-        // Check if user is active
+        // Check permissions
         if (!$this->apiConsumer->isSuperuser()) {
             throw new ForbiddenHttpException('Access Denied.');
         }
@@ -421,16 +421,16 @@ class CustomerController extends ControllerEx
 	 *
 	 * @param int $id Customer ID
 	 *
-	 * @return array
+	 * @return array|void
 	 * @throws \Throwable
 	 * @throws \yii\db\StaleObjectException
 	 */
 	public function actionDelete($id)
 	{
-        // Check if user is active
-        if (!$this->apiConsumer->isSuperuser()) {
-            throw new ForbiddenHttpException('Access Denied.');
-        }
+		// Check permissions
+		if (!$this->apiConsumer->isSuperuser()) {
+			throw new ForbiddenHttpException('Access Denied.');
+		}
 
 		// Find the customer to delete
 		if (($customer = CustomerEx::findOne((int)$id)) === null) {
