@@ -1,7 +1,8 @@
 image: php:7.3.8
 pipelines:
-  default:
-    - step:
+  branches:
+    master:
+      - step:
         name: Install OS dependencies, run PHPUnit, create BUILD
         script:
           - apt-get update && apt-get install -y unzip libxml2-dev zlib1g-dev libzip-dev zip
@@ -13,20 +14,20 @@ pipelines:
           - zip -r build.zip . -x *.git* *tests* *vagrant*
         artifacts:
           - build.zip
-    - step:
-        name: Deploy build with SCP to PRODUCTION
-        script:
-          - pipe: atlassian/scp-deploy:0.3.3
-            variables:
-              USER: $USER
-              SERVER: $SERVER
-              REMOTE_PATH: '/var/builds/api/build-$BITBUCKET_COMMIT.zip'
-              LOCAL_PATH: 'build.zip'
-    - step:
-        name: Move current app to OLD and replace with new BUILD ZIP
-        script:
-          - pipe: atlassian/ssh-run:0.2.2
-            variables:
-              SSH_USER: $USER
-              SERVER: $SERVER
-              COMMAND: 'deploy-api.sh build-$BITBUCKET_COMMIT build-$BITBUCKET_COMMIT.zip'
+      - step:
+          name: Deploy build with SCP to PRODUCTION
+          script:
+            - pipe: atlassian/scp-deploy:0.3.3
+              variables:
+                USER: $USER
+                SERVER: $SERVER
+                REMOTE_PATH: '/var/builds/api/build-$BITBUCKET_COMMIT.zip'
+                LOCAL_PATH: 'build.zip'
+      - step:
+          name: Move current app to OLD and replace with new BUILD ZIP
+          script:
+            - pipe: atlassian/ssh-run:0.2.2
+              variables:
+                SSH_USER: $USER
+                SERVER: $SERVER
+                COMMAND: 'deploy-api.sh build-$BITBUCKET_COMMIT build-$BITBUCKET_COMMIT.zip'
