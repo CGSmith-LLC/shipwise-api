@@ -14,11 +14,6 @@ return [
 	"/$version/doc"    => "$version/default/doc", // Swagger UI with "Try it out" button
 	"/$version/schema" => "$version/default/schema", // Swagger JSON spec file
 
-	// Authentication
-
-	"POST    $version/auth" => "$version/auth/login",
-	"DELETE  $version/auth" => "$version/auth/logout",
-
 	// Orders
 	[
 		"class"         => 'yii\rest\UrlRule',

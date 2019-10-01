@@ -1,10 +1,4 @@
 <?php
-/**
- * @SWG\Tag(
- *     name = "Authentication",
- *     description = "",
- * )
- */
 
 /**
  * @SWG\Tag(
