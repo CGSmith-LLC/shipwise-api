@@ -1,20 +1,32 @@
 <?php
 
+use yii\helpers\Html;
+
 /* @var $this yii\web\View */
 
-$this->title = 'My Yii Application';
+$this->title = Yii::$app->name;
 ?>
 <div class="site-index">
 
     <div class="jumbotron">
-        <h1>Congratulations!</h1>
+        <?php if (Yii::$app->user->identity->isAdmin) : ?>
 
-        <p class="lead">You have successfully created your Yii-powered application.</p>
+            <h1>Welcome admin!</h1>
+            <p class="lead">You have the power <span class="glyphicon glyphicon-sunglasses"></span></p>
+            <p><?= Html::a('Manage Users', ['/user/admin'], ['class' => 'btn btn-success']) ?></p>
 
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
+        <?php else : ?>
+
+            <h1>Welcome!</h1>
+            <p class="lead">This is your ShipWise dashboard.</p>
+            <p><?= Html::a('Get started', ['/order'], ['class' => 'btn btn-success']) ?></p>
+
+        <?php endif; ?>
     </div>
 
     <div class="body-content">
+
+        <?php /* ?>
 
         <div class="row">
             <div class="col-lg-4">
@@ -48,6 +60,8 @@ $this->title = 'My Yii Application';
                 <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
             </div>
         </div>
+
+        <?php */ ?>
 
     </div>
 </div>
