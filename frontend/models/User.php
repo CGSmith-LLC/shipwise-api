@@ -22,6 +22,6 @@ class User extends BaseUser
     public function getCustomers()
     {
         return $this->hasMany('frontend\models\Customer', ['id' => 'customer_id'])
-            ->viaTable(UserCustomer::tableName(), ['user_id' => 'id']);
+                    ->viaTable(UserCustomer::tableName(), ['user_id' => 'id']);
     }
 }

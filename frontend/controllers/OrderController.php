@@ -3,10 +3,9 @@
 namespace frontend\controllers;
 
 use Yii;
-use common\models\Order;
+use common\models\{Order, Status};
 use frontend\models\search\OrderSearch;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
+use yii\web\{Controller, NotFoundHttpException};
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -19,8 +18,8 @@ class OrderController extends Controller
     public function behaviors()
     {
         return [
-            'verbs' => [
-                'class' => 'yii\filters\VerbFilter',
+            'verbs'  => [
+                'class'   => 'yii\filters\VerbFilter',
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -39,22 +38,28 @@ class OrderController extends Controller
 
     /**
      * Lists all Order models.
+     *
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new OrderSearch();
+        $searchModel  = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider->setSort(['defaultOrder' => ['created_date' => SORT_DESC]]);
+        $dataProvider->pagination->pageSize = $searchModel->pageSize;
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
+            'searchModel'  => $searchModel,
             'dataProvider' => $dataProvider,
+            'statuses'     => Status::getList(),
         ]);
     }
 
     /**
      * Displays a single Order model.
+     *
      * @param integer $id
+     *
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -68,6 +73,7 @@ class OrderController extends Controller
     /**
      * Creates a new Order model.
      * If creation is successful, the browser will be redirected to the 'view' page.
+     *
      * @return mixed
      */
     public function actionCreate()
@@ -86,7 +92,9 @@ class OrderController extends Controller
     /**
      * Updates an existing Order model.
      * If update is successful, the browser will be redirected to the 'view' page.
+     *
      * @param integer $id
+     *
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -106,9 +114,13 @@ class OrderController extends Controller
     /**
      * Deletes an existing Order model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
+     *
      * @param integer $id
+     *
      * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     * @throws \yii\web\NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)
     {
@@ -120,7 +132,9 @@ class OrderController extends Controller
     /**
      * Finds the Order model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
+     *
      * @param integer $id
+     *
      * @return Order the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */

@@ -22,7 +22,7 @@ class Customer extends BaseCustomer
     public function getUsers()
     {
         return $this->hasMany('frontend\models\User', ['id' => 'user_id'])
-            ->viaTable(UserCustomer::tableName(), ['customer_id' => 'id']);
+                    ->viaTable(UserCustomer::tableName(), ['customer_id' => 'id']);
     }
 
     /**
@@ -39,10 +39,11 @@ class Customer extends BaseCustomer
      * Whether the customer is linked to given user
      *
      * @param int $userId
+     *
      * @return bool
      */
     public function isLinkedToUser($userId)
     {
-        return $this->getUserCustomer()->onCondition(['user_id' => (int)$userId])->exists();
+        return $this->getUserCustomer()->onCondition(['user_id' => (int) $userId])->exists();
     }
 }
