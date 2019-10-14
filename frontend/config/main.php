@@ -58,6 +58,13 @@ return [
             'datetimeFormat' => 'php:Y-m-d H:i:s',
             'timeFormat' => 'php:H:i:s',
         ],
+        'view' => [
+            'theme' => [
+                'pathMap' => [
+                    '@dektrium/user/views' => '@frontend/views/user', // our overrides
+                ],
+            ],
+        ],
     ],
     'params' => $params,
     'modules' => [
@@ -69,6 +76,7 @@ return [
             'enableFlashMessages' => false,
             'admins' => [$params['adminEmail']],
             'controllerMap' => [
+                'admin' => 'frontend\controllers\user\AdminController',
                 'registration' => [
                     'class' => '\dektrium\user\controllers\RegistrationController',
                     'on ' . \dektrium\user\controllers\RegistrationController::EVENT_AFTER_REGISTER => [
@@ -76,6 +84,9 @@ return [
                         'notifyAdmin'
                     ]
                 ],
+            ],
+            'modelMap' => [
+                'User' => 'frontend\models\User',
             ],
         ],
     ],

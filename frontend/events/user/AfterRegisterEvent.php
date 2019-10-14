@@ -2,7 +2,7 @@
 
 namespace frontend\events\user;
 
-use dektrium\user\models\User;
+use frontend\models\User;
 use dektrium\user\events\FormEvent;
 use dektrium\user\models\RegistrationForm;
 use Yii;
@@ -24,12 +24,11 @@ class AfterRegisterEvent
             ($user = User::findOne(['username' => $form->username])) !== null
         ) {
             $params = [
-                'adminUrl' => Url::to(['/user/admin/update', 'id' => $user->id], true),
+                'adminUrl' => Url::to(['/user/admin/associate-customers', 'id' => $user->id], true),
                 'username' => $user->username,
             ];
 
             try {
-
                 $mailer = Yii::$app->mailer;
                 $mailer->viewPath = '@frontend/views/user/mail';
                 $mailer->getView()->theme = Yii::$app->view->theme;
@@ -43,8 +42,6 @@ class AfterRegisterEvent
             } catch (\Exception $ex) {
                 Yii::warning('Failed to send admin email notification on new user register.');
             }
-
         }
     }
-
 }
