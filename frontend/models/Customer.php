@@ -2,8 +2,7 @@
 
 namespace frontend\models;
 
-use common\models\base\BaseCustomer;
-use Yii;
+use common\models\Customer as BaseCustomer;
 
 /**
  * Class Customer
