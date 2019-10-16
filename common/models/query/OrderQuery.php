@@ -41,8 +41,20 @@ class OrderQuery extends \yii\db\ActiveQuery
     public function forCustomer($id)
     {
         return is_numeric($id)
-            ? $this->andOnCondition([Order::tableName() . '.customer_id' => (int)$id])
+            ? $this->andOnCondition([Order::tableName() . '.customer_id' => (int) $id])
             : $this;
+    }
+
+    /**
+     * Query condition to get orders for multiple given customers
+     *
+     * @param array $ids Customer Ids
+     *
+     * @return OrderQuery
+     */
+    public function forCustomers($ids)
+    {
+        return $this->andOnCondition([Order::tableName() . '.customer_id' => $ids]);
     }
 
     /**
@@ -66,13 +78,14 @@ class OrderQuery extends \yii\db\ActiveQuery
      */
     public function byStatus($id)
     {
-        return $this->andOnCondition([Order::tableName() . '.status_id' => (int)$id]);
+        return $this->andOnCondition([Order::tableName() . '.status_id' => (int) $id]);
     }
 
     /**
      * Query condition to get requested ship date
      *
      * @param $date
+     *
      * @return OrderQuery
      */
     public function onOrBeforeRequestedDate($date)
@@ -84,6 +97,7 @@ class OrderQuery extends \yii\db\ActiveQuery
      * Query condition to get orders after an updated date
      *
      * @param $date \DateTime
+     *
      * @return OrderQuery
      */
     public function afterUpdatedDate($date)
@@ -95,6 +109,7 @@ class OrderQuery extends \yii\db\ActiveQuery
      * Query condition to get orders after an created date
      *
      * @param $date \DateTime
+     *
      * @return OrderQuery
      */
     public function afterCreatedDate($date)
@@ -111,6 +126,6 @@ class OrderQuery extends \yii\db\ActiveQuery
      */
     public function byId($id)
     {
-        return $this->andWhere([Order::tableName() . '.id' => (int)$id]);
+        return $this->andWhere([Order::tableName() . '.id' => (int) $id]);
     }
 }

@@ -12,10 +12,7 @@ use yii\helpers\ArrayHelper;
  */
 class Order extends BaseOrder
 {
-
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
@@ -23,7 +20,10 @@ class Order extends BaseOrder
             'status_id'   => 'Status',
             'status.name' => 'Status',
             'address'     => 'Ship To',
+            'carrier_id'  => 'Carrier',
+            'service_id'  => 'Service',
+            'tracking'    => 'Tracking Number',
+            'notes'       => 'Order Notes',
         ]);
     }
-
 }

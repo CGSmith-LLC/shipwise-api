@@ -3,9 +3,12 @@
 namespace frontend\controllers;
 
 use Yii;
-use common\models\{Order, Status};
+use common\models\{Carrier, Service, State, Status};
+use frontend\models\Order;
+use frontend\models\forms\OrderForm;
 use frontend\models\search\OrderSearch;
-use yii\web\{Controller, NotFoundHttpException};
+use yii\helpers\Json;
+use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException};
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -45,8 +48,6 @@ class OrderController extends Controller
     {
         $searchModel  = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $dataProvider->setSort(['defaultOrder' => ['created_date' => SORT_DESC]]);
-        $dataProvider->pagination->pageSize = $searchModel->pageSize;
 
         return $this->render('index', [
             'searchModel'  => $searchModel,
@@ -75,17 +76,37 @@ class OrderController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      *
      * @return mixed
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     * @throws \yii\web\NotFoundHttpException
      */
     public function actionCreate()
     {
-        $model = new Order();
+        /** @var OrderForm */
+        $id           = Yii::$app->request->post('order_id') ?? null;
+        $model        = new OrderForm();
+        $model->order = ($id ? $this->findModel($id) : new Order());
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->order->isNewRecord) {
+            $model->order->loadDefaultValues();
+            $model->order->status_id = Status::OPEN;
+            $model->order->origin    = Yii::$app->name;
+        }
+
+        // Load from POST
+        $model->setAttributes(Yii::$app->request->post());
+
+        // Validate model, ship and save
+        if (Yii::$app->request->post() && $model->validate() && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->order->id]);
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'model'    => $model,
+            'statuses' => Status::getList(),
+            'carriers' => Carrier::getList(),
+            'services' => Service::getList('id', 'name', $model->order->carrier_id),
+            'states'   => State::getList(),
         ]);
     }
 
@@ -145,5 +166,22 @@ class OrderController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
+     * Get list of carrier services
+     *
+     * @param int|null $carrierId Carrier ID.
+     *
+     * @throws BadRequestHttpException
+     */
+    public function actionCarrierServices($carrierId)
+    {
+        $request = Yii::$app->request;
+        if (!$request->isAjax || !($carrierId)) {
+            throw new BadRequestHttpException('Bad request.');
+        }
+
+        echo Json::encode(Service::getList('id', 'name', $carrierId));
     }
 }

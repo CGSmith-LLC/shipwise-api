@@ -12,13 +12,28 @@ use yii\helpers\ArrayHelper;
  */
 class State extends BaseState
 {
-	/**
-	 * Get array of State ids
-	 *
-	 * @return array
-	 */
-	public static function getIdsAsArray()
-	{
-		return ArrayHelper::getColumn(self::find()->select('id')->asArray()->all(), 'id');
-	}
+    /**
+     * Get array of State ids
+     *
+     * @return array
+     */
+    public static function getIdsAsArray()
+    {
+        return ArrayHelper::getColumn(self::find()->select('id')->asArray()->all(), 'id');
+    }
+
+    /**
+     * Returns list of states as array [id=>name]
+     *
+     * @param string $keyField   Field name to use as key
+     * @param string $valueField Field name to use as value
+     *
+     * @return array
+     */
+    public static function getList($keyField = 'id', $valueField = 'name')
+    {
+        $data = self::find()->orderBy(['name' => SORT_ASC])->all();
+
+        return ArrayHelper::map($data, $keyField, $valueField);
+    }
 }

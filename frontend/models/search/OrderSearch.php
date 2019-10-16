@@ -3,6 +3,7 @@
 namespace frontend\models\search;
 
 use common\models\Address;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use frontend\models\Order;
@@ -90,12 +91,18 @@ class OrderSearch extends Order
 
         // add conditions that should always apply here
 
-        // @todo If user is not admin, add condition to show order that belongs to current user (via customer)
+        // If user is not admin, then show orders that ONLY belong to current user
+        if (!Yii::$app->user->identity->isAdmin) {
+            $query->forCustomers(Yii::$app->user->identity->customerIds);
+        }
 
-        $query->joinWith(['address']);
+        $query->joinWith(['address', 'status']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'  => [
+                'defaultOrder' => ['created_date' => SORT_DESC, 'id' => SORT_DESC],
+            ],
         ]);
 
         // Set up sorting for join tables
@@ -105,6 +112,8 @@ class OrderSearch extends Order
         ];
 
         $this->load($params);
+
+        $dataProvider->pagination->pageSize = $this->pageSize;
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -117,7 +126,7 @@ class OrderSearch extends Order
             Order::tableName() . '.id' => $this->id,
             'customer_id'              => $this->customer_id,
             'status_id'                => $this->status_id,
-            'address_id'               => $this->address_id,
+            //'address_id'               => $this->address_id,
             'carrier_id'               => $this->carrier_id,
             'service_id'               => $this->service_id,
         ]);

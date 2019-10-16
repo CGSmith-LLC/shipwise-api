@@ -12,6 +12,10 @@ use yii\helpers\ArrayHelper;
  */
 class Status extends BaseStatus
 {
+    /* Please keep synchronized with db values! */
+    const SHIPPED = 1;
+    const OPEN    = 9;
+
     /**
      * Get array of Status ids
      *
@@ -32,8 +36,8 @@ class Status extends BaseStatus
      */
     public static function getList($keyField = 'id', $valueField = 'name')
     {
-        $query = self::find()->orderBy(['name' => SORT_ASC]);
+        $statuses = self::find()->orderBy(['name' => SORT_ASC])->all();
 
-        return ArrayHelper::map($query->all(), $keyField, $valueField);
+        return ArrayHelper::map($statuses, $keyField, $valueField);
     }
 }
