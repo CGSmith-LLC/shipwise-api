@@ -9,6 +9,7 @@ use frontend\assets\DatePickerAsset;
 /* @var $this yii\web\View */
 /* @var $model frontend\models\forms\OrderForm */
 /* @var $form yii\bootstrap\ActiveForm */
+/* @var $customers array List of customers */
 /* @var $statuses array List of order statuses */
 /* @var $carriers array List of carriers */
 /* @var $services array List of carrier services */
@@ -44,6 +45,9 @@ DatePickerAsset::register($this);
                         <h3 class="panel-title">Order Info</h3>
                     </div>
                     <div class="panel-body">
+
+                        <?= $form->field($model->order, 'customer_id')
+                                 ->dropdownList($customers, ['prompt' => ' Please select']) ?>
 
                         <?= $form->field($model->order, 'order_reference')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->order, 'customer_reference')->textInput(['maxlength' => true]) ?>

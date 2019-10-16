@@ -27,6 +27,22 @@ class User extends BaseUser
     }
 
     /**
+     * Returns list of customers as array [id=>name]
+     *
+     * @param string $keyField   Field name to use as key
+     * @param string $valueField Field name to use as value
+     *
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getCustomerList($keyField = 'id', $valueField = 'name')
+    {
+        $data = $this->getCustomers()->orderBy(['name' => SORT_ASC])->all();
+
+        return ArrayHelper::map($data, $keyField, $valueField);
+    }
+
+    /**
      * Get array of associated customers IDs
      *
      * @return array

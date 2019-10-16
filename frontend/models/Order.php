@@ -24,6 +24,7 @@ class Order extends BaseOrder
             'service_id'  => 'Service',
             'tracking'    => 'Tracking Number',
             'notes'       => 'Order Notes',
+            'customer_id' => 'Customer',
         ]);
     }
 }

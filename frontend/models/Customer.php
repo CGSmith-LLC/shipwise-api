@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use common\models\Customer as BaseCustomer;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Customer
@@ -45,5 +46,20 @@ class Customer extends BaseCustomer
     public function isLinkedToUser($userId)
     {
         return $this->getUserCustomer()->onCondition(['user_id' => (int) $userId])->exists();
+    }
+
+    /**
+     * Returns list of customers as array [id=>name]
+     *
+     * @param string $keyField   Field name to use as key
+     * @param string $valueField Field name to use as value
+     *
+     * @return array
+     */
+    public static function getList($keyField = 'id', $valueField = 'name')
+    {
+        $data = self::find()->orderBy(['name' => SORT_ASC])->all();
+
+        return ArrayHelper::map($data, $keyField, $valueField);
     }
 }

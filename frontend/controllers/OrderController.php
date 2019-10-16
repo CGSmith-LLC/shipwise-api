@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use frontend\models\Customer;
 use Yii;
 use common\models\{Carrier, Service, State, Status};
 use frontend\models\Order;
@@ -102,11 +103,14 @@ class OrderController extends Controller
         }
 
         return $this->render('create', [
-            'model'    => $model,
-            'statuses' => Status::getList(),
-            'carriers' => Carrier::getList(),
-            'services' => Service::getList('id', 'name', $model->order->carrier_id),
-            'states'   => State::getList(),
+            'model'     => $model,
+            'customers' => Yii::$app->user->identity->isAdmin
+                ? Customer::getList()
+                : Yii::$app->user->identity->getCustomerList(),
+            'statuses'  => Status::getList(),
+            'carriers'  => Carrier::getList(),
+            'services'  => Service::getList('id', 'name', $model->order->carrier_id),
+            'states'    => State::getList(),
         ]);
     }
 

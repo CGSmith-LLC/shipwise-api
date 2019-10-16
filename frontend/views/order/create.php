@@ -4,6 +4,7 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\forms\OrderForm */
+/* @var $customers array List of customers */
 /* @var $statuses array List of order statuses */
 /* @var $carriers array List of carriers */
 /* @var $services array List of carrier services */
@@ -19,11 +20,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
-        'model'    => $model,
-        'statuses' => $statuses,
-        'carriers' => $carriers,
-        'services' => $services,
-        'states'   => $states,
+        'model'     => $model,
+        'customers' => $customers,
+        'statuses'  => $statuses,
+        'carriers'  => $carriers,
+        'services'  => $services,
+        'states'    => $states,
     ]) ?>
 
 </div>
