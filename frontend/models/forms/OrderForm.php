@@ -67,6 +67,7 @@ class OrderForm extends Model
 
         if ($this->address->save()) {
             $this->order->address_id = $this->address->id;
+            $this->order->save();
         } else {
             $transaction->rollBack();
 
@@ -132,13 +133,12 @@ class OrderForm extends Model
     }
 
     /**
-     * @return bool|Address|null|static
+     * @return Address
      */
     protected function getAddress()
     {
         if ($this->_address === null) {
-            $this->_address = new Address();
-            $this->_address->loadDefaultValues();
+            $this->_address = $this->order->isNewRecord ? new Address() : $this->order->address;
         }
 
         return $this->_address;
@@ -153,6 +153,9 @@ class OrderForm extends Model
             $this->_address = $address;
         } else {
             if (is_array($address)) {
+                if ($this->_address === null) {
+                    $this->_address = $this->getAddress();
+                }
                 $this->_address->setAttributes($address);
             }
         }

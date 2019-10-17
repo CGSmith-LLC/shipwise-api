@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use frontend\models\Address;
 use frontend\models\Customer;
 use Yii;
 use common\models\{Carrier, Service, State, Status};
@@ -84,21 +85,23 @@ class OrderController extends Controller
     public function actionCreate()
     {
         /** @var OrderForm */
-        $id           = Yii::$app->request->post('order_id') ?? null;
-        $model        = new OrderForm();
-        $model->order = ($id ? $this->findModel($id) : new Order());
+        $model          = new OrderForm();
+        $model->order   = new Order();
+        $model->address = new Address();
 
-        if ($model->order->isNewRecord) {
-            $model->order->loadDefaultValues();
-            $model->order->status_id = Status::OPEN;
-            $model->order->origin    = Yii::$app->name;
-        }
+        // set default values
+        $model->order->loadDefaultValues();
+        $model->order->status_id  = Status::OPEN;
+        $model->order->origin     = Yii::$app->name;
+        $model->order->address_id = 0; // to avoid validation, as we validate address model separately
 
         // Load from POST
         $model->setAttributes(Yii::$app->request->post());
 
-        // Validate model, ship and save
+        // Validate model and save
         if (Yii::$app->request->post() && $model->validate() && $model->save()) {
+            Yii::$app->getSession()->setFlash('success', 'Order created.');
+
             return $this->redirect(['view', 'id' => $model->order->id]);
         }
 
@@ -121,18 +124,32 @@ class OrderController extends Controller
      * @param integer $id
      *
      * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     * @throws \yii\web\NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        /** @var OrderForm */
+        $model        = new OrderForm();
+        $model->order = $this->findModel($id);
+        $model->setAttributes(Yii::$app->request->post());
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->post() && $model->validate() && $model->save()) {
+            Yii::$app->getSession()->setFlash('success', 'Order has been updated.');
+
+            return $this->redirect(['view', 'id' => $model->order->id]);
         }
 
         return $this->render('update', [
-            'model' => $model,
+            'model'     => $model,
+            'customers' => Yii::$app->user->identity->isAdmin
+                ? Customer::getList()
+                : Yii::$app->user->identity->getCustomerList(),
+            'statuses'  => Status::getList(),
+            'carriers'  => Carrier::getList(),
+            'services'  => Service::getList('id', 'name', $model->order->carrier_id),
+            'states'    => State::getList(),
         ]);
     }
 
@@ -149,7 +166,21 @@ class OrderController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if ($model->delete()) {
+                $transaction->commit();
+                Yii::$app->getSession()->setFlash('success', 'Order deleted.');
+            } else {
+                $transaction->rollBack();
+                Yii::$app->getSession()->setFlash('error', 'Could not delete order.');
+            }
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            Yii::$app->getSession()->setFlash('error', 'Could not delete order. ' . $e->getMessage());
+        }
 
         return $this->redirect(['index']);
     }

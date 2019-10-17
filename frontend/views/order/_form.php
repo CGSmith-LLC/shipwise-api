@@ -5,6 +5,7 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\Url;
 use yii\web\View;
 use frontend\assets\DatePickerAsset;
+use frontend\models\Item;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\forms\OrderForm */
@@ -17,14 +18,18 @@ use frontend\assets\DatePickerAsset;
 
 DatePickerAsset::register($this);
 
+$item = new Item();
+$item->loadDefaultValues();
+
 ?>
 
     <div class="order-form">
 
         <?php $form = ActiveForm::begin([
-            'id'          => 'form-order',
-            'layout'      => 'horizontal',
-            'fieldConfig' => [
+            'id'                     => 'form-order',
+            'layout'                 => 'horizontal',
+            'enableClientValidation' => false,
+            'fieldConfig'            => [
                 'template'             => "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}",
                 'horizontalCssClasses' => [
                     'label'   => 'col-sm-4',
@@ -35,7 +40,6 @@ DatePickerAsset::register($this);
                 ],
             ],
         ]); ?>
-        <?= Html::hiddenInput('order_id', $model->order->id ?? null) ?>
         <?= $model->errorSummary($form); ?>
 
         <div class="row">
@@ -76,15 +80,6 @@ DatePickerAsset::register($this);
 
                     </div>
                 </div>
-
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Items</h3>
-                    </div>
-                    <div class="panel-body">
-
-                    </div>
-                </div>
             </div>
             <div class="col-md-6">
                 <div class="panel panel-primary">
@@ -112,9 +107,56 @@ DatePickerAsset::register($this);
         </div>
 
         <div class="row">
-            <div class="form-group">
-                <?= Html::submitButton('Save', ['class' => 'btn btn-lg btn-success']) ?>
-                <?= Html::a('Cancel', ['index'], ['class' => 'btn btn-lg btn-default']) ?>
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Items</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <div id="items">
+                            <?php
+                            // existing item fields
+                            foreach ($model->items as $itemKey => $_item) : ?>
+                                <div class="row item item-<?= $itemKey ?>">
+                                    <?= $this->render('partial/_item-row', [
+                                        'key'     => $_item->isNewRecord
+                                            ? (strpos($itemKey, 'new') !== false ? $itemKey : 'new' . $itemKey)
+                                            : $_item->id,
+                                        'form'    => $form,
+                                        'item'    => $_item,
+                                        'counter' => $itemKey,
+                                    ]); ?>
+                                </div>
+                            <?php endforeach; ?>
+
+                            <div id="new-item-block" class="row hidden">
+                                <?= $this->render('partial/_item-row', [
+                                    'key'     => '__id__',
+                                    'form'    => $form,
+                                    'item'    => $item,
+                                    'counter' => 0,
+                                ]);
+                                ?>
+                            </div>
+                        </div>
+
+                        <?= Html::a('<i class="glyphicon glyphicon-plus"></i> add another item', 'javascript:void(0);', [
+                            'id'    => 'btn-add-item',
+                            'class' => 'btn btn-warning btn-sm',
+                        ]) ?>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <?= Html::submitButton('Save', ['class' => 'btn btn-lg btn-success']) ?>
+                    <?= Html::a('Cancel', ['index'], ['class' => 'btn btn-lg btn-default']) ?>
+                </div>
             </div>
         </div>
 
@@ -123,15 +165,31 @@ DatePickerAsset::register($this);
 
     </div>
 
-<?php $this->registerJs("
-    initForm();
-    ",
+<?php
+ob_start(); // output buffer the javascript to register later ?>
+    <script>
+
+        initForm();
+
+        <?php
+        // Click add item when the form first loads to display the first new row
+        if (!Yii::$app->request->isPost && $model->order->isNewRecord) {
+            echo "$('#btn-add-item').click();";
+        }
+        ?>
+
+    </script>
+<?php $this->registerJs(
+    str_replace(['<script>', '</script>'], '', ob_get_clean()),
     View::POS_READY,
     'order-handler-pos-ready'
 );
 
 ob_start(); // output buffer the javascript to register later ?>
     <script>
+
+        // add item button
+        var itemKey = <?= isset($itemKey) ? str_replace('new', '', $itemKey) : 0 ?>;
 
         /**
          * Initialize form
@@ -158,6 +216,13 @@ ob_start(); // output buffer the javascript to register later ?>
 
             $('#order-carrier_id').off('change').on('change', function () {
                 getCarrierServices();
+            });
+
+            $("#btn-add-item").off('click').on("click", addItem);
+
+            // remove item button
+            $(document).on('click', '.btn-remove-item', function () {
+                $(this).closest('.row').remove();
             });
         }
 
@@ -212,6 +277,29 @@ ob_start(); // output buffer the javascript to register later ?>
                     }));
                 }
             }
+        }
+
+        /**
+         * Add new item
+         */
+        function addItem() {
+
+            itemKey += 1;
+            $("#items").append(
+                '<div class="row item item-' + itemKey + '">'
+                + $('#new-item-block').html().replace(/__id__/g, 'new' + itemKey)
+                + '</div>'
+            );
+            // disable remove button on first item
+            var row = $('.item-0').length ? $('.item-0') : $('.item-1');
+            row.find('.btn-remove-item').addClass('hidden');
+            if (itemKey !== 1) {
+                // hide label titles
+                $('.item-' + itemKey).find('label').not('.fake').html('');
+                // enable remove btn
+                $('.item-' + itemKey).find('.btn-remove-item').removeClass('hidden');
+            }
+            initListeners();
         }
 
     </script>

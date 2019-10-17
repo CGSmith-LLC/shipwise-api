@@ -36,8 +36,8 @@ class Status extends BaseStatus
      */
     public static function getList($keyField = 'id', $valueField = 'name')
     {
-        $statuses = self::find()->orderBy(['name' => SORT_ASC])->all();
+        $data = self::find()->orderBy([$valueField => SORT_ASC])->all();
 
-        return ArrayHelper::map($statuses, $keyField, $valueField);
+        return ArrayHelper::map($data, $keyField, $valueField);
     }
 }

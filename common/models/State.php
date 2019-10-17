@@ -32,7 +32,7 @@ class State extends BaseState
      */
     public static function getList($keyField = 'id', $valueField = 'name')
     {
-        $data = self::find()->orderBy(['name' => SORT_ASC])->all();
+        $data = self::find()->orderBy([$valueField => SORT_ASC])->all();
 
         return ArrayHelper::map($data, $keyField, $valueField);
     }

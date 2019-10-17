@@ -39,7 +39,7 @@ class BaseOrder extends \yii\db\ActiveRecord
         return [
             [['customer_id', 'customer_reference', 'address_id'], 'required'],
             [['customer_id', 'status_id', 'address_id', 'carrier_id', 'service_id'], 'integer'],
-            [['created_date', 'updated_date', 'carrier_id', 'service_id'], 'safe'],
+            [['created_date', 'updated_date', 'requested_ship_date', 'carrier_id', 'service_id'], 'safe'],
             [['order_reference', 'tracking'], 'string', 'max' => 45],
             [['customer_reference', 'origin'], 'string', 'max' => 64],
             [['notes'], 'string', 'max' => 140],

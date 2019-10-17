@@ -46,9 +46,9 @@ YiiAsset::register($this);
                     'tracking',
                     'notes',
                     'uuid',
-                    'requested_ship_date:datetime',
-                    'carrier_id',
-                    'service_id',
+                    'requested_ship_date:date',
+                    'carrier.name',
+                    'service.name',
                     'origin',
                     'created_date:datetime',
                     'updated_date:datetime',
@@ -58,23 +58,25 @@ YiiAsset::register($this);
 
         <div class="col-md-4">
             <h2>Ship To</h2>
-            <?= DetailView::widget([
-                'model'      => $model->address,
-                'attributes' => [
-                    //'id',
-                    'name',
-                    'address1',
-                    'address2',
-                    'city',
-                    'state.name',
-                    'zip',
-                    'phone',
-                    'email',
-                    'notes',
-                    'created_date:datetime',
-                    'updated_date:datetime',
-                ],
-            ]) ?>
+            <?php if ($model->address) : ?>
+                <?= DetailView::widget([
+                    'model'      => $model->address,
+                    'attributes' => [
+                        //'id',
+                        'name',
+                        'address1',
+                        'address2',
+                        'city',
+                        'state.name',
+                        'zip',
+                        'phone',
+                        'email',
+                        'notes',
+                        'created_date:datetime',
+                        'updated_date:datetime',
+                    ],
+                ]) ?>
+            <?php endif; ?>
         </div>
 
         <div class="col-md-3">

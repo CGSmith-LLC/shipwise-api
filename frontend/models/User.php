@@ -37,7 +37,7 @@ class User extends BaseUser
      */
     public function getCustomerList($keyField = 'id', $valueField = 'name')
     {
-        $data = $this->getCustomers()->orderBy(['name' => SORT_ASC])->all();
+        $data = $this->getCustomers()->orderBy([$valueField => SORT_ASC])->all();
 
         return ArrayHelper::map($data, $keyField, $valueField);
     }

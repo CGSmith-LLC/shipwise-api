@@ -49,6 +49,7 @@ class Service extends BaseService
         if ($carrierId) {
             $query->andWhere([Service::tableName() . '.carrier_id' => $carrierId]);
         }
+        $query->orderBy([$valueField => SORT_ASC]);
 
         return ArrayHelper::map($query->all(), $keyField, $valueField);
     }
