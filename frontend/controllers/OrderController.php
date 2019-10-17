@@ -80,16 +80,14 @@ class OrderController extends Controller
      * @return mixed
      * @throws \Throwable
      * @throws \yii\db\Exception
-     * @throws \yii\web\NotFoundHttpException
      */
     public function actionCreate()
     {
         /** @var OrderForm */
-        $model          = new OrderForm();
-        $model->order   = new Order();
-        $model->address = new Address();
+        $model        = new OrderForm();
+        $model->order = new Order();
 
-        // set default values
+        // Set default values
         $model->order->loadDefaultValues();
         $model->order->status_id  = Status::OPEN;
         $model->order->origin     = Yii::$app->name;
@@ -161,7 +159,6 @@ class OrderController extends Controller
      *
      * @return mixed
      * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
      * @throws \yii\web\NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)

@@ -172,7 +172,7 @@ ob_start(); // output buffer the javascript to register later ?>
         initForm();
 
         <?php
-        // Click add item when the form first loads to display the first new row
+        // Trigger btn-add-item button to add first item if order is a new record.
         if (!Yii::$app->request->isPost && $model->order->isNewRecord) {
             echo "$('#btn-add-item').click();";
         }

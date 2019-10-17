@@ -82,20 +82,22 @@ YiiAsset::register($this);
         <div class="col-md-3">
             <h2>Items (<?= count($model->items) ?? null ?>)</h2>
             <?php
-            $idx = 0;
-            foreach ($model->items as $item) : ?>
-                <h3>#<?= ++$idx ?></h3>
+            if ($model->items) :
+                $idx = 0;
+                foreach ($model->items as $item) : ?>
+                    <h3>#<?= ++$idx ?></h3>
 
-                <?= DetailView::widget([
-                    'model'      => $item,
-                    'attributes' => [
-                        //'id',
-                        'quantity',
-                        'sku',
-                        'name',
-                    ],
-                ]);
-            endforeach; ?>
+                    <?= DetailView::widget([
+                        'model'      => $item,
+                        'attributes' => [
+                            //'id',
+                            'quantity',
+                            'sku',
+                            'name',
+                        ],
+                    ]);
+                endforeach;
+            endif; ?>
         </div>
 
     </div>
