@@ -5,7 +5,7 @@ namespace frontend\models;
 use frontend\models\base\BaseUserCustomer;
 
 /**
- * Class Address
+ * Class UserCustomer
  *
  * @package frontend\models
  */

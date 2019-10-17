@@ -25,7 +25,7 @@ class AdminController extends BaseAdminController
     {
         return ArrayHelper::merge(parent::behaviors(), [
             'verbs' => [
-                'class' => 'yii\filters\VerbFilter',
+                'class'   => 'yii\filters\VerbFilter',
                 'actions' => [
                     'link-customer' => ['POST'],
                 ],
@@ -46,12 +46,12 @@ class AdminController extends BaseAdminController
         Url::remember('', 'actions-redirect');
         $user = $this->findModel($id);
 
-        $searchModel = new CustomerSearch();
+        $searchModel  = new CustomerSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('_associate-customers', [
-            'user' => $user,
-            'searchModel' => $searchModel,
+            'user'         => $user,
+            'searchModel'  => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -67,17 +67,17 @@ class AdminController extends BaseAdminController
      */
     public function actionLinkCustomer($id, $cid)
     {
-        $user = $this->findModel((int)$id);
-        if (($customer = Customer::findOne((int)$cid)) === null) {
+        $user = $this->findModel((int) $id);
+        if (($customer = Customer::findOne((int) $cid)) === null) {
             throw new NotFoundHttpException('Customer does not exist');
         }
 
         if ($customer->isLinkedToUser($user->id)) {
             $user->unlink('customers', $customer, true);
-            Yii::$app->getSession()->setFlash('success', Yii::t('user', 'Customer has been unlinked'));
+            Yii::$app->getSession()->setFlash('success', Yii::t('user', 'Customer has been unlinked.'));
         } else {
             $user->link('customers', $customer);
-            Yii::$app->getSession()->setFlash('success', Yii::t('user', 'Customer has been linked'));
+            Yii::$app->getSession()->setFlash('success', Yii::t('user', 'Customer has been linked.'));
         }
 
         return $this->redirect(Url::previous('actions-redirect'));

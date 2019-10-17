@@ -2,13 +2,10 @@
 
 namespace frontend\controllers;
 
-use frontend\models\Address;
 use frontend\models\Customer;
 use Yii;
 use common\models\{Carrier, Service, State, Status};
-use frontend\models\Order;
-use frontend\models\forms\OrderForm;
-use frontend\models\search\OrderSearch;
+use frontend\models\{Order, forms\OrderForm, search\OrderSearch};
 use yii\helpers\Json;
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException};
 
@@ -201,9 +198,9 @@ class OrderController extends Controller
     }
 
     /**
-     * Get list of carrier services
+     * Get list of services for given carrier.
      *
-     * @param int|null $carrierId Carrier ID.
+     * @param int $carrierId Carrier ID.
      *
      * @throws BadRequestHttpException
      */
