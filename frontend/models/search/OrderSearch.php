@@ -3,6 +3,7 @@
 namespace frontend\models\search;
 
 use common\models\Address;
+use common\models\Status;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -91,6 +92,9 @@ class OrderSearch extends Order
 
         // add conditions that should always apply here
 
+        if (!isset($params['OrderSearch']['status_id'])) {
+            $query->byStatus(Status::OPEN);
+        }
         // If user is not admin, then show orders that ONLY belong to current user
         if (!Yii::$app->user->identity->isAdmin) {
             $query->forCustomers(Yii::$app->user->identity->customerIds);

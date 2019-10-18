@@ -54,10 +54,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'options'   => ['width' => '10%'],
             ],
             [
-                'attribute' => 'customer_id',
+                'attribute' => 'customer.name',
                 'options'   => ['width' => '8%'],
             ],
-            'order_reference',
             'customer_reference',
             [
                 'attribute' => 'address',
@@ -80,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     $searchModel,
                     'status_id',
                     $statuses,
-                    ['class' => 'form-control', 'prompt' => 'All']
+                    ['class' => 'form-control']
                 ),
             ],
 

@@ -50,18 +50,16 @@ $item->loadDefaultValues();
                     </div>
                     <div class="panel-body">
 
+                        <?= $form->field($model->order, 'status_id')
+                            ->dropdownList($statuses, [
+                                'disabled' => $model->order->isNewRecord,
+                                'prompt'   => ' -- Unknown --',
+                            ]) ?>
+
                         <?= $form->field($model->order, 'customer_id')
                                  ->dropdownList($customers, ['prompt' => ' Please select']) ?>
 
                         <?= $form->field($model->order, 'customer_reference')->textInput(['maxlength' => true]) ?>
-
-                        <?= $form->field($model->order, 'status_id')
-                                 ->dropdownList($statuses, [
-                                     'disabled' => $model->order->isNewRecord,
-                                     'prompt'   => ' -- Unknown --',
-                                 ]) ?>
-
-                        <?= $form->field($model->order, 'notes')->textarea(['rows' => 3, 'maxlength' => true]) ?>
 
                         <?= $form->field($model->order, 'carrier_id')
                                  ->dropdownList($carriers, ['prompt' => ' -- Unknown --']) ?>
@@ -91,7 +89,6 @@ $item->loadDefaultValues();
                         <?= $form->field($model->address, 'zip')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'phone')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'email')->textInput(['maxlength' => true]) ?>
-                        <?= $form->field($model->address, 'notes')->textarea(['rows' => 3, 'maxlength' => true]) ?>
 
                     </div>
                 </div>

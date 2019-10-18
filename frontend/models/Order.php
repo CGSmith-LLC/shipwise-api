@@ -16,7 +16,7 @@ class Order extends BaseOrder
     public function attributeLabels()
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
-            'id'           => 'Order ID',
+            'id'           => 'ShipWise ID',
             'status_id'    => 'Status',
             'status.name'  => 'Status',
             'address'      => 'Ship To',
