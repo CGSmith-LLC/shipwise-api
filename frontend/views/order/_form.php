@@ -53,15 +53,7 @@ $item->loadDefaultValues();
                         <?= $form->field($model->order, 'customer_id')
                                  ->dropdownList($customers, ['prompt' => ' Please select']) ?>
 
-                        <?= $form->field($model->order, 'order_reference')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->order, 'customer_reference')->textInput(['maxlength' => true]) ?>
-
-                        <?= $form->field($model->order, 'requested_ship_date', [
-                            'inputTemplate' =>
-                                '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
-                        ]) ?>
-
-                        <?= $form->field($model->order, 'tracking')->textInput(['maxlength' => true]) ?>
 
                         <?= $form->field($model->order, 'status_id')
                                  ->dropdownList($statuses, [

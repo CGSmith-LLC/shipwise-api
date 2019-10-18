@@ -54,8 +54,8 @@ class BaseOrder extends \yii\db\ActiveRecord
         return [
             'id'                 => 'ID',
             'customer_id'        => 'Customer ID',
-            'order_reference'    => 'Order Reference',
-            'customer_reference' => 'Customer Reference',
+            'order_reference'    => 'WMS Order #',
+            'customer_reference' => 'Customer Order #',
             'status_id'          => 'Status ID',
             'carrier_id'         => 'Carrier ID',
             'service_id'         => 'Service ID',
