@@ -10,6 +10,11 @@ developing complex Web applications with multiple tiers.
 The template is designed to work in a team development environment. It supports
 deploying the application in different environments.
 
+For the first time installation, please refer to the following guide: 
+https://github.com/yiisoft/yii2-app-advanced/blob/master/docs/guide/start-installation.md
+
+
+
 Deployment is handled by [BitBucket pipelines](bitbucket-pipelines.yml). There is a deploy script on the web server that
 sits in `/usr/local/bin/deploy-api.sh` that can also be [viewed in the repo](deploy-api.sh).
 

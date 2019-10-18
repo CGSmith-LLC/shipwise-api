@@ -83,16 +83,16 @@
         },
         {
             "name": "bower-asset/swagger-ui",
-            "version": "v3.23.11",
+            "version": "v3.24.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swagger-api/swagger-ui.git",
-                "reference": "77f4651cbf5b3767f0d79c91fd337de82b6ddee6"
+                "reference": "7e5974c14f95559642ebad5c4dd397a9d54b3602"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swagger-api/swagger-ui/zipball/77f4651cbf5b3767f0d79c91fd337de82b6ddee6",
-                "reference": "77f4651cbf5b3767f0d79c91fd337de82b6ddee6"
+                "url": "https://api.github.com/repos/swagger-api/swagger-ui/zipball/7e5974c14f95559642ebad5c4dd397a9d54b3602",
+                "reference": "7e5974c14f95559642ebad5c4dd397a9d54b3602"
             },
             "type": "bower-asset"
         },
