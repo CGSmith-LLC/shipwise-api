@@ -85,9 +85,9 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Account', 'url' => ['/user/settings/account']];
         $menuItems[] = '<li>'
             . Html::beginForm(['/user/logout'], 'post')
-            . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
-                ['class' => 'btn btn-link logout']
+            . Html::submitButton('<img src="https://www.gravatar.com/avatar/'.md5(Yii::$app->user->identity->username).'?s=24" style="border-radius:50%">'.
+                ' Logout (' . Yii::$app->user->identity->username . ')',
+                ['class' => 'logout']
             )
             . Html::endForm()
             . '</li>';

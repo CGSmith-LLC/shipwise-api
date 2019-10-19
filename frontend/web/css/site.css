@@ -110,6 +110,18 @@ a.desc:after {
     outline: none;
 }
 
+.logout {
+    background: none;
+    border: none;
+    color: #ecf0f1;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.logout:hover {
+    color: #ecf0f1;
+}
+
 .navbar-default {
     background-color: #053165;
     border-color: #0c4a96;
