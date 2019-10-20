@@ -87,6 +87,7 @@ return [
             ],
             'modelMap' => [
                 'User' => 'frontend\models\User',
+                'RegistrationForm' => 'frontend\models\forms\RegistrationForm',
             ],
         ],
     ],

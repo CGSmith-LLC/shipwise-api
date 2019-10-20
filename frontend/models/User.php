@@ -14,6 +14,23 @@ use yii\helpers\ArrayHelper;
  */
 class User extends BaseUser
 {
+
+    public function init()
+    {
+        $this->on(self::BEFORE_REGISTER, function () {
+            $this->username = $this->email;
+        });
+
+        parent::init();
+    }
+
+    public function rules()
+    {
+        $rules = parent::rules();
+        unset($rules['usernameRequired']);
+        return $rules;
+    }
+
     /**
      * Get associated customers
      *
@@ -23,13 +40,13 @@ class User extends BaseUser
     public function getCustomers()
     {
         return $this->hasMany('frontend\models\Customer', ['id' => 'customer_id'])
-                    ->viaTable(UserCustomer::tableName(), ['user_id' => 'id']);
+            ->viaTable(UserCustomer::tableName(), ['user_id' => 'id']);
     }
 
     /**
      * Returns list of customers as array [id=>name]
      *
-     * @param string $keyField   Field name to use as key
+     * @param string $keyField Field name to use as key
      * @param string $valueField Field name to use as value
      *
      * @return array
@@ -51,9 +68,9 @@ class User extends BaseUser
     {
         return ArrayHelper::getColumn(
             $this->hasMany('frontend\models\UserCustomer', ['user_id' => 'id'])
-                 ->select('customer_id')
-                 ->asArray()
-                 ->all(),
+                ->select('customer_id')
+                ->asArray()
+                ->all(),
             'customer_id');
     }
 }
