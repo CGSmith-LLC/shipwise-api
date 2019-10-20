@@ -2,6 +2,7 @@
 
 namespace frontend\events\user;
 
+use dektrium\user\models\Profile;
 use frontend\models\User;
 use dektrium\user\events\FormEvent;
 use dektrium\user\models\RegistrationForm;
@@ -13,6 +14,7 @@ class AfterRegisterEvent
 
     /**
      * Send notification email to admin with link to admin page
+     * Update user profile for timezone and gravatar
      *
      * @param FormEvent $event
      */
@@ -20,9 +22,18 @@ class AfterRegisterEvent
     {
         // Find the newly registered user
         $form = $event->getForm() ?? null;
-        if ($form instanceof RegistrationForm && $form->username &&
-            ($user = User::findOne(['username' => $form->username])) !== null
+        if ($form instanceof RegistrationForm && $form->email &&
+            ($user = User::findOne(['email' => $form->email])) !== null
         ) {
+
+            // Set user profile
+            $profile = $user->profile;
+            $profile->timezone = Yii::$app->params['defaultTimezone'];
+            $profile->gravatar_email = $user->email;
+            //$user->setProfile($profile);
+            $profile->save();
+
+            // Send emails
             $params = [
                 'adminUrl' => Url::to(['/user/admin/associate-customers', 'id' => $user->id], true),
                 'username' => $user->username,
