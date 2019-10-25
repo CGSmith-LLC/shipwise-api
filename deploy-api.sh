@@ -22,7 +22,7 @@ cp /var/builds/configs/api/yii /var/www/api/yii || { echo 'mv failed for environ
 
 # Update SQL
 php /var/www/api/yii migrate --migrationPath=@dektrium/yii2-user/migrations --interactive=0 || { echo 'failed user update sql' ; exit 1; }
-php /var/www/api/yii migrate || { echo 'failed to update SQL' ; exit 1; }
+php /var/www/api/yii migrate --interactive=0 || { echo 'failed to update SQL' ; exit 1; }
 
 function finish {
   rm -rf /var/www/api.old
