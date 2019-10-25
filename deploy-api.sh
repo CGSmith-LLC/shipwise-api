@@ -21,6 +21,7 @@ cp /var/builds/configs/api/api/config/params-local.php /var/www/api/api/config/p
 cp /var/builds/configs/api/yii /var/www/api/yii || { echo 'mv failed for environment settings' ; exit 1; }
 
 # Update SQL
+php /var/www/api/yii migrate --migrationPath=@dektrium/yii2-user/migrations --interactive=0 || { echo 'failed user update sql' ; exit 1; }
 php /var/www/api/yii migrate || { echo 'failed to update SQL' ; exit 1; }
 
 function finish {
