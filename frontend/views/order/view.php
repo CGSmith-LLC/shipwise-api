@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Order */
 
-$this->title = $model->id;
+$this->title = 'Order ' . $model->customer_reference;
 
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -38,7 +38,7 @@ YiiAsset::register($this);
                     'id',
                     [
                         'attribute' => 'customer',
-                        'value'     => 'ID ' . $model->customer_id . ' - ' . $model->customer->name,
+                        'value'     => $model->customer->name,
                     ],
                     'order_reference',
                     'customer_reference',
