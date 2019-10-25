@@ -28,13 +28,5 @@
             "type": "composer",
             "url": "https://asset-packagist.org"
         }
-    ],
-    "scripts": {
-        "post-update-cmd": [
-            "php yii migrate --migrationPath=@dektrium/yii2-user/migrations --interactive=0"
-        ],
-        "post-install-cmd": [
-            "php yii migrate --migrationPath=@dektrium/yii2-user/migrations --interactive=0"
-        ]
-    }
+    ]
 }
