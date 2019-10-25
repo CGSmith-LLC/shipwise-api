@@ -19,49 +19,50 @@ namespace common\models\base;
  */
 class BaseAddress extends \yii\db\ActiveRecord
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	public static function tableName()
-	{
-		return 'addresses';
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'addresses';
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules()
-	{
-		return [
-			[['name', 'address1', 'city', 'state_id', 'zip', 'phone'], 'required'],
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['name', 'address1', 'city', 'state_id', 'zip', 'phone'], 'required'],
             [['email'], 'email'],
-			[['state_id'], 'integer'],
-			[['created_date', 'updated_date'], 'safe'],
-			[['name', 'address1', 'address2', 'city'], 'string', 'max' => 64],
-			[['zip'], 'string', 'max' => 16],
-			[['phone'], 'string', 'max' => 32],
-			[['notes'], 'string', 'max' => 140],
-		];
-	}
+            [['state_id'], 'integer'],
+            [['created_date', 'updated_date'], 'safe'],
+            [['name', 'address1', 'address2', 'city'], 'string', 'max' => 64],
+            [['zip'], 'string', 'max' => 16],
+            [['phone'], 'string', 'max' => 32],
+            [['notes'], 'string', 'max' => 140],
+        ];
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels()
-	{
-		return [
-			'id'           => 'ID',
-			'name'         => 'Name',
-			'email'        => 'Email',
-			'address1'     => 'Address1',
-			'address2'     => 'Address2',
-			'city'         => 'City',
-			'state_id'     => 'State ID',
-			'zip'          => 'Zip',
-			'phone'        => 'Phone',
-			'notes'        => 'Notes',
-			'created_date' => 'Created Date',
-			'updated_date' => 'Updated Date',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id'           => 'ID',
+            'name'         => 'Name',
+            'email'        => 'Email',
+            'address1'     => 'Address1',
+            'address2'     => 'Address2',
+            'city'         => 'City',
+            'state_id'     => 'State ID',
+            'state.name'   => 'State',
+            'zip'          => 'Zip',
+            'phone'        => 'Phone',
+            'notes'        => 'Notes',
+            'created_date' => 'Created Date',
+            'updated_date' => 'Updated Date',
+        ];
+    }
 }
