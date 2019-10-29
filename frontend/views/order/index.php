@@ -1,5 +1,6 @@
 <?php
 
+use frontend\models\Customer;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -10,11 +11,20 @@ use yii\grid\GridView;
 
 $this->title                   = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
+
+/**
+ * - Get a dropdown list from the associated customers
+ * - OR - get a dropdown list of all customers if admin
+ */
+if ((!Yii::$app->user->identity->getIsAdmin())) {
+    $customerDropdownList = Yii::$app->user->identity->getCustomerList();
+} else {
+    $customerDropdownList = Customer::getList();
+}
 ?>
 <div class="order-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
         <?= Html::a('Create Order', ['create'], ['class' => 'btn btn-success']) ?>
@@ -45,17 +55,20 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel'    => $searchModel,
         'filterSelector' => '#' . Html::getInputId($searchModel, 'pageSize'),
         'pager'          => [
-            'firstPageLabel' => 'First',
-            'lastPageLabel'  => 'Last',
+            'firstPageLabel' => Yii::t('app','First'),
+            'lastPageLabel'  => Yii::t('app','Last'),
         ],
         'columns'        => [
             [
-                'attribute' => 'id',
-                'options'   => ['width' => '10%'],
-            ],
-            [
                 'attribute' => 'customer.name',
-                'options'   => ['width' => '8%'],
+                // Visible if admin or has a count higher than 0 for associated users
+                'visible'   => ((count($customerDropdownList) > 1) || Yii::$app->user->identity->getIsAdmin()),
+                'filter'    => Html::activeDropDownList(
+                    $searchModel,
+                    'customer_id',
+                    $customerDropdownList,
+                    ['class' => 'form-control', 'prompt' => Yii::t('app', 'All Customers')]
+                ),
             ],
             'customer_reference',
             [
@@ -79,7 +92,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     $searchModel,
                     'status_id',
                     $statuses,
-                    ['class' => 'form-control']
+                    ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
                 ),
             ],
 
