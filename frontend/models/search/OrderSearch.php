@@ -93,14 +93,13 @@ class OrderSearch extends Order
         // add conditions that should always apply here
 
         if (!isset($params['OrderSearch']['status_id'])) {
-            $query->byStatus(Status::OPEN);
+            $this->status_id = Status::OPEN;
+            $query->byStatus($this->status_id);
         }
         // If user is not admin, then show orders that ONLY belong to current user
         if (!Yii::$app->user->identity->isAdmin) {
             $query->forCustomers(Yii::$app->user->identity->customerIds);
         }
-
-        $query->joinWith(['address', 'status']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -116,6 +115,11 @@ class OrderSearch extends Order
         ];
 
         $this->load($params);
+
+        // For a better DB query performance, only join relations if user is searching or sorting related models.
+        if ($this->address || (isset($params['sort']) && strpos($params['sort'], 'address') !== false)) {
+            $query->joinWith(['address']);
+        }
 
         $dataProvider->pagination->pageSize = $this->pageSize;
 
