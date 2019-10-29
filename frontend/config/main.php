@@ -52,11 +52,11 @@ return [
             'class' => 'yii\swiftmailer\Mailer',
         ],
         'formatter' => [
-            'defaultTimeZone' => 'UTC',
+            'defaultTimeZone' => 'America/Chicago',
             'timeZone' => 'America/Chicago',
-            'dateFormat' => 'php:Y-m-d',
-            'datetimeFormat' => 'php:Y-m-d H:i:s',
-            'timeFormat' => 'php:H:i:s',
+            'dateFormat' => 'php:m/d/Y',
+            'datetimeFormat' => 'php:m/d/Y g:ia T',
+            'timeFormat' => 'php:g:i:sa e',
         ],
         'view' => [
             'theme' => [
