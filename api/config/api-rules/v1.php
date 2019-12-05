@@ -25,6 +25,12 @@ return [
 		],
 	],
 
+    // Webhooks
+    [
+        "class"         => 'yii\rest\UrlRule',
+        "controller"    => ["$version/webhook"],
+    ],
+
 	// Customers
 	[
 		"class"      => 'yii\rest\UrlRule',

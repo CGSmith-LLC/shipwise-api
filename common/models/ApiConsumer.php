@@ -30,6 +30,17 @@ class ApiConsumer extends BaseApiConsumer
 		return $this->hasOne('common\models\Customer', ['id' => 'customer_id']);
 	}
 
+    /**
+     * Get customer meta data
+     *
+     * ApiConsumer relation to Customer's Meta Data
+     * @return \yii\db\ActiveQuery
+     */
+	public function getMeta()
+    {
+        return $this->hasMany('common\models\CustomerMeta', ['customer_id' => 'customer_id']);
+    }
+
 	/**
 	 * Find Api Consumer by auth token
 	 *
