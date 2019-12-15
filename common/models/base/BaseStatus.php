@@ -10,32 +10,33 @@ namespace common\models\base;
  */
 class BaseStatus extends \yii\db\ActiveRecord
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	public static function tableName()
-	{
-		return 'status';
-	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules()
-	{
-		return [
-			[['name'], 'string', 'max' => 45],
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'status';
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels()
-	{
-		return [
-			'id'   => 'ID',
-			'name' => 'Name',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['name'], 'string', 'max' => 45],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id'   => 'ID',
+            'name' => 'Name',
+        ];
+    }
 }

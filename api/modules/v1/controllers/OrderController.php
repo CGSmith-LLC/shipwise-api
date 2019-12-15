@@ -22,6 +22,7 @@ use api\modules\v1\models\forms\OrderForm;
  */
 class OrderController extends ControllerEx
 {
+
     /** @inheritdoc */
     protected function verbs()
     {
@@ -94,31 +95,31 @@ class OrderController extends ControllerEx
      *              @SWG\Header(
      *                      header = "X-Pagination-Per-Page",
      *                      description = "The number of resources in each page",
-     *                    type = "integer",
+     *                      type = "integer",
      *                ),
      *            },
      *          @SWG\Schema(
      *              type = "array",
-     *     			@SWG\Items( ref = "#/definitions/Order" )
+     *              @SWG\Items( ref = "#/definitions/Order" )
      *            ),
      *     ),
      *
      *     @SWG\Response(
      *          response = 401,
      *          description = "Impossible to authenticate user",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 403,
      *          description = "User is inactive",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 500,
      *          description = "Unexpected error",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     security = {{
@@ -137,6 +138,7 @@ class OrderController extends ControllerEx
         /**
          * If Api consumer is a customer, then retrieve his orders,
          * if not, we assume that the Api consumer is a superuser and return all orders
+         *
          * @see \common\models\ApiConsumer
          */
         $customerId = $this->apiConsumer->isCustomer()
@@ -175,31 +177,31 @@ class OrderController extends ControllerEx
      *     @SWG\Response(
      *          response = 400,
      *          description = "Error while creating order",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 401,
      *          description = "Impossible to authenticate user",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 403,
      *          description = "User is inactive",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 422,
      *          description = "Fields are missing or invalid",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorData" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorData" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 500,
      *          description = "Unexpected error",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     security = {{
@@ -267,6 +269,7 @@ class OrderController extends ControllerEx
             if (!$order->validate()) {
                 // if you get here then you should check if you have enough OrderForm validation rules
                 $transaction->rollBack();
+
                 return $this->unprocessableError($order->getErrors());
             }
 
@@ -298,6 +301,7 @@ class OrderController extends ControllerEx
             // Save Order model
             if (!$order->save()) {
                 $transaction->rollBack();
+
                 return $this->errorMessage(400, 'Could not save order');
             }
 
@@ -319,13 +323,16 @@ class OrderController extends ControllerEx
 
         } catch (\Exception $e) {
             $transaction->rollBack();
+
             return $this->errorMessage(400, 'Could not save order');
         } catch (\Throwable $e) {
             $transaction->rollBack();
+
             return $this->errorMessage(400, 'Could not save order');
         }
 
         $order->refresh();
+
         return $this->success($order, 201);
     }
 
@@ -349,25 +356,25 @@ class OrderController extends ControllerEx
      *     @SWG\Response(
      *          response = 401,
      *          description = "Impossible to authenticate user",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 403,
      *          description = "User is inactive",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 404,
      *          description = "Order not found",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 500,
      *          description = "Unexpected error",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     security = {{
@@ -421,37 +428,37 @@ class OrderController extends ControllerEx
      *     @SWG\Response(
      *          response = 400,
      *          description = "Error while updating order",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 401,
      *          description = "Impossible to authenticate user",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 403,
      *          description = "User is inactive",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 404,
      *          description = "Order not found",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 422,
      *          description = "Fields are missing or invalid",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorData" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorData" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 500,
      *          description = "Unexpected error",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     security = {{
@@ -585,12 +592,14 @@ class OrderController extends ControllerEx
             if (!$order->validate()) {
                 // if you get here then you should check if you have enough OrderForm validation rules
                 $transaction->rollBack();
+
                 return $this->unprocessableError($order->getErrors());
             }
 
             // Save Order model
             if (!$order->save()) {
                 $transaction->rollBack();
+
                 return $this->errorMessage(400, 'Could not save order');
             }
 
@@ -599,13 +608,16 @@ class OrderController extends ControllerEx
 
         } catch (\Exception $e) {
             $transaction->rollBack();
+
             return $this->errorMessage(400, 'Could not save order');
         } catch (\Throwable $e) {
             $transaction->rollBack();
+
             return $this->errorMessage(400, 'Could not save order');
         }
 
         $order->refresh();
+
         return $this->success($order);
     }
 
@@ -626,37 +638,37 @@ class OrderController extends ControllerEx
      *     @SWG\Response(
      *          response = 400,
      *          description = "Error while deleting order",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 401,
      *          description = "Impossible to authenticate user",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 403,
      *          description = "User is inactive",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 404,
      *          description = "Order not found",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 422,
      *          description = "Fields are missing or invalid",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorData" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorData" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 500,
      *          description = "Unexpected error",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     security = {{
@@ -695,6 +707,7 @@ class OrderController extends ControllerEx
                 ItemEx::deleteAll(['order_id' => (int)$id]);
             } else {
                 $transaction->rollBack();
+
                 return $this->errorMessage(400, 'Could not delete order');
             }
 
@@ -702,9 +715,11 @@ class OrderController extends ControllerEx
 
         } catch (\Exception $e) {
             $transaction->rollBack();
+
             return $this->errorMessage(400, 'Could not delete order');
         } catch (\Throwable $e) {
             $transaction->rollBack();
+
             return $this->errorMessage(400, 'Could not delete order');
         }
 
@@ -725,32 +740,32 @@ class OrderController extends ControllerEx
      *          description = "Successful operation. Response contains a list of order items.",
      *          @SWG\Schema(
      *              type = "array",
-     *     			@SWG\Items( ref = "#/definitions/Item" )
+     *              @SWG\Items( ref = "#/definitions/Item" )
      *            ),
      *     ),
      *
      *     @SWG\Response(
      *          response = 401,
      *          description = "Impossible to authenticate user",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 403,
      *          description = "User is inactive",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 404,
      *          description = "Order not found",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 500,
      *          description = "Unexpected error",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     security = {{
@@ -860,32 +875,32 @@ class OrderController extends ControllerEx
      *            },
      *          @SWG\Schema(
      *              type = "array",
-     *     			@SWG\Items( ref = "#/definitions/Order" )
+     *              @SWG\Items( ref = "#/definitions/Order" )
      *            ),
      *     ),
      *
      *     @SWG\Response(
      *          response = 401,
      *          description = "Impossible to authenticate user",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 403,
      *          description = "User is inactive",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 400,
      *          description = "Bad request",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 500,
      *          description = "Unexpected error",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     security = {{
@@ -898,12 +913,14 @@ class OrderController extends ControllerEx
      * Find orders by status
      *
      * @return \api\modules\v1\models\order\OrderEx[]
+     * @throws \Exception
      */
     public function actionFindbystatus()
     {
         /**
          * If Api consumer is a customer, then retrieve his orders,
          * if not, we assume that the Api consumer is a superuser and return all orders
+         *
          * @see \common\models\ApiConsumer
          */
         $customerId = $this->apiConsumer->isCustomer()
@@ -986,25 +1003,25 @@ class OrderController extends ControllerEx
      *     @SWG\Response(
      *          response = 401,
      *          description = "Impossible to authenticate user",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     @SWG\Response(
      *          response = 403,
      *          description = "User is inactive",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 404,
      *          description = "Order not found",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *     ),
      *
      *     @SWG\Response(
      *          response = 500,
      *          description = "Unexpected error",
-     *     		@SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
      *       ),
      *
      *     security = {{

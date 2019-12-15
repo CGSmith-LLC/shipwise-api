@@ -14,127 +14,130 @@ use Yii;
  */
 class ApiConsumerEx extends ApiConsumer implements IdentityInterface
 {
-	const DATETIME_FORMAT    = 'Y-m-d H:i:s';
-	const EXPIRE_TOKEN_AFTER = 15; // Time in minutes after which the auth token will expire
 
-	/** @inheritdoc */
-	public static function findIdentity($id)
-	{
-		return static::findOne(['id' => $id]);
-	}
+    const DATETIME_FORMAT    = 'Y-m-d H:i:s';
+    const EXPIRE_TOKEN_AFTER = 15; // Time in minutes after which the auth token will expire
 
-	/** @inheritdoc */
-	public static function findIdentityByAccessToken($token, $type = null)
-	{
-		return static::findByToken($token);
-	}
+    /** @inheritdoc */
+    public static function findIdentity($id)
+    {
+        return static::findOne(['id' => $id]);
+    }
 
-	/** @inheritdoc */
-	public function getId()
-	{
-		return $this->id;
-	}
+    /** @inheritdoc */
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return static::findByToken($token);
+    }
 
-	/** @inheritdoc */
-	public function getAuthKey()
-	{
-		return $this->auth_token;
-	}
+    /** @inheritdoc */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/** @inheritdoc */
-	public function validateAuthKey($authKey)
-	{
-		return null;
-	}
+    /** @inheritdoc */
+    public function getAuthKey()
+    {
+        return $this->auth_token;
+    }
 
-	/**
-	 * Generates authentication token
-	 *
-	 * @return $this
-	 * @throws \yii\base\Exception
-	 */
-	public function generateToken()
-	{
-		// Generate random string for auth token
-		$this->auth_token = Yii::$app->security->generateRandomString();
-		$this->updateLastActivity();
+    /** @inheritdoc */
+    public function validateAuthKey($authKey)
+    {
+        return null;
+    }
 
-		return $this;
-	}
+    /**
+     * Generates authentication token
+     *
+     * @return $this
+     * @throws \yii\base\Exception
+     */
+    public function generateToken()
+    {
+        // Generate random string for auth token
+        $this->auth_token = Yii::$app->security->generateRandomString();
+        $this->updateLastActivity();
 
-	/** @inheritdoc */
-	public static function findByKeySecret($key, $secret)
-	{
-		return parent::findByKeySecret($key, $secret);
-	}
+        return $this;
+    }
 
-	/** @inheritdoc */
-	public function resetToken()
-	{
-		$this->auth_token = null;
-		$this->updateLastActivity();
+    /** @inheritdoc */
+    public static function findByKeySecret($key, $secret)
+    {
+        return parent::findByKeySecret($key, $secret);
+    }
 
-		return $this;
-	}
+    /** @inheritdoc */
+    public function resetToken()
+    {
+        $this->auth_token = null;
+        $this->updateLastActivity();
 
-	/** @inheritdoc */
-	public function isActive()
-	{
-		return parent::isActive();
-	}
+        return $this;
+    }
 
-	/** @inheritdoc */
-	public function isSuperuser()
+    /** @inheritdoc */
+    public function isActive()
+    {
+        return parent::isActive();
+    }
+
+    /** @inheritdoc */
+    public function isSuperuser()
     {
         return parent::isSuperuser();
     }
 
     /**
-	 * Get Token Expiration date-time
-	 *
-	 * @param bool $formatted Whether to format the returned DateTime object
-	 *
-	 *
-	 * @return string|\DateTime
-	 * @throws \Exception
-	 */
-	public function getTokenExpiration($formatted = true)
-	{
-		$lastActivity = new \DateTime($this->last_activity, new \DateTimeZone("UTC"));
-		$expiresOn    = $lastActivity->add(
-			new \DateInterval('PT' . self::EXPIRE_TOKEN_AFTER . 'M')
-		);
+     * Get Token Expiration date-time
+     *
+     * @param bool $formatted Whether to format the returned DateTime object
+     *
+     *
+     * @return string|\DateTime
+     * @throws \Exception
+     */
+    public function getTokenExpiration($formatted = true)
+    {
+        $lastActivity = new \DateTime($this->last_activity, new \DateTimeZone("UTC"));
+        $expiresOn    = $lastActivity->add(
+            new \DateInterval('PT' . self::EXPIRE_TOKEN_AFTER . 'M')
+        );
 
-		return ($formatted ? $expiresOn->format(self::DATETIME_FORMAT) : $expiresOn);
-	}
+        return ($formatted ? $expiresOn->format(self::DATETIME_FORMAT) : $expiresOn);
+    }
 
-	/**
-	 * Is token expired
-	 *
-	 * Checks whether current date-time is greater than the
-	 * last activity date-time plus expiration interval
-	 *
-	 * @see getTokenExpiration()
-	 *
-	 * @return bool
-	 * @throws \Exception
-	 */
-	public function isTokenExpired()
-	{
-		$now = new \DateTime("now", new \DateTimeZone("UTC"));
-		return ($now > $this->getTokenExpiration(false));
-	}
+    /**
+     * Is token expired
+     *
+     * Checks whether current date-time is greater than the
+     * last activity date-time plus expiration interval
+     *
+     * @return bool
+     * @throws \Exception
+     * @see getTokenExpiration()
+     *
+     */
+    public function isTokenExpired()
+    {
+        $now = new \DateTime("now", new \DateTimeZone("UTC"));
 
-	/**
-	 * Update last activity date-time
-	 *
-	 * @return $this
-	 */
-	public function updateLastActivity()
-	{
-		$this->last_activity =
-			(new \DateTime("now", new \DateTimeZone("UTC")))->format(self::DATETIME_FORMAT);
+        return ($now > $this->getTokenExpiration(false));
+    }
 
-		return $this;
-	}
+    /**
+     * Update last activity date-time
+     *
+     * @return $this
+     * @throws \Exception
+     */
+    public function updateLastActivity()
+    {
+        $this->last_activity =
+            (new \DateTime("now", new \DateTimeZone("UTC")))->format(self::DATETIME_FORMAT);
+
+        return $this;
+    }
 }

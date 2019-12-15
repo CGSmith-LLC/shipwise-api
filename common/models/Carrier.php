@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
  */
 class Carrier extends BaseCarrier
 {
+
     /**
      * Returns list of carriers as array [id=>name]
      *

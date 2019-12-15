@@ -11,6 +11,7 @@ use frontend\models\Customer;
  */
 class CustomerSearch extends Customer
 {
+
     /**
      * {@inheritdoc}
      */
@@ -58,7 +59,7 @@ class CustomerSearch extends Customer
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
+            'id'           => $this->id,
             'created_date' => $this->created_date,
         ]);
 

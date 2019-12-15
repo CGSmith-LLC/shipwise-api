@@ -11,35 +11,36 @@ namespace common\models\base;
  */
 class BaseService extends \yii\db\ActiveRecord
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	public static function tableName()
-	{
-		return 'service';
-	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules()
-	{
-		return [
-			[['name', 'carrier_id'], 'required'],
-			[['carrier_id'], 'integer'],
-			[['name'], 'string', 'max' => 45],
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'service';
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels()
-	{
-		return [
-			'id'         => 'ID',
-			'name'       => 'Name',
-			'carrier_id' => 'Carrier ID',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['name', 'carrier_id'], 'required'],
+            [['carrier_id'], 'integer'],
+            [['name'], 'string', 'max' => 45],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id'         => 'ID',
+            'name'       => 'Name',
+            'carrier_id' => 'Carrier ID',
+        ];
+    }
 }

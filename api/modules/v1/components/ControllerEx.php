@@ -14,130 +14,133 @@ use Yii;
  */
 class ControllerEx extends Controller
 {
-	/** @var  \yii\web\Request */
-	public $request;
 
-	/** @var  \yii\web\Response */
-	public $response;
+    /** @var  \yii\web\Request */
+    public $request;
 
-	/**
-	 * API Consumer
-	 *
-	 * @var \api\modules\v1\models\core\ApiConsumerEx
-	 */
-	public $apiConsumer;
+    /** @var  \yii\web\Response */
+    public $response;
 
-	/** @inheritdoc */
-	public function init()
-	{
-		parent::init();
+    /**
+     * API Consumer
+     *
+     * @var \api\modules\v1\models\core\ApiConsumerEx
+     */
+    public $apiConsumer;
 
-		$this->request = Yii::$app->request;
-		$this->response = Yii::$app->response;
-	}
+    /** @inheritdoc */
+    public function init()
+    {
+        parent::init();
 
-	/** @inheritdoc */
-	public function behaviors()
-	{
-		return ArrayHelper::merge(parent::behaviors(), [
-			'authenticator' => [
-				'class' => 'yii\filters\auth\HttpBasicAuth',
-				'auth' => [$this, 'auth'],
-			]
-		]);
-	}
+        $this->request  = Yii::$app->request;
+        $this->response = Yii::$app->response;
+    }
 
-	/**
-	 * Authenticates user.
-	 *
-	 * This function is used by HttpBasicAuth yii authenticator.
-	 * Finds user by username and password (db fields: auth_secret and auth_token)
-	 *
-	 * @param string $username
-	 * @param string $password
-	 * @return ApiConsumerEx|null
-	 */
-	public function auth($username, $password)
-	{
-		if (empty($username) || empty($password))
-			return null;
+    /** @inheritdoc */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            'authenticator' => [
+                'class' => 'yii\filters\auth\HttpBasicAuth',
+                'auth'  => [$this, 'auth'],
+            ],
+        ]);
+    }
 
-		// Find user
-		if (($this->apiConsumer = ApiConsumerEx::findByKeySecret($username, $password)) === null) {
-			return null;
-		}
+    /**
+     * Authenticates user.
+     *
+     * This function is used by HttpBasicAuth yii authenticator.
+     * Finds user by username and password (db fields: auth_secret and auth_token)
+     *
+     * @param string $username
+     * @param string $password
+     *
+     * @return ApiConsumerEx|null
+     */
+    public function auth($username, $password)
+    {
+        if (empty($username) || empty($password)) {
+            return null;
+        }
 
-		// Check if user is active
-		if (!$this->apiConsumer->isActive()) {
-			return null;
-		}
+        // Find user
+        if (($this->apiConsumer = ApiConsumerEx::findByKeySecret($username, $password)) === null) {
+            return null;
+        }
 
-		/**
-		 * Set user identity without touching session or cookie.
-		 * (this is preferred use in stateless RESTful API implementation)
-		 */
-		Yii::$app->user->setIdentity($this->apiConsumer);
+        // Check if user is active
+        if (!$this->apiConsumer->isActive()) {
+            return null;
+        }
 
-		/**
-		 * User successfully authenticated.
-		 *
-		 * @see yii\web\User
-		 *
-		 * Yii::$app->user->identity to access currently authenticated user.
-		 * Yii::$app->user->identity->customer to access currently authenticated customer if any.
-		 *
-		 */
+        /**
+         * Set user identity without touching session or cookie.
+         * (this is preferred use in stateless RESTful API implementation)
+         */
+        Yii::$app->user->setIdentity($this->apiConsumer);
 
-		// Log user activity
-		$this->apiConsumer->updateLastActivity()->save();
+        /**
+         * User successfully authenticated.
+         *
+         * @see yii\web\User
+         *
+         * Yii::$app->user->identity to access currently authenticated user.
+         * Yii::$app->user->identity->customer to access currently authenticated customer if any.
+         *
+         */
 
-		return $this->apiConsumer;
-	}
+        // Log user activity
+        $this->apiConsumer->updateLastActivity()->save();
 
-	/**
-	 * Successful response
-	 *
-	 * This function sets the response status code 200
-	 * and returns the response.
-	 *
-	 * @param $response
-	 * @param $code
-	 *
-	 * @return array
-	 */
-	public function success($response, $code = 200)
-	{
-		$this->response->setStatusCode($code);
+        return $this->apiConsumer;
+    }
 
-		return $response;
-	}
+    /**
+     * Successful response
+     *
+     * This function sets the response status code 200
+     * and returns the response.
+     *
+     * @param $response
+     * @param $code
+     *
+     * @return array
+     */
+    public function success($response, $code = 200)
+    {
+        $this->response->setStatusCode($code);
 
-	/**
-	 * Error response
-	 *
-	 * @param int $code       HTTP code
-	 * @param string $message Error message
-	 *
-	 * @return array
-	 */
-	public function errorMessage($code, $message)
-	{
-		$this->response->setStatusCode($code);
+        return $response;
+    }
 
-		return ['message' => $message];
-	}
+    /**
+     * Error response
+     *
+     * @param int    $code    HTTP code
+     * @param string $message Error message
+     *
+     * @return array
+     */
+    public function errorMessage($code, $message)
+    {
+        $this->response->setStatusCode($code);
 
-	/**
-	 * Define the response status code to 422 (unprocessable entity) and return the errors.
-	 *
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function unprocessableError($data)
-	{
-		$this->response->setStatusCode(422);
+        return ['message' => $message];
+    }
 
-		return ['errors' => $data];
-	}
+    /**
+     * Define the response status code to 422 (unprocessable entity) and return the errors.
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    public function unprocessableError($data)
+    {
+        $this->response->setStatusCode(422);
+
+        return ['errors' => $data];
+    }
 }

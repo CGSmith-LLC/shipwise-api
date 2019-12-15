@@ -17,54 +17,55 @@ use yii\helpers\ArrayHelper;
  */
 class Pagination extends Behavior
 {
-	const PAGE_NUMBER = 0;
-	const PAGE_SIZE   = 10;
 
-	CONST PAGE_SIZE_MIN = 0;
-	const PAGE_SIZE_MAX = 1000;
+    const PAGE_NUMBER = 0;
+    const PAGE_SIZE   = 10;
 
-	/** @var pagination */
-	public $pagination;
+    CONST PAGE_SIZE_MIN = 0;
+    const PAGE_SIZE_MAX = 1000;
 
-	/** @var array List of actions that should not execute the "beforeAction" event */
-	public $except = [];
+    /** @var pagination */
+    public $pagination;
 
-	/**
-	 * @inheritdoc
-	 * @return array
-	 */
-	public function events()
-	{
-		return ArrayHelper::merge(parent::events(), [
-			Controller::EVENT_BEFORE_ACTION => 'getPagination',
-		]);
-	}
+    /** @var array List of actions that should not execute the "beforeAction" event */
+    public $except = [];
 
-	/**
-	 * @param $event
-	 */
-	public function getPagination($event)
-	{
-		if (in_array($event->action->id, $this->except)) {
-			return;
-		}
+    /**
+     * @inheritdoc
+     * @return array
+     */
+    public function events()
+    {
+        return ArrayHelper::merge(parent::events(), [
+            Controller::EVENT_BEFORE_ACTION => 'getPagination',
+        ]);
+    }
 
-		$request = Yii::$app->request;
+    /**
+     * @param $event
+     */
+    public function getPagination($event)
+    {
+        if (in_array($event->action->id, $this->except)) {
+            return;
+        }
 
-		// Get the page number parameter
-		$this->pagination = [
-			'page'     => $request->get('page', self::PAGE_NUMBER),
-			'pageSize' => $request->get('per-page', self::PAGE_SIZE),
-		];
+        $request = Yii::$app->request;
 
-		// Verify that the page size doesn't ask for more result than the maximum
-		if ($this->pagination['pageSize'] > self::PAGE_SIZE_MAX) {
-			$this->pagination['pageSize'] = self::PAGE_SIZE_MAX;
-		}
+        // Get the page number parameter
+        $this->pagination = [
+            'page'     => $request->get('page', self::PAGE_NUMBER),
+            'pageSize' => $request->get('per-page', self::PAGE_SIZE),
+        ];
 
-		// Verify that the page size doesn't ask for no result at all either
-		if ($this->pagination['pageSize'] <= self::PAGE_SIZE_MIN) {
-			$this->pagination['pageSize'] = self::PAGE_SIZE;
-		}
-	}
+        // Verify that the page size doesn't ask for more result than the maximum
+        if ($this->pagination['pageSize'] > self::PAGE_SIZE_MAX) {
+            $this->pagination['pageSize'] = self::PAGE_SIZE_MAX;
+        }
+
+        // Verify that the page size doesn't ask for no result at all either
+        if ($this->pagination['pageSize'] <= self::PAGE_SIZE_MIN) {
+            $this->pagination['pageSize'] = self::PAGE_SIZE;
+        }
+    }
 }

@@ -12,37 +12,38 @@ namespace common\models\base;
  */
 class BaseTrackingInfo extends \yii\db\ActiveRecord
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	public static function tableName()
-	{
-		return 'tracking_info';
-	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules()
-	{
-		return [
-			[['service_id', 'tracking'], 'required'],
-			[['service_id'], 'integer'],
-			[['created_date'], 'safe'],
-			[['tracking'], 'string', 'max' => 100],
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'tracking_info';
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels()
-	{
-		return [
-			'id'           => 'ID',
-			'service_id'   => 'Service ID',
-			'tracking'     => 'Tracking',
-			'created_date' => 'Created Date',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['service_id', 'tracking'], 'required'],
+            [['service_id'], 'integer'],
+            [['created_date'], 'safe'],
+            [['tracking'], 'string', 'max' => 100],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id'           => 'ID',
+            'service_id'   => 'Service ID',
+            'tracking'     => 'Tracking',
+            'created_date' => 'Created Date',
+        ];
+    }
 }

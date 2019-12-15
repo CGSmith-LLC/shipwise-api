@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
  */
 class Order extends BaseOrder
 {
+
     /** {@inheritdoc} */
     public function attributeLabels()
     {

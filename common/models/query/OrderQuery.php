@@ -11,6 +11,7 @@ use common\models\Order;
  */
 class OrderQuery extends \yii\db\ActiveQuery
 {
+
     /**
      * @inheritdoc
      * @return \common\models\Order[]|array
@@ -41,7 +42,7 @@ class OrderQuery extends \yii\db\ActiveQuery
     public function forCustomer($id)
     {
         return is_numeric($id)
-            ? $this->andOnCondition([Order::tableName() . '.customer_id' => (int) $id])
+            ? $this->andOnCondition([Order::tableName() . '.customer_id' => (int)$id])
             : $this;
     }
 
@@ -78,7 +79,7 @@ class OrderQuery extends \yii\db\ActiveQuery
      */
     public function byStatus($id)
     {
-        return $this->andOnCondition([Order::tableName() . '.status_id' => (int) $id]);
+        return $this->andOnCondition([Order::tableName() . '.status_id' => (int)$id]);
     }
 
     /**
@@ -126,6 +127,6 @@ class OrderQuery extends \yii\db\ActiveQuery
      */
     public function byId($id)
     {
-        return $this->andWhere([Order::tableName() . '.id' => (int) $id]);
+        return $this->andWhere([Order::tableName() . '.id' => (int)$id]);
     }
 }

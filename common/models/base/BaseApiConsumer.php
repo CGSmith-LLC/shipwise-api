@@ -16,27 +16,28 @@ namespace common\models\base;
  */
 class BaseApiConsumer extends \yii\db\ActiveRecord
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	public static function tableName()
-	{
-		return 'api_consumer';
-	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules()
-	{
-		return [
-			[['auth_key', 'auth_secret'], 'required'],
-			[['last_activity', 'created_date'], 'safe'],
-			[['customer_id', 'status', 'superuser'], 'integer'],
-			[['auth_key'], 'string', 'max' => 6],
-			[['auth_secret', 'auth_token'], 'string', 'max' => 32],
-			[['auth_key'], 'unique'],
-			[['auth_secret'], 'unique'],
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'api_consumer';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['auth_key', 'auth_secret'], 'required'],
+            [['last_activity', 'created_date'], 'safe'],
+            [['customer_id', 'status', 'superuser'], 'integer'],
+            [['auth_key'], 'string', 'max' => 6],
+            [['auth_secret', 'auth_token'], 'string', 'max' => 32],
+            [['auth_key'], 'unique'],
+            [['auth_secret'], 'unique'],
+        ];
+    }
 }

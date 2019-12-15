@@ -11,20 +11,21 @@ use common\models\Carrier;
  */
 class CarrierEx extends Carrier
 {
-	/**
-	 * @SWG\Definition(
-	 *     definition = "Carrier",
-	 *
-	 *     @SWG\Property( property = "id",   type = "integer", description = "Carrier ID" ),
-	 *     @SWG\Property( property = "name", type = "string", description = "Carrier name" ),
-	 * )
-	 */
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function fields()
-	{
-		return ['id', 'name'];
-	}
+    /**
+     * @SWG\Definition(
+     *     definition = "Carrier",
+     *
+     *     @SWG\Property( property = "id",   type = "integer", description = "Carrier ID" ),
+     *     @SWG\Property( property = "name", type = "string", description = "Carrier name" ),
+     * )
+     */
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fields()
+    {
+        return ['id', 'name'];
+    }
 }

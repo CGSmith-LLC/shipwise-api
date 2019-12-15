@@ -25,16 +25,17 @@ use yii\base\Model;
  */
 class CustomerForm extends Model
 {
-	public $name;
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules()
-	{
-		return [
-			['name', 'required', 'message' => '{attribute} is required.'],
-			['name', 'string', 'length' => [2, 45]],
-		];
-	}
+    public $name;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            ['name', 'required', 'message' => '{attribute} is required.'],
+            ['name', 'string', 'length' => [2, 45]],
+        ];
+    }
 }

@@ -23,5 +23,6 @@ use yii\base\Model;
  */
 class AuthenticationResponse extends Model
 {
-	public $token;
+
+    public $token;
 }

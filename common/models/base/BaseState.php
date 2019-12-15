@@ -11,35 +11,36 @@ namespace common\models\base;
  */
 class BaseState extends \yii\db\ActiveRecord
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	public static function tableName()
-	{
-		return 'states';
-	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules()
-	{
-		return [
-			[['name', 'abbreviation'], 'required'],
-			[['name'], 'string', 'max' => 45],
-			[['abbreviation'], 'string', 'max' => 12],
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'states';
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels()
-	{
-		return [
-			'id'           => 'ID',
-			'name'         => 'Name',
-			'abbreviation' => 'Abbreviation',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['name', 'abbreviation'], 'required'],
+            [['name'], 'string', 'max' => 45],
+            [['abbreviation'], 'string', 'max' => 12],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id'           => 'ID',
+            'name'         => 'Name',
+            'abbreviation' => 'Abbreviation',
+        ];
+    }
 }

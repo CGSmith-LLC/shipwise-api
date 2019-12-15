@@ -11,13 +11,14 @@ use common\models\base\BaseOrderHistory;
  */
 class OrderHistory extends BaseOrderHistory
 {
-	/**
-	 * Get Status
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getStatus()
-	{
-		return $this->hasOne('common\models\Status', ['id' => 'status_id']);
-	}
+
+    /**
+     * Get Status
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStatus()
+    {
+        return $this->hasOne('common\models\Status', ['id' => 'status_id']);
+    }
 }

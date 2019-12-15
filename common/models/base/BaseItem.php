@@ -13,38 +13,39 @@ namespace common\models\base;
  */
 class BaseItem extends \yii\db\ActiveRecord
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	public static function tableName()
-	{
-		return 'items';
-	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules()
-	{
-		return [
-			[['order_id', 'quantity', 'sku'], 'required'],
-			[['order_id', 'quantity'], 'integer'],
-			['sku', 'string', 'max' => 64],
-			['name', 'string', 'max' => 128],
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'items';
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels()
-	{
-		return [
-			'id'       => 'ID',
-			'order_id' => 'Order ID',
-			'quantity' => 'Quantity',
-			'sku'      => 'Sku',
-			'name'     => 'Name',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['order_id', 'quantity', 'sku'], 'required'],
+            [['order_id', 'quantity'], 'integer'],
+            ['sku', 'string', 'max' => 64],
+            ['name', 'string', 'max' => 128],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id'       => 'ID',
+            'order_id' => 'Order ID',
+            'quantity' => 'Quantity',
+            'sku'      => 'Sku',
+            'name'     => 'Name',
+        ];
+    }
 }

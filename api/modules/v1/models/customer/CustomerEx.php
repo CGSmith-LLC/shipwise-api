@@ -11,30 +11,31 @@ use common\models\Customer;
  */
 class CustomerEx extends Customer
 {
-	/**
-	 * @SWG\Definition(
-	 *     definition = "Customer",
-	 *
-	 *     @SWG\Property( property = "id",   type = "integer", description = "Identifier of the customer" ),
-	 *     @SWG\Property( property = "name", type = "string",  description = "Name of the customer" ),
-	 *     @SWG\Property(
-	 *            property = "createdDate",
-	 *            type = "string",
-	 *            format = "date-time",
-	 *            description = "Customer creation date-time"
-	 *        ),
-	 * )
-	 */
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function fields()
-	{
-		return [
-			'id'          => 'id',
-			'name'        => 'name',
-			'createdDate' => 'created_date',
-		];
-	}
+    /**
+     * @SWG\Definition(
+     *     definition = "Customer",
+     *
+     *     @SWG\Property( property = "id",   type = "integer", description = "Identifier of the customer" ),
+     *     @SWG\Property( property = "name", type = "string",  description = "Name of the customer" ),
+     *     @SWG\Property(
+     *            property = "createdDate",
+     *            type = "string",
+     *            format = "date-time",
+     *            description = "Customer creation date-time"
+     *        ),
+     * )
+     */
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fields()
+    {
+        return [
+            'id'          => 'id',
+            'name'        => 'name',
+            'createdDate' => 'created_date',
+        ];
+    }
 }

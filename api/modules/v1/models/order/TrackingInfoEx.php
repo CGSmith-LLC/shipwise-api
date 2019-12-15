@@ -11,39 +11,40 @@ use common\models\TrackingInfo;
  */
 class TrackingInfoEx extends TrackingInfo
 {
-	/**
-	 * @SWG\Definition(
-	 *     definition = "TrackingInfo",
-	 *
-	 *     @SWG\Property( property = "id", type = "integer", description = "Tracking Info ID" ),
-	 *     @SWG\Property( property = "service", ref = "#/definitions/Service" ),
-	 *     @SWG\Property( property = "trackingNumber", type = "string", description = "Tracking number" ),
-	 *     @SWG\Property( property = "createdDate", type = "string", format = "date-time" ),
-	 * )
-	 */
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function fields()
-	{
-		return [
-			'id'             => 'id',
-			'service'        => 'service',
-			'trackingNumber' => 'tracking',
-			'createdDate'    => 'created_date',
-		];
-	}
+    /**
+     * @SWG\Definition(
+     *     definition = "TrackingInfo",
+     *
+     *     @SWG\Property( property = "id", type = "integer", description = "Tracking Info ID" ),
+     *     @SWG\Property( property = "service", ref = "#/definitions/Service" ),
+     *     @SWG\Property( property = "trackingNumber", type = "string", description = "Tracking number" ),
+     *     @SWG\Property( property = "createdDate", type = "string", format = "date-time" ),
+     * )
+     */
 
-	/**
-	 * Get Service
-	 *
-	 * Overwrite parent method to use ServiceEx
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getService()
-	{
-		return $this->hasOne('api\modules\v1\models\core\ServiceEx', ['id' => 'service_id']);
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function fields()
+    {
+        return [
+            'id'             => 'id',
+            'service'        => 'service',
+            'trackingNumber' => 'tracking',
+            'createdDate'    => 'created_date',
+        ];
+    }
+
+    /**
+     * Get Service
+     *
+     * Overwrite parent method to use ServiceEx
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getService()
+    {
+        return $this->hasOne('api\modules\v1\models\core\ServiceEx', ['id' => 'service_id']);
+    }
 }

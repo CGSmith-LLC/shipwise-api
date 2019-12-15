@@ -11,6 +11,7 @@ use common\models\Item as BaseItem;
  */
 class Item extends BaseItem
 {
+
     /** {@inheritdoc} */
     public function rules()
     {

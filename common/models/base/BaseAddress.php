@@ -19,6 +19,7 @@ namespace common\models\base;
  */
 class BaseAddress extends \yii\db\ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */

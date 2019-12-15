@@ -46,7 +46,7 @@ class User extends BaseUser
     /**
      * Returns list of customers as array [id=>name]
      *
-     * @param string $keyField Field name to use as key
+     * @param string $keyField   Field name to use as key
      * @param string $valueField Field name to use as value
      *
      * @return array

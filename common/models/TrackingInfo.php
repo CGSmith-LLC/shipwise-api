@@ -11,13 +11,14 @@ use common\models\base\BaseTrackingInfo;
  */
 class TrackingInfo extends BaseTrackingInfo
 {
-	/**
-	 * Get Service
-	 *
-	 * @return \yii\db\ActiveQuery
-	 */
-	public function getAddress()
-	{
-		return $this->hasOne('common\models\Service', ['id' => 'service_id']);
-	}
+
+    /**
+     * Get Service
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAddress()
+    {
+        return $this->hasOne('common\models\Service', ['id' => 'service_id']);
+    }
 }

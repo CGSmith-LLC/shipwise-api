@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
  */
 class Status extends BaseStatus
 {
+
     /* Please keep synchronized with db values! */
     const SHIPPED = 1;
     const OPEN    = 9;

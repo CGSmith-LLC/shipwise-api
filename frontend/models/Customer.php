@@ -14,6 +14,7 @@ use yii\helpers\ArrayHelper;
  */
 class Customer extends BaseCustomer
 {
+
     /**
      * Get linked users
      *
@@ -23,7 +24,7 @@ class Customer extends BaseCustomer
     public function getUsers()
     {
         return $this->hasMany('frontend\models\User', ['id' => 'user_id'])
-                    ->viaTable(UserCustomer::tableName(), ['customer_id' => 'id']);
+            ->viaTable(UserCustomer::tableName(), ['customer_id' => 'id']);
     }
 
     /**
@@ -45,7 +46,7 @@ class Customer extends BaseCustomer
      */
     public function isLinkedToUser($userId)
     {
-        return $this->getUserCustomer()->onCondition(['user_id' => (int) $userId])->exists();
+        return $this->getUserCustomer()->onCondition(['user_id' => (int)$userId])->exists();
     }
 
     /**
