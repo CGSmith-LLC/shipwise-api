@@ -76,7 +76,6 @@ $item->loadDefaultValues();
 
                         <?= $form->field($model->order, 'requested_ship_date')->textInput([
                             'value' => $model->order->requested_ship_date,
-                            'type' => 'date',
                         ]); ?>
 
                     </div>
