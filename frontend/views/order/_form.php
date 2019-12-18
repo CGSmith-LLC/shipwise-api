@@ -74,6 +74,11 @@ $item->loadDefaultValues();
                             'prompt' => ' -- Unknown --',
                         ]) ?>
 
+                        <?= $form->field($model->requested_ship_date, 'requested_ship_date')->textInput([
+                            'value' => $model->requested_ship_date,
+                            'type' => 'date',
+                        ]); ?>
+
                     </div>
                 </div>
             </div>
