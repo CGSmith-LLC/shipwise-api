@@ -9,9 +9,9 @@ $version = "v1";
 return [
 
     // API Documentation
-    ""                 => "$version/default/doc", // Swagger UI with "Try it out" button
-    "/$version/doc"    => "$version/default/doc", // Swagger UI with "Try it out" button
-    "/$version/schema" => "$version/default/schema", // Swagger JSON spec file
+    ""                   => "$version/default/doc", // Swagger UI with "Try it out" button
+    "/$version/doc"      => "$version/default/doc", // Swagger UI with "Try it out" button
+    "/$version/schema"   => "$version/default/schema", // Swagger JSON spec file
 
     // Orders
     [
@@ -35,4 +35,7 @@ return [
         "class"      => 'yii\rest\UrlRule',
         "controller" => ["$version/customer"],
     ],
+
+    // Shipping Rates
+    "POST $version/shipping/rates" => "$version/shipping-rate/create",
 ];

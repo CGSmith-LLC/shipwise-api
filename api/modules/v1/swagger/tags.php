@@ -13,3 +13,10 @@
  *    description = "",
  * )
  */
+
+/**
+ * @SWG\Tag(
+ *    name = "Shipping",
+ *    description = "",
+ * )
+ */

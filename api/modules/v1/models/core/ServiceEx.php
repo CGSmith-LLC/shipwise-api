@@ -2,7 +2,7 @@
 
 namespace api\modules\v1\models\core;
 
-use common\models\Service;
+use common\models\shipping\Service;
 
 /**
  * Class ServiceEx
@@ -28,5 +28,26 @@ class ServiceEx extends Service
     public function fields()
     {
         return ['id', 'name', 'carrier'];
+    }
+
+    /**
+     * @param int|string|null $carrier Carrier ID or shipwise_code. Optional.
+     *
+     * @return array
+     */
+    public static function getShipwiseCodes($carrier = null)
+    {
+        $carriers = CarrierEx::getShipwiseCodes();
+        $flipped  = array_flip($carriers);
+
+        if (is_numeric($carrier) && isset($carriers[$carrier])) {
+            $carrierId = $carrier;
+        } elseif (in_array($carrier, array_values($carriers))) {
+            $carrierId = $flipped[$carrier];
+        } else {
+            $carrierId = $flipped;
+        }
+
+        return self::getList('id', 'shipwise_code', $carrierId);
     }
 }

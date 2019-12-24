@@ -19,6 +19,6 @@ class TrackingInfo extends BaseTrackingInfo
      */
     public function getAddress()
     {
-        return $this->hasOne('common\models\Service', ['id' => 'service_id']);
+        return $this->hasOne('common\models\shipping\Service', ['id' => 'service_id']);
     }
 }
