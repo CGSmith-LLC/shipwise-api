@@ -317,8 +317,8 @@ class UPSPlugin extends ShipmentPlugin
             __DIR__ . '/wsdl/ups/RateWS.wsdl'
         );
 
-        // \yii\helpers\VarDumper::dump($this->data, 10, true);
-        // \yii\helpers\VarDumper::dump($this->response, 10, true);
+        Yii::debug($this->data, 'UPS API Request');
+        Yii::debug($this->response, 'UPS API Response');
 
         return $this;
     }

@@ -353,8 +353,8 @@ class FedExPlugin extends ShipmentPlugin
             __DIR__ . '/wsdl/fedex/RateService_v24.wsdl'
         );
 
-        // \yii\helpers\VarDumper::dump($this->data, 10, true);
-        // \yii\helpers\VarDumper::dump($this->response, 10, true);
+        Yii::debug($this->data, 'FedEx API Request');
+        Yii::debug($this->response, 'FedEx API Response');
 
         return $this;
     }

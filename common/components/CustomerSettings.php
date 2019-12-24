@@ -31,12 +31,12 @@ class CustomerSettings extends Component
      * Yii::$app->customerSettings->get('fedex_api_account', '1');
      * ```
      *
-     * @param string $key        Settings key
-     * @param int    $customerId Customer ID
+     * @param string   $key        Settings key
+     * @param int|null $customerId Customer ID
      *
      * @return null|string
      */
-    public static function get($key, $customerId)
+    public static function get($key, $customerId = null)
     {
         $customerMeta = CustomerMeta::findOne(['customer_id' => $customerId, 'key' => $key]);
 
