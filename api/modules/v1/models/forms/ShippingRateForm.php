@@ -19,7 +19,7 @@ use yii\helpers\ArrayHelper;
  *            property = "carrier",
  *            type = "string",
  *            enum = {"FedEx","UPS"},
- *            description = "Specific carrier. You may leave it blank or unset to get all available carriers."
+ *            description = "Carrier code. You may leave it blank or unset if service field is set."
  *      ),
  *
  *     @SWG\Property(
@@ -31,7 +31,8 @@ use yii\helpers\ArrayHelper;
  *            "FedExExpressSaver","UPSNextDayAirEarlyAM","UPSWorldwideExpressPlus","UPSWorldwideExpedited","UPSStandard",
  *            "UPSWorldwideExpress","FedEx1DayFreight","FedEx2DayFreight","FedEx3DayFreight"},
  *            description =
- *     "Specific carrier's service. You may leave it blank or unset to get all available services."
+ *     "Specific carrier's service code. If you want to get all available services then leave this field blank or unset,
+ and set the carrier field."
  *      ),
  *
  *     @SWG\Property(
@@ -76,7 +77,7 @@ class ShippingRateForm extends Model
 
     /**
      * Carrier code.
-     * Can be empty for all available carriers request.
+     * Can be empty if service is set.
      * @see CarrierEx::getShipwiseCodes() for list of codes
      *
      * @var string
@@ -124,6 +125,22 @@ class ShippingRateForm extends Model
     {
         return [
             [['sender', 'recipient', 'packages'], 'required', 'message' => '{attribute} is required.'],
+            [
+                'carrier',
+                'required',
+                'when'    => function ($model) {
+                    return (empty($this->carrier) && empty($this->service));
+                },
+                'message' => "Carrier code is required when service code is not set. Set the carrier to get all available services. Or set the service code to get rates for that specific service.",
+            ],
+            [
+                'service',
+                'required',
+                'when'    => function ($model) {
+                    return (empty($this->carrier) && empty($this->service));
+                },
+                'message' => "Service code is required when carrier code is not set. Set the carrier to get all available services. Or set the service code to get rates for that specific service.",
+            ],
             [
                 'carrier',
                 'in',
@@ -264,21 +281,26 @@ class ShippingRateForm extends Model
         /**
          * Build Shipment object from ShippingRateForm.
          */
-        $shipment                        = new ShipmentEx();
-        $shipment->shipment_date         = $this->shipmentDate ?? date("c");
-        $shipment->customer_id           = $apiConsumer->customer->id ?? null;
+        $shipment                = new ShipmentEx();
+        $shipment->shipment_date = $this->shipmentDate ?? date("c");
+        $shipment->customer_id   = $apiConsumer->customer->id ?? null;
+
+        // Sender
         $shipment->sender_country        = $this->sender->country;
         $shipment->sender_city           = $this->sender->city;
-        $shipment->sender_state          = $this->sender->state;
+        $shipment->sender_state          = $shipment->recognizeState($this->sender->country, $this->sender->state);
         $shipment->sender_postal_code    = $this->sender->zip;
         $shipment->sender_is_residential = ($this->sender->type == ShipmentEx::ADDRESS_TYPE_RESIDENTIAL);
 
+        // Recipient
         $shipment->recipient_country        = $this->recipient->country;
         $shipment->recipient_city           = $this->recipient->city;
-        $shipment->recipient_state          = $this->recipient->state;
+        $shipment->recipient_state          = $shipment->recognizeState($this->recipient->country,
+            $this->recipient->state);
         $shipment->recipient_postal_code    = $this->recipient->zip;
         $shipment->recipient_is_residential = ($this->recipient->type == ShipmentEx::ADDRESS_TYPE_RESIDENTIAL);
 
+        // Packaging
         $shipment->package_type = $this->packages[0]->type ?? null;
         $shipment->weight_units = $this->packages[0]->weight->units ?? null;
         $shipment->dim_units    = $this->packages[0]->dimensions->units ?? null;
@@ -293,8 +315,12 @@ class ShippingRateForm extends Model
             $shipment->addPackage($_pkg);
         }
 
+        // Carrier & service codes
         $shipment->carrier = CarrierEx::findByShipWiseCode($this->carrier);
         $shipment->service = ServiceEx::findByShipWiseCode($this->service);
+        if ($shipment->service && !$shipment->carrier) {
+            $shipment->carrier = CarrierEx::findByServiceCode($shipment->service->shipwise_code);
+        }
 
         return $shipment;
     }

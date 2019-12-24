@@ -16,7 +16,9 @@ use yii\base\Model;
  * @property string   $deliveryTimeStamp
  * @property string   $deliveryDayOfWeek
  * @property string   $transitTime
+ * @property string   $deliveryByTime
  * @property Charge[] $detailedCharges
+ * @property string   $infoMessage
  *
  * @package common\models\shipping
  */
@@ -43,9 +45,14 @@ class ShipmentRate extends Model
 
     /** @var string */
     public $transitTime = null;
+    /** @var string */
+    public $deliveryByTime = null;
 
     /** @var Charge[] */
     public $detailedCharges = [];
+
+    /** @var string */
+    public $infoMessage = null;
 
     /**
      * @param Charge $item

@@ -117,20 +117,13 @@ class ShippingRateController extends ControllerEx
             return $this->unprocessableError($shipment->getErrors());
         }
 
-        // Get carrier's warnings
-        /*if ($shipment->getPluginWarnings()) {
-            foreach ($shipment->getPluginWarnings() as $warning) {
-                echo $warning;
-            }
-        }*/
-
         /** @var ShipmentRateEx[] $rates */
         $rates = $shipment->getRates();
 
         if (count($rates) > 0) {
             return $this->success($rates);
         } else {
-            return $this->errorMessage(400, 'Could not calculate rates. Try with different data.');
+            return $this->errorMessage(400, 'No results to return. Try with different data.');
         }
     }
 }

@@ -2,15 +2,9 @@
 
 namespace common\models\shipping\extension;
 
+use common\models\{Charge, Money};
 use Yii;
-use common\models\shipping\{
-    Carrier,
-    Service,
-    Shipment,
-    ShipmentPlugin,
-    ShipmentException,
-    ShipmentRate};
-use \yii\helpers\ArrayHelper;
+use common\models\shipping\{Carrier, PackageType, Service, ShipmentPlugin, ShipmentException, ShipmentRate};
 
 /**
  * Class UPSPlugin
@@ -96,26 +90,24 @@ class UPSPlugin extends ShipmentPlugin
     /** @inheritdoc */
     public function autoload($customerId = null)
     {
-        $_customerId = $customerId ?? $this->shipment->customer_id ?? null;
-
-        $this->isProduction = !(bool)(int)Yii::$app->settings->get('UPS_TEST_MODE', $_customerId);
+        $this->isProduction = !(bool)(int)Yii::$app->customerSettings->get('ups_api_test_mode', $customerId);
 
         $this->setAccountInfo(
             $this->isProduction
-                ? Yii::$app->settings->get('UPS_API_ACCOUNT_NUMBER_PROD', $_customerId)
-                : Yii::$app->settings->get('UPS_API_ACCOUNT_NUMBER_TEST', $_customerId),
+                ? Yii::$app->customerSettings->get('ups_api_account', $customerId)
+                : Yii::$app->customerSettings->get('ups_api_account_test', $customerId),
 
             $this->isProduction
-                ? Yii::$app->settings->get('UPS_API_USER_ID_PROD', $_customerId)
-                : Yii::$app->settings->get('UPS_API_USER_ID_TEST', $_customerId),
+                ? Yii::$app->customerSettings->get('ups_api_user_id', $customerId)
+                : Yii::$app->customerSettings->get('ups_api_user_id_test', $customerId),
 
             $this->isProduction
-                ? Yii::$app->settings->get('UPS_API_PASSWORD_PROD', $_customerId)
-                : Yii::$app->settings->get('UPS_API_PASSWORD_TEST', $_customerId),
+                ? Yii::$app->customerSettings->get('ups_api_password', $customerId)
+                : Yii::$app->customerSettings->get('ups_api_password_test', $customerId),
 
             $this->isProduction
-                ? Yii::$app->settings->get('UPS_API_KEY_PROD', $_customerId)
-                : Yii::$app->settings->get('UPS_API_KEY_TEST', $_customerId)
+                ? Yii::$app->customerSettings->get('ups_api_key', $customerId)
+                : Yii::$app->customerSettings->get('ups_api_key_test', $customerId)
         );
     }
 
@@ -176,13 +168,10 @@ class UPSPlugin extends ShipmentPlugin
      * Prepare Shipment Rate Call to carrier API
      *
      * @return $this
-     * @version 2018.11.04
+     * @version 2019.12.20
      */
     protected function ratePrepare()
     {
-
-        $fromCountry = $this->shipment->senderCountry->code;
-        $toCountry   = $this->shipment->recipientCountry->code;
 
         /**
          * Build UPS `RateRequest`
@@ -190,7 +179,8 @@ class UPSPlugin extends ShipmentPlugin
         $this->data = [
 
             'Request' => [
-                'RequestOption' => $this->isRatesComparison ? 'Shop' : 'Rate',
+                // Rates comparison or specific service
+                'RequestOption' => $this->shipment->service ? 'Rate' : 'Shop',
             ],
 
             'Shipment' => [
@@ -201,7 +191,7 @@ class UPSPlugin extends ShipmentPlugin
                         0,
                         35),
 
-                    'ShipperNumber' => $this->accountNumber ?? $this->shipment->service->carrierAccount->number ?? null,
+                    'ShipperNumber' => $this->accountNumber,
 
                     'Address' => [
                         'AddressLine'       => [
@@ -211,7 +201,7 @@ class UPSPlugin extends ShipmentPlugin
                         'City'              => $this->shipment->sender_city,
                         'StateProvinceCode' => $this->shipment->sender_state,
                         'PostalCode'        => $this->shipment->sender_postal_code,
-                        'CountryCode'       => $fromCountry,
+                        'CountryCode'       => $this->shipment->sender_country,
                     ],
                 ],
 
@@ -221,7 +211,7 @@ class UPSPlugin extends ShipmentPlugin
                         0,
                         35),
 
-                    'ShipperNumber' => $this->accountNumber ?? $this->shipment->service->carrierAccount->number ?? null,
+                    'ShipperNumber' => $this->accountNumber,
 
                     'Address' => [
                         'AddressLine'       => [
@@ -231,7 +221,7 @@ class UPSPlugin extends ShipmentPlugin
                         'City'              => $this->shipment->recipient_city,
                         'StateProvinceCode' => $this->shipment->recipient_state,
                         'PostalCode'        => $this->shipment->recipient_postal_code,
-                        'CountryCode'       => $toCountry,
+                        'CountryCode'       => $this->shipment->recipient_country,
                     ],
 
                     'ResidentialAddressIndicator' => (bool)$this->shipment->recipient_is_residential,
@@ -251,17 +241,23 @@ class UPSPlugin extends ShipmentPlugin
                         'City'              => $this->shipment->sender_city,
                         'StateProvinceCode' => $this->shipment->sender_state,
                         'PostalCode'        => $this->shipment->sender_postal_code,
-                        'CountryCode'       => $fromCountry,
+                        'CountryCode'       => $this->shipment->sender_country,
                     ],
-                ],
-
-                'Service' => [
-                    'Code' => $this->shipment->service->carrier_code ?? null,
                 ],
             ],
         ];
 
-        if ($fromCountry == 'US') {
+        /**
+         * Rates comparison or specific service
+         */
+        if ($this->shipment->service) {
+            $this->data['Shipment']['Service']['Code'] = $this->shipment->service->carrier_code ?? null;
+        }
+
+        /**
+         * Type of rates
+         */
+        if ($this->shipment->sender_country == 'US') {
             $this->data['CustomerClassification'] = [
                 'Code' => '00', // 00 = Rates Associated with Shipper Number
             ];
@@ -270,10 +266,10 @@ class UPSPlugin extends ShipmentPlugin
         /**
          * Shipment items
          */
-        foreach ($this->shipment->packages as $package) {
+        foreach ($this->shipment->getPackages() as $package) {
             $this->data['Shipment']['Package'][] = [
                 'PackagingType' => [
-                    'Code' => $this->shipment->packageType->carrier_code ?? '00', // 00 = UNKNOWN
+                    'Code' => PackageType::map(Carrier::UPS, $this->shipment->package_type) ?? '00', // 00 = UNKNOWN,
                 ],
 
                 'Dimensions' => [
@@ -293,6 +289,7 @@ class UPSPlugin extends ShipmentPlugin
 
                     'Weight' => round($package->weight),
                 ],
+                // @todo add here "PackageServiceOptions" if needed.
             ];
         }
 
@@ -305,7 +302,7 @@ class UPSPlugin extends ShipmentPlugin
      * @return $this
      * @throws ShipmentException
      * @throws \SoapFault
-     * @version 2018.11.04
+     * @version 2019.12.20
      */
     protected function rateExecute()
     {
@@ -320,6 +317,9 @@ class UPSPlugin extends ShipmentPlugin
             __DIR__ . '/wsdl/ups/RateWS.wsdl'
         );
 
+        // \yii\helpers\VarDumper::dump($this->data, 10, true);
+        // \yii\helpers\VarDumper::dump($this->response, 10, true);
+
         return $this;
     }
 
@@ -330,7 +330,7 @@ class UPSPlugin extends ShipmentPlugin
      * In a successful response it will set the Shipment::_rates array
      *
      * @return $this
-     * @version 2018.11.04
+     * @version 2019.12.20
      *
      */
     protected function rateProcess()
@@ -386,24 +386,41 @@ class UPSPlugin extends ShipmentPlugin
             foreach ((array)$rates as $rate) {
                 if (isset($rate->Service->Code) && isset($rate->TotalCharges)) {
 
-                    $service = CarrierService::find()
+                    $service = Service::find()
                         ->forCarrierService($this->shipment->carrier->id, $rate->Service->Code)
                         ->one();
 
-                    $this->shipment->addRate(
-                        new ShipmentRate(
-                            $rate->Service->Code ?? null,
-                            $service->name ?? $rate->Service->Description ?? null,
-                            $service->getIcon(),
-                            $rate->TotalCharges->MonetaryValue ?? null,
-                            $rate->TransportationCharges->MonetaryValue ?? null,
-                            $rate->ServiceOptionsCharges->MonetaryValue ?? null
-                        )
-                    );
+                    $_rate = new ShipmentRate();
+
+                    $_rate->infoMessage = $rate->RatedShipmentAlert->Description ?? null;
+
+                    $_rate->serviceCode = $service->shipwise_code ?? $rate->Service->Code ?? null;
+                    $_rate->serviceName = $service->name ?? $rate->Service->Description ?? null;
+
+                    $_rate->totalPrice = new Money([
+                        'amount'   => $rate->TotalCharges->MonetaryValue ?? null,
+                        'currency' => $rate->TotalCharges->CurrencyCode ?? null,
+                    ]);
+
+                    $_rate->addCharge(new Charge([
+                        'type'        => 'BASE',
+                        'description' => 'Base price',
+                        'amount'      => new Money([
+                            'amount'   => $rate->TransportationCharges->MonetaryValue ?? null,
+                            'currency' => $rate->TransportationCharges->CurrencyCode ?? null,
+                        ]),
+                    ]));
+
+                    // @todo for Surcharges see "PackageServiceOptions" in request.
+
+                    $_rate->deliveryTimeStamp = null; // n/a for UPS
+                    $_rate->deliveryDayOfWeek = null; // n/a for UPS
+                    $_rate->transitTime       = $rate->GuaranteedDelivery->BusinessDaysInTransit ?? null;
+                    $_rate->deliveryByTime    = $rate->GuaranteedDelivery->DeliveryByTime ?? null;
+
+                    $this->shipment->addRate($_rate);
                 }
             }
-
-
         }
 
         return $this;

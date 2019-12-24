@@ -3,9 +3,11 @@
 namespace common\models\shipping;
 
 use common\models\base\BaseShipment;
+use common\models\State;
 use Exception;
 use LogicException;
 use Yii;
+use yii\db\Expression;
 
 /**
  * Class Shipment
@@ -311,5 +313,30 @@ class Shipment extends BaseShipment
         $plugin->autoload($this->customer_id);
 
         $this->setPlugin($plugin);
+    }
+
+    /**
+     * This function will transform US state full-name to abbreviation if necessary.
+     *
+     * @param string $country Country ISO code
+     * @param string $state   State or Province
+     *
+     * @return string
+     */
+    public static function recognizeState($country, $state)
+    {
+        if ($country == 'US') {
+            $input = strtoupper(trim($state));
+            if (strlen($input) == 2) {
+                return $input;
+            } else {
+                $name = new Expression("UPPER(name)");
+                if (($_state = State::find()->where(['=', $name, $input])->one()) !== null) {
+                    return $_state->abbreviation;
+                }
+            }
+        }
+
+        return $state;
     }
 }

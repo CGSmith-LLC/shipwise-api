@@ -88,12 +88,12 @@ abstract class ShipmentPlugin extends ShipmentConnection
     /**
      * Autoload carrier settings
      *
-     * @param int|null $locationId Location ID used to get per location settings
+     * @param int|null $customerId Customer ID used to get customer specific settings
      *
-     * @see Yii::$app->settings
+     * @see Yii::$app->customerSettings
      *
      */
-    abstract public function autoload($locationId = null);
+    abstract public function autoload($customerId = null);
 
     /**
      * Get Plugin Name

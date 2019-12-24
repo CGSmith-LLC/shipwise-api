@@ -65,4 +65,24 @@ class Carrier extends BaseCarrier
 
         return self::find()->where(['id' => $flipped[$code]])->one();
     }
+
+    /**
+     * Find carrier by service ShipWise code
+     *
+     * @param string $serviceShipwiseCode Service ShipWise code.
+     *
+     * @return array|\yii\db\ActiveRecord|null
+     */
+    public static function findByServiceCode($serviceShipwiseCode)
+    {
+        if (empty($serviceShipwiseCode)) {
+            return null;
+        }
+
+        if (($service = Service::findByShipWiseCode($serviceShipwiseCode)) !== null) {
+            return self::find()->where(['id' => $service->carrier_id])->one();
+        }
+
+        return null;
+    }
 }

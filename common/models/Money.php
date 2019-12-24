@@ -29,7 +29,7 @@ class Money extends Model
         return [
             [['amount', 'currency'], 'required', 'message' => '{attribute} is required.'],
             ['amount', 'double'],
-            [['city', 'state'], 'string', 'length' => 3],
+            ['currency', 'string', 'length' => 3],
         ];
     }
 }

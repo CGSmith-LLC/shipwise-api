@@ -2,15 +2,15 @@
 
 namespace common\models\shipping\extension;
 
-use common\models\{Charge, Money, State};
+use common\models\{Charge, Money};
 use Yii;
-use common\models\shipping\{Carrier,
+use common\models\shipping\{
+    Carrier,
     PackageType,
     Service,
     ShipmentPlugin,
     ShipmentException,
     ShipmentRate};
-use yii\db\Expression;
 
 /**
  * Class FedExPlugin
@@ -99,26 +99,24 @@ class FedExPlugin extends ShipmentPlugin
     /** @inheritdoc */
     public function autoload($customerId = null)
     {
-        $_customerId = $customerId ?? $this->shipment->customer_id ?? null;
-
-        $this->isProduction = !(bool)(int)Yii::$app->customerSettings->get('fedex_test_mode', $_customerId);
+        $this->isProduction = !(bool)(int)Yii::$app->customerSettings->get('fedex_api_test_mode', $customerId);
 
         $this->setAccountInfo(
             $this->isProduction
-                ? Yii::$app->customerSettings->get('fedex_api_key', $_customerId)
-                : Yii::$app->customerSettings->get('fedex_api_key_test', $_customerId),
+                ? Yii::$app->customerSettings->get('fedex_api_key', $customerId)
+                : Yii::$app->customerSettings->get('fedex_api_key_test', $customerId),
 
             $this->isProduction
-                ? Yii::$app->customerSettings->get('fedex_api_password', $_customerId)
-                : Yii::$app->customerSettings->get('fedex_api_password_test', $_customerId),
+                ? Yii::$app->customerSettings->get('fedex_api_password', $customerId)
+                : Yii::$app->customerSettings->get('fedex_api_password_test', $customerId),
 
             $this->isProduction
-                ? Yii::$app->customerSettings->get('fedex_api_account', $_customerId)
-                : Yii::$app->customerSettings->get('fedex_api_account_test', $_customerId),
+                ? Yii::$app->customerSettings->get('fedex_api_account', $customerId)
+                : Yii::$app->customerSettings->get('fedex_api_account_test', $customerId),
 
             $this->isProduction
-                ? Yii::$app->customerSettings->get('fedex_api_meter', $_customerId)
-                : Yii::$app->customerSettings->get('fedex_api_meter_test', $_customerId)
+                ? Yii::$app->customerSettings->get('fedex_api_meter', $customerId)
+                : Yii::$app->customerSettings->get('fedex_api_meter_test', $customerId)
         );
     }
 
@@ -234,8 +232,7 @@ class FedExPlugin extends ShipmentPlugin
                             $this->shipment->sender_address2 ?? null,
                         ],
                         'City'                => $this->shipment->sender_city,
-                        'StateOrProvinceCode' => $this->recognizeState($this->shipment->sender_country,
-                            $this->shipment->sender_state),
+                        'StateOrProvinceCode' => $this->shipment->sender_state,
                         'PostalCode'          => $this->shipment->sender_postal_code,
                         'CountryCode'         => $this->shipment->sender_country,
                     ],
@@ -253,8 +250,7 @@ class FedExPlugin extends ShipmentPlugin
                             $this->shipment->recipient_address2 ?? null,
                         ],
                         'City'                => $this->shipment->recipient_city,
-                        'StateOrProvinceCode' => $this->recognizeState($this->shipment->recipient_country,
-                            $this->shipment->recipient_state),
+                        'StateOrProvinceCode' => $this->shipment->recipient_state,
                         'PostalCode'          => $this->shipment->recipient_postal_code,
                         'CountryCode'         => $this->shipment->recipient_country,
                         'Residential'         => (bool)$this->shipment->recipient_is_residential,
@@ -461,6 +457,8 @@ class FedExPlugin extends ShipmentPlugin
 
                     $_rate = new ShipmentRate();
 
+                    $_rate->infoMessage = $this->getWarnings()[0] ?? null;
+
                     $_rate->serviceCode = $service->shipwise_code ?? $rate->ServiceType ?? null;
                     $_rate->serviceName = $service->name ?? $rate->ServiceDescription->Description ?? null;
 
@@ -502,6 +500,7 @@ class FedExPlugin extends ShipmentPlugin
                     $_rate->deliveryTimeStamp = $rate->CommitDetails->CommitTimestamp ?? null;
                     $_rate->deliveryDayOfWeek = $rate->CommitDetails->DayOfWeek ?? null;
                     $_rate->transitTime       = $rate->CommitDetails->TransitTime ?? null;
+                    $_rate->deliveryByTime    = null; // n/a for FedEx
 
                     $this->shipment->addRate($_rate);
                 }
@@ -571,30 +570,5 @@ class FedExPlugin extends ShipmentPlugin
         }
 
         return $response;
-    }
-
-    /**
-     * This function will transform US state full-name to abbreviation if necessary.
-     *
-     * @param string $country Country ISO code
-     * @param string $state   State or Province
-     *
-     * @return string
-     */
-    protected function recognizeState($country, $state)
-    {
-        if ($country == 'US') {
-            $input = strtoupper(trim($state));
-            if (strlen($input) == 2) {
-                return $input;
-            } else {
-                $name = new Expression("UPPER(name)");
-                if (($_state = State::find()->where(['=', $name, $input])->one()) !== null) {
-                    return $_state->abbreviation;
-                }
-            }
-        }
-
-        return $state;
     }
 }

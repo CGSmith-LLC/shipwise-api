@@ -50,6 +50,16 @@ class ShipmentRateEx extends ShipmentRate
      *          type = "string",
      *          description = "Transit time"
      *      ),
+     *     @SWG\Property(
+     *          property = "deliveryByTime",
+     *          type = "string",
+     *          description = "Delivery by time"
+     *      ),
+     *     @SWG\Property(
+     *          property = "infoMessage",
+     *          type = "string",
+     *          description = "Info message. Relevant notes about this rate."
+     *      ),
      * )
      */
 
@@ -105,6 +115,8 @@ class ShipmentRateEx extends ShipmentRate
             'deliveryTimeStamp',
             'deliveryDayOfWeek',
             'transitTime',
+            'deliveryByTime',
+            'infoMessage',
         ];
     }
 }
