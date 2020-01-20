@@ -11,34 +11,35 @@ namespace common\models\base;
  */
 class BaseCustomer extends \yii\db\ActiveRecord
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	public static function tableName()
-	{
-		return 'customers';
-	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules()
-	{
-		return [
-			[['name', 'created_date'], 'safe'],
-			[['name'], 'string', 'max' => 45],
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'customers';
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function attributeLabels()
-	{
-		return [
-			'id'           => 'ID',
-			'name'         => 'Name',
-			'created_date' => 'Created Date',
-		];
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['name', 'created_date'], 'safe'],
+            [['name'], 'string', 'max' => 45],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id'           => 'ID',
+            'name'         => 'Name',
+            'created_date' => 'Created Date',
+        ];
+    }
 }

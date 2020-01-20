@@ -140,15 +140,15 @@ class OrderSearch extends Order
         ]);
 
         $query->andFilterWhere(['like', 'order_reference', $this->order_reference])
-              ->andFilterWhere(['like', 'customer_reference', $this->customer_reference])
-              ->andFilterWhere(['like', 'tracking', $this->tracking])
-              ->andFilterWhere(['like', 'notes', $this->notes])
-              ->andFilterWhere(['like', 'uuid', $this->uuid])
-              ->andFilterWhere(['like', 'origin', $this->origin])
-              ->andFilterWhere(['like', 'requested_ship_date', $this->requested_ship_date])
-              ->andFilterWhere(['like', Order::tableName() . '.created_date', $this->created_date])
-              ->andFilterWhere(['like', Order::tableName() . '.updated_date', $this->updated_date])
-              ->andFilterWhere(['like', Address::tableName() . '.name', $this->address]);
+            ->andFilterWhere(['like', 'customer_reference', $this->customer_reference])
+            ->andFilterWhere(['like', 'tracking', $this->tracking])
+            ->andFilterWhere(['like', 'notes', $this->notes])
+            ->andFilterWhere(['like', 'uuid', $this->uuid])
+            ->andFilterWhere(['like', 'origin', $this->origin])
+            ->andFilterWhere(['like', 'requested_ship_date', $this->requested_ship_date])
+            ->andFilterWhere(['like', Order::tableName() . '.created_date', $this->created_date])
+            ->andFilterWhere(['like', Order::tableName() . '.updated_date', $this->updated_date])
+            ->andFilterWhere(['like', Address::tableName() . '.name', $this->address]);
 
         return $dataProvider;
     }

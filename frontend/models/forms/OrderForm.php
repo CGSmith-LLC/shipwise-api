@@ -20,6 +20,7 @@ use frontend\models\{Order, Address, Item};
  */
 class OrderForm extends Model
 {
+
     /** @var Order */
     protected $_order;
 

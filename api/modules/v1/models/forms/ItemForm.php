@@ -37,24 +37,25 @@ use yii\base\Model;
  */
 class ItemForm extends Model
 {
-	/** @var int */
-	public $quantity;
-	/** @var string */
-	public $sku;
-	/** @var string */
-	public $name;
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rules()
-	{
-		return [
-			[['quantity', 'sku'], 'required', 'message' => '{attribute} is required.'],
-			['quantity', 'integer'],
-			['quantity', 'compare', 'compareValue' => 0, 'operator' => '>'],
-			['sku', 'string', 'length' => [2, 64]],
-			['name', 'string', 'length' => [2, 128]],
-		];
-	}
+    /** @var int */
+    public $quantity;
+    /** @var string */
+    public $sku;
+    /** @var string */
+    public $name;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['quantity', 'sku'], 'required', 'message' => '{attribute} is required.'],
+            ['quantity', 'integer'],
+            ['quantity', 'compare', 'compareValue' => 0, 'operator' => '>'],
+            ['sku', 'string', 'length' => [2, 64]],
+            ['name', 'string', 'length' => [2, 128]],
+        ];
+    }
 }

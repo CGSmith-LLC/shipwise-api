@@ -13,22 +13,23 @@ use yii\rest\Controller;
  */
 class Limit extends Behavior
 {
-	/** @var integer */
-	public $limit;
 
-	/** @inheritdoc */
-	public function events()
-	{
-		return ArrayHelper::merge(parent::events(), [
-			Controller::EVENT_BEFORE_ACTION => "getLimit",
-		]);
-	}
+    /** @var integer */
+    public $limit;
 
-	/**
-	 * @param $event
-	 */
-	public function getLimit($event)
-	{
-		$this->limit = \Yii::$app->request->get("limit");
-	}
+    /** @inheritdoc */
+    public function events()
+    {
+        return ArrayHelper::merge(parent::events(), [
+            Controller::EVENT_BEFORE_ACTION => "getLimit",
+        ]);
+    }
+
+    /**
+     * @param $event
+     */
+    public function getLimit($event)
+    {
+        $this->limit = \Yii::$app->request->get("limit");
+    }
 }

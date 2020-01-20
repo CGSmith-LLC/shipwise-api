@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
  */
 class Address extends BaseAddress
 {
+
     /** {@inheritdoc} */
     public function attributeLabels()
     {

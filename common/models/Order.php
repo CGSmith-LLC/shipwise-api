@@ -10,15 +10,16 @@ use common\models\query\OrderQuery;
  *
  * @package common\models
  *
- * @property Customer $customer
- * @property Address $address
- * @property TrackingInfo $trackingInfo
- * @property Item[] $items
- * @property Status $status
+ * @property Customer       $customer
+ * @property Address        $address
+ * @property TrackingInfo   $trackingInfo
+ * @property Item[]         $items
+ * @property Status         $status
  * @property OrderHistory[] $history
  */
 class Order extends BaseOrder
 {
+
     /**
      * @inheritdoc
      * @return OrderQuery the active query used by this AR class.

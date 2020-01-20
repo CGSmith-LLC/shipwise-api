@@ -18,6 +18,7 @@ use yii\web\Response;
  */
 class AdminController extends BaseAdminController
 {
+
     /**
      * {@inheritdoc}
      */
@@ -67,8 +68,8 @@ class AdminController extends BaseAdminController
      */
     public function actionLinkCustomer($id, $cid)
     {
-        $user = $this->findModel((int) $id);
-        if (($customer = Customer::findOne((int) $cid)) === null) {
+        $user = $this->findModel((int)$id);
+        if (($customer = Customer::findOne((int)$cid)) === null) {
             throw new NotFoundHttpException('Customer does not exist');
         }
 

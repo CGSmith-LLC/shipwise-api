@@ -4,7 +4,7 @@ namespace frontend\controllers;
 
 use frontend\models\Customer;
 use Yii;
-use common\models\{Carrier, Service, State, Status};
+use common\models\{State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\{Order, forms\OrderForm, search\OrderSearch};
 use yii\helpers\Json;
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException};
@@ -14,6 +14,7 @@ use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException};
  */
 class OrderController extends Controller
 {
+
     /**
      * {@inheritdoc}
      */

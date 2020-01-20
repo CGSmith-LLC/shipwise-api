@@ -2,7 +2,7 @@
 
 namespace api\modules\v1\models\core;
 
-use common\models\Carrier;
+use common\models\shipping\Carrier;
 
 /**
  * Class CarrierEx
@@ -11,20 +11,30 @@ use common\models\Carrier;
  */
 class CarrierEx extends Carrier
 {
-	/**
-	 * @SWG\Definition(
-	 *     definition = "Carrier",
-	 *
-	 *     @SWG\Property( property = "id",   type = "integer", description = "Carrier ID" ),
-	 *     @SWG\Property( property = "name", type = "string", description = "Carrier name" ),
-	 * )
-	 */
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function fields()
-	{
-		return ['id', 'name'];
-	}
+    /**
+     * Override parent to define only those carriers that are implemented in API.
+     * @see Carrier::$shipwiseCodes for all available.
+     *
+     * @var array
+     */
+    protected static $shipwiseCodes = [
+        self::FEDEX => 'FedEx',
+        self::UPS   => 'UPS',
+    ];
+
+    /**
+     * @SWG\Definition(
+     *     definition = "Carrier",
+     *
+     *     @SWG\Property( property = "id",   type = "integer", description = "Carrier ID" ),
+     *     @SWG\Property( property = "name", type = "string", description = "Carrier name" ),
+     * )
+     */
+
+    /** {@inheritdoc} */
+    public function fields()
+    {
+        return ['id', 'name'];
+    }
 }

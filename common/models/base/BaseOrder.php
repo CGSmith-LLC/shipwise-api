@@ -23,6 +23,7 @@ namespace common\models\base;
  */
 class BaseOrder extends \yii\db\ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */

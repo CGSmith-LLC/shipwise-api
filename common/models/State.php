@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
  */
 class State extends BaseState
 {
+
     /**
      * Get array of State ids
      *

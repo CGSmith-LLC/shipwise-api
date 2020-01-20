@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
  */
 class Order extends BaseOrder
 {
+
     /** {@inheritdoc} */
     public function attributeLabels()
     {
@@ -37,7 +38,7 @@ class Order extends BaseOrder
      */
     public function getCarrier()
     {
-        return $this->hasOne('common\models\Carrier', ['id' => 'carrier_id']);
+        return $this->hasOne('common\models\shipping\Carrier', ['id' => 'carrier_id']);
     }
 
     /**
@@ -47,7 +48,7 @@ class Order extends BaseOrder
      */
     public function getService()
     {
-        return $this->hasOne('common\models\Service', ['id' => 'service_id']);
+        return $this->hasOne('common\models\shipping\Service', ['id' => 'service_id']);
     }
 
     /**
