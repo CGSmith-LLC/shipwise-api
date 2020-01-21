@@ -36,9 +36,9 @@ class OrderSearch extends Order
      * @var array
      */
     public $pageSizeOptions = [
-        '10'  => '10',
-        '25'  => '25',
-        '50'  => '50',
+        '10' => '10',
+        '25' => '25',
+        '50' => '50',
         '100' => '100',
         '500' => '500',
         //'-1'  => 'All', // Use with precaution. Large dataset might crash web browser.
@@ -90,6 +90,14 @@ class OrderSearch extends Order
     {
         $query = Order::find();
 
+        // Set order search to a session
+        if (!isset($params["OrderSearch"])) {
+            if (isset(Yii::$app->session["ordersearch"])) {
+                $params["OrderSearch"] = Yii::$app->session["ordersearch"];
+            }
+        } else {
+            Yii::$app->session["ordersearch"] = $params["OrderSearch"];
+        }
         // add conditions that should always apply here
 
         if (!isset($params['OrderSearch']['status_id'])) {
@@ -103,14 +111,14 @@ class OrderSearch extends Order
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort'  => [
+            'sort' => [
                 'defaultOrder' => ['created_date' => SORT_DESC, 'id' => SORT_DESC],
             ],
         ]);
 
         // Set up sorting for join tables
         $dataProvider->sort->attributes['address'] = [
-            'asc'  => [Address::tableName() . '.name' => SORT_ASC],
+            'asc' => [Address::tableName() . '.name' => SORT_ASC],
             'desc' => [Address::tableName() . '.name' => SORT_DESC],
         ];
 
@@ -132,11 +140,11 @@ class OrderSearch extends Order
         // grid filtering conditions
         $query->andFilterWhere([
             Order::tableName() . '.id' => $this->id,
-            'customer_id'              => $this->customer_id,
-            'status_id'                => $this->status_id,
+            'customer_id' => $this->customer_id,
+            'status_id' => $this->status_id,
             //'address_id'               => $this->address_id,
-            'carrier_id'               => $this->carrier_id,
-            'service_id'               => $this->service_id,
+            'carrier_id' => $this->carrier_id,
+            'service_id' => $this->service_id,
         ]);
 
         $query->andFilterWhere(['like', 'order_reference', $this->order_reference])
