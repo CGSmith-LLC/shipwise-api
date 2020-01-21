@@ -114,6 +114,30 @@ class OrderController extends Controller
     }
 
     /**
+     * Updates status on bulk
+     *
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionBulk()
+    {
+        if (Yii::$app->request->post()) {
+            $bulkAction = (array)Yii::$app->request->post();
+            foreach ($bulkAction['BulkAction']['orderIDs'] as $id) { // selected value from gridview
+                echo $id . PHP_EOL;
+                $model = $this->findModel($id);
+                $model->status_id = (int)$bulkAction['BulkAction']['action']; // set status to action performed
+
+                $model->validate();
+                $model->save();
+
+            }
+            return 'Success';
+
+        }
+    }
+
+    /**
      * Updates an existing Order model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
