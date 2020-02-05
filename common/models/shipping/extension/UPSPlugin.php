@@ -184,7 +184,9 @@ class UPSPlugin extends ShipmentPlugin
             ],
 
             'Shipment' => [
-
+                'RateInformation' => [
+                    'NegotiatedRatesIndicator' => 1,
+                ],
                 'Shipper' => [
                     'Name' => substr(
                         $this->shipment->sender_company ?? $this->shipment->sender_contact,
