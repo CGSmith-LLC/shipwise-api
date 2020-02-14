@@ -4,6 +4,7 @@ return [
         'db' => [
             'class' => 'yii\db\Connection',
             'dsn' => 'mysql:host=localhost;dbname=cgsmpoim_shipwise',
+            // 'dsn' => 'mysql:host=mysql;dbname=cgsmpoim_shipwise', // Use this host name to connect to Docker container. See docker-compose.yml
             'username' => 'shipwise',
             'password' => 'shipwise',
             'charset' => 'utf8',

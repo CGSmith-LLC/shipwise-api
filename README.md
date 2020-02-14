@@ -71,3 +71,16 @@ api
 vendor/                  contains dependent 3rd-party packages
 environments/            contains environment-based overrides
 ```
+
+### Local development with Docker
+
+Prerequisite: Download and install Docker Desktop for your OS.
+
+Start your Docker container with:
+
+`docker-compose up -d`
+
+
+Example of importing a gzipped mysql dump:
+
+`zcat cgsmpoim_shipwise.sql.gz | mysql -h mysql -u root -p cgsmpoim_shipwise`

@@ -33,3 +33,6 @@ phpunit.phar
 
 # vagrant runtime
 /.vagrant
+
+# Persistent data in Docker volumes
+/mysql-data
