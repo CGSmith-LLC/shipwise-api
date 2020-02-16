@@ -56,18 +56,26 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                 $statuses = Status::getList();
                 $markAs = array_combine(
                     array_map(function ($k) {
-                        return $k;
+                        return "status_$k"; // <action>_<value>
                     }, array_keys($statuses)), $statuses
                 ); ?>
                 <?= Html::dropDownList('bulkAction', '',
                     [
                         '' => 'With selected: ',
-                    ] + ['Change status to:' => $markAs],
+                    ] +
                     [
-                        'class' => 'form-control',
-                        'data-toggle' => 'tooltip',
+                        'Print:' => [
+                            'print_ps'   => 'Packing Slips',
+                            'print_sl'   => 'Shipping Labels',
+                            'print_pssl' => 'Shipping Labels + Packing Slips',
+                        ],
+                    ]
+                    + ['Change status to:' => $markAs],
+                    [
+                        'class'          => 'form-control',
+                        'data-toggle'    => 'tooltip',
                         'data-placement' => 'top',
-                        'title' => 'Apply bulk action to selected orders',
+                        'title'          => 'Apply bulk action to selected orders',
                     ]) ?>
             </div>
             <div class="col-lg-9">
@@ -185,7 +193,7 @@ ob_start(); // output buffer the javascript to register later ?>
                     return false;
                 }
                 if (ids && ids.length === 0) {
-                    alert('No shipments selected. Click on checkboxes to select one or multiple shipments.');
+                    alert('No orders selected. Click on checkboxes to select one or multiple orders.');
                     return false;
                 }
                 bulk(ids, action, actionText);
@@ -216,7 +224,7 @@ ob_start(); // output buffer the javascript to register later ?>
         }
 
         /**
-         * Reload shipment grid
+         * Reload orders grid
          */
         function reloadGrid() {
             $('#orders-grid-view').yiiGridView('applyFilter');
@@ -230,9 +238,9 @@ ob_start(); // output buffer the javascript to register later ?>
         }
 
         /**
-         * Perform bulk action on selected shipments
+         * Perform bulk action on selected orders
          *
-         * @param ids Shipment IDs
+         * @param ids Order IDs
          * @param action The code of the action to perform
          * @param actionText User-friendly text of the action
          */
@@ -244,7 +252,7 @@ ob_start(); // output buffer the javascript to register later ?>
             btnConfirm.attr('disabled', false).show();
             popup.modal('show').find('.modal-body').html(
                 'Please confirm you want to perform bulk action <strong>' + actionText +
-                '</strong> on ' + ids.length + ' shipments.'
+                '</strong> on ' + ids.length + ' orders.'
             );
 
             btnConfirm.off().on('click', function () {
