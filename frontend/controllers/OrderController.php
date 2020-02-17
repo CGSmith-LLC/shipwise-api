@@ -5,9 +5,10 @@ namespace frontend\controllers;
 use frontend\models\Customer;
 use Yii;
 use common\models\{State, Status, shipping\Carrier, shipping\Service};
-use frontend\models\{Order, forms\OrderForm, search\OrderSearch};
+use frontend\models\{Order, forms\OrderForm, OrderBulk, search\OrderSearch};
+use yii\helpers\Html;
 use yii\helpers\Json;
-use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException};
+use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -114,27 +115,35 @@ class OrderController extends Controller
     }
 
     /**
-     * Updates status on bulk
+     * Bulk action
      *
-     * @return string
-     * @throws NotFoundHttpException
+     * Executes a bulk action on multiple orders
+     *
+     * @return array|string
      */
     public function actionBulk()
     {
-        if (Yii::$app->request->post()) {
-            $bulkAction = (array)Yii::$app->request->post();
-            foreach ($bulkAction['BulkAction']['orderIDs'] as $id) { // selected value from gridview
-                echo $id . PHP_EOL;
-                $model = $this->findModel($id);
-                $model->status_id = (int)$bulkAction['BulkAction']['action']; // set status to action performed
+        Yii::$app->response->format = Response::FORMAT_JSON;
 
-                $model->validate();
-                $model->save();
+        $model = new OrderBulk();
 
-            }
-            return 'Success';
-
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->execute();
         }
+
+        $response = [
+            'success' => $model->isSuccess(),
+            'message' => $model->getMessage(),
+            'errors'  => Html::errorSummary($model, ['header' => false]),
+            'link'    => $model->getLink(),
+        ];
+
+        return $response;
+    }
+
+    public function actionBatch()
+    {
+        \yii\helpers\VarDumper::dump(Yii::$app->request->get('id'), 10, true);
     }
 
     /**

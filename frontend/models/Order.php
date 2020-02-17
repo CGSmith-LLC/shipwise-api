@@ -88,4 +88,19 @@ class Order extends BaseOrder
 
         return $result;
     }
+
+    /**
+     * Changes order status
+     *
+     * @param int $newStatusId
+     *
+     * @return bool Whether the saving succeeded
+     */
+    public function changeStatus($newStatusId)
+    {
+        $this->status_id    = $newStatusId;
+        $this->updated_date = date("Y-m-d H:i:s");
+
+        return $this->save();
+    }
 }

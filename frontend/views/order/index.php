@@ -59,15 +59,15 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                         return "status_$k"; // <action>_<value>
                     }, array_keys($statuses)), $statuses
                 ); ?>
-                <?= Html::dropDownList('bulkAction', '',
+                <?= Html::dropDownList('orderBulk', '',
                     [
                         '' => 'With selected: ',
                     ] +
                     [
                         'Print:' => [
-                            'print_ps'   => 'Packing Slips',
-                            'print_sl'   => 'Shipping Labels',
-                            'print_pssl' => 'Shipping Labels + Packing Slips',
+                            'printPackingSlip'   => 'Packing Slips',
+                            'printShippingLabel' => 'Shipping Labels',
+                            'printAll'           => 'Shipping Labels + Packing Slips',
                         ],
                     ]
                     + ['Change status to:' => $markAs],
@@ -182,7 +182,7 @@ ob_start(); // output buffer the javascript to register later ?>
                 reloadGrid();
             });
 
-            $("[name='bulkAction']").change(function () {
+            $("[name='orderBulk']").change(function () {
                 var action = $(this).val(),
                     actionText = $(this).find('option:selected').text(),
                     ids = $('#orders-grid-view').yiiGridView('getSelectedRows');
@@ -257,14 +257,38 @@ ob_start(); // output buffer the javascript to register later ?>
 
             btnConfirm.off().on('click', function () {
                 btnConfirm.attr('disabled', true);
-                popup.find('.modal-body').load('<?= Url::to(['bulk']) ?>', {
-                    "BulkAction": {
-                        "action": action,
-                        "orderIDs": ids
+
+                $.ajax({
+                    url: '<?= Url::to(['bulk']) ?>',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        "OrderBulk": {
+                            "action": action,
+                            "orderIDs": ids
+                        }
                     }
-                }, function () {
-                    btnConfirm.hide();
-                });
+                })
+                    .done(function (response) {
+                        if (response.success) {
+                            popup.find('.modal-body').html('<div class="alert alert-success">' + response.message + '</div>');
+                            if (response.link) {
+                                popup.modal('toggle');
+                                var win = window.open(response.link, '_blank');
+                                win.focus();
+                            }
+                        } else {
+                            popup.find('.modal-body').html('<div class="alert alert-danger">' + response.errors + '</div>');
+                        }
+
+                    })
+                    .fail(function (jqXHR, textStatus, error) {
+                        popup.find('.modal-body').html(error).append(jqXHR.responseText || '');
+                    })
+                    .always(function () {
+                        btnConfirm.hide();
+                    });
+
             });
         }
 
