@@ -115,38 +115,6 @@ class OrderController extends Controller
     }
 
     /**
-     * Bulk action
-     *
-     * Executes a bulk action on multiple orders
-     *
-     * @return array|string
-     */
-    public function actionBulk()
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
-        $model = new BulkAction();
-
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $model->execute();
-        }
-
-        $response = [
-            'success' => $model->isSuccess(),
-            'message' => $model->getMessage(),
-            'errors'  => Html::errorSummary($model, ['header' => false]),
-            'link'    => $model->getLink(),
-        ];
-
-        return $response;
-    }
-
-    public function actionBatch()
-    {
-        \yii\helpers\VarDumper::dump(Yii::$app->request->get('id'), 10, true);
-    }
-
-    /**
      * Updates an existing Order model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
@@ -246,5 +214,51 @@ class OrderController extends Controller
         }
 
         echo Json::encode(Service::getList('id', 'name', $carrierId));
+    }
+
+    /**
+     * Bulk action
+     *
+     * Executes a bulk action on multiple orders
+     *
+     * @return array|string
+     */
+    public function actionBulk()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $model = new BulkAction();
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->execute();
+        }
+
+        $response = [
+            'success' => $model->isSuccess(),
+            'message' => $model->getMessage(),
+            'errors'  => Html::errorSummary($model, ['header' => false]),
+            'link'    => $model->getLink(),
+        ];
+
+        return $response;
+    }
+
+    /**
+     * Displays a single BulkAction model with its relations
+     *
+     * @param int $id
+     *
+     * @return mixed
+     * @throws NotFoundHttpException if the BulkAction model cannot be found
+     */
+    public function actionBulkResult($id)
+    {
+        if (($model = BulkAction::findOne($id)) === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        return $this->render('bulk-result/view', [
+            'model' => $model,
+        ]);
     }
 }

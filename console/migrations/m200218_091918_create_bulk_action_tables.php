@@ -23,9 +23,9 @@ class m200218_091918_create_bulk_action_tables extends Migration
             'id'         => $this->primaryKey(),
             'code'       => $this->string(60)->notNull()->comment('Code of the bulk action'),
             'name'       => $this->string(120)->notNull()->comment('Name of the bulk action'),
-            'status'     => $this->tinyInteger(1)->defaultValue(0)->comment('Current status. 0:queued, 1:done, 2:error'),
+            'status'     => $this->tinyInteger(1)->defaultValue(0)->comment('Current status. 0:processing, 1:completed, 2:error'),
             'created_on' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP')->comment('Created timestamp'),
-            'created_by' => $this->integer(11)->notNull()->comment('ID of the user who created/triggered bulk action'),
+            'created_by' => $this->integer(11)->defaultValue(null)->comment('ID of the user who created/triggered bulk action'),
         ], " COMMENT 'Bulk actions'");
 
         // detail table

@@ -7,14 +7,15 @@ use Yii;
 /**
  * This is the model class for table "bulk_action".
  *
- * @property int                   $id
- * @property string                $code       Code of the bulk action
- * @property string                $name       Name of the bulk action
- * @property int                   $status     Current status. 0:queued, 1:done, 2:error
- * @property string                $created_on Created timestamp
- * @property int                   $created_by ID of the user who created/triggered bulk action
+ * @property int                       $id
+ * @property string                    $code       Code of the bulk action
+ * @property string                    $name       Name of the bulk action
+ * @property int                       $status     Current status. 0:processing, 1:completed, 2:error
+ * @property string                    $created_on Created timestamp
+ * @property int                       $created_by ID of the user who created/triggered bulk action
  *
- * @property \frontend\models\User $createdBy
+ * @property \frontend\models\User     $createdBy
+ * @property \common\models\BulkItem[] $items
  */
 class BaseBulkAction extends \yii\db\ActiveRecord
 {
@@ -33,7 +34,7 @@ class BaseBulkAction extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['code', 'name', 'created_by'], 'required'],
+            [['code', 'name'], 'required'],
             [['status', 'created_by'], 'integer'],
             [['created_on'], 'safe'],
             [['code'], 'string', 'max' => 60],
@@ -47,12 +48,13 @@ class BaseBulkAction extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id'         => 'ID',
-            'code'       => 'Code',
-            'name'       => 'Name',
-            'status'     => 'Status',
-            'created_on' => 'Created On',
-            'created_by' => 'Created By',
+            'id'                 => 'ID',
+            'code'               => 'Code',
+            'name'               => 'Name',
+            'status'             => 'Status',
+            'created_on'         => 'Created On',
+            'created_by'         => 'Created By',
+            'createdBy.username' => 'Created By',
         ];
     }
 
@@ -73,5 +75,15 @@ class BaseBulkAction extends \yii\db\ActiveRecord
     public function getCreatedBy()
     {
         return $this->hasOne('frontend\models\User', ['id' => 'created_by']);
+    }
+
+    /**
+     * Get bulk items (orders)
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItems()
+    {
+        return $this->hasMany('common\models\BulkItem', ['bulk_action_id' => 'id']);
     }
 }

@@ -7,13 +7,14 @@ use Yii;
 /**
  * This is the model class for table "bulk_item".
  *
- * @property int                    $id
- * @property int                    $bulk_action_id Ref to Bulk Action
- * @property int                    $order_id       Ref to Order
- * @property string                 $queue_id       Queue message ID if any
- * @property int                    $status         Current status. 0:queued, 1:done, 2:error
+ * @property int                       $id
+ * @property int                       $bulk_action_id Ref to Bulk Action
+ * @property int                       $order_id       Ref to Order
+ * @property string                    $queue_id       Queue message ID if any
+ * @property int                       $status         Current status. 0:queued, 1:done, 2:error
  *
- * @property \common\models\Order[] $orders
+ * @property \common\models\BulkAction $bulkAction
+ * @property \common\models\Order      $order
  */
 class BaseBulkItem extends \yii\db\ActiveRecord
 {
@@ -62,12 +63,22 @@ class BaseBulkItem extends \yii\db\ActiveRecord
     }
 
     /**
-     * Get orders
+     * Get Bulk Action
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getOrders()
+    public function getBulkAction()
     {
-        return $this->hasMany('common\models\Order', ['order_id' => 'id']);
+        return $this->hasOne('common\models\BulkAction', ['id' => 'bulk_action_id']);
+    }
+
+    /**
+     * Get order
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrder()
+    {
+        return $this->hasOne('common\models\Order', ['id' => 'order_id']);
     }
 }

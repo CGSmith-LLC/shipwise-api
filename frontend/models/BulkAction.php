@@ -2,6 +2,7 @@
 
 namespace frontend\models;
 
+use common\models\BulkItem;
 use common\models\Status; // Order Status
 use common\models\BulkAction as BaseBulkAction;
 use Yii;
@@ -13,8 +14,8 @@ use yii\helpers\Url;
  * BulkAction allows you to execute an action on multiple orders.
  *
  * Two types of executing exist:
- *  1. Bulk orders are immediately executed in a sync way.
- *  2. Bulk orders are added to a queue to be executed async in background using jobs.
+ *  1. Bulk orders are immediately executed in a synchronous way.
+ *  2. Bulk orders are added to a queue to be executed asynchronously in the background using jobs.
  *
  * @property string $action
  * @property array  $params
@@ -23,8 +24,8 @@ use yii\helpers\Url;
 class BulkAction extends BaseBulkAction
 {
 
-    const EXECUTION_STATUS_DONE   = 1; // Successfully executed
-    const EXECUTION_STATUS_QUEUED = 2; // Successfully added to a queue for execution
+    const EXECUTION_TYPE_SYNC  = 1;
+    const EXECUTION_TYPE_ASYNC = 2;
 
     const ACTION_CHANGE_STATUS                 = 'changeStatus';
     const ACTION_PACKING_SLIPS                 = 'packingSlips';
@@ -162,11 +163,11 @@ class BulkAction extends BaseBulkAction
     /**
      * Change order status.
      *
-     * This function executes in a sync way. Immediate execution.
+     * This function executes all orders synchronously and returns a result.
      *
      * @param array|null $params Contains new status value
      *
-     * @return bool|int False on failure, Integer code on success
+     * @return bool|int False on failure, Integer on success
      */
     private function changeStatus($params = null)
     {
@@ -201,7 +202,7 @@ class BulkAction extends BaseBulkAction
             return false;
         }
 
-        return self::EXECUTION_STATUS_DONE;
+        return self::EXECUTION_TYPE_SYNC;
     }
 
     /**
@@ -209,15 +210,25 @@ class BulkAction extends BaseBulkAction
      *
      * Trigger creation of packing slips for each order.
      *
-     * This function executes in async way.
-     * Bulk Action is created, order are added to a queue for background execution.
+     * This function will execute orders asynchronously by adding them to a queue to be executed by job workers in
+     * background.
+     * A Bulk Action object is created to track process.
      *
      * @param array|null $params Optional
      *
-     * @return bool|int False on failure, Integer code on success
+     * @return bool|int False on failure, Integer on success
      */
     private function packingSlips($params = null)
     {
+        $bulkAction       = new parent();
+        $bulkAction->code = $this->action;
+        $bulkAction->name = self::readable($this->action);
+        if (!$bulkAction->save()) {
+            Yii::warning("Failed to save Bulk Action.");
+            Yii::warning($bulkAction->attributes);
+            Yii::warning($bulkAction->getErrors());
+        }
+
         try {
             $nbQueued = 0;
             foreach ($this->orderIDs as $id) {
@@ -225,7 +236,19 @@ class BulkAction extends BaseBulkAction
                 if (($order = Order::findOne($id)) !== null) {
                     // @todo Create CreatePackingSlipJob class
                     // Add to the execution queue
-                    // Yii::$app->queue->push(new CreatePackingSlipJob(['orderId' => $id]));
+                    $queueMessageId = '123456'; // Yii::$app->queue->push(new CreatePackingSlipJob(['orderId' => $id]));
+
+                    $bulkItem                 = new BulkItem();
+                    $bulkItem->bulk_action_id = $bulkAction->id;
+                    $bulkItem->order_id       = $order->id;
+                    $bulkItem->queue_id       = $queueMessageId;
+
+                    if (!$bulkItem->save()) {
+                        Yii::warning("Failed to save Bulk Action.");
+                        Yii::warning($bulkItem->attributes);
+                        Yii::warning($bulkItem->getErrors());
+                    }
+
                     $nbQueued++;
 
                 } else {
@@ -234,16 +257,14 @@ class BulkAction extends BaseBulkAction
             }
             $this->_success = true;
             $this->_message = ($nbQueued > 0) ? "$nbQueued orders added to execution queue." : "";
-            $this->_link    = Url::toRoute(['/order/batch', 'print' => 'packingSlip', 'id' => $this->orderIDs],
-                true);
+            $this->_link    = Url::toRoute(['/order/bulk-result', 'id' => $bulkAction->id], true);
 
         } catch (\Exception $e) {
             $this->addError('action', 'Execution failed. ' . $e->getMessage());
             return false;
-
         }
 
-        return self::EXECUTION_STATUS_QUEUED;
+        return self::EXECUTION_TYPE_ASYNC;
     }
 
 }
