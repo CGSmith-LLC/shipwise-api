@@ -1,7 +1,7 @@
 <?php
 
 use common\models\Status;
-use frontend\models\Customer;
+use frontend\models\{Customer, BulkAction};
 use yii\helpers\{Html, Url};
 use yii\bootstrap\Modal;
 use yii\grid\GridView;
@@ -29,7 +29,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
     <div class="order-index">
 
         <?php Pjax::begin([
-            'id' => 'pjax-orders',
+            'id'      => 'pjax-orders',
             'timeout' => 2000,
             //'enablePushState'    => false,
             //'enableReplaceState' => false,
@@ -54,28 +54,28 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
             <div class="col-lg-2 col-md-3 col-sm-3 col-xs-4">
                 <?php
                 $statuses = Status::getList();
-                $markAs = array_combine(
+                $changeStatus = array_combine(
                     array_map(function ($k) {
-                        return "status_$k"; // <action>_<value>
+                        return BulkAction::ACTION_CHANGE_STATUS . "_$k"; // <action>_<value>
                     }, array_keys($statuses)), $statuses
                 ); ?>
-                <?= Html::dropDownList('orderBulk', '',
+                <?= Html::dropDownList('bulkAction', '',
                     [
                         '' => 'With selected: ',
                     ] +
                     [
                         'Print:' => [
-                            'printPackingSlip'   => 'Packing Slips',
-                            'printShippingLabel' => 'Shipping Labels',
-                            'printAll'           => 'Shipping Labels + Packing Slips',
+                            BulkAction::ACTION_PACKING_SLIPS => BulkAction::readable(BulkAction::ACTION_PACKING_SLIPS),
+                            BulkAction::ACTION_SHIPPING_LABELS => BulkAction::readable(BulkAction::ACTION_SHIPPING_LABELS),
+                            BulkAction::ACTION_SHIPPING_LABELS_PACKING_SLIPS => BulkAction::readable(BulkAction::ACTION_SHIPPING_LABELS_PACKING_SLIPS),
                         ],
                     ]
-                    + ['Change status to:' => $markAs],
+                    + ['Change status to:' => $changeStatus],
                     [
-                        'class'          => 'form-control',
-                        'data-toggle'    => 'tooltip',
+                        'class' => 'form-control',
+                        'data-toggle' => 'tooltip',
                         'data-placement' => 'top',
-                        'title'          => 'Apply bulk action to selected orders',
+                        'title' => 'Apply bulk action to selected orders',
                     ]) ?>
             </div>
             <div class="col-lg-9">
@@ -182,7 +182,7 @@ ob_start(); // output buffer the javascript to register later ?>
                 reloadGrid();
             });
 
-            $("[name='orderBulk']").change(function () {
+            $("[name='bulkAction']").change(function () {
                 var action = $(this).val(),
                     actionText = $(this).find('option:selected').text(),
                     ids = $('#orders-grid-view').yiiGridView('getSelectedRows');
@@ -198,10 +198,6 @@ ob_start(); // output buffer the javascript to register later ?>
                 }
                 bulk(ids, action, actionText);
             });
-
-            $('#modalBulk').on('hidden.bs.modal', function () {
-                reloadGrid();
-            })
 
         }
 
@@ -251,8 +247,10 @@ ob_start(); // output buffer the javascript to register later ?>
 
             btnConfirm.attr('disabled', false).show();
             popup.modal('show').find('.modal-body').html(
+                '<div class="alert alert-warning">' +
                 'Please confirm you want to perform bulk action <strong>' + actionText +
-                '</strong> on ' + ids.length + ' orders.'
+                '</strong> on ' + ids.length + ' orders.' +
+                '</div>'
             );
 
             btnConfirm.off().on('click', function () {
@@ -263,7 +261,7 @@ ob_start(); // output buffer the javascript to register later ?>
                     type: 'post',
                     dataType: 'json',
                     data: {
-                        "OrderBulk": {
+                        "BulkAction": {
                             "action": action,
                             "orderIDs": ids
                         }
@@ -271,6 +269,7 @@ ob_start(); // output buffer the javascript to register later ?>
                 })
                     .done(function (response) {
                         if (response.success) {
+                            reloadGrid();
                             popup.find('.modal-body').html('<div class="alert alert-success">' + response.message + '</div>');
                             if (response.link) {
                                 popup.modal('toggle');

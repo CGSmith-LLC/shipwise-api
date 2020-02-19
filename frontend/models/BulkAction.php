@@ -2,25 +2,62 @@
 
 namespace frontend\models;
 
-use common\models\Status;
+use common\models\Status; // Order Status
+use common\models\BulkAction as BaseBulkAction;
 use Yii;
-use yii\base\Model;
 use yii\helpers\Url;
 
 //use console\jobs\CreatePackingSlipJob;
 
 /**
- * OrderBulk allows you to execute an action on multiple orders.
+ * BulkAction allows you to execute an action on multiple orders.
+ *
+ * Two types of executing exist:
+ *  1. Bulk orders are immediately executed in a sync way.
+ *  2. Bulk orders are added to a queue to be executed async in background using jobs.
  *
  * @property string $action
  * @property array  $params
  * @property array  $orderIDs
  */
-class OrderBulk extends Model
+class BulkAction extends BaseBulkAction
 {
 
-    const STATUS_SUCCESS_QUEUED    = 1; // Successfully added to execution queue
-    const STATUS_SUCCESS_IMMEDIATE = 2; // Successfully executed (no queue needed)
+    const EXECUTION_STATUS_DONE   = 1; // Successfully executed
+    const EXECUTION_STATUS_QUEUED = 2; // Successfully added to a queue for execution
+
+    const ACTION_CHANGE_STATUS                 = 'changeStatus';
+    const ACTION_PACKING_SLIPS                 = 'packingSlips';
+    const ACTION_SHIPPING_LABELS               = 'shippingLabels';
+    const ACTION_SHIPPING_LABELS_PACKING_SLIPS = 'shippingLabelsPackingSlips';
+
+    /**
+     * List of available actions
+     *
+     * @var array
+     */
+    public static $actionList = [
+        self::ACTION_CHANGE_STATUS,
+        self::ACTION_PACKING_SLIPS,
+        self::ACTION_SHIPPING_LABELS,
+        self::ACTION_SHIPPING_LABELS_PACKING_SLIPS,
+    ];
+
+    /**
+     * Returns human readable string
+     *
+     * @param string $str
+     *
+     * @return array
+     */
+    public static function readable($str)
+    {
+        $split   = preg_split('/(?=[A-Z])/', $str);
+        $implode = implode(" ", $split);
+        $result  = ucfirst($implode);
+
+        return $result;
+    }
 
     /**
      * Action to perform
@@ -83,16 +120,6 @@ class OrderBulk extends Model
     }
 
     /**
-     * @var array List of available actions
-     */
-    public static $actionList = [
-        'status', // changes order status
-        'printPackingSlip', // generates packing slips
-        'printShippingLabel', // creates shipping labels
-        'printAll', // triggers printPackingSlip & printShippingLabel
-    ];
-
-    /**
      * @return array the validation rules.
      */
     public function rules()
@@ -133,13 +160,15 @@ class OrderBulk extends Model
     }
 
     /**
-     * Change order status
+     * Change order status.
+     *
+     * This function executes in a sync way. Immediate execution.
      *
      * @param array|null $params Contains new status value
      *
      * @return bool|int False on failure, Integer code on success
      */
-    private function status($params = null)
+    private function changeStatus($params = null)
     {
         if (isset($params[0]) && in_array($params[0], Status::getList('id', 'id'))) {
             $newStatus = $params[0];
@@ -172,19 +201,22 @@ class OrderBulk extends Model
             return false;
         }
 
-        return self::STATUS_SUCCESS_IMMEDIATE;
+        return self::EXECUTION_STATUS_DONE;
     }
 
     /**
      * Print packing slips
      *
-     * This function will trigger creation of packing slips for each order
+     * Trigger creation of packing slips for each order.
+     *
+     * This function executes in async way.
+     * Bulk Action is created, order are added to a queue for background execution.
      *
      * @param array|null $params Optional
      *
      * @return bool|int False on failure, Integer code on success
      */
-    private function printPackingSlip($params = null)
+    private function packingSlips($params = null)
     {
         try {
             $nbQueued = 0;
@@ -193,7 +225,7 @@ class OrderBulk extends Model
                 if (($order = Order::findOne($id)) !== null) {
                     // @todo Create CreatePackingSlipJob class
                     // Add to the execution queue
-                    //Yii::$app->queue->push(new CreatePackingSlipJob(['orderId' => $id]));
+                    // Yii::$app->queue->push(new CreatePackingSlipJob(['orderId' => $id]));
                     $nbQueued++;
 
                 } else {
@@ -211,7 +243,7 @@ class OrderBulk extends Model
 
         }
 
-        return self::STATUS_SUCCESS_QUEUED;
+        return self::EXECUTION_STATUS_QUEUED;
     }
 
 }

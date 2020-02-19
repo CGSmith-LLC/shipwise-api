@@ -5,7 +5,7 @@ namespace frontend\controllers;
 use frontend\models\Customer;
 use Yii;
 use common\models\{State, Status, shipping\Carrier, shipping\Service};
-use frontend\models\{Order, forms\OrderForm, OrderBulk, search\OrderSearch};
+use frontend\models\{Order, forms\OrderForm, BulkAction, search\OrderSearch};
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
@@ -125,7 +125,7 @@ class OrderController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $model = new OrderBulk();
+        $model = new BulkAction();
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $model->execute();
