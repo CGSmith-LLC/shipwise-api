@@ -185,7 +185,7 @@ class UPSPlugin extends ShipmentPlugin
 
             'Shipment' => [
                 'ShipmentRatingOptions' => [
-                    'NegotiatedRatesIndicator' => "1",
+                    'NegotiatedRatesIndicator' => "",
                 ],
                 'Shipper' => [
                     'Name' => substr(
@@ -261,7 +261,7 @@ class UPSPlugin extends ShipmentPlugin
          */
         if ($this->shipment->sender_country == 'US') {
             $this->data['CustomerClassification'] = [
-                'Code' => '00', // 00 = Rates Associated with Shipper Number
+                'Code' => '04', // 00 = Rates Associated with Shipper Number
             ];
         }
 
@@ -404,22 +404,24 @@ class UPSPlugin extends ShipmentPlugin
                         'currency' => $rate->TotalCharges->CurrencyCode ?? null,
                     ]);
 
-                    $_rate->addCharge(new Charge([
-                        'type'        => 'BASE',
-                        'description' => 'Base price',
-                        'amount'      => new Money([
-                            'amount'   => $rate->TransportationCharges->MonetaryValue ?? null,
-                            'currency' => $rate->TransportationCharges->CurrencyCode ?? null,
-                        ]),
-                    ]));
+
 
                     if (isset($rate->NegotiatedRateCharges->TotalCharge)) {
                         $_rate->addCharge(new Charge([
-                            'type'        => 'NEGOTIATED',
+                            'type'        => 'BASE',
                             'description' => 'Negotiated price',
                             'amount'      => new Money([
                                 'amount'   => $rate->NegotiatedRateCharges->TotalCharge->MonetaryValue ?? null,
                                 'currency' => $rate->NegotiatedRateCharges->TotalCharge->CurrencyCode ?? null,
+                            ]),
+                        ]));
+                    }else {
+                        $_rate->addCharge(new Charge([
+                            'type'        => 'BASE',
+                            'description' => 'Base price',
+                            'amount'      => new Money([
+                                'amount'   => $rate->TransportationCharges->MonetaryValue ?? null,
+                                'currency' => $rate->TransportationCharges->CurrencyCode ?? null,
                             ]),
                         ]));
                     }
