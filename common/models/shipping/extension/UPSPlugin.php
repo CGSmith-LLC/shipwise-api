@@ -399,10 +399,18 @@ class UPSPlugin extends ShipmentPlugin
                     $_rate->serviceCode = $service->shipwise_code ?? $rate->Service->Code ?? null;
                     $_rate->serviceName = $service->name ?? $rate->Service->Description ?? null;
 
-                    $_rate->totalPrice = new Money([
-                        'amount'   => $rate->TotalCharges->MonetaryValue ?? null,
-                        'currency' => $rate->TotalCharges->CurrencyCode ?? null,
-                    ]);
+
+                    if (isset($rate->NegotiatedRateCharges->TotalCharge)) {
+                        $_rate->totalPrice = new Money([
+                            'amount'   => $rate->NegotiatedRateCharges->TotalCharge->MonetaryValue ?? null,
+                            'currency' => $rate->NegotiatedRateCharges->TotalCharge->CurrencyCode ?? null,
+                        ]);
+                    }else {
+                        $_rate->totalPrice = new Money([
+                            'amount'   => $rate->TotalCharges->MonetaryValue ?? null,
+                            'currency' => $rate->TotalCharges->CurrencyCode ?? null,
+                        ]);
+                    }
 
 
 
