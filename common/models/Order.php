@@ -88,4 +88,22 @@ class Order extends BaseOrder
     {
         return $this->hasMany('common\models\OrderHistory', ['order_id' => 'id']);
     }
+
+    public function createPackingSlip()
+    {
+        // @todo
+
+        sleep(1);
+
+        return true;
+    }
+
+    public function createShippingLabel()
+    {
+        // @todo
+
+        sleep(2);
+
+        return true;
+    }
 }

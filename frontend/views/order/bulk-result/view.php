@@ -20,13 +20,18 @@ YiiAsset::register($this);
 
         <?php Pjax::begin([
             'id' => 'pjax-container',
-        ]); ?>
+        ]);
+
+        if ($model->isCompleted()) {
+            $this->registerJs("stopRefreshing();", View::POS_END, 'bulk-result-handler-end');
+        }
+        ?>
 
         <div class="jumbotron">
             <p class="lead"><?= $model->name ?></p>
             <?php
             $btnClass = $model->isCompleted() ? 'success' : 'default';
-            $disabled = $model->isCompleted() ? '' : 'disabled';
+            $disabled = $model->isProcessed() ? '' : 'disabled';
             ?>
             <div><?= Html::a('Print', false,
                     ['class' => "btn btn-lg btn-$btnClass $disabled", 'style' => 'min-width:170px;']) ?></div>
@@ -69,13 +74,20 @@ YiiAsset::register($this);
 
 <?php
 $this->registerJs("
+    var refreshIntervalId;
+    function stopRefreshing() {
+        clearInterval(refreshIntervalId);
+    }
 
-    // @todo stop after bulk action status is completed!!!
-    
-    var refreshIntervalId = setInterval(function(){ 
+    ", View::POS_BEGIN,
+    'bulk-result-handler-begin'
+);
+
+$this->registerJs("
+    refreshIntervalId = setInterval(function(){ 
         $.pjax.reload({container: '#pjax-container', async: false}); 
     }, 4000);
-    
+
     ", View::POS_READY,
-    'bulk-result-handler'
+    'bulk-result-handler-ready'
 );

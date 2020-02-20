@@ -85,6 +85,14 @@ class BulkAction extends BaseBulkAction
     }
 
     /**
+     * @return bool
+     */
+    public function isProcessed()
+    {
+        return $this->status != self::STATUS_PROCESSING;
+    }
+
+    /**
      * @return bool|\DateInterval
      * @throws \Exception
      */
@@ -92,5 +100,31 @@ class BulkAction extends BaseBulkAction
     {
         $startedAt = new \DateTime($this->created_on);
         return $startedAt->diff(new \DateTime("now"));
+    }
+
+    /**
+     * Mark as completed
+     * (no saving performed)
+     *
+     * @return $this
+     */
+    public function markCompleted()
+    {
+        $this->status = self::STATUS_COMPLETED;
+
+        return $this;
+    }
+
+    /**
+     * Mark as failed
+     * (no saving performed)
+     *
+     * @return $this
+     */
+    public function markFailed()
+    {
+        $this->status = self::STATUS_ERROR;
+
+        return $this;
     }
 }

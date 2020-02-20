@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseBulkItem;
+use Yii;
 
 /**
  * Class BulkItem
@@ -51,5 +52,29 @@ class BulkItem extends BaseBulkItem
     public function getStatusColor()
     {
         return self::$statusColors[$this->status];
+    }
+
+    /** @inheritdoc */
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert) {
+            // insert scenario
+        } else {
+            // update scenario
+
+            /**
+             * If all Bulk Items finished processing, then update Bulk Action status.
+             * BulkItem status values are: 0:queued, 1:done, 2:error
+             */
+            $itemsStatusSum = self::find()->where(['bulk_action_id' => $this->bulk_action_id])->sum('status');
+            $nbItems        = count($this->bulkAction->items);
+            if ($itemsStatusSum == $nbItems) {
+                $this->bulkAction->markCompleted()->save();
+            } elseif ($itemsStatusSum > $nbItems) {
+                $this->bulkAction->markFailed()->save();
+            }
+        }
+
+        parent::afterSave($insert, $changedAttributes);
     }
 }
