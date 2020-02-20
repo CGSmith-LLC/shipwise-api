@@ -184,8 +184,8 @@ class UPSPlugin extends ShipmentPlugin
             ],
 
             'Shipment' => [
-                'RateInformation' => [
-                    'NegotiatedRatesIndicator' => 1,
+                'ShipmentRatingOptions' => [
+                    'NegotiatedRatesIndicator' => "1",
                 ],
                 'Shipper' => [
                     'Name' => substr(
@@ -412,6 +412,17 @@ class UPSPlugin extends ShipmentPlugin
                             'currency' => $rate->TransportationCharges->CurrencyCode ?? null,
                         ]),
                     ]));
+
+                    if (isset($rate->NegotiatedRateCharges->TotalCharge)) {
+                        $_rate->addCharge(new Charge([
+                            'type'        => 'NEGOTIATED',
+                            'description' => 'Negotiated price',
+                            'amount'      => new Money([
+                                'amount'   => $rate->NegotiatedRateCharges->TotalCharge->MonetaryValue ?? null,
+                                'currency' => $rate->NegotiatedRateCharges->TotalCharge->CurrencyCode ?? null,
+                            ]),
+                        ]));
+                    }
 
                     // @todo for Surcharges see "PackageServiceOptions" in request.
 
