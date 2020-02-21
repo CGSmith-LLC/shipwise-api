@@ -261,7 +261,13 @@ class UPSPlugin extends ShipmentPlugin
          */
         if ($this->shipment->sender_country == 'US') {
             $this->data['CustomerClassification'] = [
-                'Code' => '04', // 00 = Rates Associated with Shipper Number
+                /**
+                 * 00 = Rate associated with account number (as long as account number valid
+                 * 01 = Daily rates
+                 * 04 = Retail rates
+                 * 53 = Standard list rates
+                 */
+                'Code' => '04',
             ];
         }
 
