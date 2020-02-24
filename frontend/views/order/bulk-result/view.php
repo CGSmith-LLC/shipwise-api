@@ -1,5 +1,14 @@
 <?php
 
+
+// Generate shipping label PDF
+/*$pdf = new \common\pdf\OrderPackingSlip();
+$order = \common\models\Order::findOne(163936);
+$pdf->generate($order);
+$pdf->Output();
+
+die('Testing...');*/
+
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -30,11 +39,11 @@ YiiAsset::register($this);
         <div class="jumbotron">
             <p class="lead"><?= $model->name ?></p>
             <?php
-            $btnClass = $model->isCompleted() ? 'success' : 'default';
+            $btnText  = $model->isProcessing() ? 'Processing..' : 'Re-print';
             $disabled = $model->isProcessed() ? '' : 'disabled';
             ?>
-            <div><?= Html::a('Print', false,
-                    ['class' => "btn btn-lg btn-$btnClass $disabled", 'style' => 'min-width:170px;']) ?></div>
+            <div><?= Html::a($btnText, false,
+                    ['class' => "btn btn-lg btn-default $disabled", 'style' => 'min-width:170px;']) ?></div>
         </div>
 
         <h4>
