@@ -88,9 +88,9 @@ class UPSPlugin extends ShipmentPlugin
     public $isTrackable = true;
 
     /**
-     * Time in transit response from UPS
+     * Time in transit response from UPS stored as [UPS Code => Time in transit]
      *
-     * @var string
+     * @var array
      */
     public $timeInTransitResponse;
 
@@ -169,6 +169,36 @@ class UPSPlugin extends ShipmentPlugin
     public function getPluginName()
     {
         return self::PLUGIN_NAME;
+    }
+
+    /**
+     * Check alerts before continuing
+     */
+    private function checkAlerts()
+    {
+        /**
+         * NOTE/WARNING Case
+         *
+         * This status means that the request went through but UPS has some
+         * relevant notes to communicate to us. Retrieve notification messages
+         * and continue.
+         */
+        if (isset($this->response->Response->Alert)) {
+            // Object case
+            if (isset($this->response->Response->Alert->Description)) {
+                $this->addWarning($this->response->Response->Alert->Description);
+
+                // Array of objects case
+            } else {
+                if (is_array($this->response->Response->Alert) && count($this->response->Response->Alert) > 0) {
+                    foreach ($this->response->Response->Alert as $alert) {
+                        if (isset($alert->Description)) {
+                            $this->addWarning($alert->Description);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -339,113 +369,6 @@ class UPSPlugin extends ShipmentPlugin
     }
 
     /**
-     * Prepare variables and execute SOAP request to get transit times
-     *
-     * @return $this
-     * @throws ShipmentException
-     * @throws \SoapFault
-     */
-    protected function timeInTransitExecute()
-    {
-        $url = ($this->isProduction) ? $this->urlProd : $this->urlDev;
-
-        Yii::debug($this->shipment);
-        $data = [
-            'Request' => [], // need empty array or option set
-            'ShipFrom' => [
-                'Address' => [
-                    'AddressLine'       => [
-                        $this->shipment->sender_address1,
-                        $this->shipment->sender_address2,
-                    ],
-                    'City'              => $this->shipment->sender_city,
-                    'StateProvinceCode' => $this->shipment->sender_state,
-                    'PostalCode'        => $this->shipment->sender_postal_code,
-                    'CountryCode'       => $this->shipment->sender_country,
-                ],
-            ],
-            'ShipTo' => [
-                'Address' => [
-                    'AddressLine'       => [
-                        $this->shipment->recipient_address1,
-                        $this->shipment->recipient_address2,
-                    ],
-                    'City'              => $this->shipment->recipient_city,
-                    'StateProvinceCode' => $this->shipment->recipient_state,
-                    'PostalCode'        => $this->shipment->recipient_postal_code,
-                    'CountryCode'       => $this->shipment->recipient_country,
-                ],
-                'ResidentialAddressIndicator' => (bool)$this->shipment->recipient_is_residential,
-            ],
-            'Pickup' => [
-                'Date' =>  (new \DateTime($this->shipment->shipment_date))->format('Ymd')
-            ]
-        ];
-
-
-        $this->response = $this->runPostCall(
-            "{$url}TimeInTransit",
-            $data,
-            'ProcessTimeInTransit',
-            __DIR__ . '/wsdl/ups/TNTWS.wsdl'
-        );
-
-        return $this;
-    }
-
-    protected function timeInTransitProcess()
-    {
-        if (!isset($this->response->Response)) {
-            return $this;
-        }
-        $this->checkAlerts();
-
-        /**
-         * SUCCESS Case
-         *
-         * This status means that our rate request was successful.
-         * Retrieve available rates and add them to Shipment::_rates
-         */
-        if (isset($this->response->Response->ResponseStatus) && isset($this->response->Response->ResponseStatus->Code)
-            && ($this->response->Response->ResponseStatus->Code == '1')) {
-            $services = $this->response->TransitResponse->ServiceSummary;
-            foreach ((array)$services as $service) {
-                $this->timeInTransitResponse[$service->Service->Code] = $service->EstimatedArrival->BusinessDaysInTransit;
-            }
-        }
-    }
-
-    /**
-     * Check alerts before continuing
-     */
-    private function checkAlerts()
-    {
-        /**
-         * NOTE/WARNING Case
-         *
-         * This status means that the request went through but UPS has some
-         * relevant notes to communicate to us. Retrieve notification messages
-         * and continue.
-         */
-        if (isset($this->response->Response->Alert)) {
-            // Object case
-            if (isset($this->response->Response->Alert->Description)) {
-                $this->addWarning($this->response->Response->Alert->Description);
-
-                // Array of objects case
-            } else {
-                if (is_array($this->response->Response->Alert) && count($this->response->Response->Alert) > 0) {
-                    foreach ($this->response->Response->Alert as $alert) {
-                        if (isset($alert->Description)) {
-                            $this->addWarning($alert->Description);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Rate process
      *
      * This method will process the response received from carrier API.
@@ -556,6 +479,91 @@ class UPSPlugin extends ShipmentPlugin
 
         return $this;
     }
+
+    /**
+     * Prepare variables and execute SOAP request to get transit times
+     *
+     * @return $this
+     * @throws ShipmentException
+     * @throws \SoapFault
+     */
+    protected function timeInTransitExecute()
+    {
+        $url = ($this->isProduction) ? $this->urlProd : $this->urlDev;
+
+        Yii::debug($this->shipment);
+        $data = [
+            'Request' => [], // need empty array or option set
+            'ShipFrom' => [
+                'Address' => [
+                    'AddressLine'       => [
+                        $this->shipment->sender_address1,
+                        $this->shipment->sender_address2,
+                    ],
+                    'City'              => $this->shipment->sender_city,
+                    'StateProvinceCode' => $this->shipment->sender_state,
+                    'PostalCode'        => $this->shipment->sender_postal_code,
+                    'CountryCode'       => $this->shipment->sender_country,
+                ],
+            ],
+            'ShipTo' => [
+                'Address' => [
+                    'AddressLine'       => [
+                        $this->shipment->recipient_address1,
+                        $this->shipment->recipient_address2,
+                    ],
+                    'City'              => $this->shipment->recipient_city,
+                    'StateProvinceCode' => $this->shipment->recipient_state,
+                    'PostalCode'        => $this->shipment->recipient_postal_code,
+                    'CountryCode'       => $this->shipment->recipient_country,
+                ],
+                'ResidentialAddressIndicator' => (bool)$this->shipment->recipient_is_residential,
+            ],
+            'Pickup' => [
+                'Date' =>  (new \DateTime($this->shipment->shipment_date))->format('Ymd')
+            ]
+        ];
+
+
+        $this->response = $this->runPostCall(
+            "{$url}TimeInTransit",
+            $data,
+            'ProcessTimeInTransit',
+            __DIR__ . '/wsdl/ups/TNTWS.wsdl'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Process time in transit request and store as array in $this->timeInTransitReponse
+     *
+     * @return $this
+     */
+    protected function timeInTransitProcess()
+    {
+        if (!isset($this->response->Response)) {
+            return $this;
+        }
+        $this->checkAlerts();
+
+        /**
+         * SUCCESS Case
+         *
+         * This status means that our time in transit request was successful.
+         * Retrieve available transit times and store them to $this->timeInTransitResponse
+         */
+        if (isset($this->response->Response->ResponseStatus) && isset($this->response->Response->ResponseStatus->Code)
+            && ($this->response->Response->ResponseStatus->Code == '1')) {
+            $services = $this->response->TransitResponse->ServiceSummary;
+            foreach ((array)$services as $service) {
+                $this->timeInTransitResponse[$service->Service->Code] = $service->EstimatedArrival->BusinessDaysInTransit;
+            }
+        }
+    }
+
+
+
 
     /**
      * Find transit based off of UPS code
