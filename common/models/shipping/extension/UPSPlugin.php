@@ -87,6 +87,13 @@ class UPSPlugin extends ShipmentPlugin
      */
     public $isTrackable = true;
 
+    /**
+     * Time in transit response from UPS
+     *
+     * @var string
+     */
+    public $timeInTransitResponse;
+
     /** @inheritdoc */
     public function autoload($customerId = null)
     {
@@ -332,21 +339,87 @@ class UPSPlugin extends ShipmentPlugin
     }
 
     /**
-     * Rate process
-     *
-     * This method will process the response received from carrier API.
-     * In a successful response it will set the Shipment::_rates array
+     * Prepare variables and execute SOAP request to get transit times
      *
      * @return $this
-     * @version 2019.12.20
-     *
+     * @throws ShipmentException
+     * @throws \SoapFault
      */
-    protected function rateProcess()
+    protected function timeInTransitExecute()
+    {
+        $url = ($this->isProduction) ? $this->urlProd : $this->urlDev;
+
+        Yii::debug($this->shipment);
+        $data = [
+            'Request' => [], // need empty array or option set
+            'ShipFrom' => [
+                'Address' => [
+                    'AddressLine'       => [
+                        $this->shipment->sender_address1,
+                        $this->shipment->sender_address2,
+                    ],
+                    'City'              => $this->shipment->sender_city,
+                    'StateProvinceCode' => $this->shipment->sender_state,
+                    'PostalCode'        => $this->shipment->sender_postal_code,
+                    'CountryCode'       => $this->shipment->sender_country,
+                ],
+            ],
+            'ShipTo' => [
+                'Address' => [
+                    'AddressLine'       => [
+                        $this->shipment->recipient_address1,
+                        $this->shipment->recipient_address2,
+                    ],
+                    'City'              => $this->shipment->recipient_city,
+                    'StateProvinceCode' => $this->shipment->recipient_state,
+                    'PostalCode'        => $this->shipment->recipient_postal_code,
+                    'CountryCode'       => $this->shipment->recipient_country,
+                ],
+                'ResidentialAddressIndicator' => (bool)$this->shipment->recipient_is_residential,
+            ],
+            'Pickup' => [
+                'Date' =>  (new \DateTime($this->shipment->shipment_date))->format('Ymd')
+            ]
+        ];
+
+
+        $this->response = $this->runPostCall(
+            "{$url}TimeInTransit",
+            $data,
+            'ProcessTimeInTransit',
+            __DIR__ . '/wsdl/ups/TNTWS.wsdl'
+        );
+
+        return $this;
+    }
+
+    protected function timeInTransitProcess()
     {
         if (!isset($this->response->Response)) {
             return $this;
         }
+        $this->checkAlerts();
 
+        /**
+         * SUCCESS Case
+         *
+         * This status means that our rate request was successful.
+         * Retrieve available rates and add them to Shipment::_rates
+         */
+        if (isset($this->response->Response->ResponseStatus) && isset($this->response->Response->ResponseStatus->Code)
+            && ($this->response->Response->ResponseStatus->Code == '1')) {
+            $services = $this->response->TransitResponse->ServiceSummary;
+            foreach ((array)$services as $service) {
+                $this->timeInTransitResponse[$service->Service->Code] = $service->EstimatedArrival->BusinessDaysInTransit;
+            }
+        }
+    }
+
+    /**
+     * Check alerts before continuing
+     */
+    private function checkAlerts()
+    {
         /**
          * NOTE/WARNING Case
          *
@@ -370,6 +443,24 @@ class UPSPlugin extends ShipmentPlugin
                 }
             }
         }
+    }
+
+    /**
+     * Rate process
+     *
+     * This method will process the response received from carrier API.
+     * In a successful response it will set the Shipment::_rates array
+     *
+     * @return $this
+     * @version 2019.12.20
+     *
+     */
+    protected function rateProcess()
+    {
+        if (!isset($this->response->Response)) {
+            return $this;
+        }
+        $this->checkAlerts();
 
         /**
          * SUCCESS Case
@@ -422,18 +513,18 @@ class UPSPlugin extends ShipmentPlugin
 
                     if (isset($rate->NegotiatedRateCharges->TotalCharge)) {
                         $_rate->addCharge(new Charge([
-                            'type'        => 'BASE',
-                            'description' => 'Negotiated price',
-                            'amount'      => new Money([
+                            'type'         => 'BASE',
+                            'description'  => 'Negotiated price',
+                            'amount'       => new Money([
                                 'amount'   => $rate->NegotiatedRateCharges->TotalCharge->MonetaryValue ?? null,
                                 'currency' => $rate->NegotiatedRateCharges->TotalCharge->CurrencyCode ?? null,
                             ]),
                         ]));
-                    }else {
+                    } else {
                         $_rate->addCharge(new Charge([
-                            'type'        => 'BASE',
-                            'description' => 'Base price',
-                            'amount'      => new Money([
+                            'type'         => 'BASE',
+                            'description'  => 'Base price',
+                            'amount'       => new Money([
                                 'amount'   => $rate->TransportationCharges->MonetaryValue ?? null,
                                 'currency' => $rate->TransportationCharges->CurrencyCode ?? null,
                             ]),
@@ -442,9 +533,20 @@ class UPSPlugin extends ShipmentPlugin
 
                     // @todo for Surcharges see "PackageServiceOptions" in request.
 
+                    /**
+                     * If business days in transit is not set make a request to Time In Transit API
+                     * Store response for future in case something else is missing transit time
+                     */
+                    $_rate->transitTime = $rate->GuaranteedDelivery->BusinessDaysInTransit ?? null;
+                    if (is_null($_rate->transitTime) && !isset($this->timeInTransitResponse)) {
+                        $this->timeInTransitExecute()->timeInTransitProcess();
+                        $_rate->transitTime = $this->findTransitTime($_rate->serviceCode);
+                    } elseif (is_null($_rate->transitTime) && isset($this->timeInTransitResponse)) {
+                        $_rate->transitTime = $this->findTransitTime($_rate->serviceCode);
+                    }
+
                     $_rate->deliveryTimeStamp = null; // n/a for UPS
                     $_rate->deliveryDayOfWeek = null; // n/a for UPS
-                    $_rate->transitTime       = $rate->GuaranteedDelivery->BusinessDaysInTransit ?? null;
                     $_rate->deliveryByTime    = $rate->GuaranteedDelivery->DeliveryByTime ?? null;
 
                     $this->shipment->addRate($_rate);
@@ -453,6 +555,43 @@ class UPSPlugin extends ShipmentPlugin
         }
 
         return $this;
+    }
+
+    /**
+     * Find transit based off of UPS code
+     *
+     * @param $code string UPS code
+     * @return $transitTime integer Transit time as integer is returned
+     */
+    protected function findTransitTime($code)
+    {
+        $transitTime = 0;
+
+        switch ($code) {
+            case 'UPSNextDayAirEarlyAM':
+                $transitTime = $this->timeInTransitResponse['1DM'];
+                break;
+            case 'UPSNextDayAir':
+                $transitTime = $this->timeInTransitResponse['1DA'];
+                break;
+            case 'UPSNextDayAirSaver':
+                $transitTime = $this->timeInTransitResponse['1DP'];
+                break;
+            case 'UPS2ndDayAirAM':
+                $transitTime = $this->timeInTransitResponse['2DM'];
+                break;
+            case 'UPS2ndDayAir':
+                $transitTime = $this->timeInTransitResponse['2DA'];
+                break;
+            case 'UPSGround':
+                $transitTime = $this->timeInTransitResponse['GND'];
+                break;
+            case 'UPS3DaySelect':
+                $transitTime = $this->timeInTransitResponse['3DS'];
+                break;
+        }
+
+        return $transitTime;
     }
 
     /**
