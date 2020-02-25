@@ -127,4 +127,37 @@ class BulkAction extends BaseBulkAction
 
         return $this;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeDelete()
+    {
+        if (parent::beforeDelete()) {
+            $result = $this->deleteRelatedEntities();
+
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Delete all related entities.
+     *
+     * @return boolean
+     * @throws \yii\db\StaleObjectException
+     * @throws \Throwable
+     */
+    public function deleteRelatedEntities()
+    {
+        $result = true;
+
+        // Items
+        foreach ($this->items as $item) {
+            $result = $result && $item->delete();
+        }
+
+        return $result;
+    }
 }

@@ -3,7 +3,6 @@
 namespace common\models;
 
 use common\models\base\BaseBulkItem;
-use Yii;
 
 /**
  * Class BulkItem
@@ -77,4 +76,6 @@ class BulkItem extends BaseBulkItem
 
         parent::afterSave($insert, $changedAttributes);
     }
+
+
 }

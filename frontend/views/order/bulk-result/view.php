@@ -66,6 +66,13 @@ YiiAsset::register($this);
                         return '<span class="label label-' . $model->statusColor . '"> ' . $model->statusName . '</span>';
                     },
                 ],
+                /*[ // @todo Find a way of how to display printing status after base64 data pushed to QZ printer.
+                    'label' => 'Print status',
+                    'format'    => 'raw',
+                    'value'     => function ($model) {
+                        return '<span class="label label-warning">Queued</span>';
+                    },
+                ],*/
             ],
         ]); ?>
         <?php Pjax::end(); ?>

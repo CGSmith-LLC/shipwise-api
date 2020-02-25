@@ -216,7 +216,7 @@ class BulkAction extends BaseBulkAction
      */
     private function packingSlips($params = null)
     {
-        return $this->asyncExecute('console\jobs\CreatePackingSlipJob', $params);
+        return $this->asyncExecute('console\jobs\GeneratePackingSlipJob', $params);
     }
 
     /**
@@ -243,7 +243,7 @@ class BulkAction extends BaseBulkAction
      * A Bulk Action object is created to track process.
      *
      * @param string     $jobClass The class name of the job to be added to the queue
-     *                             eg. `console\jobs\CreatePackingSlipJob`
+     *                             eg. `console\jobs\GeneratePackingSlipJob`
      * @param array|null $params   Optional
      *
      * @return bool|int False on failure, Integer on success

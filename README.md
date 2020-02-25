@@ -19,6 +19,58 @@ Deployment is handled by [BitBucket pipelines](bitbucket-pipelines.yml). There i
 sits in `/usr/local/bin/deploy-api.sh` that can also be [viewed in the repo](deploy-api.sh).
 
 
+###Cronjobs:
+
+To create/edit crontab file:
+
+    crontab -e
+
+1. Overnight cronjob:
+
+
+    15 1 * * * /var/www/api/yii cron/overnight >> /var/www/api/console/runtime/logs/cronjob.log 2>&1
+
+To list existing cronjobs:
+
+    crontab -l
+
+
+###Job Workers
+
+**Yii2 Queue** is an extension for running tasks asynchronously via queues.
+
+https://github.com/yiisoft/yii2-queue/blob/master/docs/guide/worker.md
+
+
+sudo vim /etc/systemd/system/yii-queue@.service
+
+```
+[Unit]
+Description=Yii Queue Worker %I
+After=network.target
+# the following two lines only apply if your queue backend is mysql
+# replace this with the service that powers your backend
+After=mysql.service
+Requires=mysql.service
+
+[Service]
+User=apache
+Group=apache
+ExecStart=/usr/bin/php /var/www/api/yii queue/listen --verbose
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+sudo systemctl daemon-reload
+
+sudo systemctl start yii-queue@1 yii-queue@2
+
+sudo systemctl enable yii-queue@1 yii-queue@2
+
+systemctl status "yii-queue@*"
+
 DIRECTORY STRUCTURE
 -------------------
 

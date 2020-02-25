@@ -32,4 +32,21 @@ class BulkActionQuery extends \yii\db\ActiveQuery
     {
         return parent::one($db);
     }
+
+    /**
+     * Where created_date is older than X hours
+     *
+     * @param int $hours
+     *
+     * @return $this
+     */
+    public function olderThan($hours)
+    {
+        return $this->andWhere(
+            '(created_on < (NOW() - INTERVAL :hours HOUR))',
+            [
+                ':hours' => (int)$hours,
+            ]
+        );
+    }
 }
