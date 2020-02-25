@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\pdf\OrderPackingSlip;
 use frontend\models\Customer;
 use Yii;
 use common\models\{State, Status, shipping\Carrier, shipping\Service};
@@ -260,5 +261,22 @@ class OrderController extends Controller
         return $this->render('bulk-result/view', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Outputs Packing Slip PDF file for given Order.
+     *
+     * @param integer $id Order ID
+     *
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\web\NotFoundHttpException if the model cannot be found
+     */
+    public function actionPackingSlip($id)
+    {
+        // Generate and output PDF file
+        $pdf = new OrderPackingSlip();
+        $pdf->generate($this->findModel($id));
+        $pdf->Output();
     }
 }

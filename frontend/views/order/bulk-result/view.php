@@ -1,14 +1,5 @@
 <?php
 
-
-// Generate shipping label PDF
-/*$pdf = new \common\pdf\OrderPackingSlip();
-$order = \common\models\Order::findOne(163936);
-$pdf->generate($order);
-$pdf->Output();
-
-die('Testing...');*/
-
 use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\grid\GridView;

@@ -26,6 +26,8 @@ YiiAsset::register($this);
                 'method'  => 'post',
             ],
         ]) ?>
+        <?= Html::a('Print Packing Slip', ['packing-slip', 'id' => $model->id],
+            ['class' => 'btn btn-default', 'target' => '_blank']) ?>
     </p>
 
     <div class="row">

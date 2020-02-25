@@ -110,16 +110,14 @@ class OrderPackingSlip extends \FPDF
         /**
          * Company Logo
          *
-         * We intentionally reduce the logo image height.
-         * Width is adjusted automatically by FPDF.
+         * We intentionally reduce the logo image height to fit it in its dedicated space on label.
+         * width is adjusted automatically by FPDF.
          */
         $imgHeight = 30; // pixels
         $imgHeight = $this->px2mm($imgHeight); // convert px to mm
-
-        //$imgPath   = Yii::getAlias('@common') . "/files/logos/{$order->customer->id}/logo.png";
-        $imgPath = Yii::getAlias('@common') . "/files/logos/elegant-farmer.PNG"; // @todo make dynamic per customer
-
-        $this->Image($imgPath, $this->marginLeft + 5, null, null, $imgHeight);
+        if (!empty($order->customer->logo)) {
+            $this->Image($order->customer->logo, $this->marginLeft + 5, null, null, $imgHeight);
+        }
         $this->ln(0.5);
 
         /**
@@ -127,12 +125,14 @@ class OrderPackingSlip extends \FPDF
          */
         $this->SetXY($this->pageWidth / 2, $yBeforeImage);
         $cellH = 4; // cell height
-        $this->setFont($this->fontFamily, 'B', $this->fontSize);
-        $this->Cell(0, $cellH, "{$order->customer->id} {$order->customer->name}", 0, 2);
+        $this->setFont($this->fontFamily, 'B', $this->fontSize - 2);
+        $this->Cell(0, $cellH, $order->customer->name, 0, 2);
         $this->resetFont();
-        $this->Cell(0, $cellH, "address 1", 0, 2); // @todo
-        $this->Cell(0, $cellH, "address 2", 0, 2); // @todo
-
+        $this->setFontSize($this->fontSize - 1);
+        $txt = $order->customer->address1 . ' ' . $order->customer->address2;
+        $this->Cell(0, $cellH, $txt, 0, 2);
+        $txt = $order->customer->city . ', ' . $order->customer->state->abbreviation . ' ' . $order->customer->zip;
+        $this->Cell(0, $cellH, $txt, 0, 2);
         $this->ln(3);
         $this->setX($this->marginLeft);
 
