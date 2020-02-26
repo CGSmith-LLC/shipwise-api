@@ -27,9 +27,7 @@ To create/edit crontab file:
 crontab -e
 ```
 
-
 1. Overnight cronjob:
-
 
 ```
 15 1 * * * /var/www/api/yii cron/overnight >> /var/www/api/console/runtime/logs/cronjob.log 2>&1
