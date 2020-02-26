@@ -67,8 +67,8 @@ class Shipment extends BaseShipment
 
     /** @var array */
     protected static $addressTypes = [
-        self::ADDRESS_TYPE_BUSINESS    => 'FedEx',
-        self::ADDRESS_TYPE_RESIDENTIAL => 'UPS',
+        self::ADDRESS_TYPE_BUSINESS    => self::ADDRESS_TYPE_BUSINESS,
+        self::ADDRESS_TYPE_RESIDENTIAL => self::ADDRESS_TYPE_RESIDENTIAL,
     ];
 
     /** @return array */
@@ -338,5 +338,44 @@ class Shipment extends BaseShipment
         }
 
         return $state;
+    }
+
+    /**
+     * Ship the shipment using carrier API
+     *
+     * This method will submit a shipment creation request to carrier API
+     * to get the tracking number and label.
+     *
+     * @return Shipment|string Error
+     * @throws LogicException
+     * @throws ShipmentException
+     * @version 2020.02.25
+     *
+     *
+     */
+    public function ship()
+    {
+        if ($this->plugin === null) {
+            $this->initCarrierPlugin();
+        }
+
+        if (!$this->plugin) {
+            throw new LogicException("Shipment has no ShipmentPlugin");
+        }
+
+        if (count($this->getPackages()) < 1) {
+            throw new LogicException("Shipment has no packages");
+        }
+
+        try {
+            $this->plugin->ship($this);
+            return $this;
+
+        } catch (Exception $e) {
+            Yii::error($e);
+            throw new ShipmentException(
+                $e->getMessage() . " - in ShipmentPlugin::{$this->plugin->getPluginName()}::ship()"
+            );
+        }
     }
 }
