@@ -75,6 +75,8 @@ class OrderEx extends Order
             },
             'uuid'              => 'uuid',
             'origin'            => 'origin',
+            'packages'          => 'packages',
+            'packages.items'    => 'packageItems',
         ];
     }
 

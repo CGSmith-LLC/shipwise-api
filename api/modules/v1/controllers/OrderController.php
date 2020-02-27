@@ -974,7 +974,8 @@ class OrderController extends ControllerEx
 
         $query = OrderEx::find()
             ->forCustomer($customerId)
-            ->byStatus($statusId);
+            ->byStatus($statusId)
+            ->with('packages.items');
         /**
          * Select by updated date and/or created date
          */
