@@ -262,8 +262,6 @@ class UPSPlugin extends ShipmentPlugin
                         'PostalCode'        => $this->shipment->recipient_postal_code,
                         'CountryCode'       => $this->shipment->recipient_country,
                     ],
-
-                    'ResidentialAddressIndicator' => (bool)$this->shipment->recipient_is_residential,
                 ],
 
                 'ShipFrom' => [
@@ -285,6 +283,10 @@ class UPSPlugin extends ShipmentPlugin
                 ],
             ],
         ];
+
+        if ((bool)$this->shipment->recipient_is_residential) {
+            $this->data['Shipment']['ShipTo']['Address']['ResidentialAddressIndicator'] = (bool)$this->shipment->recipient_is_residential;
+        }
 
         /**
          * Rates comparison or specific service
@@ -639,7 +641,7 @@ class UPSPlugin extends ShipmentPlugin
         $soapClient = new \SoapClient(
             $wsdl,
             [
-                'trace'              => !$this->isProduction,
+                'trace'              => 1,//!$this->isProduction,
                 'connection_timeout' => $this->curlDownloadTimeoutInSeconds,
                 'soap_version'       => 'SOAP_1_1',
             ]
@@ -669,7 +671,8 @@ class UPSPlugin extends ShipmentPlugin
 
             // Invoke UPS web service operation
             $response = $soapClient->{$operationName}($data);
-
+            Yii::debug($soapClient->__getLastRequest());
+            Yii::debug($soapClient->__getLastResponse());
         } catch (\SoapFault $e) {
             //Yii::debug($e, 'UPS Soap Fault');
 
