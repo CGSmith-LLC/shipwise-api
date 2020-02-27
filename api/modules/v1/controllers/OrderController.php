@@ -33,6 +33,7 @@ class OrderController extends ControllerEx
             'view'         => ['GET'],
             'delete'       => ['DELETE'],
             'items'        => ['GET'],
+            'packages'     => ['GET'],
             'findbystatus' => ['GET'],
             'find'         => ['GET'],
         ];
@@ -792,6 +793,28 @@ class OrderController extends ControllerEx
         }
 
         return $this->success($order->items);
+    }
+
+    /**
+     * Get packages of a specific order
+     *
+     * @param int $id Order ID
+     *
+     * @return array|\api\modules\v1\models\order\PackageEx
+     */
+    public function actionPackages($id)
+    {
+        if (($order = OrderEx::find()
+                ->byId($id)
+                ->forCustomer($this->apiConsumer->customer->id)
+                ->with('packages.items')
+                ->asArray()
+                ->one()
+        ) === null) {
+            return $this->errorMessage(404, 'Order not found');
+        }
+
+        return $this->success($order['packages']);
     }
 
     /**

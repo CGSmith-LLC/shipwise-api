@@ -115,6 +115,17 @@ class OrderEx extends Order
     }
 
     /**
+     * Get packages from the order
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPackages()
+    {
+        return $this->hasMany('api\modules\v1\models\order\PackageEx', ['order_id' => 'id']);
+    }
+
+
+    /**
      * Get Items
      *
      * Overwrite parent method to use OrderHistoryEx

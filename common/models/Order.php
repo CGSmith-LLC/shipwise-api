@@ -14,6 +14,7 @@ use common\models\query\OrderQuery;
  * @property Address        $address
  * @property TrackingInfo   $trackingInfo
  * @property Item[]         $items
+ * @property Package[]      $packages
  * @property Status         $status
  * @property OrderHistory[] $history
  */
@@ -87,5 +88,21 @@ class Order extends BaseOrder
     public function getHistory()
     {
         return $this->hasMany('common\models\OrderHistory', ['order_id' => 'id']);
+    }
+
+    /**
+     * Get Order Packages
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPackages()
+    {
+        return $this->hasMany('common\models\Package', ['order_id' => 'id']);
+    }
+
+    public function getPackageItems()
+    {
+        return $this->hasMany('common\models\PackageItem', ['package_id' => 'id'])
+            ->via('packages');
     }
 }
