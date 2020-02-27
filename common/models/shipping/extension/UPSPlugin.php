@@ -304,7 +304,7 @@ class UPSPlugin extends ShipmentPlugin
                  * 04 = Retail rates
                  * 53 = Standard list rates
                  */
-                'Code' => '04',
+                'Code' => '00',
             ];
         }
 
