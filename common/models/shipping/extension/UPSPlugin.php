@@ -556,11 +556,14 @@ class UPSPlugin extends ShipmentPlugin
          * Retrieve available transit times and store them to $this->timeInTransitResponse
          */
         if (isset($this->response->Response->ResponseStatus) && isset($this->response->Response->ResponseStatus->Code)
-            && ($this->response->Response->ResponseStatus->Code == '1')) {
+            && ($this->response->Response->ResponseStatus->Code == '1')
+            && !isset($this->response->CandidateResponse)) {
             $services = $this->response->TransitResponse->ServiceSummary;
             foreach ((array)$services as $service) {
                 $this->timeInTransitResponse[$service->Service->Code] = $service->EstimatedArrival->BusinessDaysInTransit;
             }
+        } else {
+            $this->addWarning('No transit time available for ' . $this->shipment->recipient_postal_code . '. Check if valid ZIP');
         }
     }
 
