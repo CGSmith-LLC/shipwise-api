@@ -14,6 +14,7 @@ use Yii;
  * @property string                    $base64_filedata File encoded in base64
  * @property string                    $base64_filetype Type of encoded file: PDF, PNG.
  * @property int                       $status          Current status. 0:queued, 1:done, 2:error
+ * @property string                    $errors          Processing error messages encoded in JSON
  *
  * @property \common\models\BulkAction $bulkAction
  * @property \common\models\Order      $order
@@ -37,7 +38,7 @@ class BaseBulkItem extends \yii\db\ActiveRecord
         return [
             [['bulk_action_id'], 'required'],
             [['bulk_action_id', 'order_id', 'status'], 'integer'],
-            [['base64_filedata'], 'string'],
+            [['base64_filedata', 'errors'], 'string'],
             [['queue_id'], 'string', 'max' => 60],
             [['base64_filetype'], 'string', 'max' => 6],
         ];
@@ -55,6 +56,7 @@ class BaseBulkItem extends \yii\db\ActiveRecord
             'queue_id'        => 'Queue ID',
             'base64_filedata' => 'Base64 File Data',
             'base64_filetype' => 'Base64 File Type',
+            'errors'          => 'Errors',
             'status'          => 'Job status',
         ];
     }

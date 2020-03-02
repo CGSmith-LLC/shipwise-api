@@ -73,6 +73,13 @@ YiiAsset::register($this);
                         return '<span class="label label-warning">Queued</span>';
                     },
                 ],*/
+                [
+                    'attribute' => 'errors',
+                    'format'    => 'raw',
+                    'value'     => function ($model) {
+                        return '<span class="label label-danger">' . $model->errors . '</span>';
+                    },
+                ],
             ],
         ]); ?>
         <?php Pjax::end(); ?>

@@ -4,7 +4,14 @@ namespace common\models\shipping\extension;
 
 use common\models\{Charge, Money};
 use Yii;
-use common\models\shipping\{Carrier, PackageType, Service, ShipmentPlugin, ShipmentException, ShipmentRate};
+use common\models\shipping\{Carrier,
+    PackageType,
+    Service,
+    ShipmentPackage,
+    ShipmentPlugin,
+    ShipmentException,
+    ShipmentRate
+};
 
 /**
  * Class UPSPlugin
@@ -712,7 +719,7 @@ class UPSPlugin extends ShipmentPlugin
      *
      * @return $this
      * @throws \Exception
-     * @version 2020.02.25
+     * @version 2020.03.01
      */
     protected function shipmentPrepare()
     {
@@ -908,6 +915,8 @@ class UPSPlugin extends ShipmentPlugin
             /**
              * Package references. Max Allowed: 2
              * For available ref codes see UPS developer guide, search for "Reference Number Codes"
+             *
+             * @todo If needed, match your references with UPS codes, eg. invoice number, customer account, etc.
              */
             if ($package->reference1) {
                 $_pkg['ReferenceNumber'][] = [
@@ -917,7 +926,7 @@ class UPSPlugin extends ShipmentPlugin
             }
             if ($package->reference2) {
                 $_pkg['ReferenceNumber'][] = [
-                    'Code'  => 'TN', // TN = Transaction Reference Number
+                    'Code'  => 'IK', // IK = Invoice Number
                     'Value' => $package->reference2,
                 ];
             }
@@ -950,30 +959,30 @@ class UPSPlugin extends ShipmentPlugin
              * "Forward" shipment type
              */
             //if ($this->shipment->shipment_type == Shipment::TYPE_FORWARD) { // @todo Implement your logic here if needed
-                $invoiceDate                 = new \DateTime($this->shipment->shipment_date);
-                $intForms['InvoiceDate']     = $invoiceDate->format('Ymd');
-                $intForms['ReasonForExport'] = 'TEMPORARY EXPORT';
+            $invoiceDate                 = new \DateTime($this->shipment->shipment_date);
+            $intForms['InvoiceDate']     = $invoiceDate->format('Ymd');
+            $intForms['ReasonForExport'] = 'TEMPORARY EXPORT';
 
-                $intForms['Contacts']['SoldTo'] = [
-                    'Name'          => substr($this->shipment->recipient_company, 0, 35),
-                    'AttentionName' => substr($this->shipment->recipient_contact, 0, 35),
-                    'Phone'         => [
-                        'Number'    => $this->shipment->recipient_phone,
-                        'Extension' => $this->shipment->recipient_phone_ext,
-                    ],
+            $intForms['Contacts']['SoldTo'] = [
+                'Name'          => substr($this->shipment->recipient_company, 0, 35),
+                'AttentionName' => substr($this->shipment->recipient_contact, 0, 35),
+                'Phone'         => [
+                    'Number'    => $this->shipment->recipient_phone,
+                    'Extension' => $this->shipment->recipient_phone_ext,
+                ],
 
-                    'Address' => [
-                        'AddressLine'       => [
-                            $this->shipment->recipient_address1,
-                            $this->shipment->recipient_address2,
-                        ],
-                        'City'              => $this->shipment->recipient_city,
-                        'StateProvinceCode' => $this->shipment->recipient_state,
-                        'PostalCode'        => $this->shipment->recipient_postal_code,
-                        'CountryCode'       => $this->shipment->recipient_country,
-                        'EMailAddress'      => $this->shipment->recipient_email,
+                'Address' => [
+                    'AddressLine'       => [
+                        $this->shipment->recipient_address1,
+                        $this->shipment->recipient_address2,
                     ],
-                ];
+                    'City'              => $this->shipment->recipient_city,
+                    'StateProvinceCode' => $this->shipment->recipient_state,
+                    'PostalCode'        => $this->shipment->recipient_postal_code,
+                    'CountryCode'       => $this->shipment->recipient_country,
+                    'EMailAddress'      => $this->shipment->recipient_email,
+                ],
+            ];
             //}
 
             if ($this->shipment->sender_country == 'US') {
@@ -1074,7 +1083,7 @@ class UPSPlugin extends ShipmentPlugin
 
         } // End if international
 
-        Yii::debug($this->data, 'UPS Ship Request');
+        //Yii::debug($this->data, 'UPS Ship Request');
 
         return $this;
     }
@@ -1085,7 +1094,7 @@ class UPSPlugin extends ShipmentPlugin
      * @return $this
      * @throws ShipmentException
      * @throws \SoapFault
-     * @version 2020.02.25
+     * @version 2020.03.01
      */
     protected function shipmentExecute()
     {
@@ -1109,7 +1118,7 @@ class UPSPlugin extends ShipmentPlugin
      * This method will process the response received from carrier API
      *
      * @return $this
-     * @version 2020.02.25 @todo Vitaliy WIP!!!
+     * @version 2020.03.01
      *
      */
     protected function shipmentProcess()
@@ -1139,13 +1148,6 @@ class UPSPlugin extends ShipmentPlugin
             foreach ($alerts as $alert) {
                 $msg = @$alert->Description . " [" . @$alert->Code . "]";
                 $this->addWarning($msg);
-                // log activity
-                Activity::add(
-                    'Shipment alert',
-                    $msg,
-                    Activity::LEVEL_WARNING,
-                    $this->shipment->id ?? null
-                );
             }
         }
 
@@ -1177,7 +1179,11 @@ class UPSPlugin extends ShipmentPlugin
                 }
             }
 
-            $packages = $this->shipment->packages;
+            /** @var ShipmentPackage[] Shipment packages */
+            $packages = $this->shipment->getPackages();
+
+            /** @var array Array of filenames for temporary created label files to be merged into one */
+            $tmpFiles = [];
 
             foreach ($packages as $idx => &$package) {
 
@@ -1190,19 +1196,33 @@ class UPSPlugin extends ShipmentPlugin
 
                     // Label data
                     if (isset($packageResults[$idx]->ShippingLabel)) {
-                        $labelData             = $packageResults[$idx]->ShippingLabel->GraphicImage ?? null;
+                        $package->label_data   = $packageResults[$idx]->ShippingLabel->GraphicImage ?? null;
                         $package->label_format = $packageResults[$idx]->ShippingLabel->ImageFormat->Code ?? null;
                         /**
-                         * @todo  Save the files to AWS S3 cloud instead of local file system
+                         * Convert obtained label from UPS to the correct format:
+                         *  - Rotate the GIF label 90 degrees clockwise
                          */
-                        $filename = Yii::getAlias('@backend')
-                            . "/web/labels/{$this->getPluginName()}_{$package->tracking_num}";
-                        $filePath = Shipment::createFile($filename, $package->label_format, $labelData);
-
-                        // Update ShipmentPackage model
-                        $package->label_url = $filePath; // @todo Will contain AWS S3 URL
-                        $package->save();
+                        $filename = 'tmp_' . $package->tracking_num . '.' . $package->label_format;
+                        $fp       = fopen($filename, 'wb');
+                        fwrite($fp, base64_decode($package->label_data));
+                        fclose($fp);
+                        exec("convert -rotate \"90\" {$filename} {$filename}");
+                        $tmpFiles[] = $filename;
                     }
+                }
+            }
+
+            /**
+             * Convert GIF to PDF and merge into one file, then delete all temp files.
+             */
+            if (!empty($tmpFiles)) {
+                $mergedFilename = "tmp_merged_" . $packages[0]->master_tracking_num . ".pdf";
+                exec("convert " . implode(" ", $tmpFiles) . " $mergedFilename");
+                $this->shipment->mergedLabelsData   = base64_encode(file_get_contents($mergedFilename));
+                $this->shipment->mergedLabelsFormat = 'PDF';
+                @unlink($mergedFilename);
+                foreach ($tmpFiles as $filename) {
+                    @unlink($filename);
                 }
             }
 
@@ -1213,11 +1233,8 @@ class UPSPlugin extends ShipmentPlugin
             if (isset($this->response->ShipmentResults->Form) && isset($this->response->ShipmentResults->Form->Image)) {
                 $ciFormat = $this->response->ShipmentResults->Form->Image->ImageFormat->Code ?? 'PDF';
                 $ciData   = $this->response->ShipmentResults->Form->Image->GraphicImage;
-                /**
-                 * @todo  Save the files to AWS S3 cloud instead of local file system
-                 */
-                $filename = Yii::getAlias('@backend') . "/web/ci/CI{$this->shipment->id}";
-                $filePath = Shipment::createFile($filename, $ciFormat, $ciData);
+                //$filename = Yii::getAlias('@backend') . "/web/ci/CI{$this->shipment->id}";
+                //$filePath = Shipment::createFile($filename, $ciFormat, $ciData);
             }
 
             $this->isShipped = true;

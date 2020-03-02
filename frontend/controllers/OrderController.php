@@ -7,9 +7,8 @@ use frontend\models\Customer;
 use Yii;
 use common\models\{State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\{Order, forms\OrderForm, BulkAction, search\OrderSearch};
-use yii\helpers\Html;
-use yii\helpers\Json;
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
+use yii\helpers\Html;
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -205,6 +204,7 @@ class OrderController extends Controller
      *
      * @param int $carrierId Carrier ID.
      *
+     * @return array JSON array
      * @throws BadRequestHttpException
      */
     public function actionCarrierServices($carrierId)
@@ -214,7 +214,9 @@ class OrderController extends Controller
             throw new BadRequestHttpException('Bad request.');
         }
 
-        echo Json::encode(Service::getList('id', 'name', $carrierId));
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return Service::getList('id', 'name', $carrierId);
     }
 
     /**
@@ -264,7 +266,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Outputs Packing Slip PDF file for given Order.
+     * Generates and outputs Packing Slip PDF file for given Order.
      *
      * @param integer $id Order ID
      *
@@ -274,9 +276,45 @@ class OrderController extends Controller
      */
     public function actionPackingSlip($id)
     {
-        // Generate and output PDF file
+        $order = $this->findModel($id);
+
         $pdf = new OrderPackingSlip();
-        $pdf->generate($this->findModel($id));
-        $pdf->Output();
+        $pdf->generate($order);
+
+        return Yii::$app->response->sendContentAsFile($pdf->Output('S'),
+            "PackingSlip_{$order->customer_reference}.pdf");
+    }
+
+    /**
+     * Creates and outputs Shipping Label PDF file for given Order.
+     *
+     * @param integer $id Order ID
+     *
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\web\NotFoundHttpException if the model cannot be found
+     */
+    public function actionShippingLabel($id)
+    {
+        $order = $this->findModel($id);
+
+        try {
+            $shipment = $order->createShipment();
+        } catch (\Exception $e) {
+            Yii::error($e);
+            throw new \Exception($e);
+        }
+
+        if ($order->hasErrors()) {
+            \yii\helpers\VarDumper::dump($order->getErrors(), 10, true);
+            return false;
+        }
+
+        $order->tracking  = $shipment->getMasterTracking();
+        $order->status_id = Status::SHIPPED;
+        $order->save(false);
+
+        return Yii::$app->response->sendContentAsFile(base64_decode($shipment->mergedLabelsData),
+            "ShippingLabel_{$order->customer_reference}." . $shipment->mergedLabelsFormat);
     }
 }

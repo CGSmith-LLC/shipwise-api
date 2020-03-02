@@ -2,9 +2,11 @@
 
 namespace console\jobs;
 
-use common\models\{BulkItem, Order};
+use common\models\{BulkItem, Order, Status};
 use Exception;
+use Yii;
 use yii\base\BaseObject;
+use yii\helpers\Json;
 use yii\queue\JobInterface;
 
 /**
@@ -35,13 +37,32 @@ class CreateShippingLabelJob extends BaseObject implements JobInterface
             throw new Exception("Order not found for ID {$this->orderId}");
         }
 
-        // Create shipping label
-        $success = $order->createShippingLabel();
+        // Find bulk item
+        if (($bulkItem = BulkItem::findOne($this->bulkItemId)) === null) {
+            throw new Exception("Bulk item not found for ID {$this->bulkItemId}");
+        }
 
-        // If this job is part of a bulk action then update the status
-        if ($this->bulkItemId && (($bulkItem = BulkItem::findOne($this->bulkItemId)) !== null)) {
-            $bulkItem->status = $success ? BulkItem::STATUS_DONE : BulkItem::STATUS_ERROR;
-            $bulkItem->save();
+        // Create Shipping Label, update order tracking, save label as base64 data
+        try {
+            $shipment = $order->createShipment();
+            if ($order->hasErrors()) {
+                $bulkItem->errors = Json::encode($order->getErrors());
+                $bulkItem->status = BulkItem::STATUS_ERROR;
+            } else {
+                $order->tracking  = $shipment->getMasterTracking();
+                $order->status_id = Status::SHIPPED;
+                $order->save(false);
+
+                $bulkItem->base64_filedata = $shipment->mergedLabelsData;
+                $bulkItem->base64_filetype = $shipment->mergedLabelsFormat;
+                $bulkItem->status          = BulkItem::STATUS_DONE;
+            }
+        } catch (Exception $ex) {
+            Yii::error($ex);
+            $bulkItem->status = BulkItem::STATUS_ERROR;
+            $bulkItem->errors = Json::encode($ex->getMessage());
+        } finally {
+            $bulkItem->save(false);
         }
     }
 }

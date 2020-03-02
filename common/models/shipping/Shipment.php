@@ -12,13 +12,21 @@ use yii\db\Expression;
 /**
  * Class Shipment
  *
- * @property Carrier $carrier
- * @property Service $service
+ * @property Carrier           $carrier
+ * @property Service           $service
+ * @property ShipmentPackage[] $packages
+ * @property string            $mergedLabelsData
+ * @property string            $mergedLabelsFormat
  *
  * @package common\models\shipping
  */
 class Shipment extends BaseShipment
 {
+
+    const WEIGHT_UNITS_LB = 'LB';
+    const WEIGHT_UNITS_KG = 'KG';
+    const DIM_UNITS_IN    = 'IN';
+    const DIM_UNITS_CM    = 'CM';
 
     /**
      * Carrier
@@ -33,6 +41,20 @@ class Shipment extends BaseShipment
      * @var Service
      */
     public $service = null;
+
+    /**
+     * Contains all merged package labels file data in base64
+     *
+     * @var string
+     */
+    public $mergedLabelsData = '';
+
+    /**
+     * File format of the merged package labels data in base64. eg: PDF
+     *
+     * @var string
+     */
+    public $mergedLabelsFormat = '';
 
     /**
      * Calculated rates
@@ -377,5 +399,21 @@ class Shipment extends BaseShipment
                 $e->getMessage() . " - in ShipmentPlugin::{$this->plugin->getPluginName()}::ship()"
             );
         }
+    }
+
+    /**
+     * Get shipment master tracking number
+     *
+     * @return bool|string
+     */
+    public function getMasterTracking()
+    {
+        $firstPackage = $this->packages[0] ?? null;
+
+        if (!$firstPackage) {
+            return false;
+        }
+
+        return $firstPackage->master_tracking_num;
     }
 }

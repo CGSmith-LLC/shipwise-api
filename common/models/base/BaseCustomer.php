@@ -12,6 +12,8 @@ namespace common\models\base;
  * @property string               $city     City
  * @property int                  $state_id State ID
  * @property string               $zip      ZIP code
+ * @property string               $phone    Phone number
+ * @property string               $email    Email address
  * @property string               $logo     The absolute URL of the logo
  * @property string               $created_date
  *
@@ -40,7 +42,8 @@ class BaseCustomer extends \yii\db\ActiveRecord
             [['name'], 'string', 'max' => 45],
             [['address1', 'address2', 'city'], 'string', 'max' => 64],
             [['zip'], 'string', 'max' => 16],
-            [['logo'], 'string', 'max' => 256],
+            [['phone'], 'string', 'max' => 32],
+            [['logo', 'email'], 'string', 'max' => 255],
         ];
     }
 
@@ -57,6 +60,8 @@ class BaseCustomer extends \yii\db\ActiveRecord
             'city'         => 'City',
             'state_id'     => 'State ID',
             'zip'          => 'Zip',
+            'phone'        => 'Phone',
+            'email'        => 'Email',
             'logo'         => 'Logo',
             'created_date' => 'Created Date',
         ];

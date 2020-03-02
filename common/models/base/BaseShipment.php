@@ -56,6 +56,7 @@ use yii\base\Model;
  * @property string $bill_duties_to             Bill duties (customs) to SENDER,
  *           RECIPIENT or THIRD_PARTY
  * @property string $bill_duties_account_num    The billing account number when bill_duties_to value is THIRD_PARTY
+ * @property string $external_id1               External ID 1
  */
 class BaseShipment extends Model
 {
@@ -95,6 +96,8 @@ class BaseShipment extends Model
     public $recipient_address_id;
     public $currency;
     public $insurance_amount;
+    public $reference1;
+    public $reference2;
     public $is_saturday_delivery;
     public $package_contents = 'NON_DOCUMENTS';
     public $package_doc_type;
@@ -106,6 +109,7 @@ class BaseShipment extends Model
     public $bill_transport_account_num;
     public $bill_duties_to = 'RECIPIENT';
     public $bill_duties_account_num;
+    public $external_id1;
 
     /**
      * {@inheritdoc}
@@ -168,6 +172,7 @@ class BaseShipment extends Model
                     'recipient_email',
                     'dangerous_goods_types',
                     'package_type',
+                    'external_id1',
                 ],
                 'string',
                 'max' => 80,
@@ -251,6 +256,7 @@ class BaseShipment extends Model
             'is_dangerous_goods'       => 'Is Dangerous Goods',
             'dangerous_goods_types'    => 'Dangerous Goods Types',
             'is_flat_rate'             => 'Is Flat Rate',
+            'external_id1'             => 'External ID 1',
         ];
     }
 }

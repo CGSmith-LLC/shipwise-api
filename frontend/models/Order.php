@@ -32,26 +32,6 @@ class Order extends BaseOrder
     }
 
     /**
-     * Get carrier
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCarrier()
-    {
-        return $this->hasOne('common\models\shipping\Carrier', ['id' => 'carrier_id']);
-    }
-
-    /**
-     * Get carrier service
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getService()
-    {
-        return $this->hasOne('common\models\shipping\Service', ['id' => 'service_id']);
-    }
-
-    /**
      * @inheritdoc
      */
     public function beforeDelete()

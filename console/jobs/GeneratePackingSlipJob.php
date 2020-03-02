@@ -7,6 +7,7 @@ use common\pdf\OrderPackingSlip;
 use Exception;
 use Yii;
 use yii\base\BaseObject;
+use yii\helpers\Json;
 use yii\queue\JobInterface;
 
 /**
@@ -49,11 +50,13 @@ class GeneratePackingSlipJob extends BaseObject implements JobInterface
             $bulkItem->base64_filedata = base64_encode($pdf->Output('S'));
             $bulkItem->base64_filetype = 'PDF';
             $bulkItem->status          = BulkItem::STATUS_DONE;
+
         } catch (Exception $ex) {
             Yii::error($ex);
             $bulkItem->status = BulkItem::STATUS_ERROR;
+            $bulkItem->errors = Json::encode($ex->getMessage());
         } finally {
-            $bulkItem->save();
+            $bulkItem->save(false);
         }
     }
 }

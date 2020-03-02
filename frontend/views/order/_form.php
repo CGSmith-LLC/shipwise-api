@@ -242,8 +242,7 @@ ob_start(); // output buffer the javascript to register later ?>
 
             dropdown.attr('disabled', 'disabled');
 
-            $.get(url, function ( response ) {
-                var items = JSON.parse(response);
+            $.get({url: url, dataType: 'json'}, function ( items ) {
                 populateDropdown(dropdown, items, true);
                 if (previousValue && (0 != dropdown.find('option[value=' + previousValue + ']').length)) {
                     dropdown.val(previousValue);
