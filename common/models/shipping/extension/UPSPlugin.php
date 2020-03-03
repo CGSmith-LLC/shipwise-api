@@ -1216,7 +1216,7 @@ class UPSPlugin extends ShipmentPlugin
              * Convert GIF to PDF and merge into one file, then delete all temp files.
              */
             if (!empty($tmpFiles)) {
-                $mergedFilename = "tmp_merged_" . $packages[0]->master_tracking_num . ".pdf";
+                $mergedFilename = $packages[0]->master_tracking_num . ".pdf";
                 exec("convert " . implode(" ", $tmpFiles) . " $mergedFilename");
                 $this->shipment->mergedLabelsData   = base64_encode(file_get_contents($mergedFilename));
                 $this->shipment->mergedLabelsFormat = 'PDF';

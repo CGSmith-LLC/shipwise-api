@@ -133,145 +133,130 @@ class OrderPackingSlip extends \FPDF
         $this->Cell(0, $cellH, $txt, 0, 2);
         $txt = $order->customer->city . ', ' . $order->customer->state->abbreviation . ' ' . $order->customer->zip;
         $this->Cell(0, $cellH, $txt, 0, 2);
+        $this->Cell(0, $cellH, $order->customer->country, 0, 2);
         $this->ln(3);
         $this->setX($this->marginLeft);
 
-        // @todo from here..
+        /**
+         * Ship To
+         */
+        $cellH = 3.5; // cell height
+        $cellW = 44; // cell width
+        $this->setFont($this->fontFamily, 'B', $this->fontSize - 1);
+        $y = $this->GetY();
+        $this->Cell($cellW, $cellH + 1, "Ship To:", 0, 2);
+        $this->setFont($this->fontFamily, '', $this->fontSize - 2);
+        $this->MultiCell($cellW, $cellH, $order->address->name);
+        $txt = $order->address->address1 . ' ' . $order->address->address2;
+        $this->MultiCell($cellW, $cellH, $txt);
+        $txt = $order->address->city . ', ' . $order->address->state->abbreviation . ' ' . $order->address->zip;
+        $this->MultiCell($cellW, $cellH, $txt);
+        $this->Cell($cellW, $cellH, $order->address->country, 0, 2);
 
         /**
-         * Recipient address line 1
+         * Order and tracking details
          */
-        $this->setFont($this->fontFamily, '', 9);
-        $this->Cell(69, 4, $order->address->address1, 0, 2);
+        $this->SetXY($this->pageWidth / 2 + 3, $y);
+        $this->setFont($this->fontFamily, 'B', $this->fontSize - 1);
+        $cellH = 3.7;
+        $cellW = 20; // cell width
+        $this->Cell($cellW, $cellH, "Order #:", 0, 2, 'R');
+        $this->Cell($cellW, $cellH, "Order Date:", 0, 2, 'R');
+        $this->Cell($cellW, $cellH, "Shipped Via:", 0, 2, 'R');
+        $this->Cell($cellW, $cellH, "Tracking #:", 0, 2, 'R');
+
+        $this->SetXY($this->pageWidth / 2 + $cellW + 2, $y);
+        $cellW = 27; // cell width
+        $this->setFont($this->fontFamily, '', $this->fontSize - 1);
+        $this->Cell($cellW, $cellH, $order->customer_reference, 0, 2);
+        $date = new DateTime($order->created_date);
+        $this->Cell($cellW, $cellH, $date->format("m/d/Y"), 0, 2);
+        $this->Cell($cellW, $cellH, $order->carrier->name ?? '', 0, 2);
+        $this->MultiCell($cellW, $cellH, $order->tracking ?? '');
+
+        $this->SetX($this->marginLeft);
+        $this->ln(5);
 
         /**
-         * Recipient address line 2
+         * Items
          */
-        $this->Cell(69, 4, $order->address->address2, 0, 2);
 
-        /**
-         * Recipient suburb
-         */
-        $this->setFont($this->fontFamily, 'B', 11);
-        $this->Cell(69, 4, $order->address->city, 0, 2);
+        // Column headings
+        $header = [
+            "ITEMS",
+            "QTY",
+            "SKU",
+        ];
 
-        /**
-         * Recipient state, postcode
-         */
-        $txt = $order->address->state_id . ", " . $order->address->zip;
-        $this->Cell(40, 4, $txt, 0, 0);
+        // Data
+        $data = [];
+        if (is_array($order->items) && count($order->items) > 0) {
+            $idx = 0;
+            foreach ($order->items as $item) {
+                $data[$idx] = [
+                    $item->name,
+                    $item->quantity,
+                    $item->sku,
+                ];
+                $idx++;
+            }
+        }
 
-        /**
-         * Recipient phone number (label)
-         */
-        $this->setFont($this->fontFamily, 'B', 7);
-        $this->Cell(25, 4, "Customer Contact:", 0, 1);
+        $this->drawItemsTable($header, $data);
+    }
 
-        /**
-         * Recipient country (not necessary for domestic)
-         */
-        $this->setX($this->marginLeft);
-        $this->setFont($this->fontFamily, 'B', 7);
-        $txt = $order->address->name;
-        $this->Cell(40, 3, $txt, 0, 0);
+    /**
+     * @param array $header
+     * @param array $data
+     */
+    protected function drawItemsTable($header, $data)
+    {
 
-        /**
-         * Recipient phone number (value)
-         */
+        // Column widths
+        $w = [60, 10, 20];
+        // Column aligns
+        $align = ['L', 'C', 'L'];
+
+        // Header
+        $this->setFont($this->fontFamily, 'B', 8);
+        for ($i = 0; $i < count($header); $i++) {
+            $x = $this->GetX();
+            $y = $this->GetY();
+            $this->MultiCell($w[$i], 4, $header[$i], 0, $align[$i]);
+            $this->SetXY($x + $w[$i], $y);
+        }
+        $this->Ln(5);
+        $this->Line(
+            $this->marginLeft,
+            $this->GetY(),
+            $this->pageWidth + $this->marginRight,
+            $this->GetY()
+        );
+        $this->Ln(1);
+
+        // Data
         $this->setFont($this->fontFamily, '', 7);
-        $this->Cell(29, 3, $order->address->phone, 0, 1);
+        foreach ($data as $i => $row) {
+            $this->setFont($this->fontFamily, '', 8);
+            foreach ($row as $k => $col) {
+                $this->Cell($w[$k], 4.5, $row[$k], 0, 0, $align[$k]);
+            }
+            $this->Ln();
+        }
 
         /**
-         * Special Delivery Instructions
+         * Totals row
          */
-        $this->setX($this->marginLeft);
-        $this->Cell(69, 2.5, " ", 0, 2);
-        $this->setFont($this->fontFamily, 'B', 7);
-        $this->Cell(69, 3, "Special Instructions:", 0, 2);
-        $this->setFont($this->fontFamily, '', 6);
-
-        /**
-         * Sender (label)
-         */
-        $this->setX($this->marginLeft);
-        $this->Cell(69, 3, " ", 0, 2);
-        $this->setFont($this->fontFamily, 'B', 7);
-        $this->Cell(30, 3, "From:", 0, 0);
-
-        /**
-         * Sender account number
-         */
-        $txt = "Account #: " . $order->address->name;
-        $this->Cell(39, 3, $txt, 0, 1);
-
-        /**
-         * Sender business name
-         */
-        $this->setX($this->marginLeft);
-        $this->setFont($this->fontFamily, '', 6.5);
-        $this->Cell(69, 2.5, $order->address->name, 0, 2);
-
-        /**
-         * Sender address line 1
-         */
-        $this->Cell(69, 2.5, $order->address->name, 0, 2);
-
-        /**
-         * Sender address line 2
-         */
-        $this->Cell(69, 2.5, $order->address->name, 0, 2);
-
-        /**
-         * Sender suburb, state, postcode
-         */
-        $txt = $order->address->name;
-        $this->Cell(69, 2.5, $txt, 0, 2);
-
-        /**
-         * Sender country (not necessary for domestic)
-         */
-        $txt = $order->address->name;
-        $this->Cell(69, 2.5, $txt, 0, 2);
-
-        /**
-         * Sender contact & phone
-         */
-        $this->Cell(69, 3, " ", 0, 2);
-        $this->setFont($this->fontFamily, 'B', 6.5);
-        $this->Cell(69, 2.5, "For any Issues, Please Contact:", 0, 2);
-        $this->setFont($this->fontFamily, '', 6.5);
-        $txt = "{$order->address->phone}, 123";
-        $this->Cell(69, 2.5, $txt, 0, 2);
-
-        /**
-         * Description of goods
-         */
-        $this->Cell(69, 2, " ", 0, 2);
-        $this->setFont($this->fontFamily, 'B', 6.5);
-        $this->Cell(25, 2.5, "Description of Goods:", 0, 0);
-        $this->setFont($this->fontFamily, '', 6.5);
-        $this->Cell(44, 2.5, "Non-Hazardous Cargo", 0, 2);
-
-
-        /**
-         * Item no.
-         */
-        $this->Cell(69, 3, " ", 0, 2);
-        $this->setX(60);
-        $this->setFont($this->fontFamily, 'B', 6.5);
-        $this->Cell(10, 3, "Item no.", 0, 2);
-        $this->Cell(30, 3, $order->tracking, 0, 2);
-
-        /**
-         * Sender declaration
-         */
-        $this->setX($this->marginLeft);
-        $this->setFont($this->fontFamily, 'B', 7);
-        $this->Cell(24, 3, "DECLARATION BY:", 0, 0);
-        $this->setFont($this->fontFamily, '', 7);
-        $this->Cell(56, 3, $order->address->name, 0, 0);
-
-
+        $this->Line(
+            $this->marginLeft,
+            $this->GetY(),
+            $this->pageWidth + $this->marginRight,
+            $this->GetY()
+        );
+        $this->setFont($this->fontFamily, 'B', $this->fontSize - 1);
+        $this->Cell(17, 9, 'Total Items: ');
+        $this->setFont($this->fontFamily, '', $this->fontSize - 1);
+        $this->Cell(0, 9, count($data));
     }
 
     /**

@@ -315,6 +315,6 @@ class OrderController extends Controller
         $order->save(false);
 
         return Yii::$app->response->sendContentAsFile(base64_decode($shipment->mergedLabelsData),
-            "ShippingLabel_{$order->customer_reference}." . $shipment->mergedLabelsFormat);
+            "$order->tracking." . $shipment->mergedLabelsFormat);
     }
 }
