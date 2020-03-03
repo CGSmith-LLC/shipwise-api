@@ -14,7 +14,7 @@ class PackageEx extends Package
 
     /**
      * @SWG\Definition(
-     *     definition = "Package",
+     *     definition = "Package Shipped",
      *
      *     @SWG\Property( property = "id", type = "integer", description = "Package ID" ),
      *     @SWG\Property( property = "tracking", type = "string", description = "Tracking Number" ),
