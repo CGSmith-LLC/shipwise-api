@@ -9,6 +9,11 @@ use yii\base\Model;
  *     definition = "ItemForm",
  *     required   = { "quantity", "sku" },
  *     @SWG\Property(
+ *            property = "uuid",
+ *            type = "string",
+ *            description = "UUID of item from ecommerce system"
+ *        ),
+ *     @SWG\Property(
  *            property = "quantity",
  *            type = "integer",
  *            description = "Quantity"
@@ -38,6 +43,8 @@ use yii\base\Model;
 class ItemForm extends Model
 {
 
+    /** @var string */
+    public $uuid;
     /** @var int */
     public $quantity;
     /** @var string */
@@ -54,6 +61,7 @@ class ItemForm extends Model
             [['quantity', 'sku'], 'required', 'message' => '{attribute} is required.'],
             ['quantity', 'integer'],
             ['quantity', 'compare', 'compareValue' => 0, 'operator' => '>'],
+            ['uuid', 'string', 'length' => [1, 64]],
             ['sku', 'string', 'length' => [2, 64]],
             ['name', 'string', 'length' => [2, 128]],
         ];

@@ -313,6 +313,7 @@ class OrderController extends ControllerEx
             foreach ($orderForm->items as $formItem) {
                 $item           = new ItemEx();
                 $item->order_id = $order->id;
+                $item->uuid     = $formItem->uuid;
                 $item->sku      = $formItem->sku;
                 $item->quantity = $formItem->quantity;
                 $item->name     = $formItem->name;

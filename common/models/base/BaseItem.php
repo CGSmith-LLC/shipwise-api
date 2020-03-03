@@ -6,6 +6,7 @@ namespace common\models\base;
  * This is the model class for table "items".
  *
  * @property int    $id
+ * @property string $uuid
  * @property int    $order_id
  * @property int    $quantity
  * @property string $sku
@@ -30,7 +31,7 @@ class BaseItem extends \yii\db\ActiveRecord
         return [
             [['order_id', 'quantity', 'sku'], 'required'],
             [['order_id', 'quantity'], 'integer'],
-            ['sku', 'string', 'max' => 64],
+            [['sku', 'uuid'], 'string', 'max' => 64],
             ['name', 'string', 'max' => 128],
         ];
     }
