@@ -40,13 +40,15 @@ use api\modules\v1\models\order\StatusEx;
  *     @SWG\Property(
  *            property = "status",
  *            type = "integer",
- *            enum = {1,8,9,10},
+ *            enum = {1,7,8,9,10,11},
  *            default = "9",
  *            description = "Order status
  *                    1  - Shipped
+ *                    7  - Cancelled
  *                    8  - Pending Fulfillment
  *                    9  - Open
- *                    10 - WMS Error",
+ *                    10 - WMS Error
+ *                    11 - Completed",
  *       ),
  *     @SWG\Property(
  *            property = "items",
@@ -57,6 +59,13 @@ use api\modules\v1\models\order\StatusEx;
  *            property = "uuid",
  *            type = "string",
  *            description = "Unique identifier from ecommerce platform",
+ *            minLength = 1,
+ *            maxLength = 64
+ *        ),
+ *     @SWG\Property(
+ *            property = "poNumber",
+ *            type = "string",
+ *            description = "PO number from ecommerce platform. Useful for the 3PL to look up information.",
  *            minLength = 1,
  *            maxLength = 64
  *        ),
@@ -93,6 +102,8 @@ class OrderForm extends Model
     /** @var string */
     public $uuid;
     /** @var string */
+    public $poNumber;
+    /** @var string */
     public $origin;
     /** @var string */
     public $carrier_id;
@@ -124,7 +135,7 @@ class OrderForm extends Model
                 'required',
                 'message' => '{attribute} is required.',
             ],
-            [['uuid', 'origin', 'customerReference'], 'string', 'length' => [1, 64]],
+            [['poNumber', 'uuid', 'origin', 'customerReference'], 'string', 'length' => [1, 64]],
             ['orderReference', 'string', 'length' => [1, 45]],
             ['requestedShipDate', 'date', 'format' => 'php:Y-m-d'],
             ['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],

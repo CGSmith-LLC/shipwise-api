@@ -15,6 +15,7 @@ namespace common\models\base;
  * @property string $updated_date
  * @property int    $address_id
  * @property string $notes
+ * @property string $po_number
  * @property string $uuid
  * @property string $origin
  * @property string $requested_ship_date
@@ -44,6 +45,7 @@ class BaseOrder extends \yii\db\ActiveRecord
             [['order_reference', 'tracking'], 'string', 'max' => 45],
             [['customer_reference', 'origin'], 'string', 'max' => 64],
             [['notes'], 'string', 'max' => 140],
+            [['po_number'], 'string', 'max' => 64],
         ];
     }
 
