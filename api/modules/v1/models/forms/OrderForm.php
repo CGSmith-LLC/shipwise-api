@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\models\forms;
 
+use common\models\State;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use api\modules\v1\models\order\StatusEx;
@@ -184,6 +185,12 @@ class OrderForm extends Model
         // Initialize and validate AddressForm object
         if (isset($this->shipTo)) {
             $values       = (array)$this->shipTo;
+            // If stateId is not set but state exists then try to reference the state's value in the DB
+            if (isset($values['state']) && !isset($values['stateId'])) {
+                $lookup = (strlen($values['state']) == 2) ? 'abbreviation' : 'name';
+                $state = State::find()->where([$lookup => $values['state']])->one();
+                $values['stateId'] = $state->id;
+            }
             $this->shipTo = new AddressForm();
             $this->shipTo->setAttributes($values);
             $allValidated = $allValidated && $this->shipTo->validate();
