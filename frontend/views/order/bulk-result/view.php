@@ -59,6 +59,7 @@ YiiAsset::register($this);
                 //'order_id',
                 'order.customer_reference',
                 //'order.address.name',
+                'job',
                 [
                     'attribute' => 'status',
                     'format'    => 'raw',
@@ -89,6 +90,8 @@ YiiAsset::register($this);
 <?php
 $this->registerJs("
     var refreshIntervalId;
+    var docsToPrint = [];
+    
     function stopRefreshing() {
         clearInterval(refreshIntervalId);
     }

@@ -9,6 +9,8 @@ use yii\helpers\ArrayHelper;
 /**
  * Class Service
  *
+ * @property Carrier $carrier
+ *
  * @package common\models\shipping
  */
 class Service extends BaseService
@@ -72,7 +74,7 @@ class Service extends BaseService
      *
      * @param string $code Service ShipWise code.
      *
-     * @return array|\yii\db\ActiveRecord|null
+     * @return array|Service|null
      */
     public static function findByShipWiseCode($code)
     {

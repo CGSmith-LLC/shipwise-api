@@ -175,12 +175,9 @@ class Order extends BaseOrder
             $shipment->addPackage($_pkg);
         }
 
-        // Carrier & service codes
-        $shipment->carrier = $this->carrier;
+        // Shipping carrier & service
         $shipment->service = $this->service;
-        if ($shipment->service && !$shipment->carrier) {
-            $shipment->carrier = $this->service->carrier_id;
-        }
+        $shipment->carrier = $this->service->carrier;
 
         // Invoke carrier API call
         try {

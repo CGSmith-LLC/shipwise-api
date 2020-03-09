@@ -298,6 +298,13 @@ class OrderController extends Controller
     {
         $order = $this->findModel($id);
 
+        if (empty($order->service)) {
+            // @todo Implement here your biz logic for carrier service selection
+            $service           = Service::findByShipWiseCode('UPSGround');
+            $order->service_id = $service->id;
+            $order->carrier_id = $service->carrier_id;
+        }
+
         try {
             $shipment = $order->createShipment();
         } catch (\Exception $e) {

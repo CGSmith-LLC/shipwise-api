@@ -2,7 +2,7 @@
 
 namespace console\jobs;
 
-use common\models\{BulkItem, Order, Status};
+use common\models\{BulkItem, Order, shipping\Service, Status};
 use Exception;
 use Yii;
 use yii\base\BaseObject;
@@ -40,6 +40,13 @@ class CreateShippingLabelJob extends BaseObject implements JobInterface
         // Find bulk item
         if (($bulkItem = BulkItem::findOne($this->bulkItemId)) === null) {
             throw new Exception("Bulk item not found for ID {$this->bulkItemId}");
+        }
+
+        if (empty($order->service)) {
+            // @todo Implement here your biz logic for carrier service selection
+            $service           = Service::findByShipWiseCode('UPSGround');
+            $order->service_id = $service->id;
+            $order->carrier_id = $service->carrier->id;
         }
 
         // Create Shipping Label, update order tracking, save label as base64 data

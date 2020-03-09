@@ -216,7 +216,9 @@ class BulkAction extends BaseBulkAction
      */
     private function packingSlips($params = null)
     {
-        return $this->asyncExecute('console\jobs\GeneratePackingSlipJob', $params);
+        $bulkAction = $this->createBulkAction();
+
+        return $this->asyncExecute($bulkAction, 'GeneratePackingSlipJob', $params);
     }
 
     /**
@@ -234,29 +236,72 @@ class BulkAction extends BaseBulkAction
      */
     private function shippingLabels($params = null)
     {
-        return $this->asyncExecute('console\jobs\CreateShippingLabelJob', $params);
+        $bulkAction = $this->createBulkAction();
+
+        return $this->asyncExecute($bulkAction, 'CreateShippingLabelJob', $params);
     }
 
     /**
+     * Print packing slips AND Print shipping labels
+     *
+     * Triggers creation of packing slips for each order.
+     * Triggers creation of shipping label for each order.
+     *
      * This function will execute orders asynchronously by adding them to a queue to be executed by job workers in
      * background.
      * A Bulk Action object is created to track process.
      *
-     * @param string     $jobClass The class name of the job to be added to the queue
-     *                             eg. `console\jobs\GeneratePackingSlipJob`
-     * @param array|null $params   Optional
+     * @param array|null $params Optional
      *
      * @return bool|int False on failure, Integer on success
      */
-    private function asyncExecute($jobClass, $params = null)
+    private function shippingLabelsPackingSlips($params = null)
     {
-        $bulkAction       = new parent();
+        $bulkAction = $this->createBulkAction();
+
+        $job1 = $this->asyncExecute($bulkAction, 'CreateShippingLabelJob', $params);
+        $job2 = $this->asyncExecute($bulkAction, 'GeneratePackingSlipJob', $params);
+
+        return ($job1 && $job2) ? self::EXECUTION_TYPE_ASYNC : false;
+    }
+
+    /**
+     * Bulk Action instance to track process.
+     *
+     * @return BaseBulkAction
+     */
+    private function createBulkAction()
+    {
+        $bulkAction       = new BaseBulkAction();
         $bulkAction->code = $this->action;
         $bulkAction->name = self::readable($this->action);
         if (!$bulkAction->save()) {
             Yii::warning("Failed to save Bulk Action.");
             Yii::warning($bulkAction->attributes);
             Yii::warning($bulkAction->getErrors());
+        }
+        return $bulkAction;
+    }
+
+    /**
+     * This function will execute orders asynchronously by adding them to a queue to be executed by job workers in
+     * background.
+     * Use Bulk Action to track process.
+     *
+     * @param BaseBulkAction $bulkAction
+     * @param string         $jobClassName The class name of the console job to be added to the queue
+     *                                     eg. `GeneratePackingSlipJob`
+     * @param array|null     $params       Optional
+     *
+     * @return bool|int False on failure, Integer on success
+     */
+    private function asyncExecute($bulkAction, $jobClassName, $params = null)
+    {
+        $jobClass = "\\console\\jobs\\{$jobClassName}";
+
+        if (!class_exists($jobClass)) {
+            $this->addError('action', 'Job class not found');
+            return false;
         }
 
         try {
@@ -269,6 +314,7 @@ class BulkAction extends BaseBulkAction
 
                     $bulkItem->bulk_action_id = $bulkAction->id;
                     $bulkItem->order_id       = $order->id;
+                    $bulkItem->job            = $jobClassName;
 
                     if (!$bulkItem->save()) {
                         Yii::warning("Failed to save Bulk Action.");
