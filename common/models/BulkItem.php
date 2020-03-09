@@ -53,6 +53,14 @@ class BulkItem extends BaseBulkItem
         return self::$statusColors[$this->status];
     }
 
+    /**
+     * @return bool
+     */
+    public function isDone()
+    {
+        return $this->status == self::STATUS_DONE;
+    }
+
     /** @inheritdoc */
     public function afterSave($insert, $changedAttributes)
     {
