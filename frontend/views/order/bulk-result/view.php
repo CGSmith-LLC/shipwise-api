@@ -184,13 +184,12 @@ $this->registerJs("
         console.log('printDoc: ' + key + ' ' + docType);
         
         var config = qz.configs.create(printerFound);
-        var data = [{ 
-           type: 'pixel',
-           format: docType.toLowerCase(),
-           flavor: 'base64',
+        var data = [{
+           type: docType.toLowerCase(),
+           format: 'base64',
            data: docData 
         }];
-        //qz.print(config, data).catch(function(e) { console.error(e); });
+        qz.print(config, data).catch(function(e) { console.error(e); });
     }
     
     // Reprint all documents
