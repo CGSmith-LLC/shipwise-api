@@ -109,7 +109,7 @@ QZAsset::register($this);
 $this->registerJs("
     var refreshIntervalId,
         docsToPrint = {},
-        printerToFind = \"Microsoft Print to PDF\",
+        printerToFind = 'rollo',
         printerFound,
         qz;
     
