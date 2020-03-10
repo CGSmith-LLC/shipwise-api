@@ -37,6 +37,3 @@ phpunit.phar
 # Persistent data in Docker volumes
 /mysql-data
 
-# generated files
-/common/files/packing-slips
-/common/files/shipping-labels
