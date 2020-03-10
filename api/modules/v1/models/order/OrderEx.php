@@ -41,6 +41,7 @@ class OrderEx extends Order
      *     @SWG\Property( property = "status", ref = "#/definitions/Status" ),
      *     @SWG\Property( property = "history", ref = "#/definitions/OrderHistory" ),
      *     @SWG\Property( property = "customer", ref = "#/definitions/Customer" ),
+     *     @SWG\Property( property = "poNumber", type = "string", description = "PO Number of ecommerce customer" ),
      *     @SWG\Property( property = "uuid", type = "string", description = "Reference to ecommerce UUID" ),
      *     @SWG\Property( property = "origin", type = "string", description = "Origination of order. Such as
     SquareSpace or Zoho" ),
@@ -73,8 +74,11 @@ class OrderEx extends Order
             'service_name'      => function () {
                 return $this->service['name'];
             },
+            'poNumber'          => 'po_number',
             'uuid'              => 'uuid',
             'origin'            => 'origin',
+            'packages'          => 'packages',
+            'packages.items'    => 'packageItems',
         ];
     }
 
@@ -113,6 +117,17 @@ class OrderEx extends Order
     {
         return $this->hasMany('api\modules\v1\models\order\OrderHistoryEx', ['order_id' => 'id']);
     }
+
+    /**
+     * Get packages from the order
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPackages()
+    {
+        return $this->hasMany('api\modules\v1\models\order\PackageEx', ['order_id' => 'id']);
+    }
+
 
     /**
      * Get Items

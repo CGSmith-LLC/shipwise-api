@@ -16,6 +16,7 @@ use Yii;
  * @property Address        $address
  * @property TrackingInfo   $trackingInfo
  * @property Item[]         $items
+ * @property Package[]      $packages
  * @property Status         $status
  * @property OrderHistory[] $history
  * @property Carrier        $carrier
@@ -94,6 +95,7 @@ class Order extends BaseOrder
     }
 
     /**
+     * <<<<<<< HEAD
      * Get carrier
      *
      * @return \yii\db\ActiveQuery
@@ -194,5 +196,20 @@ class Order extends BaseOrder
         }
 
         return $shipment;
+    }
+
+    /* Get Order Packages
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPackages()
+    {
+        return $this->hasMany('common\models\Package', ['order_id' => 'id']);
+    }
+
+    public function getPackageItems()
+    {
+        return $this->hasMany('common\models\PackageItem', ['package_id' => 'id'])
+            ->via('packages');
     }
 }

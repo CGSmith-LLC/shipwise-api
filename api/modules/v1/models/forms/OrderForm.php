@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\models\forms;
 
+use common\models\State;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use api\modules\v1\models\order\StatusEx;
@@ -40,13 +41,15 @@ use api\modules\v1\models\order\StatusEx;
  *     @SWG\Property(
  *            property = "status",
  *            type = "integer",
- *            enum = {1,8,9,10},
+ *            enum = {1,7,8,9,10,11},
  *            default = "9",
  *            description = "Order status
  *                    1  - Shipped
+ *                    7  - Cancelled
  *                    8  - Pending Fulfillment
  *                    9  - Open
- *                    10 - WMS Error",
+ *                    10 - WMS Error
+ *                    11 - Completed",
  *       ),
  *     @SWG\Property(
  *            property = "items",
@@ -57,6 +60,13 @@ use api\modules\v1\models\order\StatusEx;
  *            property = "uuid",
  *            type = "string",
  *            description = "Unique identifier from ecommerce platform",
+ *            minLength = 1,
+ *            maxLength = 64
+ *        ),
+ *     @SWG\Property(
+ *            property = "poNumber",
+ *            type = "string",
+ *            description = "PO number from ecommerce platform. Useful for the 3PL to look up information.",
  *            minLength = 1,
  *            maxLength = 64
  *        ),
@@ -93,6 +103,8 @@ class OrderForm extends Model
     /** @var string */
     public $uuid;
     /** @var string */
+    public $poNumber;
+    /** @var string */
     public $origin;
     /** @var string */
     public $carrier_id;
@@ -124,7 +136,7 @@ class OrderForm extends Model
                 'required',
                 'message' => '{attribute} is required.',
             ],
-            [['uuid', 'origin', 'customerReference'], 'string', 'length' => [1, 64]],
+            [['poNumber', 'uuid', 'origin', 'customerReference'], 'string', 'length' => [1, 64]],
             ['orderReference', 'string', 'length' => [1, 45]],
             ['requestedShipDate', 'date', 'format' => 'php:Y-m-d'],
             ['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
@@ -173,6 +185,12 @@ class OrderForm extends Model
         // Initialize and validate AddressForm object
         if (isset($this->shipTo)) {
             $values       = (array)$this->shipTo;
+            // If stateId is not set but state exists then try to reference the state's value in the DB
+            if (isset($values['state']) && !isset($values['stateId'])) {
+                $lookup = (strlen($values['state']) == 2) ? 'abbreviation' : 'name';
+                $state = State::find()->where([$lookup => $values['state']])->one();
+                $values['stateId'] = $state->id;
+            }
             $this->shipTo = new AddressForm();
             $this->shipTo->setAttributes($values);
             $allValidated = $allValidated && $this->shipTo->validate();

@@ -18,9 +18,10 @@ return [
         "class"         => 'yii\rest\UrlRule',
         "controller"    => ["$version/order"],
         "extraPatterns" => [
-            "GET  {id}/items"   => "items",
-            "GET  findbystatus" => "findbystatus",
-            "GET  find"         => "find",
+            "GET  {id}/items"    => "items",
+            "GET  {id}/packages" => "packages",
+            "GET  findbystatus"  => "findbystatus",
+            "GET  find"          => "find",
         ],
     ],
 

@@ -61,6 +61,8 @@ $item->loadDefaultValues();
 
                         <?= $form->field($model->order, 'customer_reference')->textInput(['maxlength' => true]) ?>
 
+                        <?= $form->field($model->order, 'po_number')->textInput(['maxlength' => true]) ?>
+
                         <?php
                         if (Yii::$app->user->identity->getIsAdmin()) {
                            echo $form->field($model->order, 'order_reference')->textInput(['maxlength' => true]);

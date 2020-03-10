@@ -33,6 +33,7 @@ class OrderController extends ControllerEx
             'view'         => ['GET'],
             'delete'       => ['DELETE'],
             'items'        => ['GET'],
+            'packages'     => ['GET'],
             'findbystatus' => ['GET'],
             'find'         => ['GET'],
         ];
@@ -256,6 +257,7 @@ class OrderController extends ControllerEx
             $order                      = new OrderEx();
             $order->customer_id         = $this->apiConsumer->customer->id;
             $order->uuid                = $orderForm->uuid;
+            $order->po_number           = $orderForm->poNumber;
             $order->origin              = $orderForm->origin;
             $order->carrier_id          = $orderForm->carrier_id;
             $order->service_id          = $orderForm->service_id;
@@ -312,6 +314,7 @@ class OrderController extends ControllerEx
             foreach ($orderForm->items as $formItem) {
                 $item           = new ItemEx();
                 $item->order_id = $order->id;
+                $item->uuid     = $formItem->uuid;
                 $item->sku      = $formItem->sku;
                 $item->quantity = $formItem->quantity;
                 $item->name     = $formItem->name;
@@ -585,6 +588,7 @@ class OrderController extends ControllerEx
              * Update order.
              */
             $order->order_reference    = $orderForm->orderReference;
+            $order->po_number          = $orderForm->poNumber;
             $order->customer_reference = $orderForm->customerReference;
             $order->status_id          = $orderForm->status;
 
@@ -795,6 +799,28 @@ class OrderController extends ControllerEx
     }
 
     /**
+     * Get packages of a specific order
+     *
+     * @param int $id Order ID
+     *
+     * @return array|\api\modules\v1\models\order\PackageEx
+     */
+    public function actionPackages($id)
+    {
+        if (($order = OrderEx::find()
+                ->byId($id)
+                ->forCustomer($this->apiConsumer->customer->id)
+                ->with('packages.items')
+                ->asArray()
+                ->one()
+        ) === null) {
+            return $this->errorMessage(404, 'Order not found');
+        }
+
+        return $this->success($order['packages']);
+    }
+
+    /**
      * @SWG\Get(
      *     path = "/orders/findbystatus",
      *     tags = { "Orders" },
@@ -951,7 +977,8 @@ class OrderController extends ControllerEx
 
         $query = OrderEx::find()
             ->forCustomer($customerId)
-            ->byStatus($statusId);
+            ->byStatus($statusId)
+            ->with('packages.items');
         /**
          * Select by updated date and/or created date
          */

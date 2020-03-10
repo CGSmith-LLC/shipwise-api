@@ -57,6 +57,7 @@ YiiAsset::register($this);
                     'origin',
                     'created_date:datetime',
                     'updated_date:datetime',
+                    'po_number',
                 ],
             ]) ?>
         </div>
@@ -83,8 +84,10 @@ YiiAsset::register($this);
                 ]) ?>
             <?php endif; ?>
         </div>
+    </div>
 
-        <div class="col-md-3">
+    <div class="row">
+        <div class="col-md-12">
             <h2>Items (<?= count($model->items) ?? null ?>)</h2>
             <?php
             if ($model->items) :
