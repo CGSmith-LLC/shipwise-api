@@ -100,9 +100,16 @@ class Order extends BaseOrder
         return $this->hasMany('common\models\Package', ['order_id' => 'id']);
     }
 
+
     public function getPackageItems()
     {
         return $this->hasMany('common\models\PackageItem', ['package_id' => 'id'])
             ->via('packages');
+    }
+
+    public function getLotInfo()
+    {
+        return $this->hasMany(PackageItemLotInfo::class, ['id' => 'package_id'])
+            ->via('packageItems');
     }
 }

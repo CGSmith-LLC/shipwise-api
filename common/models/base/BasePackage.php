@@ -12,6 +12,7 @@ namespace common\models\base;
  * @property string $width
  * @property string $height
  * @property string $weight
+ * @property string $created_date
  */
 class BasePackage extends \yii\db\ActiveRecord
 {

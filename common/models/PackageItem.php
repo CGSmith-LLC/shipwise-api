@@ -12,4 +12,13 @@ use common\models\base\BasePackageItem;
 class PackageItem extends BasePackageItem
 {
 
+    /**
+     * Get package items
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLotInfo()
+    {
+        return $this->hasMany('common\models\PackageItemLotInfo', ['package_item_id' => 'id']);
+    }
 }

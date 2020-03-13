@@ -3,16 +3,16 @@
 namespace common\models\base;
 
 /**
- * This is the model class for table "package_items".
+ * This is the model class for table "package_items_lot_info".
  *
  * @property int $id
- * @property int $order_id
- * @property int $package_id
+ * @property int $package_items_id
  * @property int $quantity
- * @property string $sku
- * @property string $name
+ * @property string $lot_number
+ * @property string $serial_number
+ * @property string $created_date
  */
-class BasePackageItem extends \yii\db\ActiveRecord
+class BasePackageItemLotInfo extends \yii\db\ActiveRecord
 {
 
     /**
@@ -20,7 +20,7 @@ class BasePackageItem extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'package_items';
+        return 'package_items_lot_info';
     }
 
     /**
@@ -29,10 +29,9 @@ class BasePackageItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['order_id', 'package_id', 'quantity', 'sku'], 'required'],
-            [['order_id', 'package_id', 'quantity'], 'integer'],
-            ['sku', 'string', 'max' => 64],
-            [['name'], 'string', 'max' => 128],
+            [['package_item_id', 'quantity'], 'required'],
+            [['package_item_id'], 'integer'],
+            [['lot_number', 'serial_number'], 'string', 'max' => 128],
         ];
     }
 
