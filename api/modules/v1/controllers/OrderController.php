@@ -4,6 +4,7 @@ namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
 use api\modules\v1\models\core\AddressEx;
+use api\modules\v1\models\forms\StatusForm;
 use api\modules\v1\models\order\PackageEx;
 use api\modules\v1\models\order\TrackingInfoEx;
 use api\modules\v1\models\order\ItemEx;
@@ -39,6 +40,7 @@ class OrderController extends ControllerEx
             'items'        => ['GET'],
             'packages'     => ['GET'],
             'findbystatus' => ['GET'],
+            'status'       => ['POST'],
             'find'         => ['GET'],
         ];
     }
@@ -858,7 +860,7 @@ class OrderController extends ControllerEx
 
     /**
      * @SWG\Get(
-     *     path = "/orders/findbystatus",
+     *     path = "/orders/dfindbystatus",
      *     tags = { "Orders" },
      *     summary = "Fetch orders by status",
      *     description = "Fetch orders by status for authenticated user",
@@ -1039,7 +1041,84 @@ class OrderController extends ControllerEx
         return $this->success($provider);
     }
 
+    /**
+     * @SWG\Post(
+     *     path = "/orders/{id}/status",
+     *     tags = { "Orders" },
+     *     summary = "Updates specific order with status ID",
+     *     description = "Update order with status ID that is specified",
+     *
+     *     @SWG\Parameter( name = "status", in = "path", type = "integer", required = true, description = "Status ID" ),
+     *
+     *     @SWG\Response(
+     *          response = 200,
+     *          description = "Successful operation. Response contains the order found.",
+     *          @SWG\Schema(
+     *              ref = "#/definitions/Order"
+     *            ),
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 401,
+     *          description = "Impossible to authenticate user",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 403,
+     *          description = "User is inactive",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 404,
+     *          description = "Order not found",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 500,
+     *          description = "Unexpected error",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     security = {{
+     *            "basicAuth": {}
+     *     }}
+     * )
+     */
 
+    /**
+     * Set status based on POST to the order. Easier then sending a PUT request
+     *
+     * @param int $id
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionStatus(int $id)
+    {
+        // Build the Status Form with the attributes sent in request
+        $statusForm           = new StatusForm();
+        $statusForm->setAttributes($this->request->getBodyParams());
+
+        // Validate, return errors if any
+        if (!$statusForm->validate()) {
+            return $this->unprocessableError($statusForm->getErrors());
+        }
+
+        if (($order = OrderEx::find()
+                ->byId($id)
+                ->forCustomer($this->apiConsumer->customer->id)
+                ->one()
+            ) === null) {
+            return $this->errorMessage(404, 'Order not found');
+        }else {
+            $order->status_id = $statusForm->status;
+            $order->save();
+        }
+
+        return $this->success($order);
+    }
 
     /**
      * @SWG\Get(

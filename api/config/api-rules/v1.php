@@ -21,6 +21,7 @@ return [
             "GET  {id}/items"    => "items",
             "GET  {id}/packages" => "packages",
             "GET  findbystatus"  => "findbystatus",
+            "POST {id}/status"   => "status",
             "GET  find"          => "find",
         ],
     ],
