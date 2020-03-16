@@ -2,6 +2,8 @@
 
 namespace api\modules\v1\models\forms;
 
+use api\modules\v1\models\forms\shipment\Package;
+use api\modules\v1\models\order\PackageEx;
 use common\models\State;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -120,6 +122,8 @@ class OrderForm extends Model
     public $shipTo;
     /** @var TrackingForm */
     public $tracking;
+    /** @var PackageForm[] */
+    public $packages;
     /** @var string */
     public $status;
     /** @var ItemForm[] */
@@ -148,8 +152,8 @@ class OrderForm extends Model
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
                     implode(StatusEx::getIdsAsArray(), ', '),
             ],
-            ['items', 'checkIsArray'],
-            [['tracking', 'service_id', 'carrier_id'], 'safe'],
+            [['items', 'packages'], 'checkIsArray'],
+            [['tracking', 'packages', 'service_id', 'carrier_id'], 'safe'],
         ];
     }
 

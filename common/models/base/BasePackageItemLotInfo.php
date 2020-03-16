@@ -29,8 +29,8 @@ class BasePackageItemLotInfo extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['package_item_id', 'quantity'], 'required'],
-            [['package_item_id'], 'integer'],
+            [['package_items_id', 'quantity'], 'required'],
+            [['package_items_id'], 'integer'],
             [['lot_number', 'serial_number'], 'string', 'max' => 128],
         ];
     }

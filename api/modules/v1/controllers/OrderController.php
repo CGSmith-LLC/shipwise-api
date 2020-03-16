@@ -4,9 +4,13 @@ namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
 use api\modules\v1\models\core\AddressEx;
+use api\modules\v1\models\order\PackageEx;
 use api\modules\v1\models\order\TrackingInfoEx;
 use api\modules\v1\models\order\ItemEx;
 use api\modules\v1\models\order\StatusEx;
+use common\models\PackageItem;
+use common\models\PackageItemLotInfo;
+use simpleDI\LoadedTestWithDependencyInjectionCest;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use api\modules\v1\models\order\OrderEx;
@@ -598,6 +602,38 @@ class OrderController extends ControllerEx
                 $transaction->rollBack();
 
                 return $this->unprocessableError($order->getErrors());
+            }
+
+            // Packages
+            PackageEx::deleteAll(['order_id' => $order->id]);
+            foreach ($orderForm->packages as $formPackage) {
+                \Yii::debug($formPackage);
+                $package = new PackageEx();
+                $package->setAttribute('length', $formPackage['length']);
+                $package->setAttribute('width', $formPackage['width']);
+                $package->setAttribute('height', $formPackage['height']);
+                $package->setAttribute('tracking', $formPackage['tracking']);
+                $package->setAttribute('order_id', $order->id);
+                $package->save();
+                foreach ($formPackage['package_items'] as $package_item) {
+                    $packageItem = new PackageItem();
+                    $packageItem->setAttribute('quantity', $package_item['quantity']);
+                    $packageItem->setAttribute('sku', $package_item['sku']);
+                    $packageItem->setAttribute('name', $package_item['name']);
+                    $packageItem->setAttribute('package_id', $package->id);
+                    $packageItem->setAttribute('order_id', $order->id);
+                    $packageItem->save();
+                    foreach ($package_item['lot_info'] as $lot_info) {
+
+
+                        $lotInfo = new PackageItemLotInfo();
+                        $lotInfo->setAttribute('quantity', $lot_info['quantity']);
+                        $lotInfo->setAttribute('lot_number', $lot_info['lot_number']);
+                        $lotInfo->setAttribute('serial_number', $lot_info['serial_number']);
+                        $lotInfo->setAttribute('package_items_id', $packageItem->id);
+                        $lotInfo->save();
+                    }
+                }
             }
 
             // Save Order model

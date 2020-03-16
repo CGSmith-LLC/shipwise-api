@@ -13,8 +13,6 @@ use common\models\base\BasePackage;
  */
 class Package extends BasePackage
 {
-
-
     /**
      * Get package items
      *

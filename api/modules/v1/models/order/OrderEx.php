@@ -105,7 +105,7 @@ class OrderEx extends Order
                             'sku'      => $item->sku,
                             'quantity' => $item->quantity,
                         ];
-                        $lotInfos = PackageItemLotInfo::findAll(['package_items_id' => $item->package_id]);
+                        $lotInfos = PackageItemLotInfo::findAll(['package_items_id' => $item->id]);
                         foreach ($lotInfos as $lotInfo) {
                             $packageArray[$i]['items'][$x]['lot_info'][] = [
                                 'lot_number'    => $lotInfo->lot_number,
