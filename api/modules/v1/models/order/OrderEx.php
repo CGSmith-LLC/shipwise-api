@@ -113,6 +113,7 @@ class OrderEx extends Order
                                 'quantity'      => $lotInfo->quantity,
                             ];
                         }
+
                         $x++;
                     }
                     $i++;
