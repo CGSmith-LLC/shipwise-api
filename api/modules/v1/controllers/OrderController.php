@@ -626,13 +626,15 @@ class OrderController extends ControllerEx
                         $packageItem->setAttribute('package_id', $package->id);
                         $packageItem->setAttribute('order_id', $order->id);
                         $packageItem->save();
-                        foreach ($package_item['lot_info'] as $lot_info) {
-                            $lotInfo = new PackageItemLotInfo();
-                            $lotInfo->setAttribute('quantity', $lot_info['quantity']);
-                            $lotInfo->setAttribute('lot_number', $lot_info['lot_number']);
-                            $lotInfo->setAttribute('serial_number', $lot_info['serial_number']);
-                            $lotInfo->setAttribute('package_items_id', $packageItem->id);
-                            $lotInfo->save();
+                        if (isset($package_item['lot_info'])) {
+                            foreach ($package_item['lot_info'] as $lot_info) {
+                                $lotInfo = new PackageItemLotInfo();
+                                $lotInfo->setAttribute('quantity', $lot_info['quantity']);
+                                $lotInfo->setAttribute('lot_number', $lot_info['lot_number']);
+                                $lotInfo->setAttribute('serial_number', $lot_info['serial_number']);
+                                $lotInfo->setAttribute('package_items_id', $packageItem->id);
+                                $lotInfo->save();
+                            }
                         }
                     }
                 }
