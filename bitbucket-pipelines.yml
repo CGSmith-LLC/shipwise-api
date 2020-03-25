@@ -3,6 +3,11 @@ pipelines:
   branches:
     master:
       - step:
+          name: Add composer key to file
+          script:
+            - mkdir -p /root/.composer
+            - echo '{"github-oauth":{"github.com":"$COMPOSER"}}' > /root/.composer/auth.json
+      - step:
           name: Install OS dependencies, run PHPUnit, create BUILD
           script:
             - apt-get update && apt-get install -y unzip git libxml2-dev zlib1g-dev libzip-dev zip
