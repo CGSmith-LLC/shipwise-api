@@ -6,7 +6,7 @@ pipelines:
           name: Add composer key to file
           script:
             - mkdir -p /root/.composer
-            - echo '{"github-oauth":{"github.com":"$COMPOSER_AUTH"}}' > /root/.composer/auth.json
+            - echo '{"github-oauth":{"github.com":"'$COMPOSER_AUTH'"}}' > /root/.composer/auth.json
       - step:
           name: Install OS dependencies, run PHPUnit, create BUILD
           script:
