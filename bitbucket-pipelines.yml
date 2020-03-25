@@ -5,11 +5,10 @@ pipelines:
       - step:
           name: Install OS dependencies, run PHPUnit, create BUILD
           script:
-            - apt-get update && apt-get install -y unzip git libxml2-dev zlib1g-dev libzip-dev zip
+            - apt-get update && apt-get install -y unzip libxml2-dev zlib1g-dev libzip-dev zip
             - docker-php-ext-install soap
             - docker-php-ext-install zip
             - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-            - composer global require "fxp/composer-asset-plugin"
             - composer install
             - composer install --no-dev -o
             - zip -r build.zip . -x *.git* *tests* *vagrant*
