@@ -862,7 +862,7 @@ class OrderController extends ControllerEx
 
     /**
      * @SWG\Get(
-     *     path = "/orders/dfindbystatus",
+     *     path = "/orders/findbystatus",
      *     tags = { "Orders" },
      *     summary = "Fetch orders by status",
      *     description = "Fetch orders by status for authenticated user",
