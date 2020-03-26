@@ -16,6 +16,13 @@ class OrderSearch extends Order
 {
 
     /**
+     * PO Number filter
+     *
+     * @var string
+     */
+    public $po_number;
+
+    /**
      * Address name filter
      *
      * @var string
@@ -55,6 +62,7 @@ class OrderSearch extends Order
                 [
                     'order_reference',
                     'customer_reference',
+                    'po_number',
                     'tracking',
                     'created_date',
                     'updated_date',
@@ -140,6 +148,7 @@ class OrderSearch extends Order
         // grid filtering conditions
         $query->andFilterWhere([
             Order::tableName() . '.id' => $this->id,
+            'po_number' => $this->po_number,
             'customer_id' => $this->customer_id,
             'status_id' => $this->status_id,
             //'address_id'               => $this->address_id,
