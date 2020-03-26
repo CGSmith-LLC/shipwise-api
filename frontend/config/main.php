@@ -74,7 +74,7 @@ return [
                 'sender' => [$params['senderEmail'] => $appName],
             ],
             'enableFlashMessages' => false,
-            'admins' => [$params['adminEmail']],
+            'admins' => $params['adminEmail'],
             'controllerMap' => [
                 'admin' => 'frontend\controllers\user\AdminController',
                 'registration' => [
