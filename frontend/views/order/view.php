@@ -1,5 +1,7 @@
 <?php
 
+use common\models\Package;
+use common\models\PackageItemLotInfo;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
@@ -21,9 +23,9 @@ YiiAsset::register($this);
         <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
-            'data'  => [
+            'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
-                'method'  => 'post',
+                'method' => 'post',
             ],
         ]) ?>
     </p>
@@ -33,12 +35,12 @@ YiiAsset::register($this);
             <h2>Order Info</h2>
 
             <?= DetailView::widget([
-                'model'      => $model,
+                'model' => $model,
                 'attributes' => [
                     'id',
                     [
                         'attribute' => 'customer',
-                        'value'     => $model->customer->name,
+                        'value' => $model->customer->name,
                     ],
                     'order_reference',
                     'customer_reference',
@@ -61,7 +63,7 @@ YiiAsset::register($this);
             <h2>Ship To</h2>
             <?php if ($model->address) : ?>
                 <?= DetailView::widget([
-                    'model'      => $model->address,
+                    'model' => $model->address,
                     'attributes' => [
                         //'id',
                         'name',
@@ -85,22 +87,72 @@ YiiAsset::register($this);
         <div class="col-md-12">
             <h2>Items (<?= count($model->items) ?? null ?>)</h2>
             <?php
-            if ($model->items) :
-                $idx = 0;
-                foreach ($model->items as $item) : ?>
-                    <h3>#<?= ++$idx ?></h3>
+            $dataProvider = new \yii\data\ActiveDataProvider([
+                'query' => \frontend\models\Item::find()->where(['order_id' => $model->id]),
+            ]);
+            $count = Yii::$app->db->createCommand('
+                SELECT COUNT(*) FROM package_items WHERE order_id=:order_id
+            ', [':order_id' => $model->id])->queryScalar();
 
-                    <?= DetailView::widget([
-                        'model'      => $item,
-                        'attributes' => [
-                            //'id',
-                            'quantity',
-                            'sku',
-                            'name',
+            $dataProviderPackages = new \yii\data\SqlDataProvider([
+                'sql' => 'SELECT * from package_items_lot_info
+                            left join package_items on
+                            package_items.id = package_items_lot_info.package_items_id
+                            left join packages on
+                            packages.id = package_items.package_id where packages.order_id = :order_id order by tracking',
+                'params' => [':order_id' => $model->id],
+                'totalCount' => $count,
+                'sort' => [
+                    'attributes' => [
+                        'packages.tracking',
+                        'name' => [
+                            'asc' => ['first_name' => SORT_ASC, 'last_name' => SORT_ASC],
+                            'desc' => ['first_name' => SORT_DESC, 'last_name' => SORT_DESC],
+                            'default' => SORT_DESC,
+                            'label' => 'Name',
                         ],
-                    ]);
-                endforeach;
-            endif; ?>
+                    ],
+                ],
+                'pagination' => [
+                    'pageSize' => 20,
+                ],
+            ]);
+
+            // get the user records in the current page
+            $models = $dataProvider->getModels();
+            echo \yii\grid\GridView::widget([
+                'dataProvider' => $dataProvider,
+                'columns' => [
+                    [
+                        'class' => 'yii\grid\SerialColumn',
+                        'header' => 'Line #',
+                    ],
+                    'quantity',
+                    'sku',
+                    'name',
+                ],
+            ]); ?>
+            <h2>Packages</h2>
+            <?php
+            echo \yii\grid\GridView::widget([
+                'dataProvider' => $dataProviderPackages,
+                'columns' => [
+                    'tracking',
+                        /*[
+                        'attribute' => 'tracking',
+                        'value' => function ($model) use ($dataProviderPackages) {
+                            //if ($model->tracking ) {
+                                Yii::debug($dataProviderPackages);
+                            //}
+                        }
+                    ]*/
+                    'quantity',
+                    'sku',
+                    'lot_number',
+                ],
+            ]);
+
+            ?>
         </div>
 
     </div>
