@@ -472,6 +472,15 @@ class OrderController extends ControllerEx
      */
     public function actionHistory($id)
     {
+        // Find the order to update
+        if (($order = OrderEx::find()
+                ->byId($id)
+                ->forCustomer($this->apiConsumer->customer->id)
+                ->one()
+            ) === null) {
+            return $this->errorMessage(404, 'Order not found');
+        }
+
         // Build the Order Form with the attributes sent in request
         $historyForm = new HistoryForm();
         $historyForm->setAttributes($this->request->getBodyParams());
@@ -485,8 +494,8 @@ class OrderController extends ControllerEx
 
         try {
             $history = new OrderHistoryEx();
-            $history->order_id = (int) $id;
-            $history->status_id = $historyForm->status;
+            $history->order_id = $order->id;
+            $history->status_id = $order->status_id;
             $history->comment = $historyForm->comment;
 
             // Save Order model
