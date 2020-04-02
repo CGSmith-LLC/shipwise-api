@@ -4,7 +4,9 @@ namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
 use api\modules\v1\models\core\AddressEx;
+use api\modules\v1\models\forms\HistoryForm;
 use api\modules\v1\models\forms\StatusForm;
+use api\modules\v1\models\order\OrderHistoryEx;
 use api\modules\v1\models\order\PackageEx;
 use api\modules\v1\models\order\TrackingInfoEx;
 use api\modules\v1\models\order\ItemEx;
@@ -410,6 +412,107 @@ class OrderController extends ControllerEx
         }
 
         return $this->success($order);
+    }
+
+
+    /**
+     * @SWG\Post(
+     *     path = "/orders/{id}/history",
+     *     tags = { "Orders" },
+     *     summary = "Create history and associate with an order",
+     *     description = "Creates new history",
+     *
+     *     @SWG\Parameter(
+     *          name = "HistoryForm", in = "body", required = true,
+     *          @SWG\Schema( ref = "#/definitions/HistoryForm" ),
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 201,
+     *          description = "History created successfully",
+     *          @SWG\Schema(
+     *              ref = "#/definitions/OrderHistory"
+     *            ),
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 400,
+     *          description = "Error while creating order",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 401,
+     *          description = "Impossible to authenticate user",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 403,
+     *          description = "User is inactive",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 422,
+     *          description = "Fields are missing or invalid",
+     *          @SWG\Schema( ref = "#/definitions/ErrorData" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 500,
+     *          description = "Unexpected error",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     security = {{
+     *            "basicAuth": {}
+     *     }}
+     * )
+     */
+    public function actionHistory($id)
+    {
+        // Build the Order Form with the attributes sent in request
+        $historyForm = new HistoryForm();
+        $historyForm->setAttributes($this->request->getBodyParams());
+
+        if (!$historyForm->validate()) {
+            return $this->unprocessableError($historyForm->getErrorsAll());
+        }
+
+        // Begin DB transaction
+        $transaction = \Yii::$app->db->beginTransaction();
+
+        try {
+            $history = new OrderHistoryEx();
+            $history->order_id = (int) $id;
+            $history->status_id = $historyForm->status;
+            $history->comment = $historyForm->comment;
+
+            // Save Order model
+            if (!$history->save()) {
+                $transaction->rollBack();
+
+                return $this->errorMessage(400, 'Could not save history');
+            }
+
+            // Commit DB transaction
+            $transaction->commit();
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            \Yii::debug($history);
+
+            return $this->errorMessage(400, 'Could not save history');
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+
+            return $this->errorMessage(400, 'Could not save history');
+        }
+
+        $history->refresh();
+
+        return $this->success($history, 201);
     }
 
     /**
