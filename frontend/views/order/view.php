@@ -87,6 +87,10 @@ YiiAsset::register($this);
         <div class="col-md-12">
             <h2>Items (<?= count($model->items) ?? null ?>)</h2>
             <?php
+            $dataproviderHistory = new \yii\data\ActiveDataProvider([
+                'query' => \common\models\OrderHistory::find()->where(['order_id' => $model->id])
+            ]);
+
             $dataProvider = new \yii\data\ActiveDataProvider([
                 'query' => \frontend\models\Item::find()->where(['order_id' => $model->id]),
             ]);
@@ -138,17 +142,26 @@ YiiAsset::register($this);
                 'dataProvider' => $dataProviderPackages,
                 'columns' => [
                     'tracking',
-                        /*[
-                        'attribute' => 'tracking',
-                        'value' => function ($model) use ($dataProviderPackages) {
-                            //if ($model->tracking ) {
-                                Yii::debug($dataProviderPackages);
-                            //}
-                        }
-                    ]*/
                     'quantity',
                     'sku',
                     'lot_number',
+                ],
+            ]);
+
+            ?>
+            <h2>Order History</h2>
+            <?php
+            echo \yii\grid\GridView::widget([
+                'dataProvider' => $dataproviderHistory,
+                'columns' => [
+                    'created_date:datetime',
+                    [
+                        'attribute' => 'comment',
+                        'value' => function ($model) {
+                            return nl2br($model->comment);
+                        },
+                        'format' => 'raw',
+                    ]
                 ],
             ]);
 
