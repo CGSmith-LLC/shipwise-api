@@ -141,3 +141,12 @@ Start your Docker container with:
 Example of importing a gzipped mysql dump:
 
 `zcat cgsmpoim_shipwise.sql.gz | mysql -h mysql -u root -p cgsmpoim_shipwise`
+
+### Running queue jobs locally
+
+When you are developing in a local environment, all you need to have the queue jobs executed is this:
+
+- open the CLI on your local dev server, eg. docker or vagrant instance, then enter this command and keep the terminal open:
+
+`php yii queue/listen --verbose`
+
