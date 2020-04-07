@@ -30,7 +30,7 @@ class PackageEx extends Package
      */
     public function fields()
     {
-        return ['id', 'tracking', 'length', 'width', 'height', 'weight'];
+        return ['id', 'order_id', 'tracking', 'length', 'width', 'height', 'weight'];
     }
 
 }

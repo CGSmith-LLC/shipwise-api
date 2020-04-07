@@ -113,6 +113,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                     ),
                 ],
                 'customer_reference',
+                'po_number',
                 [
                     'attribute' => 'address',
                     'value' => 'address.name',

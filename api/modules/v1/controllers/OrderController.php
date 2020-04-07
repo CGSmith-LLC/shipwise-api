@@ -4,9 +4,16 @@ namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
 use api\modules\v1\models\core\AddressEx;
+use api\modules\v1\models\forms\HistoryForm;
+use api\modules\v1\models\forms\StatusForm;
+use api\modules\v1\models\order\OrderHistoryEx;
+use api\modules\v1\models\order\PackageEx;
 use api\modules\v1\models\order\TrackingInfoEx;
 use api\modules\v1\models\order\ItemEx;
 use api\modules\v1\models\order\StatusEx;
+use common\models\PackageItem;
+use common\models\PackageItemLotInfo;
+use simpleDI\LoadedTestWithDependencyInjectionCest;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use api\modules\v1\models\order\OrderEx;
@@ -35,6 +42,7 @@ class OrderController extends ControllerEx
             'items'        => ['GET'],
             'packages'     => ['GET'],
             'findbystatus' => ['GET'],
+            'status'       => ['POST'],
             'find'         => ['GET'],
         ];
     }
@@ -406,6 +414,116 @@ class OrderController extends ControllerEx
         return $this->success($order);
     }
 
+
+    /**
+     * @SWG\Post(
+     *     path = "/orders/{id}/history",
+     *     tags = { "Orders" },
+     *     summary = "Create history and associate with an order",
+     *     description = "Creates new history",
+     *
+     *     @SWG\Parameter(
+     *          name = "HistoryForm", in = "body", required = true,
+     *          @SWG\Schema( ref = "#/definitions/HistoryForm" ),
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 201,
+     *          description = "History created successfully",
+     *          @SWG\Schema(
+     *              ref = "#/definitions/OrderHistory"
+     *            ),
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 400,
+     *          description = "Error while creating order",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 401,
+     *          description = "Impossible to authenticate user",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 403,
+     *          description = "User is inactive",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 422,
+     *          description = "Fields are missing or invalid",
+     *          @SWG\Schema( ref = "#/definitions/ErrorData" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 500,
+     *          description = "Unexpected error",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     security = {{
+     *            "basicAuth": {}
+     *     }}
+     * )
+     */
+    public function actionHistory($id)
+    {
+        // Find the order to update
+        if (($order = OrderEx::find()
+                ->byId($id)
+                ->forCustomer($this->apiConsumer->customer->id)
+                ->one()
+            ) === null) {
+            return $this->errorMessage(404, 'Order not found');
+        }
+
+        // Build the Order Form with the attributes sent in request
+        $historyForm = new HistoryForm();
+        $historyForm->setAttributes($this->request->getBodyParams());
+
+        if (!$historyForm->validate()) {
+            return $this->unprocessableError($historyForm->getErrorsAll());
+        }
+
+        // Begin DB transaction
+        $transaction = \Yii::$app->db->beginTransaction();
+
+        try {
+            $history = new OrderHistoryEx();
+            $history->order_id = $order->id;
+            $history->status_id = $order->status_id;
+            $history->comment = $historyForm->comment;
+
+            // Save Order model
+            if (!$history->save()) {
+                $transaction->rollBack();
+
+                return $this->errorMessage(400, 'Could not save history');
+            }
+
+            // Commit DB transaction
+            $transaction->commit();
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            \Yii::debug($history);
+
+            return $this->errorMessage(400, 'Could not save history');
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+
+            return $this->errorMessage(400, 'Could not save history');
+        }
+
+        $history->refresh();
+
+        return $this->success($history, 201);
+    }
+
     /**
      * @SWG\Put(
      *     path = "/orders/{id}",
@@ -598,6 +716,40 @@ class OrderController extends ControllerEx
                 $transaction->rollBack();
 
                 return $this->unprocessableError($order->getErrors());
+            }
+
+            // Packages
+
+            if (!empty($orderForm->packages)) {
+                PackageEx::deleteAll(['order_id' => $order->id]);
+                foreach ($orderForm->packages as $formPackage) {
+                    $package = new PackageEx();
+                    $package->setAttribute('length', $formPackage['length']);
+                    $package->setAttribute('width', $formPackage['width']);
+                    $package->setAttribute('height', $formPackage['height']);
+                    $package->setAttribute('tracking', $formPackage['tracking']);
+                    $package->setAttribute('order_id', $order->id);
+                    $package->save();
+                    foreach ($formPackage['package_items'] as $package_item) {
+                        $packageItem = new PackageItem();
+                        $packageItem->setAttribute('quantity', $package_item['quantity']);
+                        $packageItem->setAttribute('sku', $package_item['sku']);
+                        $packageItem->setAttribute('name', $package_item['name']);
+                        $packageItem->setAttribute('package_id', $package->id);
+                        $packageItem->setAttribute('order_id', $order->id);
+                        $packageItem->save();
+                        if (isset($package_item['lot_info'])) {
+                            foreach ($package_item['lot_info'] as $lot_info) {
+                                $lotInfo = new PackageItemLotInfo();
+                                $lotInfo->setAttribute('quantity', $lot_info['quantity']);
+                                $lotInfo->setAttribute('lot_number', $lot_info['lot_number']);
+                                $lotInfo->setAttribute('serial_number', $lot_info['serial_number']);
+                                $lotInfo->setAttribute('package_items_id', $packageItem->id);
+                                $lotInfo->save();
+                            }
+                        }
+                    }
+                }
             }
 
             // Save Order model
@@ -1003,7 +1155,84 @@ class OrderController extends ControllerEx
         return $this->success($provider);
     }
 
+    /**
+     * @SWG\Post(
+     *     path = "/orders/{id}/status",
+     *     tags = { "Orders" },
+     *     summary = "Updates specific order with status ID",
+     *     description = "Update order with status ID that is specified",
+     *
+     *     @SWG\Parameter( name = "status", in = "path", type = "integer", required = true, description = "Status ID" ),
+     *
+     *     @SWG\Response(
+     *          response = 200,
+     *          description = "Successful operation. Response contains the order found.",
+     *          @SWG\Schema(
+     *              ref = "#/definitions/Order"
+     *            ),
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 401,
+     *          description = "Impossible to authenticate user",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 403,
+     *          description = "User is inactive",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 404,
+     *          description = "Order not found",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 500,
+     *          description = "Unexpected error",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     security = {{
+     *            "basicAuth": {}
+     *     }}
+     * )
+     */
 
+    /**
+     * Set status based on POST to the order. Easier then sending a PUT request
+     *
+     * @param int $id
+     * @return array
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function actionStatus(int $id)
+    {
+        // Build the Status Form with the attributes sent in request
+        $statusForm           = new StatusForm();
+        $statusForm->setAttributes($this->request->getBodyParams());
+
+        // Validate, return errors if any
+        if (!$statusForm->validate()) {
+            return $this->unprocessableError($statusForm->getErrors());
+        }
+
+        if (($order = OrderEx::find()
+                ->byId($id)
+                ->forCustomer($this->apiConsumer->customer->id)
+                ->one()
+            ) === null) {
+            return $this->errorMessage(404, 'Order not found');
+        }else {
+            $order->status_id = $statusForm->status;
+            $order->save();
+        }
+
+        return $this->success($order);
+    }
 
     /**
      * @SWG\Get(
