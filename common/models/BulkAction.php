@@ -20,6 +20,9 @@ class BulkAction extends BaseBulkAction
     const STATUS_COMPLETED  = 1;
     const STATUS_ERROR      = 2;
 
+    const PRINT_MODE_QZ  = 1; // Print using qz plugin (thermal printer)
+    const PRINT_MODE_PDF = 2; // Print as one combined PDF file
+
     /** @inheritdoc */
     public function beforeSave($insert)
     {

@@ -61,7 +61,7 @@ QZAsset::register($this);
 
         <?= GridView::widget([
             'dataProvider' => new ActiveDataProvider([
-                'query'      => $model->getItems(),
+                'query'      => $model->getItems()->orderBy('order_id'),
                 'sort'       => false,
                 'pagination' => false,
             ]),

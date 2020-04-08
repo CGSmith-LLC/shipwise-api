@@ -31,7 +31,7 @@ class BulkAction extends BaseBulkAction
     const ACTION_SHIPPING_LABELS_PACKING_SLIPS = 'shippingLabelsPackingSlips';
 
     /**
-     * List of available actions
+     * List of all available actions
      *
      * @var array
      */
@@ -41,6 +41,19 @@ class BulkAction extends BaseBulkAction
         self::ACTION_SHIPPING_LABELS,
         self::ACTION_SHIPPING_LABELS_PACKING_SLIPS,
     ];
+
+    /**
+     * List of printing actions
+     * @return array
+     */
+    public static function getPrintActionsList()
+    {
+        return [
+            self::ACTION_PACKING_SLIPS                 => static::readable(BulkAction::ACTION_PACKING_SLIPS),
+            self::ACTION_SHIPPING_LABELS               => static::readable(BulkAction::ACTION_SHIPPING_LABELS),
+            self::ACTION_SHIPPING_LABELS_PACKING_SLIPS => static::readable(BulkAction::ACTION_SHIPPING_LABELS_PACKING_SLIPS),
+        ];
+    }
 
     /**
      * Returns human readable string
@@ -76,6 +89,13 @@ class BulkAction extends BaseBulkAction
      * @var array
      */
     public $orderIDs = [];
+
+    /**
+     * Additional action options
+     *
+     * @var array
+     */
+    public $options = [];
 
     /**
      * @var bool
@@ -125,6 +145,7 @@ class BulkAction extends BaseBulkAction
             [['action', 'orderIDs'], 'required'],
             ['action', 'validateAction'],
             ['orderIDs', 'each', 'rule' => ['integer']],
+            ['options', 'safe'],
         ];
     }
 
@@ -275,6 +296,9 @@ class BulkAction extends BaseBulkAction
         $bulkAction       = new BaseBulkAction();
         $bulkAction->code = $this->action;
         $bulkAction->name = self::readable($this->action);
+        if (in_array($this->action, array_keys(static::getPrintActionsList()))) {
+            $bulkAction->print_mode = $this->options['print_as_pdf'] ? static::PRINT_MODE_PDF : static::PRINT_MODE_QZ;
+        }
         if (!$bulkAction->save()) {
             Yii::warning("Failed to save Bulk Action.");
             Yii::warning($bulkAction->attributes);

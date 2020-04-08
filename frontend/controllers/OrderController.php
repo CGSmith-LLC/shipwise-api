@@ -8,6 +8,7 @@ use Yii;
 use common\models\{State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\{Order, forms\OrderForm, BulkAction, search\OrderSearch};
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
+use yii\helpers\FileHelper;
 use yii\helpers\Html;
 
 /**
@@ -236,14 +237,12 @@ class OrderController extends Controller
             $model->execute();
         }
 
-        $response = [
+        return [
             'success' => $model->isSuccess(),
             'message' => $model->getMessage(),
             'errors'  => Html::errorSummary($model, ['header' => false]),
             'link'    => $model->getLink(),
         ];
-
-        return $response;
     }
 
     /**
@@ -260,9 +259,62 @@ class OrderController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
 
-        return $this->render('bulk-result/view', [
+        $viewName = ($model->print_mode == BulkAction::PRINT_MODE_PDF) ? 'view-pdf' : 'view-qz';
+
+        return $this->render("bulk-result/$viewName", [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Given BulkAction id, reprints a single combined PDF file merged from bulk items base64 data
+     *
+     * @param int $id
+     *
+     * @return mixed
+     * @throws NotFoundHttpException if the BulkAction model cannot be found
+     * @throws \yii\web\RangeNotSatisfiableHttpException
+     * @throws \yii\base\Exception
+     */
+    public function actionBulkReprint($id)
+    {
+        if (($model = BulkAction::findOne($id)) === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        /**
+         * Retrieve base64 PDF data from bulk items, create temp files, merge into one PDF, then clear temp files.
+         */
+        $dir = Yii::getAlias('@frontend') . '/runtime/pdf/';
+        if (!is_dir($dir)) {
+            FileHelper::createDirectory($dir, 0777, true);
+        }
+        $tmpFiles = [];
+        foreach ($model->getItems()->orderBy('order_id')->all() as $item) {
+            $filename = $dir . 'tmp_' . $item->id . '.' . strtolower($item->base64_filetype);
+            $fp       = fopen($filename, 'wb');
+            fwrite($fp, base64_decode($item->base64_filedata));
+            fclose($fp);
+            $tmpFiles[] = $filename;
+        }
+
+        /**
+         * Merge files into one, then delete all temp files.
+         */
+        $mergedFileData = '';
+        $mergedFilename = $dir . ucfirst($model->code) . ".pdf";
+        if (!empty($tmpFiles)) {
+            // using GhostScript here for merging
+            exec("gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=$mergedFilename " . implode(" ", $tmpFiles));
+            $mergedFileData = base64_encode(file_get_contents($mergedFilename));
+            @unlink($mergedFilename);
+            foreach ($tmpFiles as $filename) {
+                @unlink($filename);
+            }
+        }
+
+        return Yii::$app->response->sendContentAsFile(base64_decode($mergedFileData), $mergedFilename,
+            ['mimeType' => 'application/pdf', 'inline' => true]);
     }
 
     /**

@@ -150,3 +150,9 @@ When you are developing in a local environment, all you need to have the queue j
 
 `php yii queue/listen --verbose`
 
+### Installing GhostScript manually
+
+`apt-get update && apt-get install ghostscript`
+
+note: disregard if you use Docker, as it's already in [/frontend/Dockerfile](frontend/Dockerfile)
+

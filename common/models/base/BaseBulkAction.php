@@ -11,6 +11,7 @@ use Yii;
  * @property string                    $code       Code of the bulk action
  * @property string                    $name       Name of the bulk action
  * @property int                       $status     Current status. 0:processing, 1:completed, 2:error
+ * @property int                       $print_mode Printing mode. 1: qz plugin, 2: pdf file
  * @property string                    $created_on Created timestamp
  * @property int                       $created_by ID of the user who created/triggered bulk action
  *
@@ -35,7 +36,7 @@ class BaseBulkAction extends \yii\db\ActiveRecord
     {
         return [
             [['code', 'name'], 'required'],
-            [['status', 'created_by'], 'integer'],
+            [['status', 'print_mode', 'created_by'], 'integer'],
             [['created_on'], 'safe'],
             [['code'], 'string', 'max' => 60],
             [['name'], 'string', 'max' => 120],
@@ -52,6 +53,7 @@ class BaseBulkAction extends \yii\db\ActiveRecord
             'code'               => 'Code',
             'name'               => 'Name',
             'status'             => 'Status',
+            'print_mode'         => 'Print Mode',
             'created_on'         => 'Created On',
             'created_by'         => 'Created By',
             'createdBy.username' => 'Created By',

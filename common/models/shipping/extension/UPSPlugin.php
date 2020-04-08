@@ -1212,6 +1212,7 @@ class UPSPlugin extends ShipmentPlugin
                         $fp       = fopen($filename, 'wb');
                         fwrite($fp, base64_decode($package->label_data));
                         fclose($fp);
+                        // using ImageMagick here for rotating the GIF
                         exec("convert -rotate \"90\" {$filename} {$filename}");
                         $tmpFiles[] = $filename;
                     }
@@ -1223,6 +1224,7 @@ class UPSPlugin extends ShipmentPlugin
              */
             if (!empty($tmpFiles)) {
                 $mergedFilename = $packages[0]->master_tracking_num . ".pdf";
+                // using ImageMagick here for merging GIFs into one PDF file
                 exec("convert " . implode(" ", $tmpFiles) . " $mergedFilename");
                 $this->shipment->mergedLabelsData   = base64_encode(file_get_contents($mergedFilename));
                 $this->shipment->mergedLabelsFormat = 'PDF';

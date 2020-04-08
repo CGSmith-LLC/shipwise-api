@@ -2,7 +2,7 @@
 
 use common\models\Status;
 use frontend\models\{Customer, BulkAction};
-use yii\helpers\{Html, Url};
+use yii\helpers\{Html, Json, Url};
 use yii\bootstrap\Modal;
 use yii\grid\GridView;
 use yii\web\View;
@@ -64,11 +64,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                         '' => 'With selected: ',
                     ] +
                     [
-                        'Print:' => [
-                            BulkAction::ACTION_PACKING_SLIPS => BulkAction::readable(BulkAction::ACTION_PACKING_SLIPS),
-                            BulkAction::ACTION_SHIPPING_LABELS => BulkAction::readable(BulkAction::ACTION_SHIPPING_LABELS),
-                            BulkAction::ACTION_SHIPPING_LABELS_PACKING_SLIPS => BulkAction::readable(BulkAction::ACTION_SHIPPING_LABELS_PACKING_SLIPS),
-                        ],
+                        'Print:' => BulkAction::getPrintActionsList(),
                     ]
                     + ['Change status to:' => $changeStatus],
                     [
@@ -244,15 +240,24 @@ ob_start(); // output buffer the javascript to register later ?>
         function bulk(ids, action, actionText) {
 
             var popup = $('#modalBulk'),
-                btnConfirm = popup.find('button.confirm');
+                btnConfirm = popup.find('button.confirm'),
+                printingActions = <?= Json::encode(array_keys(BulkAction::getPrintActionsList())) ?>;
 
             btnConfirm.attr('disabled', false).show();
+
             popup.modal('show').find('.modal-body').html(
                 '<div class="alert alert-warning">' +
                 'Please confirm you want to perform bulk action <strong>' + actionText +
                 '</strong> on ' + ids.length + ' orders.' +
                 '</div>'
             );
+
+            // additional input options based on action type
+            var container = popup.find('.modal-body');
+            if(jQuery.inArray(action, printingActions) !== -1) {
+                $('<input />', {type: 'checkbox', id: 'bulkaction-print_as_pdf', checked: true}).appendTo(container);
+                $('<label />', {'for': 'bulkaction-print_as_pdf', text: ' Print as PDF'}).appendTo(container);
+            }
 
             btnConfirm.off().on('click', function () {
                 btnConfirm.attr('disabled', true);
@@ -264,7 +269,10 @@ ob_start(); // output buffer the javascript to register later ?>
                     data: {
                         "BulkAction": {
                             "action": action,
-                            "orderIDs": ids
+                            "orderIDs": ids,
+                            "options": {
+                                "print_as_pdf": $('#bulkaction-print_as_pdf').is(':checked') ? 1 : 0
+                            }
                         }
                     }
                 })
