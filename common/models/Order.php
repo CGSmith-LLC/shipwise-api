@@ -166,14 +166,14 @@ class Order extends BaseOrder
         $shipment->weight_units = Shipment::WEIGHT_UNITS_LB;
         $shipment->dim_units    = Shipment::DIM_UNITS_IN;
 
-        foreach ($this->items as $item) {
+        foreach ($this->packages as $package) {
             $_pkg              = new ShipmentPackage();
-            $_pkg->quantity    = $item->quantity;
-            $_pkg->weight      = 5; // @todo TBD
-            $_pkg->length      = 1; // @todo TBD
-            $_pkg->width       = 1; // @todo TBD
-            $_pkg->height      = 1; // @todo TBD
-            $_pkg->description = $item->name;
+            $_pkg->quantity    = 1; // @todo TBD
+            $_pkg->weight      = $package->weight;
+            $_pkg->length      = $package->length;
+            $_pkg->width       = $package->width;
+            $_pkg->height      = $package->height;
+            $_pkg->description = 'Package'; // @todo TBD
             $shipment->addPackage($_pkg);
         }
 
