@@ -274,9 +274,9 @@ class OrderPackingSlip extends \FPDF
 
         // Column headings
         $header = [
-            "ITEMS",
-            "QTY",
             "SKU",
+            "QTY",
+            "ITEMS",
         ];
 
         // Data
@@ -285,9 +285,9 @@ class OrderPackingSlip extends \FPDF
             $idx = 0;
             foreach ($order->items as $item) {
                 $data[$idx] = [
-                    $item->name,
-                    $item->quantity,
                     $item->sku,
+                    $item->quantity,
+                    $item->name,
                 ];
                 $idx++;
             }
