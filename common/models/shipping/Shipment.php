@@ -12,13 +12,21 @@ use yii\db\Expression;
 /**
  * Class Shipment
  *
- * @property Carrier $carrier
- * @property Service $service
+ * @property Carrier           $carrier
+ * @property Service           $service
+ * @property ShipmentPackage[] $packages
+ * @property string            $mergedLabelsData
+ * @property string            $mergedLabelsFormat
  *
  * @package common\models\shipping
  */
 class Shipment extends BaseShipment
 {
+
+    const WEIGHT_UNITS_LB = 'LB';
+    const WEIGHT_UNITS_KG = 'KG';
+    const DIM_UNITS_IN    = 'IN';
+    const DIM_UNITS_CM    = 'CM';
 
     /**
      * Carrier
@@ -33,6 +41,20 @@ class Shipment extends BaseShipment
      * @var Service
      */
     public $service = null;
+
+    /**
+     * Contains all merged package labels file data in base64
+     *
+     * @var string
+     */
+    public $mergedLabelsData = '';
+
+    /**
+     * File format of the merged package labels data in base64. eg: PDF
+     *
+     * @var string
+     */
+    public $mergedLabelsFormat = '';
 
     /**
      * Calculated rates
@@ -67,8 +89,8 @@ class Shipment extends BaseShipment
 
     /** @var array */
     protected static $addressTypes = [
-        self::ADDRESS_TYPE_BUSINESS    => 'FedEx',
-        self::ADDRESS_TYPE_RESIDENTIAL => 'UPS',
+        self::ADDRESS_TYPE_BUSINESS    => self::ADDRESS_TYPE_BUSINESS,
+        self::ADDRESS_TYPE_RESIDENTIAL => self::ADDRESS_TYPE_RESIDENTIAL,
     ];
 
     /** @return array */
@@ -338,5 +360,60 @@ class Shipment extends BaseShipment
         }
 
         return $state;
+    }
+
+    /**
+     * Ship the shipment using carrier API
+     *
+     * This method will submit a shipment creation request to carrier API
+     * to get the tracking number and label.
+     *
+     * @return Shipment|string Error
+     * @throws LogicException
+     * @throws ShipmentException
+     * @version 2020.02.25
+     *
+     *
+     */
+    public function ship()
+    {
+        if ($this->plugin === null) {
+            $this->initCarrierPlugin();
+        }
+
+        if (!$this->plugin) {
+            throw new LogicException("Shipment has no ShipmentPlugin");
+        }
+
+        if (count($this->getPackages()) < 1) {
+            throw new LogicException("Shipment has no packages");
+        }
+
+        try {
+            $this->plugin->ship($this);
+            return $this;
+
+        } catch (Exception $e) {
+            Yii::error($e);
+            throw new ShipmentException(
+                $e->getMessage() . " - in ShipmentPlugin::{$this->plugin->getPluginName()}::ship()"
+            );
+        }
+    }
+
+    /**
+     * Get shipment master tracking number
+     *
+     * @return bool|string
+     */
+    public function getMasterTracking()
+    {
+        $firstPackage = $this->packages[0] ?? null;
+
+        if (!$firstPackage) {
+            return false;
+        }
+
+        return $firstPackage->master_tracking_num;
     }
 }

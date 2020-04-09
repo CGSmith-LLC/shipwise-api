@@ -571,4 +571,19 @@ class FedExPlugin extends ShipmentPlugin
 
         return $response;
     }
+
+    // @todo
+    protected function shipmentPrepare()
+    {
+    }
+
+    // @todo
+    protected function shipmentExecute()
+    {
+    }
+
+    // @todo
+    protected function shipmentProcess()
+    {
+    }
 }

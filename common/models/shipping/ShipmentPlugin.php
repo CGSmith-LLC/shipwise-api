@@ -125,6 +125,28 @@ abstract class ShipmentPlugin extends ShipmentConnection
     abstract protected function rateProcess();
 
     /**
+     * Prepare Shipment Call to Carrier API
+     *
+     * @return mixed
+     */
+    abstract protected function shipmentPrepare();
+
+    /**
+     * Execute Ship Curl Request
+     *
+     * @return $this
+     */
+    abstract protected function shipmentExecute();
+
+    /**
+     * Shipment Process
+     *
+     * @return $this
+     * @throws \Exception
+     */
+    abstract protected function shipmentProcess();
+
+    /**
      * Get Rates from carrier API
      *
      * This method will submit the request to shipping carrier to get rates.
@@ -186,5 +208,34 @@ abstract class ShipmentPlugin extends ShipmentConnection
     protected function get(array $array, $key, $default = null)
     {
         return isset($array[$key]) ? $array[$key] : $default;
+    }
+
+    /**
+     * Ship using carrier API
+     *
+     * This method will submit the request to shipping carrier to create a shipment
+     * and get back the tracking numbers and labels
+     *
+     * @param Shipment $shipment The shipment to ship
+     *
+     * @return $this
+     * @throws ShipmentException
+     */
+    public function ship(Shipment $shipment)
+    {
+        $this->shipment = $shipment;
+
+        $this
+            ->shipmentPrepare()
+            ->shipmentExecute()
+            ->shipmentProcess();
+
+        if (!$this->isShipped) {
+            throw new ShipmentException(
+                "Shipment was not processed by ShipmentPlugin"
+            );
+        }
+
+        return $this;
     }
 }

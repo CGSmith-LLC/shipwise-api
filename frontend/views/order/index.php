@@ -1,8 +1,8 @@
 <?php
 
 use common\models\Status;
-use frontend\models\Customer;
-use yii\helpers\{Html, Url};
+use frontend\models\{Customer, BulkAction};
+use yii\helpers\{Html, Json, Url};
 use yii\bootstrap\Modal;
 use yii\grid\GridView;
 use yii\web\View;
@@ -29,7 +29,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
     <div class="order-index">
 
         <?php Pjax::begin([
-            'id' => 'pjax-orders',
+            'id'      => 'pjax-orders',
             'timeout' => 2000,
             //'enablePushState'    => false,
             //'enableReplaceState' => false,
@@ -54,15 +54,19 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
             <div class="col-lg-2 col-md-3 col-sm-3 col-xs-4">
                 <?php
                 $statuses = Status::getList();
-                $markAs = array_combine(
+                $changeStatus = array_combine(
                     array_map(function ($k) {
-                        return $k;
+                        return BulkAction::ACTION_CHANGE_STATUS . "_$k"; // <action>_<value>
                     }, array_keys($statuses)), $statuses
                 ); ?>
                 <?= Html::dropDownList('bulkAction', '',
                     [
                         '' => 'With selected: ',
-                    ] + ['Change status to:' => $markAs],
+                    ] +
+                    [
+                        'Print:' => BulkAction::getPrintActionsList(),
+                    ]
+                    + ['Change status to:' => $changeStatus],
                     [
                         'class' => 'form-control',
                         'data-toggle' => 'tooltip',
@@ -186,15 +190,11 @@ ob_start(); // output buffer the javascript to register later ?>
                     return false;
                 }
                 if (ids && ids.length === 0) {
-                    alert('No shipments selected. Click on checkboxes to select one or multiple shipments.');
+                    alert('No orders selected. Click on checkboxes to select one or multiple orders.');
                     return false;
                 }
                 bulk(ids, action, actionText);
             });
-
-            $('#modalBulk').on('hidden.bs.modal', function () {
-                reloadGrid();
-            })
 
         }
 
@@ -217,7 +217,7 @@ ob_start(); // output buffer the javascript to register later ?>
         }
 
         /**
-         * Reload shipment grid
+         * Reload orders grid
          */
         function reloadGrid() {
             $('#orders-grid-view').yiiGridView('applyFilter');
@@ -231,33 +231,72 @@ ob_start(); // output buffer the javascript to register later ?>
         }
 
         /**
-         * Perform bulk action on selected shipments
+         * Perform bulk action on selected orders
          *
-         * @param ids Shipment IDs
+         * @param ids Order IDs
          * @param action The code of the action to perform
          * @param actionText User-friendly text of the action
          */
         function bulk(ids, action, actionText) {
 
             var popup = $('#modalBulk'),
-                btnConfirm = popup.find('button.confirm');
+                btnConfirm = popup.find('button.confirm'),
+                printingActions = <?= Json::encode(array_keys(BulkAction::getPrintActionsList())) ?>;
 
             btnConfirm.attr('disabled', false).show();
+
             popup.modal('show').find('.modal-body').html(
+                '<div class="alert alert-warning">' +
                 'Please confirm you want to perform bulk action <strong>' + actionText +
-                '</strong> on ' + ids.length + ' shipments.'
+                '</strong> on ' + ids.length + ' orders.' +
+                '</div>'
             );
+
+            // additional input options based on action type
+            var container = popup.find('.modal-body');
+            if(jQuery.inArray(action, printingActions) !== -1) {
+                $('<input />', {type: 'checkbox', id: 'bulkaction-print_as_pdf', checked: true}).appendTo(container);
+                $('<label />', {'for': 'bulkaction-print_as_pdf', text: ' Print as PDF'}).appendTo(container);
+            }
 
             btnConfirm.off().on('click', function () {
                 btnConfirm.attr('disabled', true);
-                popup.find('.modal-body').load('<?= Url::to(['bulk']) ?>', {
-                    "BulkAction": {
-                        "action": action,
-                        "orderIDs": ids
+
+                $.ajax({
+                    url: '<?= Url::to(['bulk']) ?>',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        "BulkAction": {
+                            "action": action,
+                            "orderIDs": ids,
+                            "options": {
+                                "print_as_pdf": $('#bulkaction-print_as_pdf').is(':checked') ? 1 : 0
+                            }
+                        }
                     }
-                }, function () {
-                    btnConfirm.hide();
-                });
+                })
+                    .done(function (response) {
+                        if (response.success) {
+                            reloadGrid();
+                            popup.find('.modal-body').html('<div class="alert alert-success">' + response.message + '</div>');
+                            if (response.link) {
+                                popup.modal('toggle');
+                                var win = window.open(response.link, '_blank');
+                                win.focus();
+                            }
+                        } else {
+                            popup.find('.modal-body').html('<div class="alert alert-danger">' + response.errors + '</div>');
+                        }
+
+                    })
+                    .fail(function (jqXHR, textStatus, error) {
+                        popup.find('.modal-body').html(error).append(jqXHR.responseText || '');
+                    })
+                    .always(function () {
+                        btnConfirm.hide();
+                    });
+
             });
         }
 

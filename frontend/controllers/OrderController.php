@@ -2,12 +2,14 @@
 
 namespace frontend\controllers;
 
+use common\pdf\OrderPackingSlip;
 use frontend\models\Customer;
 use Yii;
 use common\models\{State, Status, shipping\Carrier, shipping\Service};
-use frontend\models\{Order, forms\OrderForm, search\OrderSearch};
-use yii\helpers\Json;
-use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException};
+use frontend\models\{Order, forms\OrderForm, BulkAction, search\OrderSearch};
+use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
+use yii\helpers\FileHelper;
+use yii\helpers\Html;
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -114,30 +116,6 @@ class OrderController extends Controller
     }
 
     /**
-     * Updates status on bulk
-     *
-     * @return string
-     * @throws NotFoundHttpException
-     */
-    public function actionBulk()
-    {
-        if (Yii::$app->request->post()) {
-            $bulkAction = (array)Yii::$app->request->post();
-            foreach ($bulkAction['BulkAction']['orderIDs'] as $id) { // selected value from gridview
-                echo $id . PHP_EOL;
-                $model = $this->findModel($id);
-                $model->status_id = (int)$bulkAction['BulkAction']['action']; // set status to action performed
-
-                $model->validate();
-                $model->save();
-
-            }
-            return 'Success';
-
-        }
-    }
-
-    /**
      * Updates an existing Order model.
      * If update is successful, the browser will be redirected to the 'view' page.
      *
@@ -227,6 +205,7 @@ class OrderController extends Controller
      *
      * @param int $carrierId Carrier ID.
      *
+     * @return array JSON array
      * @throws BadRequestHttpException
      */
     public function actionCarrierServices($carrierId)
@@ -236,6 +215,165 @@ class OrderController extends Controller
             throw new BadRequestHttpException('Bad request.');
         }
 
-        echo Json::encode(Service::getList('id', 'name', $carrierId));
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return Service::getList('id', 'name', $carrierId);
+    }
+
+    /**
+     * Bulk action
+     *
+     * Executes a bulk action on multiple orders
+     *
+     * @return array|string
+     */
+    public function actionBulk()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $model = new BulkAction();
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->execute();
+        }
+
+        return [
+            'success' => $model->isSuccess(),
+            'message' => $model->getMessage(),
+            'errors'  => Html::errorSummary($model, ['header' => false]),
+            'link'    => $model->getLink(),
+        ];
+    }
+
+    /**
+     * Displays a single BulkAction model with its relations
+     *
+     * @param int $id
+     *
+     * @return mixed
+     * @throws NotFoundHttpException if the BulkAction model cannot be found
+     */
+    public function actionBulkResult($id)
+    {
+        if (($model = BulkAction::findOne($id)) === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        $viewName = ($model->print_mode == BulkAction::PRINT_MODE_PDF) ? 'view-pdf' : 'view-qz';
+
+        return $this->render("bulk-result/$viewName", [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Given BulkAction id, reprints a single combined PDF file merged from bulk items base64 data
+     *
+     * @param int $id
+     *
+     * @return mixed
+     * @throws NotFoundHttpException if the BulkAction model cannot be found
+     * @throws \yii\web\RangeNotSatisfiableHttpException
+     * @throws \yii\base\Exception
+     */
+    public function actionBulkReprint($id)
+    {
+        if (($model = BulkAction::findOne($id)) === null) {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+
+        /**
+         * Retrieve base64 PDF data from bulk items, create temp files, merge into one PDF, then clear temp files.
+         */
+        $dir = Yii::getAlias('@frontend') . '/runtime/pdf/';
+        if (!is_dir($dir)) {
+            FileHelper::createDirectory($dir, 0777, true);
+        }
+        $tmpFiles = [];
+        foreach ($model->getItems()->orderBy('order_id')->all() as $item) {
+            $filename = $dir . 'tmp_' . $item->id . '.' . strtolower($item->base64_filetype);
+            $fp       = fopen($filename, 'wb');
+            fwrite($fp, base64_decode($item->base64_filedata));
+            fclose($fp);
+            $tmpFiles[] = $filename;
+        }
+
+        /**
+         * Merge files into one, then delete all temp files.
+         */
+        $mergedFileData = '';
+        $mergedFilename = $dir . ucfirst($model->code) . ".pdf";
+        if (!empty($tmpFiles)) {
+            // using GhostScript here for merging
+            exec("gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=$mergedFilename " . implode(" ", $tmpFiles));
+            $mergedFileData = base64_encode(file_get_contents($mergedFilename));
+            @unlink($mergedFilename);
+            foreach ($tmpFiles as $filename) {
+                @unlink($filename);
+            }
+        }
+
+        return Yii::$app->response->sendContentAsFile(base64_decode($mergedFileData), $mergedFilename,
+            ['mimeType' => 'application/pdf', 'inline' => true]);
+    }
+
+    /**
+     * Generates and outputs Packing Slip PDF file for given Order.
+     *
+     * @param integer $id Order ID
+     *
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\web\NotFoundHttpException if the model cannot be found
+     */
+    public function actionPackingSlip($id)
+    {
+        $order = $this->findModel($id);
+
+        $pdf = new OrderPackingSlip();
+        $pdf->generate($order);
+
+        return Yii::$app->response->sendContentAsFile($pdf->Output('S'),
+            "PackingSlip_{$order->customer_reference}.pdf");
+    }
+
+    /**
+     * Creates and outputs Shipping Label PDF file for given Order.
+     *
+     * @param integer $id Order ID
+     *
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\web\NotFoundHttpException if the model cannot be found
+     */
+    public function actionShippingLabel($id)
+    {
+        $order = $this->findModel($id);
+
+        if (empty($order->service)) {
+            // @todo Implement here your biz logic for carrier service selection
+            $service           = Service::findByShipWiseCode('UPSGround');
+            $order->service_id = $service->id;
+            $order->carrier_id = $service->carrier_id;
+        }
+
+        try {
+            $shipment = $order->createShipment();
+        } catch (\Exception $e) {
+            Yii::error($e);
+            throw new \Exception($e);
+        }
+
+        if ($order->hasErrors()) {
+            \yii\helpers\VarDumper::dump($order->getErrors(), 10, true);
+            return false;
+        }
+
+        $order->tracking  = $shipment->getMasterTracking();
+        $order->status_id = Status::SHIPPED;
+        $order->save(false);
+
+        return Yii::$app->response->sendContentAsFile(base64_decode($shipment->mergedLabelsData),
+            "$order->tracking." . $shipment->mergedLabelsFormat);
     }
 }

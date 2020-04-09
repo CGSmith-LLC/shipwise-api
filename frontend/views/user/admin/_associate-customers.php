@@ -32,6 +32,7 @@ $userId = $user->id;
     'columns' => [
         'id',
         'name',
+        'city',
         //'created_date',
         [
             'header' => Yii::t('user', 'Association'),

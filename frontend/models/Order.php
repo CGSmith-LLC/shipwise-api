@@ -32,26 +32,6 @@ class Order extends BaseOrder
     }
 
     /**
-     * Get carrier
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCarrier()
-    {
-        return $this->hasOne('common\models\shipping\Carrier', ['id' => 'carrier_id']);
-    }
-
-    /**
-     * Get carrier service
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getService()
-    {
-        return $this->hasOne('common\models\shipping\Service', ['id' => 'service_id']);
-    }
-
-    /**
      * @inheritdoc
      */
     public function beforeDelete()
@@ -87,5 +67,20 @@ class Order extends BaseOrder
         }
 
         return $result;
+    }
+
+    /**
+     * Changes order status
+     *
+     * @param int $newStatusId
+     *
+     * @return bool Whether the saving succeeded
+     */
+    public function changeStatus($newStatusId)
+    {
+        $this->status_id    = $newStatusId;
+        $this->updated_date = date("Y-m-d H:i:s");
+
+        return $this->save();
     }
 }

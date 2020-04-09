@@ -19,7 +19,7 @@ use yii\base\Model;
  * @property string $sender_city                Sender city
  * @property string $sender_state               Sender state / province
  * @property string $sender_postal_code         Sender postal code / ZIP
- * @property int    $sender_country             Sender country ISO code
+ * @property string $sender_country             Sender country ISO code
  * @property string $sender_phone               Sender hone number
  * @property string $sender_phone_ext           Sender phone extension
  * @property string $sender_email               Sender email
@@ -42,6 +42,8 @@ use yii\base\Model;
  * @property int    $recipient_address_id       Recipient Address ID reference if any
  * @property string $currency                   The currency code
  * @property string $insurance_amount           The insurance amount
+ * @property string $reference1                 Shipment reference 1
+ * @property string $reference2                 Shipment reference 2
  * @property string $package_contents           Package contents: NON_DOCUMENTS (parcel), DOCUMENTS
  * @property string $package_doc_type           Package document type when package_contents is DOCUMENTS
  * @property string $type_of_document_other     Type of document when package_doc_type is other
@@ -54,6 +56,7 @@ use yii\base\Model;
  * @property string $bill_duties_to             Bill duties (customs) to SENDER,
  *           RECIPIENT or THIRD_PARTY
  * @property string $bill_duties_account_num    The billing account number when bill_duties_to value is THIRD_PARTY
+ * @property string $external_id1               External ID 1
  */
 class BaseShipment extends Model
 {
@@ -93,6 +96,8 @@ class BaseShipment extends Model
     public $recipient_address_id;
     public $currency;
     public $insurance_amount;
+    public $reference1;
+    public $reference2;
     public $is_saturday_delivery;
     public $package_contents = 'NON_DOCUMENTS';
     public $package_doc_type;
@@ -104,6 +109,7 @@ class BaseShipment extends Model
     public $bill_transport_account_num;
     public $bill_duties_to = 'RECIPIENT';
     public $bill_duties_account_num;
+    public $external_id1;
 
     /**
      * {@inheritdoc}
@@ -144,7 +150,13 @@ class BaseShipment extends Model
             [['insurance_amount', 'dry_ice_weight'], 'number'],
             [['weight_units', 'dim_units', 'sender_country', 'recipient_country'], 'string', 'max' => 2],
             [
-                ['bill_transport_account_num', 'bill_duties_account_num', 'type_of_document_other',],
+                [
+                    'bill_transport_account_num',
+                    'bill_duties_account_num',
+                    'type_of_document_other',
+                    'reference1',
+                    'reference2',
+                ],
                 'string',
                 'max' => 64,
             ],
@@ -160,6 +172,7 @@ class BaseShipment extends Model
                     'recipient_email',
                     'dangerous_goods_types',
                     'package_type',
+                    'external_id1',
                 ],
                 'string',
                 'max' => 80,
@@ -235,12 +248,15 @@ class BaseShipment extends Model
             'recipient_address_id'     => 'Recipient Address ID',
             'currency'                 => 'Currency',
             'insurance_amount'         => 'Insurance Amount',
+            'reference1'               => 'Shipment Reference 1',
+            'reference2'               => 'Shipment Reference 2',
             'is_saturday_delivery'     => 'Is Saturday Delivery',
             'is_dry_ice'               => 'Is Dry Ice',
             'dry_ice_weight'           => 'Dry Ice Weight',
             'is_dangerous_goods'       => 'Is Dangerous Goods',
             'dangerous_goods_types'    => 'Dangerous Goods Types',
             'is_flat_rate'             => 'Is Flat Rate',
+            'external_id1'             => 'External ID 1',
         ];
     }
 }
