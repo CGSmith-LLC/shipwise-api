@@ -239,8 +239,7 @@ class OrderPackingSlip extends \FPDF
         $this->Cell($cellW, $cellH + 1, "Ship To:", 0, 2);
         $this->setFont($this->fontFamily, '', $this->fontSize - 2);
         $this->MultiCell(0, $cellH, $order->address->name);
-        $txt = trim($order->address->address1);
-        $this->MultiCell($cellW, $cellH, $txt);
+        $this->MultiCell($cellW, $cellH, $order->address->address1);
         if (!empty($order->address->address2)) {
             $this->Cell(0, $cellH, $order->address->address2, 0, 2);
         }
