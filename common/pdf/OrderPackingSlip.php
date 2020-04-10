@@ -84,19 +84,20 @@ class OrderPackingSlip extends \FPDF
     /**
      * Generate code39
      *
-     * @param $xpos
-     * @param $ypos
-     * @param $code
+     * @param       $xpos
+     * @param       $ypos
+     * @param       $code
      * @param float $baseline
-     * @param int $height
+     * @param int   $height
+     *
      * @throws \Exception
      * @see http://www.fpdf.org/en/script/script46.php
      */
-    public function Code39($xpos, $ypos, $code, $baseline=0.5, $height=5)
+    public function Code39($xpos, $ypos, $code, $baseline = 0.5, $height = 5)
     {
-        $wide = $baseline;
-        $narrow = $baseline / 3 ;
-        $gap = $narrow;
+        $wide   = $baseline;
+        $narrow = $baseline / 3;
+        $gap    = $narrow;
 
         $barChar['0'] = 'nnnwwnwnn';
         $barChar['1'] = 'wnnwnnnnw';
@@ -143,24 +144,24 @@ class OrderPackingSlip extends \FPDF
         $barChar['+'] = 'nwnnnwnwn';
         $barChar['%'] = 'nnnwnwnwn';
 
-        $this->SetFont('Arial','',10);
+        $this->SetFont('Arial', '', 10);
         $this->Text($xpos, $ypos + $height + 4, $code);
         $this->SetFillColor(0);
 
-        $code = '*'.strtoupper($code).'*';
-        for($i=0; $i<strlen($code); $i++){
+        $code = '*' . strtoupper($code) . '*';
+        for ($i = 0; $i < strlen($code); $i++) {
             $char = $code[$i];
-            if(!isset($barChar[$char])){
-                $this->Error('Invalid character in barcode: '.$char);
+            if (!isset($barChar[$char])) {
+                $this->Error('Invalid character in barcode: ' . $char);
             }
             $seq = $barChar[$char];
-            for($bar=0; $bar<9; $bar++){
-                if($seq[$bar] == 'n'){
+            for ($bar = 0; $bar < 9; $bar++) {
+                if ($seq[$bar] == 'n') {
                     $lineWidth = $narrow;
-                }else{
+                } else {
                     $lineWidth = $wide;
                 }
-                if($bar % 2 == 0){
+                if ($bar % 2 == 0) {
                     $this->Rect($xpos, $ypos, $lineWidth, $height, 'F');
                 }
                 $xpos += $lineWidth;
@@ -181,7 +182,7 @@ class OrderPackingSlip extends \FPDF
      */
     public function generate(Order $order)
     {
-
+        $this->SetTitle("Packing Slip - Order " . trim($order->customer_reference));
         $this->AddPage();
 
         /**
@@ -189,7 +190,7 @@ class OrderPackingSlip extends \FPDF
          */
         $txt = "Packing Slip for Order #{$order->customer_reference}";
         if (!empty($order->order_reference)) {
-            $this->Code39(30,130,$order->order_reference,1,10);
+            $this->Code39(30, 130, $order->order_reference, 1, 10);
         }
         $this->SetFillColor(239, 239, 239);
         $this->SetDrawColor(239, 239, 239);
@@ -237,11 +238,14 @@ class OrderPackingSlip extends \FPDF
         $y = $this->GetY();
         $this->Cell($cellW, $cellH + 1, "Ship To:", 0, 2);
         $this->setFont($this->fontFamily, '', $this->fontSize - 2);
-        $this->MultiCell($cellW, $cellH, $order->address->name);
-        $txt = $order->address->address1 . ' ' . $order->address->address2;
+        $this->MultiCell(0, $cellH, $order->address->name);
+        $txt = trim($order->address->address1);
         $this->MultiCell($cellW, $cellH, $txt);
+        if (!empty($order->address->address2)) {
+            $this->Cell(0, $cellH, $order->address->address2, 0, 2);
+        }
         $txt = $order->address->city . ', ' . $order->address->state->abbreviation . ' ' . $order->address->zip;
-        $this->MultiCell($cellW, $cellH, $txt);
+        $this->MultiCell(0, $cellH, $txt);
         $this->Cell($cellW, $cellH, $order->address->country, 0, 2);
 
         /**
@@ -263,7 +267,7 @@ class OrderPackingSlip extends \FPDF
         $date = new DateTime($order->created_date);
         $this->Cell($cellW, $cellH, $date->format("m/d/Y"), 0, 2);
         $this->Cell($cellW, $cellH, $order->carrier->name ?? '', 0, 2);
-        $this->MultiCell($cellW, $cellH, $order->tracking ?? '');
+        $this->MultiCell(0, $cellH, $order->tracking ?? '');
 
         $this->SetX($this->marginLeft);
         $this->ln(5);
@@ -301,7 +305,7 @@ class OrderPackingSlip extends \FPDF
          * Ship To
          */
         $cellH = 3.5; // cell height
-        $cellW = 30; // cell width
+        $cellW = $this->pageWidth; // cell width
         $this->setFont($this->fontFamily, 'B', $this->fontSize - 1);
         $y = $this->GetY();
         $this->Cell($cellW, $cellH + 1, "Notes:", 0, 2);
@@ -317,7 +321,7 @@ class OrderPackingSlip extends \FPDF
     {
 
         // Column widths
-        $w = [60, 10, 20];
+        $w = [20, 10, 60];
         // Column aligns
         $align = ['L', 'C', 'L'];
 
@@ -339,11 +343,12 @@ class OrderPackingSlip extends \FPDF
         $this->Ln(1);
 
         // Data
-        $this->setFont($this->fontFamily, '', 7);
+        $this->setFont($this->fontFamily, '', 7.5);
+        $charLimit = 46;
         foreach ($data as $i => $row) {
-            $this->setFont($this->fontFamily, '', 8);
             foreach ($row as $k => $col) {
-                $this->Cell($w[$k], 4.5, $row[$k], 0, 0, $align[$k]);
+                $txt = (strlen($row[$k]) < $charLimit) ? $row[$k] : substr($row[$k], 0, $charLimit) . '...';
+                $this->Cell($w[$k], 4.5, $txt, 0, 0, $align[$k]);
             }
             $this->Ln();
         }
