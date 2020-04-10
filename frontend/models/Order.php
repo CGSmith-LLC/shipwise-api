@@ -69,6 +69,22 @@ class Order extends BaseOrder
         return $result;
     }
 
+    /** @inheritdoc */
+    public function beforeSave($insert)
+    {
+        if (!parent::beforeSave($insert)) {
+            return false;
+        }
+
+        // Normalize datetime input
+        if (!empty($this->requested_ship_date)) {
+            $date = new \DateTime($this->requested_ship_date);
+            $this->requested_ship_date = $date->format('Y-m-d H:i:s');
+        }
+
+        return true;
+    }
+
     /**
      * Changes order status
      *
