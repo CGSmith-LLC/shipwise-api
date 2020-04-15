@@ -378,4 +378,81 @@ class OrderController extends Controller
             "$order->tracking." . $shipment->mergedLabelsFormat,
             ['mimeType' => 'application/pdf', 'inline' => true]);
     }
+
+    /**
+     * Amazon MWS CreateShipment testing
+     */
+    public function actionTest($id)
+    {
+
+        $order = $this->findModel($id);
+        /*\yii\helpers\VarDumper::dump($order->attributes, 10, true);
+        \yii\helpers\VarDumper::dump($order->address->attributes, 10, true);
+        exit;*/
+
+        $serviceUrl = "https://mws.amazonservices.com/MerchantFulfillment/2015-06-01";
+
+        $config = [
+            'ServiceURL'    => $serviceUrl,
+            'ProxyHost'     => null,
+            'ProxyPort'     => -1,
+            'ProxyUsername' => null,
+            'ProxyPassword' => null,
+            'MaxErrorRetry' => 3,
+        ];
+
+        /*$service = new \MWSMerchantFulfillmentService_Client(
+            AWS_ACCESS_KEY_ID,
+            AWS_SECRET_ACCESS_KEY,
+            APPLICATION_NAME,
+            APPLICATION_VERSION,
+            $config);*/
+
+        /************************************************************************
+         * Uncomment to try out Mock Service that simulates MWSMerchantFulfillmentService
+         * responses without calling MWSMerchantFulfillmentService service.
+         *
+         * Responses are loaded from local XML files. You can tweak XML files to
+         * experiment with various outputs during development
+         *
+         * XML files available under MWSMerchantFulfillmentService/Mock tree
+         *
+         ***********************************************************************/
+        $service = new \MWSMerchantFulfillmentService_Mock();
+
+        /************************************************************************
+         * Setup request parameters and uncomment invoke to try out
+         * sample for Create Shipment Action
+         ***********************************************************************/
+        // @TODO: set request. Action can be passed as MWSMerchantFulfillmentService_Model_CreateShipment
+        $request = new \MWSMerchantFulfillmentService_Model_CreateShipmentRequest();
+        $request->setSellerId('123456');
+
+        \yii\helpers\VarDumper::dump($request, 10, true);
+        exit;
+
+        try {
+            $response = $service->CreateShipment($request);
+
+            echo ("Service Response\n");
+            echo ("=============================================================================\n");
+
+            $dom = new \DOMDocument();
+            $dom->loadXML($response->toXML());
+            $dom->preserveWhiteSpace = false;
+            $dom->formatOutput = true;
+            echo $dom->saveXML();
+            echo("ResponseHeaderMetadata: " . $response->getResponseHeaderMetadata() . "\n");
+
+        } catch (\MWSMerchantFulfillmentService_Exception $ex) {
+            echo("Caught Exception: " . $ex->getMessage() . "\n");
+            echo("Response Status Code: " . $ex->getStatusCode() . "\n");
+            echo("Error Code: " . $ex->getErrorCode() . "\n");
+            echo("Error Type: " . $ex->getErrorType() . "\n");
+            echo("Request ID: " . $ex->getRequestId() . "\n");
+            echo("XML: " . $ex->getXML() . "\n");
+            echo("ResponseHeaderMetadata: " . $ex->getResponseHeaderMetadata() . "\n");
+        }
+
+    }
 }

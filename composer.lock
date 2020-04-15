@@ -4,14 +4,14 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6e4a558f3c79ffb2685417f2c9c010e3",
+    "content-hash": "23c620104913028a322ed9671ca0a669",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
             "version": "v3.4.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/twbs/bootstrap.git",
+                "url": "git@github.com:twbs/bootstrap.git",
                 "reference": "68b0d231a13201eb14acd3dc84e51543d16e5f7e"
             },
             "dist": {
@@ -32,7 +32,7 @@
             "version": "3.3.11",
             "source": {
                 "type": "git",
-                "url": "https://github.com/RobinHerbots/Inputmask.git",
+                "url": "git@github.com:RobinHerbots/Inputmask.git",
                 "reference": "5e670ad62f50c738388d4dcec78d2888505ad77b"
             },
             "dist": {
@@ -53,7 +53,7 @@
             "version": "3.4.1",
             "source": {
                 "type": "git",
-                "url": "git@github.com:jquery/jquery-dist.git",
+                "url": "https://github.com/jquery/jquery-dist.git",
                 "reference": "15bc73803f76bc53b654b9fdbbbc096f56d7c03d"
             },
             "dist": {
@@ -1771,6 +1771,42 @@
             "time": "2020-01-23T09:40:22+00:00"
         },
         {
+            "name": "serzh/amazon-mws-merchant-fulfillment",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SerzhYevtushenko/amazon-mws-merchant-fulfillment.git",
+                "reference": "60b8865a3a02d20338a8507d40b59ebfd303bf99"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SerzhYevtushenko/amazon-mws-merchant-fulfillment/zipball/60b8865a3a02d20338a8507d40b59ebfd303bf99",
+                "reference": "60b8865a3a02d20338a8507d40b59ebfd303bf99",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                "src/"
+            ],
+            "authors": [
+                {
+                    "name": "Sergey Evtushenko",
+                    "email": "s.evtyshenko@gmail.com"
+                }
+            ],
+            "description": "Amazon Merchant Fulfillment API PHP Client Library",
+            "time": "2020-04-07T06:01:03+00:00"
+        },
+        {
             "name": "setasign/fpdf",
             "version": "1.8.2",
             "source": {
@@ -3012,6 +3048,7 @@
                 "functional testing",
                 "unit testing"
             ],
+            "abandoned": true,
             "time": "2019-04-24T11:36:34+00:00"
         },
         {
