@@ -214,17 +214,17 @@ class OrderPackingSlip extends \FPDF
         /**
          * Company details
          */
-        $this->SetXY($this->pageWidth / 2, $yBeforeImage);
+        $this->SetXY($this->pageWidth / 1.5, $yBeforeImage);
         $cellH = 4; // cell height
         $this->setFont($this->fontFamily, 'B', $this->fontSize - 2);
-        $this->Cell(0, $cellH, $order->customer->name, 0, 2);
+        $this->Cell(0, $cellH, $order->customer->name, 0, 2, 'R');
         $this->resetFont();
         $this->setFontSize($this->fontSize - 1);
         $txt = $order->customer->address1 . ' ' . $order->customer->address2;
-        $this->Cell(0, $cellH, $txt, 0, 2);
+        $this->Cell(0, $cellH, $txt, 0, 2, 'R');
         $txt = $order->customer->city . ', ' . $order->customer->state->abbreviation . ' ' . $order->customer->zip;
-        $this->Cell(0, $cellH, $txt, 0, 2);
-        $this->Cell(0, $cellH, $order->customer->country, 0, 2);
+        $this->Cell(0, $cellH, $txt, 0, 2, 'R');
+        $this->Cell(0, $cellH, $order->customer->country, 0, 2, 'R');
         $this->ln(3);
         $this->setX($this->marginLeft);
 
@@ -256,14 +256,14 @@ class OrderPackingSlip extends \FPDF
         $this->Cell($cellW, $cellH, "Shipped Via:", 0, 2, 'R');
         $this->Cell($cellW, $cellH, "Tracking #:", 0, 2, 'R');
 
-        $this->SetXY($this->pageWidth / 2 + $cellW + 2, $y);
+        $this->SetXY($this->pageWidth / 2 + $cellW - 7, $y);
         $cellW = 37; // cell width
         $this->setFont($this->fontFamily, '', $this->fontSize - 1);
-        $this->Cell($cellW, $cellH, $order->customer_reference, 0, 2);
+        $this->Cell($cellW, $cellH, $order->customer_reference, 0, 2, 'R');
         $date = new DateTime($order->created_date);
-        $this->Cell($cellW, $cellH, $date->format("m/d/Y"), 0, 2);
-        $this->Cell($cellW, $cellH, $order->carrier->name ?? '', 0, 2);
-        $this->MultiCell($cellW, $cellH, $order->tracking ?? '');
+        $this->Cell($cellW, $cellH, $date->format("m/d/Y"), 0, 2, 'R');
+        $this->Cell($cellW, $cellH, $order->carrier->name ?? '', 0, 2, 'R');
+        $this->MultiCell($cellW, $cellH, $order->tracking ?? '', 0, 'R');
 
         $this->SetX($this->marginLeft);
         $this->ln(6);
