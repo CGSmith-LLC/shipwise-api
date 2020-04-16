@@ -287,7 +287,7 @@ class OrderPackingSlip extends \FPDF
                 $data[$idx] = [
                     $item->quantity,
                     $item->sku,
-                    $item->name,
+                    (strlen($item->name) > 33) ? substr($item->name, 0, 33) . '...' : $item->name,
                 ];
                 $idx++;
             }
@@ -306,7 +306,7 @@ class OrderPackingSlip extends \FPDF
         $y = $this->GetY();
         $this->Cell($cellW, $cellH + 1, "Notes:", 0, 2);
         $this->setFont($this->fontFamily, '', $this->fontSize - 2);
-        $this->MultiCell($cellW, $cellH, $order->notes);
+        $this->MultiCell($cellW, $cellH, $order->address->notes);
     }
 
     /**
