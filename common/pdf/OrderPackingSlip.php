@@ -319,7 +319,7 @@ class OrderPackingSlip extends \FPDF
         // Column widths
         $w = [10, 20, 60];
         // Column aligns
-        $align = ['C', 'L', 'L'];
+        $align = ['C', 'L', 'R'];
 
         // Header
         $this->setFont($this->fontFamily, 'B', 8);
