@@ -232,16 +232,16 @@ class OrderPackingSlip extends \FPDF
          * Ship To
          */
         $cellH = 3.5; // cell height
-        $cellW = 30; // cell width
+        $cellW = 40; // cell width
         $this->setFont($this->fontFamily, 'B', $this->fontSize - 1);
         $y = $this->GetY();
         $this->Cell($cellW, $cellH + 1, "Ship To:", 0, 2);
         $this->setFont($this->fontFamily, '', $this->fontSize - 2);
-        $this->MultiCell($cellW, $cellH, $order->address->name);
+        $this->MultiCell($cellW, $cellH, $order->address->name, 0, 'L');
         $txt = $order->address->address1 . ' ' . $order->address->address2;
-        $this->MultiCell($cellW, $cellH, $txt);
+        $this->MultiCell($cellW, $cellH, $txt, 0, 'L');
         $txt = $order->address->city . ', ' . $order->address->state->abbreviation . ' ' . $order->address->zip;
-        $this->MultiCell($cellW, $cellH, $txt);
+        $this->MultiCell($cellW, $cellH, $txt, 0, 'L');
         $this->Cell($cellW, $cellH, $order->address->country, 0, 2);
 
         /**
@@ -266,7 +266,7 @@ class OrderPackingSlip extends \FPDF
         $this->MultiCell($cellW, $cellH, $order->tracking ?? '');
 
         $this->SetX($this->marginLeft);
-        $this->ln(5);
+        $this->ln(6);
 
         /**
          * Items
@@ -274,8 +274,8 @@ class OrderPackingSlip extends \FPDF
 
         // Column headings
         $header = [
-            "SKU",
             "QTY",
+            "SKU",
             "ITEMS",
         ];
 
@@ -285,8 +285,8 @@ class OrderPackingSlip extends \FPDF
             $idx = 0;
             foreach ($order->items as $item) {
                 $data[$idx] = [
-                    $item->sku,
                     $item->quantity,
+                    $item->sku,
                     $item->name,
                 ];
                 $idx++;
@@ -317,9 +317,9 @@ class OrderPackingSlip extends \FPDF
     {
 
         // Column widths
-        $w = [60, 10, 20];
+        $w = [10, 20, 60];
         // Column aligns
-        $align = ['L', 'C', 'L'];
+        $align = ['C', 'L', 'L'];
 
         // Header
         $this->setFont($this->fontFamily, 'B', 8);
