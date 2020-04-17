@@ -98,6 +98,11 @@ class OrderSearch extends Order
     {
         $query = Order::find();
 
+        // Clear order search from a session if requested
+        if (isset($params["clearfilters"])) {
+            Yii::$app->session->set("ordersearch", null);
+        }
+
         // Set order search to a session
         if (!isset($params["OrderSearch"])) {
             if (isset(Yii::$app->session["ordersearch"])) {
@@ -162,10 +167,17 @@ class OrderSearch extends Order
             ->andFilterWhere(['like', 'notes', $this->notes])
             ->andFilterWhere(['like', 'uuid', $this->uuid])
             ->andFilterWhere(['like', 'origin', $this->origin])
-            ->andFilterWhere(['like', 'requested_ship_date', $this->requested_ship_date])
-            ->andFilterWhere(['like', Order::tableName() . '.created_date', $this->created_date])
-            ->andFilterWhere(['like', Order::tableName() . '.updated_date', $this->updated_date])
             ->andFilterWhere(['like', Address::tableName() . '.name', $this->address]);
+
+        if (!empty($this->created_date)) {
+            $date = new \DateTime($this->created_date);
+            $query->andFilterWhere(['like', Order::tableName() . '.created_date', $date->format('Y-m-d')]);
+        }
+
+        if (!empty($this->requested_ship_date)) {
+            $date = new \DateTime($this->requested_ship_date);
+            $query->andFilterWhere(['like', 'requested_ship_date', $date->format('Y-m-d')]);
+        }
 
         return $dataProvider;
     }

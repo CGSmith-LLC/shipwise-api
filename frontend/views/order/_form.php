@@ -76,9 +76,12 @@ $item->loadDefaultValues();
                             'prompt' => ' -- Unknown --',
                         ]) ?>
 
-                        <?= $form->field($model->order, 'requested_ship_date')->textInput([
-                            'value' => $model->order->requested_ship_date,
-                        ]); ?>
+                        <?= $form->field($model->order, 'requested_ship_date', [
+                            'inputTemplate' =>
+                                '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
+                        ])->textInput([
+                            'value' => Yii::$app->formatter->asDatetime($model->order->requested_ship_date),
+                        ]) ?>
 
                     </div>
                 </div>
@@ -203,7 +206,7 @@ ob_start(); // output buffer the javascript to register later ?>
                 keyboardNavigation : false,
                 forceParse         : false,
                 autoclose          : true,
-                format             : 'yyyy-mm-dd',
+                format             : 'mm/dd/yyyy',
                 todayHighlight     : true,
             });
 

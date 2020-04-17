@@ -10,7 +10,8 @@
         "codemix/yii2-localeurls": "^1.7",
         "dektrium/yii2-user": "^0.9.14",
         "yiisoft/yii2-queue": "^2.3",
-        "setasign/fpdf": "^1.8"
+        "setasign/fpdf": "^1.8",
+        "serzh/amazon-mws-merchant-fulfillment": "^1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

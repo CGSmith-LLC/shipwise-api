@@ -135,6 +135,7 @@ class Order extends BaseOrder
         $shipment                = new Shipment();
         $shipment->shipment_date = new \DateTime("now");
         $shipment->customer_id   = $this->customer_id;
+        $shipment->order_id      = $this->id;
 
         // Sender
         $shipment->sender_contact        = $this->customer->name;
@@ -180,6 +181,10 @@ class Order extends BaseOrder
         // Shipping carrier & service
         $shipment->service = $this->service;
         $shipment->carrier = $this->service->carrier;
+
+        // References
+        $shipment->reference1 = $this->customer_reference;
+        $shipment->reference2 = $this->order_reference;
 
         // Invoke carrier API call
         try {
