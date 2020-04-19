@@ -280,9 +280,6 @@ class AmazonMWS extends ShipmentPlugin
     protected function shipmentExecute()
     {
 
-        // \yii\helpers\VarDumper::dump($this->data, 10, true);
-        // exit;
-
         $config = [
             'ServiceURL'    => $this->urlProd,
             'ProxyHost'     => null,
@@ -396,14 +393,14 @@ class AmazonMWS extends ShipmentPlugin
 
         // Label data
         $package->label_data   = $fileContents->getContents(); // Base64-encoded data for printing labels, GZip-compressed string
-        $package->label_format = $label->getLabelFormat();
+        $package->label_format = strtoupper($label->getLabelFormat());
 
         // Amazon-defined shipment identifier
         $this->shipment->external_id1 = $shipment->getShipmentId();
 
         // @todo For now it's always one label/package. For merging multiple files, refer to UPSPlugin code.
         $this->shipment->mergedLabelsData   = $package->label_data;
-        $this->shipment->mergedLabelsFormat = strtoupper($label->getLabelFormat());
+        $this->shipment->mergedLabelsFormat = $package->label_format;
 
         $this->isShipped = true;
 
