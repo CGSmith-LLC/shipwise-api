@@ -272,6 +272,7 @@ class OrderController extends ControllerEx
             $order->order_reference     = $orderForm->orderReference;
             $order->customer_reference  = $orderForm->customerReference;
             $order->requested_ship_date = $orderForm->requestedShipDate;
+            $order->notes               = $orderForm->notes;
             $order->status_id           = isset($orderForm->status) ? $orderForm->status : null;
             $order->address_id          = $address->id;
 

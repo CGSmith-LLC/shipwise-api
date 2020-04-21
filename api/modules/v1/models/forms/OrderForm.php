@@ -28,6 +28,13 @@ use api\modules\v1\models\order\StatusEx;
  *            maxLength = 64
  *        ),
  *     @SWG\Property(
+ *            property = "notes",
+ *            type = "string",
+ *            description = "Notes that will display under order info for ShipWise",
+ *            minLength = 1,
+ *            maxLength = 140
+ *        ),
+ *     @SWG\Property(
  *            property = "requestedShipDate",
  *            type = "string",
  *            description = "When the order should ship and be fulfilled",
@@ -128,6 +135,8 @@ class OrderForm extends Model
     public $status;
     /** @var ItemForm[] */
     public $items;
+    /** @var string */
+    public $notes;
 
     /**
      * {@inheritdoc}
@@ -142,6 +151,7 @@ class OrderForm extends Model
             ],
             [['poNumber', 'uuid', 'origin', 'customerReference'], 'string', 'length' => [1, 64]],
             ['orderReference', 'string', 'length' => [1, 45]],
+            ['notes', 'string', 'length' => [1, 140]],
             ['requestedShipDate', 'date', 'format' => 'php:Y-m-d'],
             ['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
             ['status', 'integer', 'on' => self::SCENARIO_UPDATE],
