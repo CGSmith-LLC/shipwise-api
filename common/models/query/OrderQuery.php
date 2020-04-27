@@ -53,9 +53,12 @@ class OrderQuery extends \yii\db\ActiveQuery
      *
      * @return OrderQuery
      */
-    public function forCustomers($ids)
+    public function forCustomers($ids = [])
     {
-        return $this->andOnCondition([Order::tableName() . '.customer_id' => $ids]);
+        if (!empty($ids)) {
+            return $this->andOnCondition([Order::tableName() . '.customer_id' => $ids]);
+        }
+        return $this;
     }
 
     /**

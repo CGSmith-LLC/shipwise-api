@@ -2,6 +2,9 @@
 
 namespace frontend\controllers;
 
+use common\models\Order;
+use common\models\Status;
+use frontend\models\User;
 use yii\web\Controller;
 
 /**
@@ -47,8 +50,46 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $orders = Order::find()
+            ->byStatus(Status::OPEN)
+            ->forCustomers((!\Yii::$app->user->identity->isAdmin) ? \Yii::$app->user->identity->getCustomerIds() : null)
+            ->count();
+
+        $totalpendingorders = Order::find()
+            ->byStatus(Status::PENDING)
+            ->forCustomers((!\Yii::$app->user->identity->isAdmin) ? \Yii::$app->user->identity->getCustomerIds() : null)
+            ->count();
+
+        $shipped = Order::find()
+            ->byStatus(Status::SHIPPED)
+            ->forCustomers((!\Yii::$app->user->identity->isAdmin) ? \Yii::$app->user->identity->getCustomerIds() : null)
+            ->count();
+        $cancelled = Order::find()
+            ->byStatus(Status::CANCELLED)
+            ->forCustomers((!\Yii::$app->user->identity->isAdmin) ? \Yii::$app->user->identity->getCustomerIds() : null)
+            ->count();
+        $wmserrors = Order::find()
+            ->byStatus(Status::WMS_ERROR)
+            ->forCustomers((!\Yii::$app->user->identity->isAdmin) ? \Yii::$app->user->identity->getCustomerIds() : null)
+            ->count();
+        $completed = Order::find()
+            ->byStatus(Status::COMPLETED)
+            ->forCustomer((!\Yii::$app->user->identity->isAdmin) ? \Yii::$app->user->identity->getCustomerIds() : null)
+            ->count();
+
+        return $this->render('index', [
+            'orders' => $orders,
+            'totalpendingorders' => $totalpendingorders,
+            'shipped' => $shipped,
+            'cancelled' => $cancelled,
+            'wmserrors' => $wmserrors,
+            'completed' => $completed,
+        ]);
+
+
     }
+
+
 }
 
 

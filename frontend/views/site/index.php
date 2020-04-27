@@ -17,11 +17,24 @@ $this->title = Yii::$app->name;
 
         <?php else : ?>
 
-            <h1>Welcome!</h1>
+            <h1>Welcomes!</h1>
             <p class="lead">This is your ShipWise dashboard.</p>
             <p><?= Html::a('Get started', ['/order'], ['class' => 'btn btn-success']) ?></p>
 
         <?php endif; ?>
+    </div>
+
+    <div style="text-align: center; ">
+        <?php
+
+
+        echo Html::button('Open Orders ' . $orders, ['class' => 'btn btn-primary']);
+        echo Html::button('Total Pending Orders' . $totalpendingorders, ['class' => 'btn btn-primary']);
+        echo Html::button(Yii::t('app', 'Shipped' . $shipped), ['class' => 'btn btn-primary']);
+        echo Html::button(Yii::t('app', 'Cancelled' . $cancelled), ['class' => 'btn btn-primary']);
+        echo Html::button(Yii::t('app', 'WMS Errors' . $wmserrors), ['class' => 'btn btn-primary']);
+        echo Html::button(Yii::t('app', 'Completed' . $completed), ['class' => 'btn btn-primary']);
+        ?>
     </div>
 
     <div class="body-content">
@@ -64,4 +77,9 @@ $this->title = Yii::$app->name;
         <?php */ ?>
 
     </div>
-</div>
+
+
+
+
+
+
