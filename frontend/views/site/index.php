@@ -1,5 +1,7 @@
 <?php
 
+use common\models\Order;
+use common\models\Status;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
@@ -11,75 +13,106 @@ $this->title = Yii::$app->name;
     <div class="jumbotron">
         <?php if (Yii::$app->user->identity->isAdmin) : ?>
 
-            <h1>Welcome admin!</h1>
+            <h1>Welcome Admin!</h1>
             <p class="lead">You have the power <span class="glyphicon glyphicon-sunglasses"></span></p>
             <p><?= Html::a('Manage Users', ['/user/admin'], ['class' => 'btn btn-success']) ?></p>
 
         <?php else : ?>
 
-            <h1>Welcomes!</h1>
-            <p class="lead">This is your ShipWise dashboard.</p>
+            <h1>Welcome!</h1>
+            <p class="lead">To your ShipWise dashboard.</p>
             <p><?= Html::a('Get started', ['/order'], ['class' => 'btn btn-success']) ?></p>
 
         <?php endif; ?>
     </div>
 
-    <div style="text-align: center; ">
-        <?php
-
-
-        echo Html::button('Open Orders ' . $orders, ['class' => 'btn btn-primary']);
-        echo Html::button('Total Pending Orders' . $totalpendingorders, ['class' => 'btn btn-primary']);
-        echo Html::button(Yii::t('app', 'Shipped' . $shipped), ['class' => 'btn btn-primary']);
-        echo Html::button(Yii::t('app', 'Cancelled' . $cancelled), ['class' => 'btn btn-primary']);
-        echo Html::button(Yii::t('app', 'WMS Errors' . $wmserrors), ['class' => 'btn btn-primary']);
-        echo Html::button(Yii::t('app', 'Completed' . $completed), ['class' => 'btn btn-primary']);
-        ?>
-    </div>
-
-    <div class="body-content">
-
-        <?php /* ?>
-
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
-            </div>
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title"><?=Yii::t('app','Open Orders')?></h5>
+            <h6 class="card-subtitle mb-2"><?= $orders ?></h6>
         </div>
+    </div>
 
-        <?php */ ?>
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title"><?=Yii::t('app','Total Pending Orders')?></h5>
+            <h6 class="card-subtitle mb-2"><?= $totalpendingorders ?></h6>
+        </div>
+    </div>
 
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title"><?=Yii::t('app','Shipped')?></h5>
+            <h6 class="card-subtitle mb-2"><?= $shipped ?></h6>
+        </div>
+    </div>
+
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title"><?=Yii::t('app','Cancelled')?></h5>
+            <h6 class="card-subtitle mb-2"><?= $cancelled ?></h6>
+        </div>
+    </div>
+
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title"><?=Yii::t('app','WMS Errors')?></h5>
+            <h6 class="card-subtitle mb-2"><?= $wmserrors ?></h6>
+        </div>
+    </div>
+
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title"><?=Yii::t('app','Completed')?></h5>
+            <h6 class="card-subtitle mb-2"><?= $completed ?></h6>
+        </div>
     </div>
 
 
+        <br>
+        <br>
+        <br>
+        <br>
 
+            <script>
+                window.onload = function () {
 
+                    var dataPoints = [];
 
+                    var chart = new CanvasJS.Chart("chartContainer", {
+                        animationEnabled: true,
+                        theme: "light2",
+                        zoomEnabled: true,
+                        title: {
+                            text: "Bitcoin Price - 2017"
+                        },
+                        axisY: {
+                            title: "Price in USD",
+                            titleFontSize: 24,
+                            prefix: "$"
+                        },
+                        data: [{
+                            type: "line",
+                            yValueFormatString: "$#,##0.00",
+                            dataPoints: dataPoints
+                        }]
+                    });
 
+                    function addData(data) {
+                        var dps = data.price_usd;
+                        for (var i = 0; i < dps.length; i++) {
+                            dataPoints.push({
+                                x: new Date(dps[i][0]),
+                                y: dps[i][1]
+                            });
+                        }
+                        chart.render();
+                    }
+
+                    $.getJSON("https://canvasjs.com/data/gallery/php/bitcoin-price.json", addData);
+
+                }
+            </script>
+        <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+        <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+        <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>

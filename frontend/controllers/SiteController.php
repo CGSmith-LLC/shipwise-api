@@ -64,14 +64,17 @@ class SiteController extends Controller
             ->byStatus(Status::SHIPPED)
             ->forCustomers((!\Yii::$app->user->identity->isAdmin) ? \Yii::$app->user->identity->getCustomerIds() : null)
             ->count();
+
         $cancelled = Order::find()
             ->byStatus(Status::CANCELLED)
             ->forCustomers((!\Yii::$app->user->identity->isAdmin) ? \Yii::$app->user->identity->getCustomerIds() : null)
             ->count();
+
         $wmserrors = Order::find()
             ->byStatus(Status::WMS_ERROR)
             ->forCustomers((!\Yii::$app->user->identity->isAdmin) ? \Yii::$app->user->identity->getCustomerIds() : null)
             ->count();
+
         $completed = Order::find()
             ->byStatus(Status::COMPLETED)
             ->forCustomer((!\Yii::$app->user->identity->isAdmin) ? \Yii::$app->user->identity->getCustomerIds() : null)
