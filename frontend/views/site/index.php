@@ -84,7 +84,7 @@ $this->title = Yii::$app->name;
                         theme: "light2",
                         zoomEnabled: true,
                         title: {
-                            text: "Bitcoin Price - 2017"
+                            text: "Quick View"
                         },
                         axisY: {
                             title: "Price in USD",
