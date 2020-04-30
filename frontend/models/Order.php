@@ -13,6 +13,18 @@ use yii\helpers\ArrayHelper;
 class Order extends BaseOrder
 {
 
+    /**
+     * @inheritDoc
+     */
+    public function rules()
+    {
+        $return = parent::rules();
+        $return[] = [['requested_ship_date'], 'date', 'format' => 'php:m/d/Y'];
+
+        return $return;
+    }
+
+
     /** {@inheritdoc} */
     public function attributeLabels()
     {
@@ -29,6 +41,32 @@ class Order extends BaseOrder
             'carrier.name' => 'Carrier',
             'service.name' => 'Service',
         ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function afterFind()
+    {
+        if (!empty($this->requested_ship_date)) {
+            $date = new \DateTime($this->requested_ship_date);
+            $this->setAttribute('requested_ship_date', $date->format('m/d/Y'));
+        }
+
+        parent::afterFind();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function beforeSave($insert)
+    {
+        if (!empty($this->requested_ship_date)) {
+            $date = new \DateTime($this->requested_ship_date);
+            $this->setAttribute('requested_ship_date', $date->format('Y-m-d'));
+        }
+
+        return parent::beforeSave($insert);
     }
 
     /**
@@ -78,7 +116,7 @@ class Order extends BaseOrder
      */
     public function changeStatus($newStatusId)
     {
-        $this->status_id    = $newStatusId;
+        $this->status_id = $newStatusId;
         $this->updated_date = date("Y-m-d H:i:s");
 
         return $this->save();

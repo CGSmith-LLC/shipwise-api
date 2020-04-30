@@ -21,6 +21,10 @@ DatePickerAsset::register($this);
 $item = new Item();
 $item->loadDefaultValues();
 
+$this->registerJs("$(function () {
+    $('#datetimepicker').datepicker();
+});", View::POS_READY);
+
 ?>
 
     <div class="order-form">
@@ -78,6 +82,7 @@ $item->loadDefaultValues();
 
                         <?= $form->field($model->order, 'requested_ship_date')->textInput([
                             'value' => $model->order->requested_ship_date,
+                            'id' => 'datetimepicker',
                         ]); ?>
 
                     </div>
