@@ -46,4 +46,13 @@ class InvoiceItems extends \yii\db\ActiveRecord
             'amount' => 'Amount',
         ];
     }
+
+    /**
+     * Relation for Invoice
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInvoice()
+    {
+        return $this->hasOne(Invoice::class, ['invoice_id'=>'id']);
+    }
 }

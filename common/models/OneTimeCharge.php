@@ -48,4 +48,9 @@ class OneTimeCharge extends \yii\db\ActiveRecord
             'added_to_invoice' => 'Added To Invoice',
         ];
     }
+
+    public function getCustomer()
+    {
+        return $this->hasOne(Customer::class, ['customer_id' => 'id']);
+    }
 }

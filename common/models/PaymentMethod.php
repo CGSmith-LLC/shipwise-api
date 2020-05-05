@@ -12,7 +12,7 @@ use Yii;
  * @property string $stripe_payment_method_id
  * @property int $default Is this the customer's default payment method?
  */
-class Paymentmethod extends \yii\db\ActiveRecord
+class PaymentMethod extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -45,5 +45,15 @@ class Paymentmethod extends \yii\db\ActiveRecord
             'stripe_payment_method_id' => 'Stripe Payment Method ID',
             'default' => 'Default',
         ];
+    }
+
+    /**
+     * Relation for customer
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCustomer()
+    {
+        return $this->hasOne(Customer::class, ['id'=> 'customer_id']);
     }
 }

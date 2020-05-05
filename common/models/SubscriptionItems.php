@@ -46,4 +46,13 @@ class SubscriptionItems extends \yii\db\ActiveRecord
             'amount' => 'Amount',
         ];
     }
+
+    /**
+     * Relation to Subscription
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSubscription()
+    {
+        return $this->hasOne(Subscription::class, ['id' => 'subscription_id']);
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace common\models\base;
 
+use common\models\PaymentMethod;
+
 /**
  * This is the model class for table "customers".
  *
@@ -75,5 +77,15 @@ class BaseCustomer extends \yii\db\ActiveRecord
     public function getState()
     {
         return $this->hasOne('common\models\State', ['id' => 'state_id']);
+    }
+
+    /**
+     * Payment method relation
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentMethods()
+    {
+        return $this->hasMany(PaymentMethod::class, ['customer_id' => 'id']);
     }
 }

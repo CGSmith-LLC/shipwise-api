@@ -58,4 +58,34 @@ class Invoice extends \yii\db\ActiveRecord
             'status' => 'Status',
         ];
     }
+
+    /**
+     * Relation for InvoiceItems
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItems()
+    {
+        return $this->hasMany(InvoiceItems::class, ['invoice_id' => 'id']);
+    }
+
+    /**
+     * Relation for Customers
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCustomer()
+    {
+        return $this->hasOne(Customer::class, ['id' => 'customer_id']);
+    }
+
+    /**
+     * Relation for Subscriptions
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSubscription()
+    {
+        return $this->hasMany(Subscription::class, ['id' => 'subscription_id']);
+    }
 }

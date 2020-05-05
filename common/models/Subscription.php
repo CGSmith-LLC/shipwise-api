@@ -46,4 +46,22 @@ class Subscription extends \yii\db\ActiveRecord
             'months_to_recur' => 'Months To Recur',
         ];
     }
+
+    /**
+     * Customer relation
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCustomer()
+    {
+        return $this->hasOne(Customer::class, ['id' => 'customer_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getItems()
+    {
+        return $this->hasMany(SubscriptionItems::class, ['subscription_id' => 'id']);
+    }
 }
