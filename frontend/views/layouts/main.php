@@ -80,6 +80,7 @@ AppAsset::register($this);
 
         if (Yii::$app->user->identity->isAdmin) {
             $menuItems[] = ['label' => 'Users', 'url' => ['/user/admin/']];
+            $menuItems[] = ['label' => 'Subscriptions', 'url' => ['/subscription']];
         }
 
         $menuItems[] = ['label' => 'Account', 'url' => ['/user/settings/account']];
