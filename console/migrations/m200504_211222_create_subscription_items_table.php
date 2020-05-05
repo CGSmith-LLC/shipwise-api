@@ -14,9 +14,9 @@ class m200504_211222_create_subscription_items_table extends Migration
     {
         $this->createTable('{{%subscription_items}}', [
             'id' => $this->primaryKey(),
-            'name' => $this->string(120)->notNull()->comment('Name'),
-            'subscription_items_id' => $this->integer(11)->notNull()->comment('Reference to subscription_items_id'),
-            'amount' => $this->integer(11)->notNull()->comment('amount'),
+            'subscription_id' => $this->integer(11)->notNull()->comment('Reference to subscriptions'),
+            'name' => $this->string(128)->notNull(),
+            'amount' => $this->integer(11)->notNull()->comment('amount in cents'),
         ]);
     }
 

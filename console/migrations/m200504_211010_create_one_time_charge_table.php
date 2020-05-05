@@ -15,11 +15,17 @@ class m200504_211010_create_one_time_charge_table extends Migration
         $this->createTable('{{%one_time_charge}}', [
             'id' => $this->primaryKey(),
             'customer_id' => $this->integer(11)->notNull()->comment('Reference to customer'),
-            'one_time_item_name' => $this->string(64)->notNull()->comment(''),
-            'amount' => $this->integer(11)->notNull(),
-            'added_to_transaction' => $this->boolean()->notNull()->defaultValue(0),
+            'name' => $this->string(128)->notNull(),
+            'amount' => $this->integer(11)->notNull()->comment('In cents'),
+            'added_to_invoice' => $this->boolean()->notNull()->defaultValue(0),
         ]);
     }
 
-
+    /**
+     * {@inheritdoc}
+     */
+    public function safeDown()
+    {
+        $this->dropTable('{{%one_time_charge}}');
+    }
 }

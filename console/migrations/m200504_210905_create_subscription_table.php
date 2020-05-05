@@ -14,7 +14,7 @@ class m200504_210905_create_subscription_table extends Migration
     {
         $this->createTable('{{%subscription}}', [
             'id' => $this->primaryKey(),
-            'customer_id' => $this->string(120)->notNull()->comment('Reference to customer'),
+            'customer_id' => $this->integer(11)->notNull()->comment('Reference to customer'),
             'next_invoice' => $this->date()->notNull()->comment('The Next Date to generate an invoice'),
             'months_to_recur' => $this->integer(2)->notNull()->comment('How many months will be used to calculate the next invoice'),
         ]);

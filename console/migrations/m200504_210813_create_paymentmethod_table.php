@@ -14,9 +14,9 @@ class m200504_210813_create_paymentmethod_table extends Migration
     {
         $this->createTable('{{%paymentmethod}}', [
             'id' => $this->primaryKey(),
-            'customer_id'=>$this->integer(11)->defaultValue(null)->comment('Reference to customer'),
-            'stripe_charge_id'=>$this->integer(11)->notNull()->comment(''),
-            'default'=>$this->string(120)->notNull()->comment('Name of the bulk action'),
+            'customer_id' => $this->integer(11)->null()->comment('Reference to customer'),
+            'stripe_payment_method_id' => $this->char(128)->null(),
+            'default' => $this->boolean()->notNull()->comment('Is this the customer\'s default payment method?'),
         ]);
     }
 
