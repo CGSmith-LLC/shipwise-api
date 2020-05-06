@@ -101,10 +101,14 @@ class SubscriptionController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = new SubscriptionForm();
+        $model->subscription = $this->findModel($id);
+        $model->setAttributes(Yii::$app->request->post());
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->post() && $model->validate() && $model->save()) {
+            Yii::$app->getSession()->setFlash('success', 'Subscription has been updated.');
+
+            return $this->redirect(['view', 'id' => $model->subscription->id]);
         }
 
         return $this->render('update', [

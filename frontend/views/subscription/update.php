@@ -3,11 +3,11 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model frontend\models\Subscription */
+/* @var $model frontend\models\forms\SubscriptionForm */
 
-$this->title = 'Update Subscription: ' . $model->id;
+$this->title = 'Update Subscription: ' . $model->subscription->id;
 $this->params['breadcrumbs'][] = ['label' => 'Subscriptions', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->subscription->id, 'url' => ['view', 'id' => $model->subscription->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="subscription-update">
