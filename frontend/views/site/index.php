@@ -17,56 +17,48 @@ $this->title = Yii::$app->name;
             <p class="lead">You have the power <span class="glyphicon glyphicon-sunglasses"></span></p>
             <p><?= Html::a('Manage Users', ['/user/admin'], ['class' => 'btn btn-success']) ?></p>
 
-        <?php else : ?>
 
-            <h1>Welcome!</h1>
-            <p class="lead">To your ShipWise dashboard.</p>
-            <p><?= Html::a('Get started', ['/order'], ['class' => 'btn btn-success']) ?></p>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title"><?=Yii::t('app','Open Orders')?></h5>
+                    <h6 class="card-subtitle mb-2"><?= $orders ?></h6>
+                </div>
+            </div>
 
-        <?php endif; ?>
-    </div>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title"><?=Yii::t('app','Total Pending Orders')?></h5>
+                    <h6 class="card-subtitle mb-2"><?= $totalpendingorders ?></h6>
+                </div>
+            </div>
 
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title"><?=Yii::t('app','Open Orders')?></h5>
-            <h6 class="card-subtitle mb-2"><?= $orders ?></h6>
-        </div>
-    </div>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title"><?=Yii::t('app','Shipped')?></h5>
+                    <h6 class="card-subtitle mb-2"><?= $shipped ?></h6>
+                </div>
+            </div>
 
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title"><?=Yii::t('app','Total Pending Orders')?></h5>
-            <h6 class="card-subtitle mb-2"><?= $totalpendingorders ?></h6>
-        </div>
-    </div>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title"><?=Yii::t('app','Cancelled')?></h5>
+                    <h6 class="card-subtitle mb-2"><?= $cancelled ?></h6>
+                </div>
+            </div>
 
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title"><?=Yii::t('app','Shipped')?></h5>
-            <h6 class="card-subtitle mb-2"><?= $shipped ?></h6>
-        </div>
-    </div>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title"><?=Yii::t('app','WMS Errors')?></h5>
+                    <h6 class="card-subtitle mb-2"><?= $wmserrors ?></h6>
+                </div>
+            </div>
 
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title"><?=Yii::t('app','Cancelled')?></h5>
-            <h6 class="card-subtitle mb-2"><?= $cancelled ?></h6>
-        </div>
-    </div>
-
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title"><?=Yii::t('app','WMS Errors')?></h5>
-            <h6 class="card-subtitle mb-2"><?= $wmserrors ?></h6>
-        </div>
-    </div>
-
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title"><?=Yii::t('app','Completed')?></h5>
-            <h6 class="card-subtitle mb-2"><?= $completed ?></h6>
-        </div>
-    </div>
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title"><?=Yii::t('app','Completed')?></h5>
+                    <h6 class="card-subtitle mb-2"><?= $completed ?></h6>
+                </div>
+            </div>
 
 
         <br>
@@ -113,6 +105,16 @@ $this->title = Yii::$app->name;
 
                 }
             </script>
-        <div id="chartContainer" style="height: 370px; width: 100%;"></div>
-        <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
-        <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+            <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+            <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+            <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+
+
+        <?php else : ?>
+
+            <h1>Welcome!</h1>
+            <p class="lead">To your ShipWise dashboard.</p>
+            <p><?= Html::a('Get started', ['/order'], ['class' => 'btn btn-success']) ?></p>
+
+        <?php endif; ?>
+    </div>
