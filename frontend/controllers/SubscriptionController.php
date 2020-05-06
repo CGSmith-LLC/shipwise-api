@@ -125,7 +125,18 @@ class SubscriptionController extends Controller
      */
     public function actionDelete($id)
     {
+        // Deletes subscription model
         $this->findModel($id)->delete();
+
+        /**
+         * Also find items and delete
+         */
+        $items = SubscriptionItems::find()->where(['subscription_id' => $id])->all();
+
+        /** @var SubscriptionItems $item */
+        foreach ($items as $item) {
+            $item->delete();
+        }
 
         return $this->redirect(['index']);
     }
