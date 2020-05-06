@@ -39,11 +39,11 @@ $this->registerJsFile('@web/js/subscription-create.js');
 
     <?php $form = ActiveForm::begin(['enableClientValidation' => false,]); ?>
 
-    <?= $form->field($model->subscription, 'customer_id')->dropDownList(\frontend\models\Customer::getList()) ?>
+    <?= $form->field($model->subscription, 'customer_id')->dropDownList(\frontend\models\Customer::getList())->label('Customer Name')  ?>
 
     <?= $form->field($model->subscription, 'next_invoice')->textInput([
         'id' => 'datetimepicker',
-    ]) ?>
+    ])->label('Next Invoice Date') ?>
 
     <?= $form->field($model->subscription, 'months_to_recur')->textInput() ?>
 
@@ -51,7 +51,7 @@ $this->registerJsFile('@web/js/subscription-create.js');
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Items</h3>
+                    <h3 class="panel-title">Subscription Items</h3>
                 </div>
                 <div class="panel-body">
 
@@ -82,7 +82,7 @@ $this->registerJsFile('@web/js/subscription-create.js');
                         </div>
                     </div>
 
-                    <?= Html::a('<i class="glyphicon glyphicon-plus"></i> add another item', 'javascript:void(0);', [
+                    <?= Html::a('<i class="glyphicon glyphicon-plus"></i> Add Another Item', 'javascript:void(0);', [
                         'id'    => 'btn-add-item',
                         'class' => 'btn btn-warning btn-sm',
                     ]) ?>

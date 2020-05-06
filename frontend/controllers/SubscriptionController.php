@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\SubscriptionItems;
 use frontend\models\forms\SubscriptionForm;
 use Yii;
 use frontend\models\Subscription;
@@ -53,8 +54,14 @@ class SubscriptionController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $dataProvider = new ActiveDataProvider([
+            'query' => SubscriptionItems::find()->where(['subscription_id' => $model->id])
+        ]);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'dataProvider' => $dataProvider,
+            'model' => $model,
         ]);
     }
 

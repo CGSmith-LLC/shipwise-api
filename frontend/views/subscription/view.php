@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Subscription */
 
-$this->title = $model->id;
+$this->title = $model->customer->name . ' Subscription #' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Subscriptions', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -29,11 +29,22 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
-            'customer_id',
             'next_invoice',
             'months_to_recur',
         ],
+    ]) ?>
+
+    <?= \yii\grid\GridView::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => [
+            'name',
+            [
+                'attribute' => 'amount',
+                'value' => function ($model) {
+                    return Yii::$app->formatter->asCurrency($model->decimalAmount);
+                }
+            ],
+        ]
     ]) ?>
 
 </div>
