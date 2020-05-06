@@ -37,7 +37,7 @@ $this->registerJsFile('@web/js/subscription-create.js');
 
 <div class="subscription-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['enableClientValidation' => false,]); ?>
 
     <?= $form->field($model->subscription, 'customer_id')->dropDownList(\frontend\models\Customer::getList()) ?>
 

@@ -28,7 +28,7 @@ class SubscriptionItems extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['subscription_id', 'name', 'amount'], 'required'],
+            [['name', 'amount'], 'required'],
             [['subscription_id', 'amount'], 'integer'],
             [['name'], 'string', 'max' => 128],
         ];

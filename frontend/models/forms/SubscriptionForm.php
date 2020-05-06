@@ -29,7 +29,8 @@ class SubscriptionForm extends Model
     public function rules()
     {
         return [
-            [['Subscription', 'SubscriptionItems'], 'required'],
+            // These names represent the getItems or getSubscription calls below
+            [['Subscription', 'Items'], 'required'],
         ];
     }
 

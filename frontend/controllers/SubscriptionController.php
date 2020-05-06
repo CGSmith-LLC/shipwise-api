@@ -62,19 +62,27 @@ class SubscriptionController extends Controller
      * Creates a new Subscription model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
+     * @throws \yii\db\Exception
+     * @throws \Throwable
      */
     public function actionCreate()
     {
+        /**@var SubscriptionForm */
         $model = new SubscriptionForm();
         $model->subscription = new Subscription();
+        $model->subscription->loadDefaultValues();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $model->setAttributes(Yii::$app->request->post());
+        if (Yii::$app->request->post() && $model->validate() && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->subscription->id]);
         }
+
 
         return $this->render('create', [
             'model' => $model,
         ]);
+
+
     }
 
     /**
