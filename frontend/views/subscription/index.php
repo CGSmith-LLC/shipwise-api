@@ -20,12 +20,16 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'customer_id',
+            [
+                'attribute' => 'customer_id',
+                'value' => function ($model) {
+                    return $model->customer->name;
+                }
+            ],
             'next_invoice',
             'months_to_recur',
+            // YTD
+            // OPEN invoices
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
