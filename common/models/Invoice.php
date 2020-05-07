@@ -19,6 +19,9 @@ use Yii;
  */
 class Invoice extends \yii\db\ActiveRecord
 {
+    const STATUS_UNPAID = 1;
+    const STATUS_PAID   = 2;
+    const STATUS_LATE   = 3;
     /**
      * {@inheritdoc}
      */
