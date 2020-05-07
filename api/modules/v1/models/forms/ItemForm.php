@@ -22,7 +22,7 @@ use yii\base\Model;
  *            property = "sku",
  *            type = "string",
  *            description = "SKU",
- *            minLength = 2,
+ *            minLength = 1,
  *            maxLength = 64
  *        ),
  *     @SWG\Property(
