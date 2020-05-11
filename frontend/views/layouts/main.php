@@ -80,13 +80,18 @@ AppAsset::register($this);
 
         if (Yii::$app->user->identity->isAdmin) {
             $menuItems[] = ['label' => 'Users', 'url' => ['/user/admin/']];
-            $menuItems[] = ['label' => 'Subscriptions', 'url' => ['/subscription']];
+            $menuItems[] = [
+                    'label' => 'Subscriptions', 'url' => ['/subscription'],
+                    'items' => [
+                    ['label' => 'Subscriptions', 'url' => ['/subscription']],
+                    ['label' => 'One Time Charges', 'url' => ['/one-time-charge']],
+                ]];
         }
 
         $menuItems[] = ['label' => 'Account', 'url' => ['/user/settings/account']];
         $menuItems[] = '<li>'
             . Html::beginForm(['/user/logout'], 'post')
-            . Html::submitButton('<img src="https://www.gravatar.com/avatar/'.md5(Yii::$app->user->identity->email).'?s=24&d=mp" style="border-radius:50%">'.
+            . Html::submitButton('<img src="https://www.gravatar.com/avatar/' . md5(Yii::$app->user->identity->email) . '?s=24&d=mp" style="border-radius:50%">' .
                 ' Logout (' . Yii::$app->user->identity->username . ')',
                 ['class' => 'logout']
             )

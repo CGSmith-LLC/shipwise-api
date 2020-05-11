@@ -154,6 +154,11 @@ class SubscriptionController extends Controller
         return $this->redirect(['index']);
     }
 
+    public function actionOneTime()
+    {
+        return $this->render('one-time');
+    }
+
     /**
      * Finds the Subscription model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

@@ -81,7 +81,6 @@ class InvoiceController extends Controller
 
             // send copy of invoice to customer's email address
 
-
         }
 
 
