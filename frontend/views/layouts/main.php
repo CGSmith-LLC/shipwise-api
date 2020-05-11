@@ -88,7 +88,12 @@ AppAsset::register($this);
                 ]];
         }
 
-        $menuItems[] = ['label' => 'Account', 'url' => ['/user/settings/account']];
+        $menuItems[] = [
+            'label' => 'Account', 'url' => ['/user/settings/account'],
+            'items' => [
+                ['label' => 'Account', 'url' => ['/user/settings/account']],
+                ['label' => 'Billing', 'url' => ['/payment-method']],
+            ]];
         $menuItems[] = '<li>'
             . Html::beginForm(['/user/logout'], 'post')
             . Html::submitButton('<img src="https://www.gravatar.com/avatar/' . md5(Yii::$app->user->identity->email) . '?s=24&d=mp" style="border-radius:50%">' .
