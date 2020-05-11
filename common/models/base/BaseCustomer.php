@@ -17,6 +17,7 @@ use common\models\PaymentMethod;
  * @property string               $phone    Phone number
  * @property string               $email    Email address
  * @property string               $logo     The absolute URL of the logo
+ * @property string               $stripe_customer_id   Stripe ID for the customer
  * @property string               $created_date
  *
  * @property \common\models\State $state
@@ -45,6 +46,7 @@ class BaseCustomer extends \yii\db\ActiveRecord
             [['address1', 'address2', 'city'], 'string', 'max' => 64],
             [['zip'], 'string', 'max' => 16],
             [['phone'], 'string', 'max' => 32],
+            [['stripe_customer_id'], 'string', 'max' => 128],
             [['logo', 'email'], 'string', 'max' => 255],
         ];
     }

@@ -60,6 +60,19 @@ class User extends BaseUser
     }
 
     /**
+     * Return the customer stripe id token from the first model
+     *
+     * @return string
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getCustomerStripeId()
+    {
+        /** @var Customer $customer */
+        $customer = $this->getCustomers()->one();
+        return $customer->stripe_customer_id;
+    }
+
+    /**
      * Get array of associated customers IDs
      *
      * @return array
