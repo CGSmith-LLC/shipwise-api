@@ -39,7 +39,10 @@ AppAsset::register($this);
     <meta name="msapplication-TileImage" content="/images/ms-icon-144x144.png">
     <meta name="theme-color" content="#2c9fd6">
 
-
+    <script src ="https://js.stripe.com/v3/"></script>
+    <script type="application/javascript">
+        var stripe = Stripe('<?=Yii::$app->stripe->publicKey?>');
+    </script>
 
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
