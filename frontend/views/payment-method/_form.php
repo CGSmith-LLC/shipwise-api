@@ -9,9 +9,6 @@ use yii\widgets\ActiveForm;
 
 \Stripe\Stripe::setApiKey(Yii::$app->stripe->privateKey);
 
-$intent = \Stripe\SetupIntent::create([
-        'customer' => Yii::$app->user->identity->getCustomerStripeId(),
-]);
 $this->registerJsFile('@web/cc-form.js');
 $this->registerJsFile('https://js.stripe.com/v3/');
 
@@ -31,6 +28,7 @@ $this->registerJsFile('https://js.stripe.com/v3/');
         <div id="card-errors" role="alert"></div>
     </div>
 
+    <?= $form->field($model, 'default')->checkbox() ?>
     <?= $form->field($model, 'stripe_payment_method_id')->hiddenInput()->label(false) ?>
     <div class="form-group">
         <?= Html::button(Yii::t('app', 'Save Card'), ['class' => 'btn btn-success', 'onclick' => 'createCC()', 'data-secret' => $model->setupIntent->client_secret, 'Id' => 'card-button'])?>

@@ -2,6 +2,9 @@
 
 namespace frontend\controllers;
 
+use cgsmith\stripe\Stripe;
+use common\models\Status;
+use frontend\models\Customer;
 use Yii;
 use frontend\models\PaymentMethod;
 use yii\data\ActiveDataProvider;
@@ -66,8 +69,14 @@ class PaymentMethodController extends Controller
     {
         $model = new PaymentMethod();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate()) {
+                if ($model->save()) {
+                    Yii::$app->getSession()->setFlash('success', 'Payment Made.');
+
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+            }
         }
 
         return $this->render('create', [
