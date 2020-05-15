@@ -73,6 +73,19 @@ class User extends BaseUser
     }
 
     /**
+     * Return the customer id
+     *
+     * @return string
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getCustomerId()
+    {
+        /** @var Customer $customer */
+        $customer = $this->getCustomers()->one();
+        return $customer->id;
+    }
+
+    /**
      * Get array of associated customers IDs
      *
      * @return array
