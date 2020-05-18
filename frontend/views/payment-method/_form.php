@@ -34,11 +34,11 @@ $this->registerJsFile('https://js.stripe.com/v3/');
         <?= Html::button(Yii::t('app', 'Save Card'), ['class' => 'btn btn-success', 'onclick' => 'createCC()', 'data-secret' => $model->setupIntent->client_secret, 'Id' => 'card-button'])?>
     </div>
 
-
-
     <input id="cardholder-name" type="text">
     <!-- placeholder for Elements -->
 
     <?php ActiveForm::end(); ?>
 
 </div>
+
+

@@ -31,8 +31,8 @@ function stripeTokenHandler(token) {
     var hiddenInput = $("#paymentmethod-stripe_payment_method_id");
     hiddenInput.val(token.payment_method);
 
-        // Submit the form
-        form.submit();
+    // Submit the form
+    form.submit();
 }
 //display error(s)
 cardElement.addEventListener('change',function(event){

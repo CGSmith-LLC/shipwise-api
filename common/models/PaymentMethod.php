@@ -2,10 +2,12 @@
 
 namespace common\models;
 
+use api\modules\v1\controllers\DefaultController;
 use frontend\models\PaymentMethods;
 use Stripe\Customer;
 use Stripe\Exception\ApiErrorException;
 use Stripe\SetupIntent;
+use Stripe\PaymentIntent;
 use Stripe\Source;
 use Stripe\Stripe;
 use Yii;
@@ -108,6 +110,16 @@ class PaymentMethod extends \yii\db\ActiveRecord
                 $paymentMethod->save();
             }
         }
+
+        $array = [
+            'amount' => 2000,
+            'currency' => 'usd',
+            'payment_method' => $event->sender->stripe_payment_method_id,
+            'customer' => Yii::$app->user->identity->getCustomerStripeId(),
+            'off_session' => true,
+            'confirm' => true,
+        ];
+        \Stripe\PaymentIntent::create($array);
     }
 
     /**
@@ -116,34 +128,22 @@ class PaymentMethod extends \yii\db\ActiveRecord
      */
     public function stripeCreateSource($event)
     {
-       // if (!$event->sender->account_type) {
-           // $customer = (isset($event->sender->subscriber->stripe_customer_token)) ? $event->sender->subscriber->stripe_customer_token : $event->sender->developer->stripe_customer_token;
+        /** @var $source Source */
+        $this->setAttribute('stripe_payment_method_id', isset($source->id) ? $source->id : null);
 
-            // Create new bank source
-          /**$source = Customer::createSource(
-                $customer,
-                [
-                    'source' => $event->sender->stripe_token, // Bank token
-                ]
-            );*/
+        // Credit card payment method
+        try {
+            $paymentMethod = \Stripe\PaymentMethod::retrieve($event->sender->stripe_payment_method_id);
 
-            /** @var $source Source */
-            Yii::debug($event);
-            $this->setAttribute('stripe_payment_method_id', isset($source->id) ? $source->id : null);
+            // Associate with customer id
+            $paymentMethod->attach(['customer' => $event->sender->customer->stripe_customer_token]);
 
-            // Credit card payment method
-            try {
-                $paymentMethod = \Stripe\PaymentMethod::retrieve($event->sender->stripe_payment_method_id);
-
-                // Associate with customer id
-                $paymentMethod->attach(['customer' => $event->sender->customer->stripe_customer_token]);
-
-                /** @var $paymentMethod \Stripe\PaymentMethod */
-                $this->setAttribute('stripe_token', isset($paymentMethod->id) ? $paymentMethod->id : null);
-            } catch (ApiErrorException $e) {
-                $event->sender->addError('cc', $e->getMessage());
-                $event->isValid = false;
-            }
+            /** @var $paymentMethod \Stripe\PaymentMethod */
+            $this->setAttribute('stripe_token', isset($paymentMethod->id) ? $paymentMethod->id : null);
+        } catch (ApiErrorException $e) {
+            $event->sender->addError('cc', $e->getMessage());
+            $event->isValid = false;
+        }
     }
 }
 
