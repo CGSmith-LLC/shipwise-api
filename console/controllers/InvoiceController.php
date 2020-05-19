@@ -2,11 +2,19 @@
 
 namespace console\controllers;
 
+use common\models\Charge;
 use common\models\Invoice;
 use common\models\InvoiceItems;
 use common\models\OneTimeCharge;
 use common\models\Subscription;
 use common\models\SubscriptionItems;
+use frontend\models\Charges;
+use frontend\models\Customer;
+use frontend\models\Invoices;
+use common\models\PaymentMethod;
+use frontend\models\Payouts;
+use Stripe\Exception\ApiErrorException;
+use Stripe\PaymentIntent;
 use yii\console\Controller;
 
 class InvoiceController extends Controller
@@ -86,5 +94,36 @@ class InvoiceController extends Controller
 
     }
 
+    /**
+     * @var Charge
+     */
 
+    public function actionCharge($date = 'now')
+    {
+
+        $date = new \DateTime($date);
+        /** Get Invoices*/
+        $invoices = Invoice::find()
+            ->where(['<=', 'status', $date->format('Y-m-d')])
+            ->andWhere(['>', 'balance', 0])
+        ->all();
+
+        /** @var Invoice $invoice */
+        foreach ($invoices as $invoice) {
+            $customer = Customer::findOne($invoice->customer_id);
+            $paymentMethod = PaymentMethod::find()->where(['customer_id' => $customer->id, 'default' => PaymentMethod::PRIMARY_PAYMENT_METHOD_YES])->one();
+            $charge = PaymentIntent::create([
+                'amount' => $invoice->balance,
+                'currency' => 'usd',
+                'customer' => $customer->stripe_customer_id,
+                'description' => 'Invoice #' . $invoice->id,
+                'payment_method' => $paymentMethod->stripe_payment_method_id,
+                'confirm' => true,
+                'metadata' => [
+                    'invoice_id' => $invoice->id,
+                    'invoice_url' => 'https://app.getshipwise.com/invoice/view?id=' . $invoice->id,
+                ],
+            ]);
+        }
+    }
 }

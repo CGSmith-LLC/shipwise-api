@@ -5,12 +5,16 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "paymentmethod".
+ * This is the model class for table "payment_intent".
  *
  * @property int $id
  * @property int $customer_id Reference to customer
- * @property string $stripe_payment_method_id
- * @property int $default Is this the customer's default payment method?
+ * @property int $payment_method_id Reference to payment method table
+ * @property int $invoice_id
+ * @property string $stripe_payment_intent_id stripe payment intent id
+ * @property int $amount Total in Cents
+ * @property string $status Stripe Status of Payment Intent
+ * @property string $created_date Created Date
  */
 class PaymentIntent extends \yii\db\ActiveRecord
 {
@@ -19,7 +23,7 @@ class PaymentIntent extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'paymentmethod';
+        return 'payment_intent';
     }
 
     /**
@@ -28,9 +32,11 @@ class PaymentIntent extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer_id', 'default'], 'integer'],
-            [['default'], 'required'],
-            [['stripe_payment_method_id'], 'string', 'max' => 128],
+            [['customer_id', 'payment_method_id', 'invoice_id', 'amount', 'status', 'created_date'], 'required'],
+            [['customer_id', 'payment_method_id', 'invoice_id', 'amount'], 'integer'],
+            [['created_date'], 'safe'],
+            [['stripe_payment_intent_id'], 'string', 'max' => 128],
+            [['status'], 'string', 'max' => 64],
         ];
     }
 
@@ -42,8 +48,12 @@ class PaymentIntent extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'customer_id' => 'Customer ID',
-            'stripe_payment_method_id' => 'Stripe Payment Method ID',
-            'default' => 'Default',
+            'payment_method_id' => 'Payment Method ID',
+            'invoice_id' => 'Invoice ID',
+            'stripe_payment_intent_id' => 'Stripe Payment Intent ID',
+            'amount' => 'Amount',
+            'status' => 'Status',
+            'created_date' => 'Created Date',
         ];
     }
 }

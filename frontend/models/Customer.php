@@ -63,4 +63,17 @@ class Customer extends BaseCustomer
 
         return ArrayHelper::map($data, $keyField, $valueField);
     }
+
+    /**
+     * Get Default Payment Method ID from the customer's payment method relations
+     *
+     * @return string
+     */
+    public function getDefaultPaymentMethodId()
+    {
+        /** @var PaymentMethod $paymentMethod */
+        $paymentMethod = $this->getPaymentMethods()->where(['default' => PaymentMethod::PRIMARY_PAYMENT_METHOD_YES])->one();
+
+        return $paymentMethod->stripe_payment_method_id;
+    }
 }
