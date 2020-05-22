@@ -8,12 +8,11 @@ use common\models\InvoiceItems;
 use common\models\OneTimeCharge;
 use common\models\Subscription;
 use common\models\SubscriptionItems;
+use common\models\PaymentMethod;
 use frontend\models\Charges;
 use frontend\models\Customer;
 use frontend\models\Invoices;
-use common\models\PaymentMethod;
 use frontend\models\Payouts;
-use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentIntent;
 use yii\console\Controller;
 
@@ -21,6 +20,7 @@ class InvoiceController extends Controller
 {
 
     public $date;
+    public $chargeArray = [];
 
     public function actionIndex($date = 'now')
     {
@@ -100,30 +100,89 @@ class InvoiceController extends Controller
 
     public function actionCharge($date = 'now')
     {
-
         $date = new \DateTime($date);
-        /** Get Invoices*/
         $invoices = Invoice::find()
             ->where(['<=', 'status', $date->format('Y-m-d')])
+            ->andwhere(['<=', 'status', 1])
             ->andWhere(['>', 'balance', 0])
         ->all();
 
+        $this->chargeInvoices($invoices);
+
+        foreach ($this->chargeArray as $invoice_id => $charge) {
+            $paymentIntent = new \frontend\models\PaymentIntent([
+                'invoice_id' => $invoice_id,
+                'stripe_payment_intent_id' => $charge->id,
+                'amount' => $charge->amount,
+                'status' => $charge->status,
+                'customer_id' => $charge['customer_id'],
+                'payment_method_id' => $charge['payment_method_id'],
+            ]);
+            $paymentIntent->save();
+
+            if ($charge->status == 'succeeded' || $charge->status == 'processing') {
+                $this->stdout("Charge successful for invoice #" . $invoice_id . PHP_EOL);
+            } else {
+                $this->stdout("Charge is NOT successful for invoice #" . $invoice_id . " - " . $charge->status . PHP_EOL);
+            }
+        }
+        /**
+         * Check if the charge was successful
+         */
+        if (isset($chargeArray->invoice_id) && (!isset($chargeArray->failure_code))) {
+            if ($chargeArray->status != Invoice::STATUS_PAID) {
+                $invoice = Invoice::findOne($invoice->due_date->$invoices);
+                $invoice->balance = $invoice->$amount(($invoice->balance) - $chargeArray->amount);
+                $invoice->update();
+                $this->stdout(" charged $" . $invoice->balance . " from " . $paymentMethod . " (" . $paymentMethod->stripe_payment_method_id . ") ");
+                $invoice->setAttribute('stripe_payment_method_id', $chargeArray->id);
+                $invoice->update();
+                $paymentMethod = PaymentMethod::find()->where(['invoice_line_item_id' => $invoice->id])->all();
+                /** @var PaymentMethod $ */
+                foreach ($paymentMethod as $paymentMethods) {
+                    $paymentMethods->setAttribute('transfer_group', 'I' . $invoice->id);
+                    $paymentMethods->save();
+                }
+            }
+
+        }
+    }
+
+    /**
+     * Charge invoices that are available
+     * @param $invoices array of Invoice object
+     * @return InvoiceController
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    protected function chargeInvoices($invoices)
+    {
         /** @var Invoice $invoice */
         foreach ($invoices as $invoice) {
             $customer = Customer::findOne($invoice->customer_id);
+            /** @var PaymentMethod $paymentMethod */
             $paymentMethod = PaymentMethod::find()->where(['customer_id' => $customer->id, 'default' => PaymentMethod::PRIMARY_PAYMENT_METHOD_YES])->one();
-            $charge = PaymentIntent::create([
-                'amount' => $invoice->balance,
-                'currency' => 'usd',
-                'customer' => $customer->stripe_customer_id,
-                'description' => 'Invoice #' . $invoice->id,
-                'payment_method' => $paymentMethod->stripe_payment_method_id,
-                'confirm' => true,
-                'metadata' => [
-                    'invoice_id' => $invoice->id,
-                    'invoice_url' => 'https://app.getshipwise.com/invoice/view?id=' . $invoice->id,
-                ],
-            ]);
+
+            if ($paymentMethod) {
+                $this->chargeArray[$invoice->id] = PaymentIntent::create([
+                    'amount' => $invoice->balance,
+                    'currency' => 'usd',
+                    'customer' => $customer->stripe_customer_id,
+                    'description' => 'Invoice #' . $invoice->id,
+                    'payment_method' => $paymentMethod->stripe_payment_method_id,
+                    'confirm' => true,
+                    'metadata' => [
+                        'invoice_id' => $invoice->id,
+                        'invoice_url' => 'https://app.getshipwise.com/invoice/view?id=' . $invoice->id,
+                    ],
+                ]);
+
+                $this->chargeArray[$invoice->id]['customer_id'] = $customer->id;
+                $this->chargeArray[$invoice->id]['payment_method_id'] = $paymentMethod->id;
+            } else {
+                $this->stderr('Payment method does not exist for invoice #' . $invoice->id . PHP_EOL);
+            }
         }
+
+        return $this;
     }
 }

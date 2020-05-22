@@ -2,17 +2,13 @@
 
 namespace common\models;
 
-use api\modules\v1\controllers\DefaultController;
-use frontend\models\PaymentMethods;
 use Stripe\Customer;
 use Stripe\Exception\ApiErrorException;
 use Stripe\SetupIntent;
-use Stripe\PaymentIntent;
 use Stripe\Source;
 use Stripe\Stripe;
 use Yii;
 use yii\base\Event;
-use yii\queue\serializers\IgbinarySerializer;
 
 /**
  * This is the model class for table "paymentmethod".

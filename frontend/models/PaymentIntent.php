@@ -1,8 +1,7 @@
 <?php
 
-namespace app\models;
+namespace frontend\models;
 
-use Yii;
 
 /**
  * This is the model class for table "payment_intent".
@@ -32,7 +31,7 @@ class PaymentIntent extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer_id', 'payment_method_id', 'invoice_id', 'amount', 'status', 'created_date'], 'required'],
+            [['customer_id', 'payment_method_id', 'invoice_id', 'amount', 'status'], 'required'],
             [['customer_id', 'payment_method_id', 'invoice_id', 'amount'], 'integer'],
             [['created_date'], 'safe'],
             [['stripe_payment_intent_id'], 'string', 'max' => 128],
