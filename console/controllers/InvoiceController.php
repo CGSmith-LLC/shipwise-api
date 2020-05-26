@@ -6,6 +6,7 @@ use common\models\Charge;
 use common\models\Invoice;
 use common\models\InvoiceItems;
 use common\models\OneTimeCharge;
+use common\models\Status;
 use common\models\Subscription;
 use common\models\SubscriptionItems;
 use common\models\PaymentMethod;
@@ -13,8 +14,10 @@ use frontend\models\Charges;
 use frontend\models\Customer;
 use frontend\models\Invoices;
 use frontend\models\Payouts;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 use Stripe\PaymentIntent;
 use yii\console\Controller;
+use yii\rest\UpdateAction;
 
 class InvoiceController extends Controller
 {
@@ -81,7 +84,11 @@ class InvoiceController extends Controller
 
             $invoice->setAttribute('amount', $totalAmount);
             $invoice->setAttribute('balance', $totalAmount);
-            $invoice->update();
+            if ($invoice->update() == false) {
+                foreach ($invoice->getErrorSummary(true) as $error) {
+                    echo  'actionIndex() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
+                }
+            }
 
             //need to update the subscription for the next invoice date
             $currentDate = new \DateTime($subscription->next_invoice);
@@ -108,6 +115,9 @@ class InvoiceController extends Controller
         $this->chargeInvoices($invoices);
 
         foreach ($this->chargeArray as $invoice_id => $charge) {
+            /**
+             * Save Stripe ID after charging the customer
+             */
             $paymentIntent = new \frontend\models\PaymentIntent([
                 'invoice_id' => $invoice_id,
                 'stripe_payment_intent_id' => $charge->id,
@@ -118,31 +128,31 @@ class InvoiceController extends Controller
             ]);
             $paymentIntent->save();
 
+            /**
+             * 1. Get invoice
+             * 2. Update balance maybe?
+             * 3. Update status maybe?
+             * 4. update()
+             */
+            $invoice = Invoice::findOne($invoice_id);
+
+            // check stripe's status
+            if ($charge->status == 'succeeded') {
+                // update invoice.balance to the remaining amount minus stripe's charges
+                $invoice->setAttribute('balance', ($invoice->amount - $charge->amount));
+                $invoice->setAttribute('status', Invoice::STATUS_PAID);
+                if ($invoice->update() == false) {
+                    foreach ($invoice->getErrorSummary(true) as $error) {
+                        echo  'actionCharge() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
+                    }
+                }
+            }
+
             if ($charge->status == 'succeeded' || $charge->status == 'processing') {
                 $this->stdout("Charge successful for invoice #" . $invoice_id . PHP_EOL);
             } else {
                 $this->stdout("Charge is NOT successful for invoice #" . $invoice_id . " - " . $charge->status . PHP_EOL);
             }
-        }
-        /**
-         * Check if the charge was successful
-         */
-        if (isset($chargeArray->invoice_id) && (!isset($chargeArray->failure_code))) {
-            if ($chargeArray->status != Invoice::STATUS_PAID) {
-                $invoice = Invoice::findOne($invoice->due_date->$invoices);
-                $invoice->balance = $invoice->$amount(($invoice->balance) - $chargeArray->amount);
-                $invoice->update();
-                $this->stdout(" charged $" . $invoice->balance . " from " . $paymentMethod . " (" . $paymentMethod->stripe_payment_method_id . ") ");
-                $invoice->setAttribute('stripe_payment_method_id', $chargeArray->id);
-                $invoice->update();
-                $paymentMethod = PaymentMethod::find()->where(['invoice_line_item_id' => $invoice->id])->all();
-                /** @var PaymentMethod $ */
-                foreach ($paymentMethod as $paymentMethods) {
-                    $paymentMethods->setAttribute('transfer_group', 'I' . $invoice->id);
-                    $paymentMethods->save();
-                }
-            }
-
         }
     }
     /**
