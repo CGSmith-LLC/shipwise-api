@@ -18,17 +18,22 @@ use yii\console\Controller;
 
 class InvoiceController extends Controller
 {
-
     public $date;
     public $chargeArray = [];
 
+    /**
+     * Creating invoice from Subscriptions
+     *
+     * @param string $date
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
     public function actionIndex($date = 'now')
     {
         $date = new \DateTime($date);
         //need to look for all subscriptions due today
 
         $subscriptions = Subscription::find()->where(['<=', 'next_invoice', $date->format('Y-m-d')])->all();
-
 
         //need to create invoices and associate them the customers
         /** @var Subscription $subscription */
@@ -46,7 +51,6 @@ class InvoiceController extends Controller
             ]);
             $invoice->save();
 
-
             /** @var SubscriptionItems $item */
             foreach ($items as $item) {
                 $invoiceItem = new InvoiceItems([
@@ -57,8 +61,6 @@ class InvoiceController extends Controller
                 $invoiceItem->save();
                 $totalAmount = $totalAmount + $invoiceItem->amount;
             }
-
-
             // include one time charges
             foreach (OneTimeCharge::find()
                          ->where([
@@ -73,7 +75,7 @@ class InvoiceController extends Controller
                 ]);
                 $invoiceItem->save();
                 $totalAmount = $totalAmount + $onetimecharge->amount;
-                $onetimecharge->added_to_invoice = true;
+                $onetimecharge->added_to_invoice = 1;
                 $onetimecharge->update();
             }
 
@@ -88,16 +90,12 @@ class InvoiceController extends Controller
             $subscription->update();
 
             // send copy of invoice to customer's email address
-
         }
-
-
     }
 
     /**
      * @var Charge
      */
-
     public function actionCharge($date = 'now')
     {
         $date = new \DateTime($date);
@@ -147,7 +145,6 @@ class InvoiceController extends Controller
 
         }
     }
-
     /**
      * Charge invoices that are available
      * @param $invoices array of Invoice object
@@ -175,14 +172,12 @@ class InvoiceController extends Controller
                         'invoice_url' => 'https://app.getshipwise.com/invoice/view?id=' . $invoice->id,
                     ],
                 ]);
-
                 $this->chargeArray[$invoice->id]['customer_id'] = $customer->id;
                 $this->chargeArray[$invoice->id]['payment_method_id'] = $paymentMethod->id;
             } else {
                 $this->stderr('Payment method does not exist for invoice #' . $invoice->id . PHP_EOL);
             }
         }
-
         return $this;
     }
 }

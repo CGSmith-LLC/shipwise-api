@@ -14,4 +14,13 @@ use common\models\SubscriptionItems as BaseSubscriptionItems;
 class SubscriptionItems extends BaseSubscriptionItems
 {
 
+    /**
+     * @inheritDoc
+     */
+    public function beforeSave($insert)
+    {
+        $this->amount = $this->setFromDecimalAmount();
+        return parent::beforeSave($insert);
+    }
+
 }

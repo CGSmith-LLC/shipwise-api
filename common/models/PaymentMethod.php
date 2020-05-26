@@ -115,6 +115,7 @@ class PaymentMethod extends \yii\db\ActiveRecord
         \Stripe\PaymentIntent::create($array);
     }
 
+
     /**
      * @param $event Event
      * @throws ApiErrorException
