@@ -118,7 +118,13 @@ class PaymentMethodController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        // Default cards cannot be deleted
+        $paymentMethod = $this->findModel($id);
+        if ($paymentMethod->default == PaymentMethod::PRIMARY_PAYMENT_METHOD_YES) {
+            Yii::$app->session->addFlash('errors', 'You cannot delete a primary payment method.');
+        }else {
+            $paymentMethod->delete();
+        }
 
         return $this->redirect(['index']);
     }

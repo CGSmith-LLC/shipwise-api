@@ -35,7 +35,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
                 <div>**** <?=$stripePaymentMethod->card->last4; ?></div>
                 <div><?=$stripePaymentMethod->card->exp_month . '/' . $stripePaymentMethod->card->exp_year; ?></div>
-                <div>Delete Make Default</div>
+                <div>
+                    <?php
+                    // If it is not default allow deletion
+                    if ($paymentMethod->default === \common\models\PaymentMethod::PRIMARY_PAYMENT_METHOD_NO) {
+                       echo Html::a('Delete', ['delete', 'id' => $paymentMethod->id], [
+                            'class' => 'btn btn-danger',
+                            'data' => [
+                                'confirm' => 'Are you sure you want to delete this payment method?',
+                                'method' => 'post',
+                            ],
+                        ]);
+                    }
+                    ?>
+                    Make Default</div>
             </div>
         <?php
         }
