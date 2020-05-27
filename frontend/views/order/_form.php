@@ -80,7 +80,7 @@ $item->loadDefaultValues();
                             'inputTemplate' =>
                                 '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
                         ])->textInput([
-                            'value' => Yii::$app->formatter->asDatetime($model->order->requested_ship_date),
+                            'value' => (isset($model->order->requested_ship_date)) ? Yii::$app->formatter->asDate($model->order->requested_ship_date) : '',
                         ]) ?>
 
                     </div>
