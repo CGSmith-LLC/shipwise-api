@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use cgsmith\stripe\Stripe;
+use common\models\Invoice;
 use common\models\Status;
 use frontend\models\Customer;
 use Yii;
@@ -38,12 +39,16 @@ class PaymentMethodController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
+        $paymentMethodDataProvider = new ActiveDataProvider([
             'query' => PaymentMethod::find(),
+        ]);
+        $invoiceDataProvider = new ActiveDataProvider([
+            'query' => Invoice::find(),
         ]);
 
         return $this->render('index', [
-            'dataProvider' => $dataProvider,
+            'paymentMethodDataProvider' => $paymentMethodDataProvider,
+            'invoiceDataProvider' => $invoiceDataProvider,
         ]);
     }
 
