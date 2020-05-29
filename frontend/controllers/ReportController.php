@@ -6,6 +6,7 @@ namespace frontend\controllers;
 use api\modules\v1\models\order\OrderEx;
 use frontend\models\Customer;
 use frontend\models\forms\ReportForm;
+use frontend\models\Item;
 use frontend\models\Order;
 use Yii;
 use yii\web\Controller;
@@ -68,6 +69,7 @@ class ReportController extends Controller
     {
         //csv header
         $order = new Order();
+        $item = new Item();
         $body = [
             [
                 $order->getAttributeLabel('customer_reference'),
@@ -87,31 +89,39 @@ class ReportController extends Controller
                 $order->getAttributeLabel('requested_ship_date'),
                 $order->getAttributeLabel('po_number'),
                 $order->getAttributeLabel('origin'),
+                $item->getAttributeLabel('quantity'),
+                $item->getAttributeLabel('sku'),
+                $item->getAttributeLabel('name'),
             ]
         ];
 
         //csv body
         /** @var Order $order */
         foreach ($orders as $order) {
-            $body[] = [
-                $order->customer_reference,
-                $order->created_date,
-                $order->id,
-                $order->order_reference,
-                $order->status->name,
-                $order->address->name,
-                $order->address->city,
-                $order->address->state->name,
-                $order->address->zip,
-                $order->address->notes,
-                $order->notes,
-                $order->tracking,
-                $order->carrier->name,
-                $order->service->name,
-                $order->requested_ship_date,
-                $order->po_number,
-                $order->origin,
-            ];
+            foreach ($order->getItems()->all() as $item) {
+                $body[] = [
+                    $order->customer_reference,
+                    $order->created_date,
+                    $order->id,
+                    $order->order_reference,
+                    $order->status->name,
+                    $order->address->name,
+                    $order->address->city,
+                    $order->address->state->name,
+                    $order->address->zip,
+                    $order->address->notes,
+                    $order->notes,
+                    $order->tracking,
+                    $order->carrier->name,
+                    $order->service->name,
+                    $order->requested_ship_date,
+                    $order->po_number,
+                    $order->origin,
+                    $item->quantity,
+                    $item->sku,
+                    $item->name,
+                ];
+            }
         }
 
         $fp = fopen('file.csv', 'w');
