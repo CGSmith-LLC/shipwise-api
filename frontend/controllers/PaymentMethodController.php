@@ -9,6 +9,7 @@ use frontend\models\Customer;
 use Yii;
 use frontend\models\PaymentMethod;
 use yii\data\ActiveDataProvider;
+use yii\rest\UpdateAction;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -108,6 +109,29 @@ class PaymentMethodController extends Controller
             'model' => $model,
         ]);
     }
+
+    public function actionSelect($id)
+    {
+        $model = $this->findModel($id);
+        //make the current default card not default\
+        $currentDefaultModels = PaymentMethod::find()
+            ->where(['default' => 1])
+            ->all();
+        /** @var PaymentMethod $paymentMethod */
+        foreach ($currentDefaultModels as $currentDefaultModel) {
+            $currentDefaultModel->default = PaymentMethod::PRIMARY_PAYMENT_METHOD_NO;
+            $currentDefaultModel->update();
+        }
+
+        // if action triggers update the current ID to default payment
+        $model->setAttributes([
+            'default' => 1,
+        ]);
+        $model->update();
+
+        return $this->redirect(['index']);
+    }
+
 
     /**
      * Deletes an existing PaymentMethod model.

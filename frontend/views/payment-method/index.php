@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <h1 style="text-align:center"><?= Html::encode($this->title) ?></h1>
 
-    <div class="row">
+    <div class="container" style="border-style: solid">
     <?php
         // Display card information
         // Iterate over cards, ask stripe for the payment method details
@@ -48,7 +48,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         ]);
                     }
                     ?>
-                    Make Default</div>
+
+                <div>
+                    <?php
+                    //Mark the card as default for payment
+                    echo Html::a('Make Default',['select', 'id' => $paymentMethod->id]);
+                    ?>
+                </div>
             </div>
         <?php
         }
