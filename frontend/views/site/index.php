@@ -1,67 +1,112 @@
 <?php
 
+use frontend\assets\DatePickerAsset;
+use yii\bootstrap\ActiveForm;
+use yii\bootstrap\Modal;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 
 $this->title = Yii::$app->name;
-?>
-<div class="site-index">
+DatePickerAsset::register($this);
 
-    <div class="jumbotron">
-        <?php if (Yii::$app->user->identity->isAdmin) : ?>
+$this->registerJs('
+            // Datepicker
+            $(\'.date\').datepicker({
+                todayBtn           : \'linked\',
+                keyboardNavigation : false,
+                forceParse         : false,
+                autoclose          : true,
+                format             : \'mm/dd/yyyy\',
+                todayHighlight     : true,
+            });');
 
-            <h1>Welcome admin!</h1>
-            <p class="lead">You have the power <span class="glyphicon glyphicon-sunglasses"></span></p>
-            <p><?= Html::a('Manage Users', ['/user/admin'], ['class' => 'btn btn-success']) ?></p>
+Modal::begin([
+    'id' => 'dashboardSearch',
+    'clientOptions' => ['backdrop' => 'static', 'keyboard' => false],
+    'header' => '<h4>Search</h4>',
+    'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>',
+]); ?>
+    <div class="report-form">
+        <?php $form = ActiveForm::begin(); ?>
 
-        <?php else : ?>
+        <?= $form->field($model, 'start_date', [
+            'inputTemplate' =>
+                '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
+        ])->textInput([
+            'value' => (isset($model->start_date)) ? Yii::$app->formatter->asDate($model->start_date) : '',
+        ]); ?>
+        <?= $form->field($model, 'end_date', [
+            'inputTemplate' =>
+                '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
+        ])->textInput([
+            'value' => (isset($model->end_date)) ? Yii::$app->formatter->asDate($model->end_date) : '',
+        ]); ?>
+        <?php echo $form->field($model, 'customers')->dropdownList($customers, ['prompt' => ' Please select']); ?>
 
-            <h1>Welcome!</h1>
-            <p class="lead">This is your ShipWise dashboard.</p>
-            <p><?= Html::a('Get started', ['/order'], ['class' => 'btn btn-success']) ?></p>
-
-        <?php endif; ?>
+        <div class="form-group">
+            <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
+        </div>
+        <?php ActiveForm::end(); ?>
     </div>
+<?php
+Modal::end();
 
-    <div class="body-content">
+$this->registerJsFile('js/dashboard-search.js', ['position' => \yii\web\View::POS_HEAD]);
+$this->registerJs('
+ $("#searchButton").click(function () {
+    dashboardSearch();
+ });
+');
+?>
+<div class="body-content">
+    <h1>Dashboard <button id="searchButton" class="btn btn-primary">Search</button></h1>
 
-        <?php /* ?>
-
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
+</div>
+<div class="row">
+    <div class="col-md-3 col-xl-3">
+        <div class="card bg-c-shipwise order-card">
+            <div class="card-block">
+                <h3>Open Orders</h3>
+                <h2 class="text-right"><i class="fa fa-arrow-circle-down f-left"></i><span><?=$openCount; ?></span></h2>
             </div>
         </div>
+    </div>
 
-        <?php */ ?>
+    <div class="col-md-3 col-xl-3">
+        <div class="card bg-c-yellow order-card">
+            <div class="card-block">
+                <h3>Pending Fulfillment</h3>
+                <h2 class="text-right"><i class="fa fa-cart-plus f-left"></i><span><?=$pendingCount; ?></span></h2>
+            </div>
+        </div>
+    </div>
 
+    <div class="col-md-3 col-xl-3">
+        <div class="card bg-c-green order-card">
+            <div class="card-block">
+                <h3>Shipped</h3>
+                <h2 class="text-right"><i class="fa fa-rocket f-left"></i><span><?=$shippedCount; ?></span></h2>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-3 col-xl-3">
+        <div class="card bg-c-blue order-card">
+            <div class="card-block">
+                <h3>Completed</h3>
+                <h2 class="text-right"><i class="fa fa-check f-left"></i><span><?=$completedCount; ?></span></h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-xl-3">
+        <div class="card bg-c-pink order-card">
+            <div class="card-block">
+                <h3>Error</h3>
+                <h2 class="text-right"><i class="fa fa-times f-left"></i><span><?=$errorCount; ?></span></h2>
+            </div>
+        </div>
     </div>
 </div>

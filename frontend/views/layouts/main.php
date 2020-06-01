@@ -38,6 +38,7 @@ AppAsset::register($this);
     <meta name="msapplication-TileColor" content="#2c9fd6">
     <meta name="msapplication-TileImage" content="/images/ms-icon-144x144.png">
     <meta name="theme-color" content="#2c9fd6">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
