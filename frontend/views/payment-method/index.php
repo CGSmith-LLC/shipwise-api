@@ -58,8 +58,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     //Mark the card as default for payment
                     if ($paymentMethod->default != \common\models\PaymentMethod::PRIMARY_PAYMENT_METHOD_YES) {
 
-                        echo Html::a('Make Default Payment Method', ['select', 'id' => $paymentMethod->id], [
-                            'class' => 'btn btn-info',
+                        echo Html::a('Make Default', ['select', 'id' => $paymentMethod->id], [
+                            'class' => 'btn btn-default',
                             'data' => [
                                 'confirm' => 'Are you sure you make this you default payment method?',
                                 'method' => 'post',
@@ -89,14 +89,25 @@ $this->params['breadcrumbs'][] = $this->title;
         echo GridView::widget([
             'dataProvider' => $invoiceDataProvider,
             'columns' => [
-                ['class' => 'yii\grid\SerialColumn'],
+                [
+                    'attribute' => 'id',
+                    'label' => 'Invoice #',
+                ],
                 'customer_name',
-                'subscription_id',
-                'amount',
-                'balance',
+
+                [
+                    'attribute' => 'amount',
+                    'value' => function ($model) {
+                        return Yii::$app->formatter->asCurrency($model->decimalAmount);
+                    },
+                ],
                 'due_date',
                 'status',
-                ['class' => 'yii\grid\ActionColumn'],
+
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'template' => '{view}',
+                ],
             ],
         ]); ?>
     </div>

@@ -63,6 +63,16 @@ class Invoice extends \yii\db\ActiveRecord
     }
 
     /**
+     * Returns decimal amount after getting from database
+     * @return float
+     */
+    public function getDecimalAmount()
+    {
+        return $this->amount / 100;
+    }
+
+
+    /**
      * Relation for InvoiceItems
      *
      * @return \yii\db\ActiveQuery

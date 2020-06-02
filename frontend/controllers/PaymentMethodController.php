@@ -26,7 +26,7 @@ class PaymentMethodController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -41,10 +41,11 @@ class PaymentMethodController extends Controller
     public function actionIndex()
     {
         $paymentMethodDataProvider = new ActiveDataProvider([
-            'query' => PaymentMethod::find(),
+            'query' => PaymentMethod::find()->where(['customer_id' => Yii::$app->user->identity->getCustomerId()]),
         ]);
+
         $invoiceDataProvider = new ActiveDataProvider([
-            'query' => Invoice::find(),
+            'query' => Invoice::find()->where(['customer_id' => Yii::$app->user->identity->getCustomerId()])->orderBy(['id' => SORT_DESC]),
         ]);
 
         return $this->render('index', [
