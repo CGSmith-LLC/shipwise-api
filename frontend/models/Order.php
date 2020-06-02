@@ -57,33 +57,6 @@ class Order extends BaseOrder
     }
 
     /**
-     * @inheritDoc
-     */
-    public function beforeSave($insert)
-    {
-        if (!empty($this->requested_ship_date)) {
-            $date = new \DateTime($this->requested_ship_date);
-            $this->setAttribute('requested_ship_date', $date->format('Y-m-d'));
-        }
-
-        return parent::beforeSave($insert);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function beforeDelete()
-    {
-        if (parent::beforeDelete()) {
-            $result = $this->deleteRelatedEntities();
-
-            return $result;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Delete all related entities.
      *
      * @return boolean
