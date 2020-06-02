@@ -13,7 +13,7 @@ use yii\widgets\Pjax;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $statuses array List of order statuses */
 
-$this->title = 'Orders';
+$this->title                   = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
 
 /**
@@ -44,16 +44,16 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                 <?= Html::dropDownList('OrderSearch[pageSize]', $searchModel->pageSize,
                     $searchModel->pageSizeOptions,
                     [
-                        'id' => 'ordersearch-pagesize',
-                        'class' => 'form-control',
-                        'data-toggle' => 'tooltip',
+                        'id'             => 'ordersearch-pagesize',
+                        'class'          => 'form-control',
+                        'data-toggle'    => 'tooltip',
                         'data-placement' => 'right',
-                        'title' => '# of entries to show per page',
+                        'title'          => '# of entries to show per page',
                     ]) ?>
             </div>
             <div class="col-lg-2 col-md-3 col-sm-3 col-xs-4">
                 <?php
-                $statuses = Status::getList();
+                $statuses     = Status::getList();
                 $changeStatus = array_combine(
                     array_map(function ($k) {
                         return BulkAction::ACTION_CHANGE_STATUS . "_$k"; // <action>_<value>
@@ -68,15 +68,16 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                     ]
                     + ['Change status to:' => $changeStatus],
                     [
-                        'class' => 'form-control',
-                        'data-toggle' => 'tooltip',
+                        'class'          => 'form-control',
+                        'data-toggle'    => 'tooltip',
                         'data-placement' => 'top',
-                        'title' => 'Apply bulk action to selected orders',
+                        'title'          => 'Apply bulk action to selected orders',
                     ]) ?>
             </div>
             <div class="col-lg-9">
                 <div class="pull-right">
-                    <?= Html::a('<i class="glyphicon glyphicon-remove-sign"></i> Clear filters', [''],
+                    <?= Html::a('<i class="glyphicon glyphicon-remove-sign"></i> Clear filters',
+                        ['/order?' . urlencode('OrderSearch[clearfilters]') . '=1'],
                         ['class' => 'btn btn-default btn-xs m-b-xs m-r-xs']) ?>
                     <?= Html::a('<i class="glyphicon glyphicon-refresh"></i> Refresh', false,
                         ['class' => 'btn btn-default btn-xs m-b-xs', 'id' => 'refresh-btn']) ?>
@@ -85,23 +86,23 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
         </div>
 
         <?= GridView::widget([
-            'id' => 'orders-grid-view',
-            'dataProvider' => $dataProvider,
-            'filterModel' => $searchModel,
+            'id'             => 'orders-grid-view',
+            'dataProvider'   => $dataProvider,
+            'filterModel'    => $searchModel,
             'filterSelector' => '#' . Html::getInputId($searchModel, 'pageSize'),
-            'pager' => [
+            'pager'          => [
                 'firstPageLabel' => Yii::t('app', 'First'),
-                'lastPageLabel' => Yii::t('app', 'Last'),
+                'lastPageLabel'  => Yii::t('app', 'Last'),
             ],
-            'columns' => [
+            'columns'        => [
                 [
                     'class' => 'yii\grid\CheckboxColumn',
                 ],
                 [
                     'attribute' => 'customer.name',
                     // Visible if admin or has a count higher than 0 for associated users
-                    'visible' => ((count($customerDropdownList) > 1) || Yii::$app->user->identity->getIsAdmin()),
-                    'filter' => Html::activeDropDownList(
+                    'visible'   => ((count($customerDropdownList) > 1) || Yii::$app->user->identity->getIsAdmin()),
+                    'filter'    => Html::activeDropDownList(
                         $searchModel,
                         'customer_id',
                         $customerDropdownList,
@@ -112,15 +113,17 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                 'po_number',
                 [
                     'attribute' => 'address',
-                    'value' => 'address.name',
+                    'value'     => 'address.name',
                 ],
                 'tracking',
                 'created_date:datetime',
+                'requested_ship_date:datetime',
+                'notes',
                 [
                     'attribute' => 'status_id',
-                    'options' => ['width' => '10%'],
-                    'value' => 'status.name',
-                    'filter' => Html::activeDropDownList(
+                    'options'   => ['width' => '10%'],
+                    'value'     => 'status.name',
+                    'filter'    => Html::activeDropDownList(
                         $searchModel,
                         'status_id',
                         $statuses,
@@ -134,10 +137,10 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
     </div>
 
 <?php Modal::begin([
-    'id' => 'modalBulk',
+    'id'            => 'modalBulk',
     'clientOptions' => ['backdrop' => 'static', 'keyboard' => false],
-    'header' => '<h4>Bulk Action</h4>',
-    'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    'header'        => '<h4>Bulk Action</h4>',
+    'footer'        => '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" class="confirm btn btn-primary">Confirm</button>',
 ]);
 Modal::end();
@@ -254,7 +257,7 @@ ob_start(); // output buffer the javascript to register later ?>
 
             // additional input options based on action type
             var container = popup.find('.modal-body');
-            if(jQuery.inArray(action, printingActions) !== -1) {
+            if (jQuery.inArray(action, printingActions) !== -1) {
                 $('<input />', {type: 'checkbox', id: 'bulkaction-print_as_pdf', checked: true}).appendTo(container);
                 $('<label />', {'for': 'bulkaction-print_as_pdf', text: ' Print as PDF'}).appendTo(container);
             }

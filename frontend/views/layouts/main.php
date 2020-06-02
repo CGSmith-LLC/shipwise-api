@@ -38,6 +38,7 @@ AppAsset::register($this);
     <meta name="msapplication-TileColor" content="#2c9fd6">
     <meta name="msapplication-TileImage" content="/images/ms-icon-144x144.png">
     <meta name="theme-color" content="#2c9fd6">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
     <script src ="https://js.stripe.com/v3/"></script>
     <script type="application/javascript">
@@ -82,6 +83,7 @@ AppAsset::register($this);
             ['label' => 'Home', 'url' => ['/']],
         ];
         $menuItems[] = ['label' => 'Orders', 'url' => ['/order']];
+        $menuItems[] = ['label' => 'Reports', 'url' => ['/report']];
 
         if (Yii::$app->user->identity->isAdmin) {
             $menuItems[] = ['label' => 'Users', 'url' => ['/user/admin/']];

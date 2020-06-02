@@ -31,7 +31,7 @@ abstract class ShipmentPlugin extends ShipmentConnection
     /**
      * Call Data
      *
-     * @var string
+     * @var mixed
      */
     protected $data;
 

@@ -25,5 +25,12 @@ return [
         'ups_api_user_id'    => '',
         'ups_api_password'   => '',
         'ups_api_key'        => '',
+
+        // Amazon MWS credentials
+        'amazon_mws_seller_id'         => '',
+        'amazon_mws_auth_token'        => '',
+        'amazon_mws_aws_access_key_id' => '',
+        'amazon_mws_aws_secret_key'    => '',
+
     ],
 ];

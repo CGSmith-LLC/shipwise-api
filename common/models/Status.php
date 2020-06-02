@@ -14,12 +14,12 @@ class Status extends BaseStatus
 {
 
     /* Please keep synchronized with db values! */
-    const SHIPPED   = 1;
+    const SHIPPED = 1;
     const CANCELLED = 7;
-    const PENDING   = 8;
+    const PENDING = 8;
+    const OPEN    = 9;
     const WMS_ERROR = 10;
     const COMPLETED = 11;
-    const OPEN      = 9;
 
     /**
      * Get array of Status ids

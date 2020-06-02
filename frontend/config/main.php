@@ -52,7 +52,7 @@ return [
             'class' => 'yii\swiftmailer\Mailer',
         ],
         'formatter' => [
-            'defaultTimeZone' => 'America/Chicago',
+            //'defaultTimeZone' => 'America/Chicago',
             'timeZone' => 'America/Chicago',
             'dateFormat' => 'php:m/d/Y',
             'datetimeFormat' => 'php:m/d/Y g:ia T',

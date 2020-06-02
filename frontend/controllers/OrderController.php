@@ -335,7 +335,8 @@ class OrderController extends Controller
         $pdf->generate($order);
 
         return Yii::$app->response->sendContentAsFile($pdf->Output('S'),
-            "PackingSlip_{$order->customer_reference}.pdf");
+            "PackingSlip_{$order->customer_reference}.pdf",
+            ['mimeType' => 'application/pdf', 'inline' => true]);
     }
 
     /**
@@ -375,6 +376,7 @@ class OrderController extends Controller
         $order->save(false);
 
         return Yii::$app->response->sendContentAsFile(base64_decode($shipment->mergedLabelsData),
-            "$order->tracking." . $shipment->mergedLabelsFormat);
+            "$order->tracking." . $shipment->mergedLabelsFormat,
+            ['mimeType' => 'application/pdf', 'inline' => true]);
     }
 }

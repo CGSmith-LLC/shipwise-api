@@ -21,10 +21,6 @@ DatePickerAsset::register($this);
 $item = new Item();
 $item->loadDefaultValues();
 
-$this->registerJs("$(function () {
-    $('#datetimepicker').datepicker();
-});", View::POS_READY);
-
 ?>
 
     <div class="order-form">
@@ -80,10 +76,12 @@ $this->registerJs("$(function () {
                             'prompt' => ' -- Unknown --',
                         ]) ?>
 
-                        <?= $form->field($model->order, 'requested_ship_date')->textInput([
-                            'value' => $model->order->requested_ship_date,
-                            'id' => 'datetimepicker',
-                        ]); ?>
+                        <?= $form->field($model->order, 'requested_ship_date', [
+                            'inputTemplate' =>
+                                '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
+                        ])->textInput([
+                            'value' => (isset($model->order->requested_ship_date)) ? Yii::$app->formatter->asDate($model->order->requested_ship_date) : '',
+                        ]) ?>
 
                     </div>
                 </div>
@@ -208,7 +206,7 @@ ob_start(); // output buffer the javascript to register later ?>
                 keyboardNavigation : false,
                 forceParse         : false,
                 autoclose          : true,
-                format             : 'yyyy-mm-dd',
+                format             : 'mm/dd/yyyy',
                 todayHighlight     : true,
             });
 

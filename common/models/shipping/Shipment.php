@@ -324,7 +324,9 @@ class Shipment extends BaseShipment
     protected function initCarrierPlugin()
     {
         $carrierCode = $this->carrier->name ?? null;
-        $class       = "\\common\\models\\shipping\\extension\\{$carrierCode}Plugin";
+        $carrierCode = str_replace(" ", "", $carrierCode);
+
+        $class = "\\common\\models\\shipping\\extension\\{$carrierCode}Plugin";
 
         if (!($carrierCode && class_exists($class))) {
             $this->addError('plugin', "Shipping carrier plugin not found");
