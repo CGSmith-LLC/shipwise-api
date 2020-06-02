@@ -9,15 +9,16 @@ use frontend\models\Customer;
 use Yii;
 use frontend\models\PaymentMethod;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\rest\UpdateAction;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * PaymentMethodController implements the CRUD actions for PaymentMethod model.
+ * BillingController implements the CRUD actions for PaymentMethod model.
  */
-class PaymentMethodController extends Controller
+class BillingController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -25,6 +26,18 @@ class PaymentMethodController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'ruleConfig' => [
+                    'class' => \dektrium\user\filters\AccessRule::class,
+                ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [

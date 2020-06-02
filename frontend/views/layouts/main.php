@@ -97,7 +97,7 @@ AppAsset::register($this);
             'label' => 'Account', 'url' => ['/user/settings/account'],
             'items' => [
                 ['label' => 'Account', 'url' => ['/user/settings/account']],
-                ['label' => 'Billing', 'url' => ['/payment-method']],
+                ['label' => 'Billing', 'url' => ['/billing']],
             ]];
         $menuItems[] = '<li>'
             . Html::beginForm(['/user/logout'], 'post')

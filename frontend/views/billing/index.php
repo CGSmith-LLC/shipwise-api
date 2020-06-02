@@ -94,19 +94,26 @@ $this->params['breadcrumbs'][] = $this->title;
                     'label' => 'Invoice #',
                 ],
                 'customer_name',
-
                 [
                     'attribute' => 'amount',
                     'value' => function ($model) {
                         return Yii::$app->formatter->asCurrency($model->decimalAmount);
                     },
                 ],
-                'due_date',
-                'status',
-
+                'due_date:date',
+                [
+                    'attribute' => 'status',
+                    'format' => 'raw',
+                    'value' => function($model) {
+                        return $model->getStatusLabel();
+                    }
+                ],
                 [
                     'class' => 'yii\grid\ActionColumn',
                     'template' => '{view}',
+                    'urlCreator' => function($action, $model, $key, $index) {
+                        return \yii\helpers\Url::toRoute(['invoice/view', 'id' => $model->id]);
+                    },
                 ],
             ],
         ]); ?>

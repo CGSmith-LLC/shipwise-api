@@ -55,4 +55,14 @@ class InvoiceItems extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Invoice::class, ['invoice_id'=>'id']);
     }
+
+
+    /**
+     * Returns decimal amount after getting from database
+     * @return float
+     */
+    public function getDecimalAmount()
+    {
+        return $this->amount / 100;
+    }
 }

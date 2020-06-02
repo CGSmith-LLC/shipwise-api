@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\debug\UserswitchAsset;
 
 /**
  * This is the model class for table "invoice".
@@ -69,6 +70,24 @@ class Invoice extends \yii\db\ActiveRecord
     public function getDecimalAmount()
     {
         return $this->amount / 100;
+    }
+
+    public function getStatusLabel()
+    {
+        $status = '';
+        switch ($this->status) {
+            case self::STATUS_UNPAID:
+                $status = '<p class="label label-primary">Unpaid</p>';
+                break;
+            case self::STATUS_PAID:
+                $status = '<p class="label label-success">Paid</p>';
+                break;
+            case self::STATUS_LATE:
+                $status = '<p class="label label-danger">Past Due</p>';
+                break;
+        }
+
+        return $status;
     }
 
 
