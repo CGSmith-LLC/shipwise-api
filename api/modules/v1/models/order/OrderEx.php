@@ -66,7 +66,7 @@ class OrderEx extends Order
             'createdDate'       => 'created_date',
             'updatedDate'       => 'updated_date',
             'status'            => 'status',
-            //'history'           => 'history',
+            'history'           => 'history',
             'customer'          => 'customer',
             'carrier_id'        => 'carrier_id',
             'carrier_name'      => function () {
