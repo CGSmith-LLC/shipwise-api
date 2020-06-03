@@ -16,20 +16,40 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a('Create One Time Charge', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
+    <p>
+        <p class="label label-success">Invoiced</p> Has been added to the invoice and will not be added to future invoices.<br/>
+        <p class="label label-default">Pending</p> Not added to an invoice yet. Should be added at next invoice run.
+    </p>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'customer_id',
-            'name',
             [
-                'attribute' => 'decimalAmount',
-                'format' => 'currency',
+                'attribute' => 'customer_id',
+                'label' => 'Customer Name',
+                'value' => function ($model) {
+                    return $model->customer->name;
+                },
             ],
-            'added_to_invoice',
+            [
+                'attribute' => 'name',
+                'label' => 'Subscription'
+            ],
+            [
+                'attribute' => 'amount',
+                'format' => 'raw',
+                'label' => 'Total Amount',
+                'value' => function($model) {
+                    $return = ''; // instantiate variable
+                    if ($model->added_to_invoice) {
+                        $return .= '<p class="label label-success">Invoiced</p>';
+                    } else {
+                        $return .= '<p class="label label-default">Pending</p>';
+                    }
+                    $return .= ' ' . Yii::$app->formatter->asCurrency($model->decimalAmount);
+                    return $return;
+                }
+            ],
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

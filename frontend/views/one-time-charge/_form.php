@@ -16,8 +16,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'amount')->textInput() ?>
-
+    <?= $form->field($model, 'amount',[
+        'template' => '{label}<div class="input-group"><span class="input-group-addon">$</span>{input}
+            </div>{error}{hint}'])->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

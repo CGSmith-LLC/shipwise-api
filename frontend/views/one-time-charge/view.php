@@ -40,27 +40,27 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'customer_id',
-            'name',
+            'customer.name',
+            [
+                'attribute' => 'name',
+                'label' => 'One Time Charge Name'
+            ],
             [
                 'attribute' => 'decimalAmount',
                 'format' => 'currency',
             ],
-            'added_to_invoice',
-        ],
-    ]) ?>
-
-    <?= \yii\grid\GridView::widget([
-        'dataProvider' => $dataProvider,
-        'columns' => [
-            'name',
             [
-                'attribute' => 'amount',
-                'value' => function ($model) {
-                    return Yii::$app->formatter->asCurrency($model->decimalAmount);
+                'attribute' => 'added_to_invoice',
+                'format' => 'raw',
+                'value' => function($model) {
+                    if ($model ->added_to_invoice) {
+                        return '<p class="label label-success">Invoiced</p>';
+                    } else {
+                        return '<p class="label label-default">Pending</p>';
+                    }
                 }
             ],
-        ]
+        ],
     ]) ?>
 
 
