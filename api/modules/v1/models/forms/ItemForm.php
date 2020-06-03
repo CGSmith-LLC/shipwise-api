@@ -63,7 +63,6 @@ class ItemForm extends Model
             ['quantity', 'compare', 'compareValue' => 0, 'operator' => '>'],
             ['uuid', 'string', 'length' => [1, 64]],
             ['sku', 'string', 'length' => [1, 64]],
-            ['name', 'string', 'length' => [2, 128]],
         ];
     }
 }
