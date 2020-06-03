@@ -24,7 +24,7 @@ $this->registerJs('
 Modal::begin([
     'id' => 'dashboardSearch',
     'clientOptions' => ['backdrop' => 'static', 'keyboard' => false],
-    'header' => '<h4>Search</h4>',
+    'header' => '<h4>Select Dates</h4>',
     'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>',
 ]); ?>
     <div class="report-form">
@@ -60,7 +60,7 @@ $this->registerJs('
 ');
 ?>
 <div class="body-content">
-    <h1>Dashboard <button id="searchButton" class="btn btn-primary">Search</button></h1>
+    <h1>Dashboard <button id="searchButton" class="btn btn-primary">Select Date Range</button></h1>
 
 </div>
 <div class="row">
