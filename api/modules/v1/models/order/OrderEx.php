@@ -66,7 +66,7 @@ class OrderEx extends Order
             'createdDate'       => 'created_date',
             'updatedDate'       => 'updated_date',
             'status'            => 'status',
-            //'history'           => 'history',
+            'history'           => 'history',
             'customer'          => 'customer',
             'carrier_id'        => 'carrier_id',
             'carrier_name'      => function () {
@@ -157,7 +157,7 @@ class OrderEx extends Order
      */
     public function getHistory()
     {
-        return $this->hasMany('api\modules\v1\models\order\OrderHistoryEx', ['order_id' => 'id']);
+        return $this->hasMany('api\modules\v1\models\order\OrderHistoryEx', ['order_id' => 'id'])->limit(3)->orderBy(['id' => SORT_DESC]);
     }
 
     /**
