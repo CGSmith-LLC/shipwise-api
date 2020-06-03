@@ -157,7 +157,7 @@ class OrderEx extends Order
      */
     public function getHistory()
     {
-        return $this->hasMany('api\modules\v1\models\order\OrderHistoryEx', ['order_id' => 'id']);
+        return $this->hasMany('api\modules\v1\models\order\OrderHistoryEx', ['order_id' => 'id'])->limit(3)->orderBy(['id' => SORT_DESC]);
     }
 
     /**
