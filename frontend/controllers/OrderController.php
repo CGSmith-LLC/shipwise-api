@@ -14,7 +14,8 @@ use yii\helpers\Html;
 /**
  * OrderController implements the CRUD actions for Order model.
  */
-class OrderController extends Controller
+class OrderController extends \frontend\controllers\Controller
+
 {
 
     /**

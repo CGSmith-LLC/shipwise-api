@@ -12,7 +12,7 @@ use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-class InvoiceController extends Controller
+class InvoiceController extends \frontend\controllers\Controller
 {
     public function behaviors()
     {

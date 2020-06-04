@@ -15,7 +15,7 @@ use yii\filters\VerbFilter;
 /**
  * SubscriptionController implements the CRUD actions for Subscription model.
  */
-class SubscriptionController extends Controller
+class SubscriptionController extends \frontend\controllers\Controller
 {
     /**
      * {@inheritdoc}

@@ -13,7 +13,7 @@ use yii\filters\VerbFilter;
 /**
  * OneTimeChargeController implements the CRUD actions for OneTimeCharge model.
  */
-class OneTimeChargeController extends Controller
+class OneTimeChargeController extends \frontend\controllers\Controller
 {
     /**
      * {@inheritdoc}

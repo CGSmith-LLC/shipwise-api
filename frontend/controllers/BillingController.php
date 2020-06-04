@@ -2,23 +2,18 @@
 
 namespace frontend\controllers;
 
-use cgsmith\stripe\Stripe;
 use common\models\Invoice;
-use common\models\Status;
-use frontend\models\Customer;
 use Yii;
 use frontend\models\PaymentMethod;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
-use yii\rest\UpdateAction;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * BillingController implements the CRUD actions for PaymentMethod model.
  */
-class BillingController extends Controller
+class BillingController extends \frontend\controllers\Controller
 {
     /**
      * {@inheritdoc}
