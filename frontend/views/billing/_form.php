@@ -9,7 +9,7 @@ use yii\widgets\ActiveForm;
 
 \Stripe\Stripe::setApiKey(Yii::$app->stripe->privateKey);
 
-$this->registerJsFile('@web/cc-form.js');
+$this->registerJsFile('@web/js/cc-form.js');
 $this->registerJsFile('https://js.stripe.com/v3/');
 
 ?>

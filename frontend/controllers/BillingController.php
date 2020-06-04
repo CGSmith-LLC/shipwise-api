@@ -3,8 +3,10 @@
 namespace frontend\controllers;
 
 use common\models\Invoice;
+use Stripe\Stripe;
 use Yii;
 use frontend\models\PaymentMethod;
+use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
@@ -87,9 +89,22 @@ class BillingController extends \frontend\controllers\Controller
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate()) {
                 if ($model->save()) {
-                    Yii::$app->getSession()->setFlash('success', 'Payment Made.');
+                    // if PaymentMethod count is 1 - then set this payment method as default true.
+                    if (PaymentMethod::find()->where(['customer_id' => $model->customer_id])->count() == 1) {
+                        $model->default = PaymentMethod::PRIMARY_PAYMENT_METHOD_YES;
+                    }
+                    $stripePaymentMethod = \Stripe\PaymentMethod::retrieve($model->stripe_payment_method_id);
+                    $model->brand = $stripePaymentMethod->card->brand;
+                    $model->lastfour = $stripePaymentMethod->card->last4;
+                    $month = $stripePaymentMethod->card->exp_month;
+                    $year = $stripePaymentMethod->card->exp_year;
+                    $model->expiration = $month . "/" . $year;
+                    $model->update();
 
-                    return $this->redirect(['view', 'id' => $model->id]);
+                    Yii::$app->getSession()->setFlash('success', 'Credit card successfully added.');
+
+                    return $this->redirect(['index']);
+
                 }
             }
         }
@@ -155,7 +170,7 @@ class BillingController extends \frontend\controllers\Controller
         $paymentMethod = $this->findModel($id);
         if ($paymentMethod->default == PaymentMethod::PRIMARY_PAYMENT_METHOD_YES) {
             Yii::$app->session->addFlash('errors', 'You cannot delete a primary payment method.');
-        }else {
+        } else {
             $paymentMethod->delete();
         }
 
