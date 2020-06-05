@@ -92,7 +92,7 @@ class PaymentMethod extends \yii\db\ActiveRecord
      */
     public function getCustomer()
     {
-        return $this->hasOne(Customer::class, ['id' => 'customer_id']);
+        return $this->hasOne(\frontend\models\Customer::class, ['id' => 'customer_id']);
     }
 
     /**

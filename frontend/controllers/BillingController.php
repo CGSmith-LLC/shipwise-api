@@ -9,6 +9,7 @@ use frontend\models\PaymentMethod;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
+use yii\httpclient\RequestEvent;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -104,7 +105,6 @@ class BillingController extends \frontend\controllers\Controller
                     Yii::$app->getSession()->setFlash('success', 'Credit card successfully added.');
 
                     return $this->redirect(['index']);
-
                 }
             }
         }
