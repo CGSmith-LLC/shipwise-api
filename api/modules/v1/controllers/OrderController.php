@@ -983,12 +983,14 @@ class OrderController extends ControllerEx
      *                in = "query",
      *                type = "integer",
      *                required = true,
-     *                enum = {1,8,9,10},
+     *                enum = {1,7,8,9,10,11},
      *                description = "Status value that need to be considered for filter
     1 - Shipped
+    7 - Cancelled
     8 - Pending Fulfillment
     9 - Open
-    10 - WMS Error"
+    10 - WMS Error
+    11 - Completed"
      *            ),
      *     @SWG\Parameter(
      *                name = "page",
@@ -1016,6 +1018,13 @@ class OrderController extends ControllerEx
      *                in = "query",
      *                type = "string",
      *                description = "Search for orders on requested ship date",
+     *                default = 0
+     *            ),
+     *     @SWG\Parameter(
+     *                name = "origin",
+     *                in = "query",
+     *                type = "string",
+     *                description = "Search for with a specific orign",
      *                default = 0
      *            ),
      *     @SWG\Parameter(
@@ -1117,6 +1126,7 @@ class OrderController extends ControllerEx
         $updatedDate       = null;
         $createdDate       = null;
         $requestedShipDate = null;
+        $origin            = null;
         if (null !== $this->request->get('updatedDate')) {
             $updatedDate = $this->request->get('updatedDate');
         }
@@ -1125,6 +1135,9 @@ class OrderController extends ControllerEx
         }
         if (null !== $this->request->get('requestedShipDate')) {
             $requestedShipDate = $this->request->get('requestedShipDate');
+        }
+        if (null !== $this->request->get('origin')) {
+            $origin = $this->request->get('origin');
         }
 
         $query = OrderEx::find()
@@ -1144,6 +1157,10 @@ class OrderController extends ControllerEx
 
         if ($requestedShipDate !== null) {
             $query->onOrBeforeRequestedDate($requestedShipDate);
+        }
+
+        if ($origin !== null) {
+            $query->withOrigin($origin);
         }
 
         // Get paginated results

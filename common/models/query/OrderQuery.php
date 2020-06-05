@@ -83,6 +83,18 @@ class OrderQuery extends \yii\db\ActiveQuery
     }
 
     /**
+     * Query condition to search by origin
+     *
+     * @param string $origin Origin search
+     *
+     * @return OrderQuery
+     */
+    public function withOrigin($origin)
+    {
+        return $this->andOnCondition([Order::tableName() . '.origin' => (string)$origin]);
+    }
+
+    /**
      * Query condition to get requested ship date
      *
      * @param $date
