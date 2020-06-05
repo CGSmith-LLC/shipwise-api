@@ -9,6 +9,8 @@ use yii\grid\GridView;
 
 $this->title = 'Billing';
 $this->params['breadcrumbs'][] = $this->title;
+$this->registerCssFile('/css/card.css')
+
 
 ?>
 <div class="payment-method-index">
@@ -28,14 +30,14 @@ $this->params['breadcrumbs'][] = $this->title;
             <tr>
 
                 <td><?php
-                    echo $stripePaymentMethod->card->brand . '&nbsp;';
+                    echo $paymentMethod->brand . '&nbsp;';
                     if ($paymentMethod->default) {
                         echo '<span class="label label-primary" disabled="disabled">Default</span>';
                     }
                     ?>
                 </td>
-                <td>****<?= $stripePaymentMethod->card->last4; ?></td>
-                <td><?= $stripePaymentMethod->card->exp_month . '/' . $stripePaymentMethod->card->exp_year; ?></td>
+                <td>****<?= $paymentMethod->lastfour; ?></td>
+                <td><?= $paymentMethod->expiration; ?></td>
                 <td>
                     <?php
                     // If it is not default allow deletion

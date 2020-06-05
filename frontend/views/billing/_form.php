@@ -11,20 +11,30 @@ use yii\widgets\ActiveForm;
 
 $this->registerJsFile('@web/js/cc-form.js');
 $this->registerJsFile('https://js.stripe.com/v3/');
-
+$this->registerCssFile('web/css/site.css')
 ?>
 
 <div class="payment-method-form">
     <?php $form = \yii\widgets\ActiveForm::begin(['id' => 'add-cc-form']); ?>
 
+
     <div class="form-row">
-        <label for="card-element">
-            Credit or Debit Card
-        </label>
-        <div id="card-element">
-            <!-- A Stripe Element will be inserted here. -->
-        </div>
-        <!-- Used to display form errors. -->
+        <label for="cardholder-name">Name</label>
+        <input id="cardholder-name" type="text">
+    </div>
+    <div class="form-row">
+        <label for="card-number">Credit or Debit Card</label>
+        <div id="card-number"></div>
+        <div id="card-errors" role="alert"></div>
+    </div>
+    <div class="form-row">
+        <label for="card-expiration">Expiration</label>
+        <div id="card-expiration"></div>
+        <div id="card-errors" role="alert"></div>
+    </div>
+    <div class="form-row">
+        <label for="card-cvc">CVC</label>
+        <div id="card-cvc"></div>
         <div id="card-errors" role="alert"></div>
     </div>
 
@@ -33,9 +43,6 @@ $this->registerJsFile('https://js.stripe.com/v3/');
     <div class="form-group">
         <?= Html::button(Yii::t('app', 'Save Card'), ['class' => 'btn btn-success', 'onclick' => 'createCC()', 'data-secret' => $model->setupIntent->client_secret, 'Id' => 'card-button'])?>
     </div>
-
-    <input id="cardholder-name" type="text">
-    <!-- placeholder for Elements -->
 
     <?php ActiveForm::end(); ?>
 

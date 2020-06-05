@@ -1,4 +1,3 @@
-
 var style = {
     base: {
         color: '#32325d',
@@ -17,10 +16,16 @@ var style = {
 
 
 var elements = stripe.elements();
-var cardElement = elements.create('card', {style: style});
+//var cardElement = elements.create('card', {style: style});
+var cardNumberElement = elements.create('cardNumber');
+var cardExpireElement = elements.create('cardExpiry');
+var cardCvcElement = elements.create('cardCvc');
 var cardButton = document.getElementById('card-button');
 var clientSecret = cardButton.dataset.secret;
-cardElement.mount('#card-element');
+//cardElement.mount('#card-element');
+cardNumberElement.mount('#card-number');
+cardExpireElement.mount('#card-expiration');
+cardCvcElement.mount('#card-cvc');
 
 var cardholderName = document.getElementById('cardholder-name');
 
@@ -35,7 +40,36 @@ function stripeTokenHandler(token) {
     form.submit();
 }
 //display error(s)
+/**
 cardElement.addEventListener('change',function(event){
+    var displayError = $("#card-errors");
+    if (event.error) {
+        displayError.html(event.error.message);
+    } else {
+        displayError.html('');
+    }
+});
+*/
+
+cardNumberElement.addEventListener('change',function(event){
+    var displayError = $("#card-errors");
+    if (event.error) {
+        displayError.html(event.error.message);
+    } else {
+        displayError.html('');
+    }
+});
+
+cardExpireElement.addEventListener('change',function(event){
+    var displayError = $("#card-errors");
+    if (event.error) {
+        displayError.html(event.error.message);
+    } else {
+        displayError.html('');
+    }
+});
+
+cardCvcElement.addEventListener('change',function(event){
     var displayError = $("#card-errors");
     if (event.error) {
         displayError.html(event.error.message);
@@ -49,7 +83,7 @@ function createCC() {
         clientSecret,
         {
             payment_method: {
-                card: cardElement,
+                card: cardNumberElement,
                 billing_details: {
                     name: cardholderName.value,
                 },
