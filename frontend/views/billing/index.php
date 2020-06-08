@@ -29,7 +29,8 @@ $this->registerCssFile('/css/card.css')
             <tr>
 
                 <td><?php
-                    echo $paymentMethod->brand . '&nbsp;';
+                    echo $paymentMethod->brandImage() ;
+
                     if ($paymentMethod->default) {
                         echo '<span class="label label-primary" disabled="disabled">Default</span>';
                     }

@@ -8,6 +8,7 @@ use Stripe\SetupIntent;
 use Stripe\StripeClient;
 use Yii;
 use yii\base\ErrorException;
+use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -47,6 +48,7 @@ class PaymentMethod extends \common\models\PaymentMethod
                 $this->customer->stripe_customer_id,
                 ['source' => [
                     'object' => 'card',
+
                     'number' => $this->card_number,
                     'exp_month' => $this->card_month,
                     'exp_year' => $this->card_year,
@@ -73,7 +75,19 @@ class PaymentMethod extends \common\models\PaymentMethod
         ]);
     }
 
-
+    public function brandImage()
+    {
+        if ($this->brand == 'visa') {
+            return '<img src= /images/card_brands/visa.png>';
+        } elseif ($this->brand == 'discover') {
+            return '<img src= /images/card_brands/discover_logo.jpg>';
+        } elseif ($this->brand == 'master_card') {
+            return '<img src= /images/card_brands/mc_vrt_opt_pos_63_2x.png>';
+        } elseif ($this->brand == 'american_express') {
+            return '<img src= /images/card_brands/Amex_logo_color.png>';
+        } else
+            return '<img src= /images/card_brands/discover_logo.jpg>';
+    }
 
 
 }
