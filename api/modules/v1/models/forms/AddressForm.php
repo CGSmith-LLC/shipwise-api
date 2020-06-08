@@ -17,6 +17,13 @@ use api\modules\v1\models\core\StateEx;
  *            maxLength = 64
  *        ),
  *     @SWG\Property(
+ *            property = "company",
+ *            type = "string",
+ *            description = "Company name",
+ *            minLength = 2,
+ *            maxLength = 64
+ *        ),
+ *     @SWG\Property(
  *            property = "email",
  *            type = "string",
  *            description = "Email",
@@ -47,7 +54,7 @@ use api\modules\v1\models\core\StateEx;
  *            type = "integer",
  *              enum = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
  *                        21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,
- *                        37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52},
+ *                        37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53},
  *            description = "State ID
 1 - Alabama
 2 - Alaska
@@ -100,7 +107,8 @@ use api\modules\v1\models\core\StateEx;
 49 - Washington
 50 - West Virginia
 51 - Wisconsin
-52 - Wyoming",
+52 - Wyoming
+53 - Armed Forces Americas",
  *        ),
  *     @SWG\Property(
  *            property = "zip",
@@ -137,6 +145,8 @@ class AddressForm extends Model
     /** @var string */
     public $name;
     /** @var string */
+    public $company;
+    /** @var string */
     public $email;
     /** @var string */
     public $address1;
@@ -160,7 +170,7 @@ class AddressForm extends Model
     {
         return [
             [['name', 'address1', 'city', 'stateId', 'zip'], 'required', 'message' => '{attribute} is required.'],
-            [['name', 'address1', 'city'], 'string', 'length' => [2, 64]],
+            [['name', 'company', 'address1', 'city'], 'string', 'length' => [2, 64]],
             ['email', 'email'],
             ['address2', 'string', 'length' => [1, 64]],
             ['zip', 'string', 'length' => [2, 16]],

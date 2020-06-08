@@ -80,6 +80,13 @@ use api\modules\v1\models\order\StatusEx;
  *            maxLength = 64
  *        ),
  *     @SWG\Property(
+ *            property = "notes",
+ *            type = "string",
+ *            description = "Order notes",
+ *            minLength = 1,
+ *            maxLength = 64
+ *        ),
+ *     @SWG\Property(
  *            property = "carrier_id",
  *            type = "integer",
  *        ),
@@ -106,6 +113,8 @@ class OrderForm extends Model
     public $uuid;
     /** @var string */
     public $poNumber;
+    /** @var string */
+    public $notes;
     /** @var string */
     public $origin;
     /** @var string */
@@ -140,7 +149,7 @@ class OrderForm extends Model
                 'required',
                 'message' => '{attribute} is required.',
             ],
-            [['poNumber', 'uuid', 'origin', 'customerReference'], 'string', 'length' => [1, 64]],
+            [['poNumber', 'uuid', 'origin', 'customerReference', 'notes'], 'string', 'length' => [1, 64]],
             ['orderReference', 'string', 'length' => [1, 45]],
             ['requestedShipDate', 'date', 'format' => 'php:Y-m-d'],
             ['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
