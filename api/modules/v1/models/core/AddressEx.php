@@ -18,6 +18,7 @@ class AddressEx extends Address
      *
      *     @SWG\Property( property = "id",   type = "integer", description = "Address ID" ),
      *     @SWG\Property( property = "name", type = "string", description = "Contact name" ),
+     *     @SWG\Property( property = "company", type = "string", description = "Company Name" ),
      *     @SWG\Property( property = "email", type = "string", description = "Email address" ),
      *     @SWG\Property( property = "address1", type = "string",  description = "Address line 1" ),
      *     @SWG\Property( property = "address2", type = "string",  description = "Address line 2" ),
@@ -36,6 +37,7 @@ class AddressEx extends Address
     {
         return [
             'id'       => 'id',
+            'company'  => 'company',
             'name'     => 'name',
             'email'    => 'email',
             'address1' => 'address1',

@@ -6,6 +6,7 @@ namespace common\models\base;
  * This is the model class for table "addresses".
  *
  * @property int    $id
+ * @property string $company
  * @property string $name
  * @property string $address1
  * @property string $address2
@@ -38,7 +39,7 @@ class BaseAddress extends \yii\db\ActiveRecord
             [['email'], 'email'],
             [['state_id'], 'integer'],
             [['created_date', 'updated_date'], 'safe'],
-            [['name', 'address1', 'address2', 'city'], 'string', 'max' => 64],
+            [['company', 'name', 'address1', 'address2', 'city'], 'string', 'max' => 64],
             [['zip'], 'string', 'max' => 16],
             [['phone'], 'string', 'max' => 32],
             [['notes'], 'string', 'max' => 140],
@@ -53,6 +54,7 @@ class BaseAddress extends \yii\db\ActiveRecord
         return [
             'id'           => 'ID',
             'name'         => 'Name',
+            'company'      => 'Company',
             'email'        => 'Email',
             'address1'     => 'Address1',
             'address2'     => 'Address2',
