@@ -45,6 +45,7 @@ class OrderEx extends Order
      *     @SWG\Property( property = "customer", ref = "#/definitions/Customer" ),
      *     @SWG\Property( property = "poNumber", type = "string", description = "PO Number of ecommerce customer" ),
      *     @SWG\Property( property = "uuid", type = "string", description = "Reference to ecommerce UUID" ),
+     *     @SWG\Property( property = "notes", type = "string", description = "Notes specific to an order" ),
      *     @SWG\Property( property = "origin", type = "string", description = "Origination of order. Such as
     SquareSpace or Zoho" ),
      * )
@@ -78,6 +79,7 @@ class OrderEx extends Order
             },
             'poNumber'          => 'po_number',
             'uuid'              => 'uuid',
+            'notes'             => 'notes',
             'origin'            => 'origin',
             /**
              * 3/12/2020 CGS
