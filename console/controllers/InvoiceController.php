@@ -37,6 +37,7 @@ class InvoiceController extends Controller
         //need to look for all subscriptions due today
 
         $subscriptions = Subscription::find()->where(['<=', 'next_invoice', $date->format('Y-m-d')])->all();
+        $invoicesToEmail = [];
 
         //need to create invoices and associate them the customers
         /** @var Subscription $subscription */
@@ -86,8 +87,10 @@ class InvoiceController extends Controller
             $invoice->setAttribute('balance', $totalAmount);
             if ($invoice->update() == false) {
                 foreach ($invoice->getErrorSummary(true) as $error) {
-                    echo  'actionIndex() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
+                    echo 'actionIndex() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
                 }
+            } else {
+                $invoicesToEmail[] = $invoice->id;
             }
 
             //need to update the subscription for the next invoice date
@@ -95,9 +98,31 @@ class InvoiceController extends Controller
             $period = new \DateInterval('P' . $subscription->months_to_recur . 'M');
             $subscription->next_invoice = $currentDate->add($period)->format('Y-m-d');
             $subscription->update();
-
-            // send copy of invoice to customer's email address
         }
+
+
+        // send copy of invoice to customer's email address
+        $mailer = \Yii::$app->mailer;
+        $mailer->viewPath = '@frontend/views/mail';
+        $mailer->getView()->theme = \Yii::$app->view->theme;
+        foreach ($invoicesToEmail as $invoice_id) {
+            /** @var $invoiceToEmail Invoice */
+            $invoiceToEmail = Invoice::findOne($invoice_id);
+
+            try {
+                $mailer->compose(['html' => 'new-invoice'], ['model' => $invoiceToEmail])
+                    ->setTo('brian@cgsmith.net')//$invoiceToEmail->getCustomer()->user->email)
+                    ->setBcc(\Yii::$app->params['adminEmail'])
+                    ->setFrom(\Yii::$app->params['senderEmail'])
+                    ->setSubject('ShipWise Invoice #' . $invoiceToEmail->id)
+                    ->send();
+            } catch (\Exception $ex) {
+                var_dump($ex->getMessage());
+                die('exception hit');
+            }
+        }
+
+
     }
 
     /**
@@ -110,7 +135,7 @@ class InvoiceController extends Controller
             ->where(['<=', 'status', $date->format('Y-m-d')])
             ->andwhere(['<=', 'status', 1])
             ->andWhere(['>', 'balance', 0])
-        ->all();
+            ->all();
 
         $this->chargeInvoices($invoices);
 
@@ -143,7 +168,7 @@ class InvoiceController extends Controller
                 $invoice->setAttribute('status', Invoice::STATUS_PAID);
                 if ($invoice->update() == false) {
                     foreach ($invoice->getErrorSummary(true) as $error) {
-                        echo  'actionCharge() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
+                        echo 'actionCharge() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
                     }
                 }
             }
@@ -155,6 +180,7 @@ class InvoiceController extends Controller
             }
         }
     }
+
     /**
      * Charge invoices that are available
      * @param $invoices array of Invoice object
