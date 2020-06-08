@@ -3,9 +3,12 @@
 namespace frontend\models;
 
 
+use frontend\controllers\BillingController;
 use Stripe\SetupIntent;
 use Stripe\StripeClient;
 use Yii;
+use yii\base\ErrorException;
+use yii\web\NotFoundHttpException;
 
 /**
  * This is the model class for table "payment-method".
@@ -39,16 +42,23 @@ class PaymentMethod extends \common\models\PaymentMethod
     {
         $stripe = new StripeClient(\Yii::$app->stripe->privateKey);
 
-        $paymentMethod = $stripe->customers->createSource(
-            $this->customer->stripe_customer_id,
-            ['source' => [
-                'object' => 'card',
-                'number' => $this->card_number,
-                'exp_month' => $this->card_month,
-                'exp_year' => $this->card_year,
-                'cvc' => $this->card_cvc,
-            ]]
-        );
+        try {
+            $paymentMethod = $stripe->customers->createSource(
+                $this->customer->stripe_customer_id,
+                ['source' => [
+                    'object' => 'card',
+                    'number' => $this->card_number,
+                    'exp_month' => $this->card_month,
+                    'exp_year' => $this->card_year,
+                    'cvc' => $this->card_cvc,
+                ]]
+            );
+            $this->stripe_payment_method_id = $paymentMethod->id;
+        } catch (\Exception $e) {
+            $this->addError('stripe', $e->getMessage());
+            return false;
+
+        }
 
         return parent::beforeSave($insert);
     }
@@ -62,6 +72,8 @@ class PaymentMethod extends \common\models\PaymentMethod
             'customer' => Yii::$app->user->identity->getCustomerStripeId(),
         ]);
     }
+
+
 
 
 }

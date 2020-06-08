@@ -114,16 +114,6 @@ class PaymentMethod extends \yii\db\ActiveRecord
                 $paymentMethod->save();
             }
         }
-
-        $array = [
-            'amount' => 2000,
-            'currency' => 'usd',
-            'payment_method' => $event->sender->stripe_payment_method_id,
-            'customer' => Yii::$app->user->identity->getCustomerStripeId(),
-            'off_session' => true,
-            'confirm' => true,
-        ];
-        \Stripe\PaymentIntent::create($array);
     }
 
 

@@ -25,8 +25,7 @@ $this->registerCssFile('/css/card.css')
         /** @var \frontend\models\PaymentMethod $paymentMethod */
 
         foreach ($paymentMethodDataProvider->getModels() as $paymentMethod) {
-            $stripePaymentMethod = \Stripe\PaymentMethod::retrieve($paymentMethod->stripe_payment_method_id);
-            ?>
+        ?>
             <tr>
 
                 <td><?php
