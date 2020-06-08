@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Class m200507_153434_add_index_created_date_to_orders_table
  */
-class m200507_153434_add_index_created_date_to_orders_table extends Migration
+class m200608_074300_add_company_name_to_orders_table extends Migration
 {
     /**
      * {@inheritdoc}
