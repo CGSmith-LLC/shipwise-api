@@ -251,6 +251,7 @@ class OrderController extends ControllerEx
              */
             $address           = new AddressEx();
             $address->name     = $orderForm->shipTo->name;
+            $address->company  = $orderForm->shipTo->company;
             $address->email    = $orderForm->shipTo->email;
             $address->address1 = $orderForm->shipTo->address1;
             $address->address2 = $orderForm->shipTo->address2;
@@ -264,6 +265,7 @@ class OrderController extends ControllerEx
             // Create Order
             $order                      = new OrderEx();
             $order->customer_id         = $this->apiConsumer->customer->id;
+            $order->notes               = $orderForm->notes;
             $order->uuid                = $orderForm->uuid;
             $order->po_number           = $orderForm->poNumber;
             $order->origin              = $orderForm->origin;
