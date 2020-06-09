@@ -78,15 +78,16 @@ class PaymentMethod extends \common\models\PaymentMethod
     public function brandImage()
     {
         if ($this->brand == 'visa') {
-            return '<img src= /images/card_brands/visa.png>';
+            return '<img src="/images/card_brands/visa.png" alt="VISA Logo">';
         } elseif ($this->brand == 'discover') {
-            return '<img src= /images/card_brands/discover_logo.jpg>';
+            return '<img src="/images/card_brands/discover_logo.jpg" alt="Discover Logo">';
         } elseif ($this->brand == 'master_card') {
-            return '<img src= /images/card_brands/mc_vrt_opt_pos_63_2x.png>';
+            return '<img src="/images/card_brands/mc_vrt_opt_pos_63_2x.png" alt="MasterCard Logo">';
         } elseif ($this->brand == 'american_express') {
-            return '<img src= /images/card_brands/Amex_logo_color.png>';
-        } else
-            return '<img src= /images/card_brands/discover_logo.jpg>';
+            return '<img src="/images/card_brands/Amex_logo_color.png" alt="American Express Logo">';
+        } else {
+            return '<img src="/images/card_brands/credit_card.png" alt="Credit Card">';
+        }
     }
 
 
