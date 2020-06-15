@@ -72,6 +72,7 @@ YiiAsset::register($this);
                     'attributes' => [
                         //'id',
                         'name',
+                        'company',
                         'address1',
                         'address2',
                         'city',
