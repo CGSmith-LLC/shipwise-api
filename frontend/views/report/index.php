@@ -43,9 +43,6 @@ $this->title = Yii::$app->name;
             ]); ?>
             <?php echo $form->field($model, 'customers')->dropdownList($customers, ['prompt' => ' Please select']); ?>
 
-            <?php echo $form->field($model, 'customers')->dropdownList($customers, ['prompt' => ' Please select']); ?>
-
-
             <div class="form-group">
                 <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
             </div>
