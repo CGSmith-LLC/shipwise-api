@@ -12,9 +12,6 @@ use frontend\assets\QZAsset;
 /* @var $model common\models\BulkAction */
 
 $this->title = $model->name;
-
-$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => "Bulk Actions"];
 YiiAsset::register($this);
 QZAsset::register($this);
 ?>

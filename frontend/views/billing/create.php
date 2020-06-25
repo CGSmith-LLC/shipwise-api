@@ -7,8 +7,7 @@ use yii\helpers\Html;
 /* @var $customers frontend\models\User */
 
 $this->title = 'Create Payment Method';
-$this->params['breadcrumbs'][] = ['label' => 'Payment Methods', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="payment-method-create">
 

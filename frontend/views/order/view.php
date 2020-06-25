@@ -10,10 +10,6 @@ use yii\widgets\DetailView;
 /* @var $model frontend\models\Order */
 
 $this->title = 'Order ' . $model->customer_reference;
-$this->title = 'Order ' . $model->customer_reference;
-
-$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 ?>
 <div class="order-view">

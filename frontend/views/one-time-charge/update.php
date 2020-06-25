@@ -6,9 +6,7 @@ use yii\helpers\Html;
 /* @var $model frontend\models\OneTimeCharge */
 
 $this->title = 'Update One Time Charge: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'One Time Charges', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+
 ?>
 <div class="one-time-charge-update">
 

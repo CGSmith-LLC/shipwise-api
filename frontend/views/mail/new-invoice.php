@@ -6,8 +6,7 @@ use yii\helpers\Html;
 /* @var $model common\models\Invoice */
 
 $this->title = 'Invoice #' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Billing', 'url' => ['/billing']];
-$this->params['breadcrumbs'][] = $this->title;
+
 
 
 $formatter = Yii::$app->getFormatter();

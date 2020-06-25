@@ -7,8 +7,6 @@ use yii\widgets\DetailView;
 /* @var $model common\models\Invoice */
 
 $this->title = 'Invoice #' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Billing', 'url' => ['/billing']];
-$this->params['breadcrumbs'][] = $this->title;
 
 $this->registerCssFile('/css/invoice.css');
 $this->registerCssFile('/css/invoice-print.css', ['media' => 'print']);
