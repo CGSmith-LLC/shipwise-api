@@ -31,6 +31,7 @@ class User extends BaseUser
     public function rules()
     {
         $rules = parent::rules();
+        $rules['fieldRequired'] = ['customer_id', 'required'];
         unset($rules['usernameRequired']);
         return $rules;
     }
