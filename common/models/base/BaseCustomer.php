@@ -40,7 +40,6 @@ class BaseCustomer extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'created_date'], 'safe'],
-            [['address1', 'city', 'state_id', 'zip', 'logo'], 'required'],
             [['state_id'], 'integer'],
             [['name'], 'string', 'max' => 45],
             [['address1', 'address2', 'city'], 'string', 'max' => 64],

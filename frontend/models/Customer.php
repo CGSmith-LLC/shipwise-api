@@ -5,6 +5,7 @@ namespace frontend\models;
 use common\models\Customer as BaseCustomer;
 use yii\helpers\ArrayHelper;
 
+
 /**
  * Class Customer
  *
@@ -76,4 +77,5 @@ class Customer extends BaseCustomer
 
         return $paymentMethod->stripe_payment_method_id;
     }
+
 }

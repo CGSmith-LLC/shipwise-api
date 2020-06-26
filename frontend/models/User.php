@@ -3,6 +3,9 @@
 namespace frontend\models;
 
 use dektrium\user\models\User as BaseUser;
+use Stripe\Customer;
+use Stripe\Exception\ApiErrorException;
+use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
 /**

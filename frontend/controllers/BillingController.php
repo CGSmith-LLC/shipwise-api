@@ -29,6 +29,7 @@ class BillingController extends \frontend\controllers\Controller
                 'ruleConfig' => [
                     'class' => \dektrium\user\filters\AccessRule::class,
                 ],
+
                 'rules' => [
                     [
                         'allow' => true,
