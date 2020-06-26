@@ -14,6 +14,7 @@ use yii\helpers\ArrayHelper;
  * @package frontend\models
  *
  * @property Customer[] $customers
+ * @property integer $customer_id
  */
 class User extends BaseUser
 {
@@ -73,6 +74,17 @@ class User extends BaseUser
         /** @var Customer $customer */
         $customer = $this->getCustomers()->one();
         return $customer->stripe_customer_id;
+    }
+
+    public function hasPaymentMethod()
+    {
+        return PaymentMethod::find()->where(['customer_id' => $this->customer_id])->exists();
+    }
+
+    public function isDirectCustomer()
+    {
+        $customer = \frontend\models\Customer::findOne($this->customer_id);
+        return $customer->direct;
     }
 
     /**

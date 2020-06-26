@@ -33,7 +33,8 @@ class Controller extends \yii\web\Controller
              */
             if (!Yii::$app->session->has(AdminController::ORIGINAL_USER_SESSION_KEY) &&
                 !Yii::$app->user->identity->isAdmin &&
-                !Yii::$app->user->identity->getCustomerStripeId() &&
+                Yii::$app->user->identity->isDirectCustomer() &&
+                !Yii::$app->user->identity->hasPaymentMethod() &&
                 !in_array($this->module->requestedRoute, $this->excludedRoutes)) {
 
                 Yii::$app->getSession()->setFlash('error', 'Please Set Up Payment Method and Add A Card To Your Profile.');

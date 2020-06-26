@@ -19,6 +19,7 @@ use common\models\PaymentMethod;
  * @property string               $logo     The absolute URL of the logo
  * @property string               $stripe_customer_id   Stripe ID for the customer
  * @property string               $created_date
+ * @property int                  $direct Is this customer paying or not?
  *
  * @property \common\models\State $state
  */
