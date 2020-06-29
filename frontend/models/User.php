@@ -21,6 +21,10 @@ class User extends BaseUser
             $this->username = $this->email;
         });
 
+        $this->on(self::BEFORE_CREATE, function () {
+            $this->username = $this->email;
+        });
+
         parent::init();
     }
 
