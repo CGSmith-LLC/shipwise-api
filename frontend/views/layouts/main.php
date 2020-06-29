@@ -99,7 +99,12 @@ AppAsset::register($this);
             'label' => 'Account', 'url' => ['/user/settings/account'],
             'items' => [
                 ['label' => 'Account', 'url' => ['/user/settings/account']],
-                ['label' => 'Billing', 'url' => ['/billing']],
+                [
+                    'label' => 'Billing',
+                    'url' => ['/billing'],
+                    'visible' => Yii::$app->user->identity->isDirectCustomer()
+                ],
+
             ]];
         $menuItems[] = '<li>'
             . Html::beginForm(['/user/logout'], 'post')
