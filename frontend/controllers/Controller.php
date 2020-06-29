@@ -2,7 +2,9 @@
 
 namespace frontend\controllers;
 
+use common\models\Customer;
 use dektrium\user\controllers\AdminController;
+use frontend\models\PaymentMethod;
 use Yii;
 
 /**
