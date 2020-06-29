@@ -51,7 +51,7 @@ class User extends BaseUser
     /**
      * Returns list of customers as array [id=>name]
      *
-     * @param string $keyField   Field name to use as key
+     * @param string $keyField Field name to use as key
      * @param string $valueField Field name to use as value
      *
      * @return array
@@ -73,7 +73,7 @@ class User extends BaseUser
     public function getCustomerStripeId()
     {
         /** @var Customer $customer */
-        $customer = $this->getCustomers()->one();
+        $customer = \frontend\models\Customer::findOne($this->customer_id);
         return $customer->stripe_customer_id;
     }
 
@@ -84,6 +84,13 @@ class User extends BaseUser
 
     public function isDirectCustomer()
     {
+        /**
+         * Admins need to be able to see the Billings page without being a direct customer
+         */
+        if ($this->isAdmin) {
+            return true;
+        }
+
         $customer = \frontend\models\Customer::findOne($this->customer_id);
         return $customer->direct;
     }
@@ -96,9 +103,7 @@ class User extends BaseUser
      */
     public function getCustomerId()
     {
-        /** @var Customer $customer */
-        $customer = $this->getCustomers()->one();
-        return $customer->id;
+        return $this->customer_id;
     }
 
     /**
