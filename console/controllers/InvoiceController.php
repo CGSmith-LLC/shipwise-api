@@ -10,6 +10,7 @@ use common\models\Status;
 use common\models\Subscription;
 use common\models\SubscriptionItems;
 use common\models\PaymentMethod;
+use dektrium\user\models\User;
 use frontend\models\Charges;
 use frontend\models\Customer;
 use frontend\models\Invoices;
@@ -17,6 +18,7 @@ use frontend\models\Payouts;
 use SebastianBergmann\CodeCoverage\Report\PHP;
 use Stripe\PaymentIntent;
 use yii\console\Controller;
+use yii\helpers\ArrayHelper;
 use yii\rest\UpdateAction;
 
 class InvoiceController extends Controller
@@ -108,10 +110,19 @@ class InvoiceController extends Controller
         foreach ($invoicesToEmail as $invoice_id) {
             /** @var $invoiceToEmail Invoice */
             $invoiceToEmail = Invoice::findOne($invoice_id);
+            /**
+             * 1. search for a User by the $invoiceToEmail->customer_id
+             * 2. get the $user->email
+             */
+
+            $customers = User::find()->where(['customer_id' => $invoiceToEmail->customer_id])->all();
+            $customerEmails = ArrayHelper::map($customers,'email','email');
+
+
 
             try {
                 $mailer->compose(['html' => 'new-invoice'], ['model' => $invoiceToEmail])
-                    ->setTo('brian@cgsmith.net')//$invoiceToEmail->getCustomer()->user->email)
+                    ->setTo($customerEmails)
                     ->setBcc(\Yii::$app->params['adminEmail'])
                     ->setFrom(\Yii::$app->params['senderEmail'])
                     ->setSubject('ShipWise Invoice #' . $invoiceToEmail->id)
@@ -122,7 +133,7 @@ class InvoiceController extends Controller
             }
         }
 
-
+        die;
     }
 
     /**
