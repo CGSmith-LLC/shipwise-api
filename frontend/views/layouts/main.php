@@ -40,6 +40,11 @@ AppAsset::register($this);
     <meta name="theme-color" content="#2c9fd6">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
+    <script src ="https://js.stripe.com/v3/"></script>
+    <script type="application/javascript">
+        var stripe = Stripe('<?=Yii::$app->stripe->publicKey?>');
+    </script>
+
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
@@ -82,12 +87,28 @@ AppAsset::register($this);
 
         if (Yii::$app->user->identity->isAdmin) {
             $menuItems[] = ['label' => 'Users', 'url' => ['/user/admin/']];
+            $menuItems[] = [
+                    'label' => 'Subscriptions', 'url' => ['/subscription'],
+                    'items' => [
+                    ['label' => 'Subscriptions', 'url' => ['/subscription']],
+                    ['label' => 'One Time Charges', 'url' => ['/one-time-charge']],
+                ]];
         }
 
-        $menuItems[] = ['label' => 'Account', 'url' => ['/user/settings/account']];
+        $menuItems[] = [
+            'label' => 'Account', 'url' => ['/user/settings/account'],
+            'items' => [
+                ['label' => 'Account', 'url' => ['/user/settings/account']],
+                [
+                    'label' => 'Billing',
+                    'url' => ['/billing'],
+                    'visible' => Yii::$app->user->identity->isDirectCustomer()
+                ],
+
+            ]];
         $menuItems[] = '<li>'
             . Html::beginForm(['/user/logout'], 'post')
-            . Html::submitButton('<img src="https://www.gravatar.com/avatar/'.md5(Yii::$app->user->identity->email).'?s=24&d=mp" style="border-radius:50%">'.
+            . Html::submitButton('<img src="https://www.gravatar.com/avatar/' . md5(Yii::$app->user->identity->email) . '?s=24&d=mp" style="border-radius:50%">' .
                 ' Logout (' . Yii::$app->user->identity->username . ')',
                 ['class' => 'logout']
             )
@@ -103,9 +124,6 @@ AppAsset::register($this);
     ?>
 
     <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
         <?= Alert::widget() ?>
         <?= $content ?>
     </div>

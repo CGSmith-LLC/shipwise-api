@@ -11,7 +11,7 @@ use frontend\models\Order;
 use Yii;
 use yii\web\Controller;
 
-class ReportController extends Controller
+class ReportController extends \frontend\controllers\Controller
 {
 
     public function behaviors()

@@ -13,7 +13,7 @@ use yii\web\Controller;
 /**
  * Site controller
  */
-class SiteController extends Controller
+class SiteController extends \frontend\controllers\Controller
 {
 
     /**
@@ -115,5 +115,8 @@ class SiteController extends Controller
         ]);
     }
 }
+
+
+
 
 
