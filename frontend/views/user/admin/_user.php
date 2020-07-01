@@ -15,5 +15,4 @@
 $array = \yii\helpers\ArrayHelper::map(
     \frontend\models\Customer::find()->all(), 'id', 'name'
 );
-array_unshift($array, "Select");
-echo $form->field($user, 'customer_id')->dropDownList($array) ?>
+echo $form->field($user, 'customer_id')->dropDownList($array, ['prompt'=> 'Select']) ?>
