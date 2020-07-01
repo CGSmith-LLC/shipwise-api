@@ -14,7 +14,8 @@ use yii\helpers\Html;
 /**
  * OrderController implements the CRUD actions for Order model.
  */
-class OrderController extends Controller
+class OrderController extends \frontend\controllers\Controller
+
 {
 
     /**
@@ -132,6 +133,7 @@ class OrderController extends Controller
         $model        = new OrderForm();
         $model->order = $this->findModel($id);
         $model->setAttributes(Yii::$app->request->post());
+        Yii::debug($model->order);
 
         if (Yii::$app->request->post() && $model->validate() && $model->save()) {
             Yii::$app->getSession()->setFlash('success', 'Order has been updated.');

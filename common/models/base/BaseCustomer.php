@@ -2,6 +2,8 @@
 
 namespace common\models\base;
 
+use common\models\PaymentMethod;
+
 /**
  * This is the model class for table "customers".
  *
@@ -15,7 +17,9 @@ namespace common\models\base;
  * @property string               $phone    Phone number
  * @property string               $email    Email address
  * @property string               $logo     The absolute URL of the logo
+ * @property string               $stripe_customer_id   Stripe ID for the customer
  * @property string               $created_date
+ * @property int                  $direct Is this customer paying or not?
  *
  * @property \common\models\State $state
  */
@@ -37,12 +41,12 @@ class BaseCustomer extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'created_date'], 'safe'],
-            [['address1', 'city', 'state_id', 'zip', 'logo'], 'required'],
             [['state_id'], 'integer'],
             [['name'], 'string', 'max' => 45],
             [['address1', 'address2', 'city'], 'string', 'max' => 64],
             [['zip'], 'string', 'max' => 16],
             [['phone'], 'string', 'max' => 32],
+            [['stripe_customer_id'], 'string', 'max' => 128],
             [['logo', 'email'], 'string', 'max' => 255],
         ];
     }
@@ -75,5 +79,15 @@ class BaseCustomer extends \yii\db\ActiveRecord
     public function getState()
     {
         return $this->hasOne('common\models\State', ['id' => 'state_id']);
+    }
+
+    /**
+     * Payment method relation
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentMethods()
+    {
+        return $this->hasMany(PaymentMethod::class, ['customer_id' => 'id']);
     }
 }

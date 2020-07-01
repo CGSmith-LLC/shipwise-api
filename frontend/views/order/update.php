@@ -11,10 +11,6 @@ use yii\helpers\Html;
 /* @var $states array List of states */
 
 $this->title = 'Update Order: ' . $model->order->id;
-
-$this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->order->id, 'url' => ['view', 'id' => $model->order->id]];
-$this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="order-update">
 

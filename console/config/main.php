@@ -31,6 +31,10 @@ return [
                 ],
             ],
         ],
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'scriptUrl' => 'https://app.getshipwise.com'
+        ],
     ],
     'params' => $params,
     'modules' => [

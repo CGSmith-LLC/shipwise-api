@@ -1,0 +1,9 @@
+@media print {
+    .footer,.breadcrumb {
+        display: none;
+    }
+
+    .title {
+        width: 150px;
+    }
+}
