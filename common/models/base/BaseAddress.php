@@ -36,7 +36,6 @@ class BaseAddress extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'address1', 'city', 'state_id', 'zip', 'phone'], 'required'],
-            [['email'], 'email'],
             [['state_id'], 'integer'],
             [['created_date', 'updated_date'], 'safe'],
             [['company', 'name', 'address1', 'address2', 'city'], 'string', 'max' => 64],
