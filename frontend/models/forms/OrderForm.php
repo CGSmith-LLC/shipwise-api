@@ -68,7 +68,9 @@ class OrderForm extends Model
 
         if ($this->address->save()) {
             $this->order->address_id = $this->address->id;
-            $this->order->save();
+            if (!$this->order->save()) {
+                $transaction->rollBack();
+            }
         } else {
             $transaction->rollBack();
 
