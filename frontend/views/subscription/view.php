@@ -7,7 +7,8 @@ use yii\widgets\DetailView;
 /* @var $model frontend\models\Subscription */
 
 $this->title = $model->customer->name . ' Subscription #' . $model->id;
-
+$this->params['breadcrumbs'][] = ['label' => 'Subscriptions', 'url' => ['index']];
+$this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="subscription-view">
