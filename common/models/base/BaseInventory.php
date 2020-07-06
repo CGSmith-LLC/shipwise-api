@@ -4,7 +4,7 @@ namespace common\models\base;
 
 
 /**
- *  This is the model class for table "customers".
+ *  This is the model class for table "inventory".
  *
  * @property int $id
  * @property int $customer_id
