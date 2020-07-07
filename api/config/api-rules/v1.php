@@ -45,6 +45,10 @@ return [
         "controller" => ["$version/inventory"],
     ],
 
+    "POST $version/inventory" => "$version/inventory/create",
+    "GET $version/inventory" => "$version/inventory",
+    "DELETE $version/inventory" => "$version/inventory/delete",
+
     // Shipping Rates
     "POST $version/shipping/rates" => "$version/shipping-rate/create",
 ];
