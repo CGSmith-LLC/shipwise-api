@@ -196,7 +196,7 @@ class InventoryController extends PaginatedControllerEx
     {
         // Get paginated results
         $provider = new ActiveDataProvider([
-            'query'      => InventoryEx::find()->forCustomer($this->apiConsumer->customer->id),
+            'query'      => InventoryEx::find()->forCustomer($this->apiConsumer->customer->id)->orderBy(['sku' => SORT_ASC]),
             'pagination' => $this->pagination,
         ]);
 
