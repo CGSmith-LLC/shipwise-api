@@ -3,16 +3,12 @@
 namespace api\modules\v1\models\forms;
 
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 
 /**
  * @SWG\Definition(
  *     definition = "InventoryForm",
  *     required   = { "sku" },
- *     @SWG\Property(
- *            property = "id",
- *            type = "integer",
- *            description = "id"
- *        ),
  *
  *     @SWG\Property(
  *            property = "sku",
@@ -32,7 +28,6 @@ use yii\base\Model;
  *            property = "available_quantity",
  *            type = "number",
  *            description = "available quantity",
- *
  *        ),
  * )
  */
@@ -66,7 +61,6 @@ class InventoryForm extends Model
             [['customer_id', 'id'], 'integer'],
             [['name', 'sku'], 'string', 'max' => 64],
             [['available_quantity'], 'number']
-
         ];
     }
 }
