@@ -47,7 +47,7 @@ return [
 
     "POST $version/inventory" => "$version/inventory/create",
     "GET $version/inventory" => "$version/inventory",
-    "DELETE $version/inventory" => "$version/inventory/delete",
+    "DELETE $version/inventory/purge" => "$version/inventory/purge",
 
     // Shipping Rates
     "POST $version/shipping/rates" => "$version/shipping-rate/create",

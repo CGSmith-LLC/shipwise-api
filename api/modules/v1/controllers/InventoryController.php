@@ -203,10 +203,57 @@ class InventoryController extends PaginatedControllerEx
         return $this->success($provider);
     }
 
-    public function actionDelete()
+    /**
+     * @SWG\Delete(
+     *     path = "/inventory/purge",
+     *     tags = { "Inventory" },
+     *     summary = "Delete all inventory",
+     *     description = "Removes all inventoried items",
+     *
+     *     @SWG\Response(
+     *          response = 204,
+     *          description = "Inventory deleted successfully",
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 400,
+     *          description = "Error while deleting order",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 401,
+     *          description = "Impossible to authenticate user",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 403,
+     *          description = "User is inactive",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 500,
+     *          description = "Unexpected error",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     security = {{
+     *            "basicAuth": {}
+     *     }}
+     * )
+     */
+    public function actionPurge()
     {
+        // Ensure we are an API consumer and not a super admin
+        if (!$this->apiConsumer->isCustomer()) {
+            return $this->unprocessableError(['You must be a customer to be able to delete']);
+        }
 
+        InventoryEx::deleteAll(['customer_id' => $this->apiConsumer->customer->id]);
+
+        return $this->success(null, 204);
     }
-
 
 }
