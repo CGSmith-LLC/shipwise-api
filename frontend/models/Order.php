@@ -3,7 +3,9 @@
 namespace frontend\models;
 
 use common\models\Order as BaseOrder;
+use DateTime;
 use yii\helpers\ArrayHelper;
+use Yii;
 
 /**
  * Class Order
@@ -19,11 +21,21 @@ class Order extends BaseOrder
     public function rules()
     {
         $return = parent::rules();
-        $return[] = [['requested_ship_date'], 'date', 'format' => 'php:m/d/Y'];
+        //$return[] = [['requested_ship_date'], 'date', 'format'=>'Y/m/d'];
 
         return $return;
     }
+public function beforeValidate()
+{
+    if (!empty($this->requested_ship_date)) {
+        $newDateTime = DateTime::createFromFormat('m/d/Y', $this->requested_ship_date);
+        Yii::debug($newDateTime);
+        //$this->requested_ship_date = $newDateTime->format('Y-m-d');
 
+    }
+    return parent::beforeValidate();
+
+}
 
     /** {@inheritdoc} */
     public function attributeLabels()
@@ -91,6 +103,7 @@ class Order extends BaseOrder
         if (!empty($this->requested_ship_date)) {
             $date = new \DateTime($this->requested_ship_date);
             $this->requested_ship_date = $date->format('Y-m-d H:i:s');
+
         }
 
         return true;
