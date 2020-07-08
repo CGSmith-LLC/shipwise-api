@@ -7,6 +7,8 @@ use yii\widgets\DetailView;
 /* @var $model frontend\models\OneTimeCharge */
 
 $this->title = $model->name;
+$this->params['breadcrumbs'][] = ['label' => 'One Time Charges', 'url' => ['index']];
+$this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="one-time-charge-view">

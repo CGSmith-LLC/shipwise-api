@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'One Time Charges';
-
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="one-time-charge-index">
 

@@ -8,6 +8,7 @@ use yii\grid\GridView;
 /* @var $invoiceDataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Billing';
+$this->params['breadcrumbs'][] = $this->title;
 $this->registerCssFile('/css/card.css')
 
 
