@@ -59,6 +59,8 @@ $item->loadDefaultValues();
                         <?= $form->field($model->order, 'customer_id')
                                  ->dropdownList($customers, ['prompt' => ' Please select']) ?>
 
+                        <?= $form->field($model->order, 'tracking')->textInput(['maxlength' => true]) ?>
+
                         <?= $form->field($model->order, 'customer_reference')->textInput(['maxlength' => true]) ?>
 
                         <?= $form->field($model->order, 'po_number')->textInput(['maxlength' => true]) ?>
