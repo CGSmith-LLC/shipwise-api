@@ -20,3 +20,10 @@
  *    description = "",
  * )
  */
+
+/**
+ * @SWG\Tag(
+ *    name = "Inventory",
+ *    description = "",
+ * )
+ */

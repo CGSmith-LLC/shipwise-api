@@ -13,7 +13,8 @@ use yii\bootstrap\Nav;
  */
 
 $this->title = Yii::t('user', 'Update user account') . ' - ID ' . $user->id;
-
+$this->params['breadcrumbs'][] = ['label' => Yii::t('user', 'Users'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <?= $this->render('/_alert', ['module' => Yii::$app->getModule('user')]) ?>

@@ -14,7 +14,7 @@ use yii\widgets\Pjax;
 /* @var $statuses array List of order statuses */
 
 $this->title                   = 'Orders';
-
+$this->params['breadcrumbs'][] = $this->title;
 /**
  * - Get a dropdown list from the associated customers
  * - OR - get a dropdown list of all customers if admin

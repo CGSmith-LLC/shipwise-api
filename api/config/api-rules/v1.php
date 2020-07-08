@@ -39,6 +39,16 @@ return [
         "controller" => ["$version/customer"],
     ],
 
+    // Inventory
+    [
+        "class"      => 'yii\rest\UrlRule',
+        "controller" => ["$version/inventory"],
+    ],
+
+    "POST $version/inventory" => "$version/inventory/create",
+    "GET $version/inventory" => "$version/inventory",
+    "DELETE $version/inventory/purge" => "$version/inventory/purge",
+
     // Shipping Rates
     "POST $version/shipping/rates" => "$version/shipping-rate/create",
 ];

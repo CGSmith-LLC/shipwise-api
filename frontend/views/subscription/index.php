@@ -7,6 +7,7 @@ use yii\grid\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Subscriptions';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="subscription-index">
 

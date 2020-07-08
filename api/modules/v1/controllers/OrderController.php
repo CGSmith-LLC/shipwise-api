@@ -2,19 +2,16 @@
 
 namespace api\modules\v1\controllers;
 
-use api\modules\v1\components\ControllerEx;
+use api\modules\v1\components\PaginatedControllerEx;
 use api\modules\v1\models\core\AddressEx;
 use api\modules\v1\models\forms\HistoryForm;
 use api\modules\v1\models\forms\StatusForm;
 use api\modules\v1\models\order\OrderHistoryEx;
 use api\modules\v1\models\order\PackageEx;
-use api\modules\v1\models\order\TrackingInfoEx;
 use api\modules\v1\models\order\ItemEx;
 use api\modules\v1\models\order\StatusEx;
 use common\models\PackageItem;
 use common\models\PackageItemLotInfo;
-use simpleDI\LoadedTestWithDependencyInjectionCest;
-use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use api\modules\v1\models\order\OrderEx;
 use api\modules\v1\models\forms\OrderForm;
@@ -27,7 +24,7 @@ use api\modules\v1\models\forms\OrderForm;
  * @property \api\modules\v1\components\parameters\Pagination $pagination
  * @property \common\models\ApiConsumer                       $apiConsumer
  */
-class OrderController extends ControllerEx
+class OrderController extends PaginatedControllerEx
 {
 
     /** @inheritdoc */
@@ -47,19 +44,6 @@ class OrderController extends ControllerEx
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return ArrayHelper::merge(parent::behaviors(), [
-            'Pagination' => [
-                'class' => 'api\modules\v1\components\parameters\Pagination',
-            ],
-            'Search'     => 'api\modules\v1\components\parameters\Search',
-            'Limit'      => 'api\modules\v1\components\parameters\Limit',
-        ]);
-    }
 
     /**
      * @SWG\Get(
