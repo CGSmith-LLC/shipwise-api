@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\models\SubscriptionItems;
+
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\forms\SubscriptionForm */
@@ -58,15 +60,18 @@ $this->registerJsFile('@web/js/subscription-create.js');
                     <div id="items">
                         <?php
                         // existing item fields
+
                         foreach ($model->items as $itemKey => $_item) : ?>
-                            <div class="row item item-<?= $itemKey ?>">
+                                <div class="row item item-<?= $itemKey ?>">
+
                                 <?= $this->render('partial/_item-row', [
                                     'key'     => $_item->isNewRecord
                                         ? (strpos($itemKey, 'new') !== false ? $itemKey : 'new' . $itemKey)
                                         : $_item->id,
                                     'form'    => $form,
-                                    'item'    => $_item,
+                                    'item'    => $_item ,
                                     'counter' => $itemKey,
+
                                 ]); ?>
                             </div>
                         <?php endforeach; ?>
