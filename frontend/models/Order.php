@@ -25,17 +25,6 @@ class Order extends BaseOrder
 
         return $return;
     }
-public function beforeValidate()
-{
-    if (!empty($this->requested_ship_date)) {
-        $newDateTime = DateTime::createFromFormat('m/d/Y', $this->requested_ship_date);
-        Yii::debug($newDateTime);
-        //$this->requested_ship_date = $newDateTime->format('Y-m-d');
-
-    }
-    return parent::beforeValidate();
-
-}
 
     /** {@inheritdoc} */
     public function attributeLabels()
