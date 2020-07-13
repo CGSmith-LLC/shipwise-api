@@ -60,15 +60,18 @@ class OrderForm extends Model
     public function save()
     {
         $transaction = Yii::$app->db->beginTransaction();
+        Yii::debug($this->order);
         if (!$this->order->save()) {
             $transaction->rollBack();
 
             return false;
         }
 
+
         if ($this->address->save()) {
             $this->order->address_id = $this->address->id;
             if (!$this->order->save()) {
+
                 $transaction->rollBack();
             }
         } else {
