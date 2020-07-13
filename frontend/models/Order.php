@@ -15,16 +15,7 @@ use Yii;
 class Order extends BaseOrder
 {
 
-    /**
-     * @inheritDoc
-     */
-    public function rules()
-    {
-        $return = parent::rules();
-        //$return[] = [['requested_ship_date'], 'date', 'format'=>'Y/m/d'];
 
-        return $return;
-    }
 
     /** {@inheritdoc} */
     public function attributeLabels()

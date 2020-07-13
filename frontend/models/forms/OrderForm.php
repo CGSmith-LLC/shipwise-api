@@ -67,11 +67,11 @@ class OrderForm extends Model
             return false;
         }
 
-        Yii::debug($this->order);
+
         if ($this->address->save()) {
             $this->order->address_id = $this->address->id;
             if (!$this->order->save()) {
-                Yii::debug($this->order);
+
                 $transaction->rollBack();
             }
         } else {
