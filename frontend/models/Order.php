@@ -3,7 +3,9 @@
 namespace frontend\models;
 
 use common\models\Order as BaseOrder;
+use DateTime;
 use yii\helpers\ArrayHelper;
+use Yii;
 
 /**
  * Class Order
@@ -13,16 +15,6 @@ use yii\helpers\ArrayHelper;
 class Order extends BaseOrder
 {
 
-    /**
-     * @inheritDoc
-     */
-    public function rules()
-    {
-        $return = parent::rules();
-        $return[] = [['requested_ship_date'], 'date', 'format' => 'php:m/d/Y'];
-
-        return $return;
-    }
 
 
     /** {@inheritdoc} */
@@ -91,6 +83,7 @@ class Order extends BaseOrder
         if (!empty($this->requested_ship_date)) {
             $date = new \DateTime($this->requested_ship_date);
             $this->requested_ship_date = $date->format('Y-m-d H:i:s');
+
         }
 
         return true;
