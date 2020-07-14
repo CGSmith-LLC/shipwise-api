@@ -176,10 +176,12 @@ class AmazonMWS extends ShipmentPlugin
         $orderItems = Item::find()->where(['order_id' => $this->shipment->order_id])->all();
 
         foreach ($orderItems as $orderItem) {
-            $_item = new \MWSMerchantFulfillmentService_Model_Item();
-            $_item->setOrderItemId($orderItem->uuid);
-            $_item->setQuantity($orderItem->quantity);
-            $itemList[] = $_item;
+            if (isset($orderItem->uuid)) { // If the item doesn't have a UUID then we assume it is packaging
+                $_item = new \MWSMerchantFulfillmentService_Model_Item();
+                $_item->setOrderItemId($orderItem->uuid);
+                $_item->setQuantity($orderItem->quantity);
+                $itemList[] = $_item;
+            }
         }
         $details->setItemList($itemList);
 

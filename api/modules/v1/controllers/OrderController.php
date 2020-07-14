@@ -683,6 +683,7 @@ class OrderController extends PaginatedControllerEx
                 $item           = new ItemEx();
                 $item->order_id = $order->id;
                 $item->sku      = $formItem->sku;
+                $item->uuid     = $formItem->uuid;
                 $item->quantity = $formItem->quantity;
                 $item->name     = $formItem->name;
                 $item->save();
