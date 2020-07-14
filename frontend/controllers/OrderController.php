@@ -10,7 +10,6 @@ use frontend\models\{Order, forms\OrderForm, BulkAction, search\OrderSearch};
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
-
 /**
  * OrderController implements the CRUD actions for Order model.
  */
@@ -134,6 +133,7 @@ class OrderController extends \frontend\controllers\Controller
         $model->order = $this->findModel($id);
         $model->setAttributes(Yii::$app->request->post());
         Yii::debug($model->order);
+
 
         if (Yii::$app->request->post() && $model->validate() && $model->save()) {
             Yii::$app->getSession()->setFlash('success', 'Order has been updated.');

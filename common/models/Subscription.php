@@ -31,7 +31,7 @@ class Subscription extends \yii\db\ActiveRecord
             [['customer_id', 'next_invoice', 'months_to_recur'], 'required'],
             [['customer_id'], 'integer'],
             [['months_to_recur'], 'integer'
-            ,'message' => 'Can Not recur in partial months. Please select full months.'],
+            ,'message' => 'Can not recur in partial months. Please select full months.'],
             [['next_invoice'], 'safe'],
         ];
     }

@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'amount',[
+    <?= $form->field($model, 'decimalAmount',[
         'template' => '{label}<div class="input-group"><span class="input-group-addon">$</span>{input}
             </div>{error}{hint}'])->textInput() ?>
 

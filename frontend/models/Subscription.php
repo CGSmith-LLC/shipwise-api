@@ -4,6 +4,8 @@
 namespace frontend\models;
 
 use common\models\Subscription as BaseSubscription;
+use phpDocumentor\Reflection\Types\Float_;
+
 
 /**
  * Class Subscription
@@ -36,6 +38,7 @@ class Subscription extends BaseSubscription
         if (!empty($this->next_invoice)) {
             $date = new \DateTime($this->next_invoice);
             $this->setAttribute('next_invoice', $date->format('Y-m-d'));
+
         }
 
         return parent::beforeSave($insert);
