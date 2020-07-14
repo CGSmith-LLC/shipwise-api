@@ -713,7 +713,12 @@ class OrderController extends PaginatedControllerEx
                     $package->setAttribute('length', $formPackage['length']);
                     $package->setAttribute('width', $formPackage['width']);
                     $package->setAttribute('height', $formPackage['height']);
-                    $package->setAttribute('tracking', $formPackage['tracking']);
+                    if (isset($formPackage['weight'])) {
+                        $package->setAttribute('weight', $formPackage['weight']);
+                    }
+                    if (isset($formPackage['tracking'])) {
+                        $package->setAttribute('tracking', $formPackage['tracking']);
+                    }
                     $package->setAttribute('order_id', $order->id);
                     $package->save();
                     foreach ($formPackage['package_items'] as $package_item) {
