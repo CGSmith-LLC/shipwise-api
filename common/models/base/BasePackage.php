@@ -31,7 +31,7 @@ class BasePackage extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['order_id', 'tracking'], 'required'],
+            [['order_id'], 'required'],
             [['order_id'], 'integer'],
             ['tracking', 'string', 'max' => 64],
             [['length', 'width', 'height', 'weight'], 'string', 'max' => 16],
