@@ -716,27 +716,29 @@ class OrderController extends PaginatedControllerEx
                     if (isset($formPackage['weight'])) {
                         $package->setAttribute('weight', $formPackage['weight']);
                     }
-                    if (isset($formPackage['tracking'])) {
+                    if (isset($formPackage['tracking']) && !is_null($formPackage['tracking'])) {
                         $package->setAttribute('tracking', $formPackage['tracking']);
                     }
                     $package->setAttribute('order_id', $order->id);
                     $package->save();
-                    foreach ($formPackage['package_items'] as $package_item) {
-                        $packageItem = new PackageItem();
-                        $packageItem->setAttribute('quantity', $package_item['quantity']);
-                        $packageItem->setAttribute('sku', $package_item['sku']);
-                        $packageItem->setAttribute('name', $package_item['name']);
-                        $packageItem->setAttribute('package_id', $package->id);
-                        $packageItem->setAttribute('order_id', $order->id);
-                        $packageItem->save();
-                        if (isset($package_item['lot_info'])) {
-                            foreach ($package_item['lot_info'] as $lot_info) {
-                                $lotInfo = new PackageItemLotInfo();
-                                $lotInfo->setAttribute('quantity', $lot_info['quantity']);
-                                $lotInfo->setAttribute('lot_number', $lot_info['lot_number']);
-                                $lotInfo->setAttribute('serial_number', $lot_info['serial_number']);
-                                $lotInfo->setAttribute('package_items_id', $packageItem->id);
-                                $lotInfo->save();
+                    if (is_array($formPackage['package_items'])) {
+                        foreach ($formPackage['package_items'] as $package_item) {
+                            $packageItem = new PackageItem();
+                            $packageItem->setAttribute('quantity', $package_item['quantity']);
+                            $packageItem->setAttribute('sku', $package_item['sku']);
+                            $packageItem->setAttribute('name', $package_item['name']);
+                            $packageItem->setAttribute('package_id', $package->id);
+                            $packageItem->setAttribute('order_id', $order->id);
+                            $packageItem->save();
+                            if (isset($package_item['lot_info'])) {
+                                foreach ($package_item['lot_info'] as $lot_info) {
+                                    $lotInfo = new PackageItemLotInfo();
+                                    $lotInfo->setAttribute('quantity', $lot_info['quantity']);
+                                    $lotInfo->setAttribute('lot_number', $lot_info['lot_number']);
+                                    $lotInfo->setAttribute('serial_number', $lot_info['serial_number']);
+                                    $lotInfo->setAttribute('package_items_id', $packageItem->id);
+                                    $lotInfo->save();
+                                }
                             }
                         }
                     }
