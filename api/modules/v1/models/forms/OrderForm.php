@@ -144,8 +144,6 @@ class OrderForm extends Model
     public $status;
     /** @var ItemForm[] */
     public $items;
-    /** @var string */
-    public $notes;
 
     /**
      * {@inheritdoc}
