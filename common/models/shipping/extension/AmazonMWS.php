@@ -151,7 +151,7 @@ class AmazonMWS extends ShipmentPlugin
     /**
      * Prepare Shipment Call to carrier API
      *
-     * This function builds UPS shipment request
+     * This function builds AmazonMWS shipment request
      *
      * @return $this
      * @throws \Exception
