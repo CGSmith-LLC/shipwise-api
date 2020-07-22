@@ -18,6 +18,8 @@ use common\models\shipping\{
  *
  * @see     http://docs.developer.amazonservices.com/en_US/merch_fulfill/MerchFulfill_CreateShipment.html
  * @package common\models\shipping\extension
+ *
+ * @property int $maxRetries
  */
 class AmazonMWS extends ShipmentPlugin
 {
@@ -80,6 +82,12 @@ class AmazonMWS extends ShipmentPlugin
      * @var integer
      */
     protected $mpsSequenceNumber = 0;
+
+    /**
+     * @var int Max number of retries for API calls to Amazon MWS.
+     *          Used in shipmentExecute method to handle throttling
+     */
+    protected $maxRetries = 30;
 
     /**
      * Whether the shipment plugin has tracking API (non URL)
@@ -194,10 +202,13 @@ class AmazonMWS extends ShipmentPlugin
          * Ship From
          */
         $shipFrom = new \MWSMerchantFulfillmentService_Model_Address();
-        $shipFrom->setName(substr(
-            $this->shipment->sender_company ?? $this->shipment->sender_contact,
-            0,
-            30));
+        $shipFrom->setName(
+            substr(
+                $this->shipment->sender_company ?? $this->shipment->sender_contact,
+                0,
+                30
+            )
+        );
         $shipFrom->setAddressLine1(substr($this->shipment->sender_address1, 0, 180));
         if (!empty($this->shipment->sender_address2)) {
             $shipFrom->setAddressLine2(substr($this->shipment->sender_address2, 0, 60));
@@ -247,7 +258,9 @@ class AmazonMWS extends ShipmentPlugin
          * - DeliveryConfirmationWithoutSignature - Delivery confirmation without signature.
          * - NoTracking - No delivery confirmation.
          */
-        $options->setDeliveryExperience('DeliveryConfirmationWithoutSignature'); // @todo Please review this for your need
+        $options->setDeliveryExperience(
+            'DeliveryConfirmationWithoutSignature'
+        ); // @todo Please review this for your need
 
         /**
          * CarrierWillPickUp
@@ -275,13 +288,18 @@ class AmazonMWS extends ShipmentPlugin
     /**
      * Execute the API Request
      *
+     * @param int $retryNb Retry # increment
+     *
      * @return $this
      * @throws ShipmentException
      * @version 2020.04.15
+     *
+     * Handles throttling. Ref: http://docs.developer.amazonservices.com/en_US/dev_guide/DG_Throttling.html
+     * Amazon MWS CreateShipment operation has a maximum request quota of 10 and a restore rate of five requests every
+     * second. (Error code returned: 'RequestThrottled' (HTTP 503))
      */
-    protected function shipmentExecute()
+    protected function shipmentExecute($retryNb = 0)
     {
-
         $config = [
             'ServiceURL'    => $this->urlProd,
             'ProxyHost'     => null,
@@ -296,7 +314,8 @@ class AmazonMWS extends ShipmentPlugin
             $this->awsSecretKey,
             Yii::$app->name,
             '1.0',
-            $config);
+            $config
+        );
 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates MWSMerchantFulfillmentService
@@ -312,9 +331,14 @@ class AmazonMWS extends ShipmentPlugin
         try {
             $this->response = $service->CreateShipment($this->data);
             Yii::debug($this->response);
-
         } catch (\MWSMerchantFulfillmentService_Exception $ex) {
             Yii::debug($ex, 'Amazon MWS Exception');
+
+            // handle throttling
+            if (($ex->getErrorCode() == 'RequestThrottled') && ($retryNb < $this->maxRetries)) {
+                sleep(1);
+                return $this->shipmentExecute(++$retryNb);
+            }
 
             $msg = "Caught Exception: " . $ex->getMessage() . "\n";
             $msg .= "Response Status Code: " . $ex->getStatusCode() . "\n";
@@ -343,7 +367,6 @@ class AmazonMWS extends ShipmentPlugin
      */
     protected function shipmentProcess()
     {
-
         /** @var \MWSMerchantFulfillmentService_Model_CreateShipmentResponse $response */
         $response = $this->response;
 
@@ -394,7 +417,8 @@ class AmazonMWS extends ShipmentPlugin
         $fileContents = $label->getFileContents();
 
         // Label data
-        $package->label_data   = $fileContents->getContents(); // Base64-encoded data for printing labels, GZip-compressed string
+        $package->label_data   = $fileContents->getContents(
+        ); // Base64-encoded data for printing labels, GZip-compressed string
         $package->label_format = strtoupper($label->getLabelFormat());
 
         // Amazon-defined shipment identifier
