@@ -4,12 +4,15 @@ namespace common\models;
 
 use common\models\shipping\Carrier;
 
+
 /**
- * Class Country
+ * This is the model class for table "country".
  *
- * @package common\models
+ * @property int $id
+ * @property string $name
+ * @property string $abbreviation
  */
-class Country
+class Country extends \yii\db\ActiveRecord
 {
 
     private static $list = [
@@ -262,6 +265,38 @@ class Country
         'ZM' => 'Zambia',
         'ZW' => 'Zimbabwe',
     ];
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'country';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['name', 'abbreviation'], 'required'],
+            [['name'], 'string', 'max' => 64],
+            [['abbreviation'], 'string', 'max' => 2],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'name' => 'Name',
+            'abbreviation' => 'Abbreviation',
+        ];
+    }
 
     public static function exists($isoCode)
     {
