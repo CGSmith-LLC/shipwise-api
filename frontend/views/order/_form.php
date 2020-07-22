@@ -15,6 +15,7 @@ use frontend\models\Item;
 /* @var $carriers array List of carriers */
 /* @var $services array List of carrier services */
 /* @var $states array List of states */
+/* @var $countries array list of states */
 
 DatePickerAsset::register($this);
 
@@ -99,6 +100,10 @@ $item->loadDefaultValues();
                         <?= $form->field($model->address, 'address1')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'address2')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'city')->textInput(['maxlength' => true]) ?>
+
+
+                        <?= $form->field($model->address, 'country')
+                            ->dropdownList($countries, ['default' => 'US']) ?>
 
                         <?= $form->field($model->address, 'state_id')
                                  ->dropdownList($states, ['prompt' => ' Please select']) ?>

@@ -5,7 +5,7 @@ namespace frontend\controllers;
 use common\pdf\OrderPackingSlip;
 use frontend\models\Customer;
 use Yii;
-use common\models\{State, Status, shipping\Carrier, shipping\Service};
+use common\models\{Country, State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\{Order, forms\OrderForm, BulkAction, search\OrderSearch};
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
 use yii\helpers\FileHelper;
@@ -89,6 +89,8 @@ class OrderController extends \frontend\controllers\Controller
 
         // Set default values
         $model->order->loadDefaultValues();
+        $model->address->loadDefaultValues();
+
         $model->order->status_id  = Status::OPEN;
         $model->order->origin     = Yii::$app->name;
         $model->order->address_id = 0; // to avoid validation, as we validate address model separately
@@ -112,6 +114,7 @@ class OrderController extends \frontend\controllers\Controller
             'carriers'  => Carrier::getList(),
             'services'  => Service::getList('id', 'name', $model->order->carrier_id),
             'states'    => State::getList(),
+            'countries' => Country::getList(),
         ]);
     }
 
@@ -130,6 +133,7 @@ class OrderController extends \frontend\controllers\Controller
     {
         /** @var OrderForm */
         $model        = new OrderForm();
+
         $model->order = $this->findModel($id);
         $model->setAttributes(Yii::$app->request->post());
         Yii::debug($model->order);
@@ -150,6 +154,7 @@ class OrderController extends \frontend\controllers\Controller
             'carriers'  => Carrier::getList(),
             'services'  => Service::getList('id', 'name', $model->order->carrier_id),
             'states'    => State::getList(),
+            'countries' => Country::getList(),
         ]);
     }
 

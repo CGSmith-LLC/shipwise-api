@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\shipping\Carrier;
+use yii\helpers\ArrayHelper;
 
 
 /**
@@ -345,12 +346,17 @@ class Country extends \yii\db\ActiveRecord
     }
 
     /**
-     * Returns list of countries as array [code=>name]
+     * Returns list of Countries as array [abbreviation=>name]
+     *
+     * @param string $keyField   Field name to use as key
+     * @param string $valueField Field name to use as value
      *
      * @return array
      */
-    public static function getList()
+    public static function getList($keyField = 'abbreviation', $valueField = 'name')
     {
-        return static::$list;
+        $data = self::find()->orderBy([$valueField => SORT_ASC])->all();
+
+        return ArrayHelper::map($data, $keyField, $valueField);
     }
 }
