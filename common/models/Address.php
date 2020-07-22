@@ -15,8 +15,6 @@ use common\models\base\BaseAddress;
 class Address extends BaseAddress
 {
 
-    public $country = 'US';
-
     /**
      * Get State
      *

@@ -20,7 +20,9 @@ class State extends BaseState
      */
     public static function getIdsAsArray()
     {
-        return ArrayHelper::getColumn(self::find()->select('id')->asArray()->all(), 'id');
+        $array = ArrayHelper::getColumn(self::find()->select('id')->asArray()->all(), 'id');
+        $array[] = 0;
+        return $array;
     }
 
     /**
