@@ -162,6 +162,8 @@ class AddressForm extends Model
     public $phone;
     /** @var string */
     public $notes;
+    /** @var string */
+    public $country;
 
     /**
      * {@inheritdoc}
@@ -169,18 +171,19 @@ class AddressForm extends Model
     public function rules()
     {
         return [
-            [['name', 'address1', 'city', 'stateId', 'zip'], 'required', 'message' => '{attribute} is required.'],
+            [['name', 'address1', 'city', 'zip'], 'required', 'message' => '{attribute} is required.'],
             [['name', 'company', 'address1', 'city'], 'string', 'length' => [2, 64]],
             ['email', 'email'],
             ['address2', 'string', 'length' => [1, 64]],
             ['zip', 'string', 'length' => [2, 16]],
             ['phone', 'string', 'length' => [2, 32]],
             ['notes', 'string', 'length' => [2, 140]],
+            [['country'],'string', 'max' => 2],
             ['stateId', 'integer'],
             [
                 'stateId',
                 'in',
-                'range'   => StateEx::getIdsAsArray(),
+                'range' => StateEx::getIdsAsArray(),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
                     implode(StateEx::getIdsAsArray(), ', '),
             ],

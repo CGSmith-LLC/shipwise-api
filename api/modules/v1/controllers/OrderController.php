@@ -218,9 +218,9 @@ class OrderController extends PaginatedControllerEx
         $orderForm->setAttributes($this->request->getBodyParams());
 
         // Validate OrderForm and its related models, return errors if any
-        if (!$orderForm->validateAll()) {
-            return $this->unprocessableError($orderForm->getErrorsAll());
-        }
+       if (!$orderForm->validateAll()) {
+           return $this->unprocessableError($orderForm->getErrorsAll());
+       }
 
         // Begin DB transaction
         $transaction = \Yii::$app->db->beginTransaction();
@@ -234,6 +234,8 @@ class OrderController extends PaginatedControllerEx
              * At this stage the required shipTo object should be fully validated.
              */
             $address           = new AddressEx();
+            $address->loadDefaultValues();
+            \Yii::debug($orderForm->shipTo);
             $address->name     = $orderForm->shipTo->name;
             $address->company  = $orderForm->shipTo->company;
             $address->email    = $orderForm->shipTo->email;
@@ -244,7 +246,9 @@ class OrderController extends PaginatedControllerEx
             $address->zip      = $orderForm->shipTo->zip;
             $address->phone    = $orderForm->shipTo->phone;
             $address->notes    = $orderForm->shipTo->notes;
+            $address->country  = $orderForm->shipTo->country;
             $address->save();
+            \Yii::debug($address);
 
             // Create Order
             $order                      = new OrderEx();
@@ -258,6 +262,7 @@ class OrderController extends PaginatedControllerEx
             $order->order_reference     = $orderForm->orderReference;
             $order->customer_reference  = $orderForm->customerReference;
             $order->requested_ship_date = $orderForm->requestedShipDate;
+            $order->notes               = $orderForm->notes;
             $order->status_id           = isset($orderForm->status) ? $orderForm->status : null;
             $order->address_id          = $address->id;
 
@@ -624,6 +629,7 @@ class OrderController extends PaginatedControllerEx
                 $address->city     = $orderForm->shipTo->city;
                 $address->state_id = $orderForm->shipTo->stateId;
                 $address->zip      = $orderForm->shipTo->zip;
+                $address->country  = $orderForm->shipTo->country;
 
                 if (isset($orderForm->shipTo->phone) && !empty($orderForm->shipTo->phone)) {
                     $address->phone = $orderForm->shipTo->phone;
@@ -683,6 +689,7 @@ class OrderController extends PaginatedControllerEx
                 $item           = new ItemEx();
                 $item->order_id = $order->id;
                 $item->sku      = $formItem->sku;
+                $item->uuid     = $formItem->uuid;
                 $item->quantity = $formItem->quantity;
                 $item->name     = $formItem->name;
                 $item->save();
@@ -713,25 +720,32 @@ class OrderController extends PaginatedControllerEx
                     $package->setAttribute('length', $formPackage['length']);
                     $package->setAttribute('width', $formPackage['width']);
                     $package->setAttribute('height', $formPackage['height']);
-                    $package->setAttribute('tracking', $formPackage['tracking']);
+                    if (isset($formPackage['weight'])) {
+                        $package->setAttribute('weight', $formPackage['weight']);
+                    }
+                    if (isset($formPackage['tracking']) && !is_null($formPackage['tracking'])) {
+                        $package->setAttribute('tracking', $formPackage['tracking']);
+                    }
                     $package->setAttribute('order_id', $order->id);
                     $package->save();
-                    foreach ($formPackage['package_items'] as $package_item) {
-                        $packageItem = new PackageItem();
-                        $packageItem->setAttribute('quantity', $package_item['quantity']);
-                        $packageItem->setAttribute('sku', $package_item['sku']);
-                        $packageItem->setAttribute('name', $package_item['name']);
-                        $packageItem->setAttribute('package_id', $package->id);
-                        $packageItem->setAttribute('order_id', $order->id);
-                        $packageItem->save();
-                        if (isset($package_item['lot_info'])) {
-                            foreach ($package_item['lot_info'] as $lot_info) {
-                                $lotInfo = new PackageItemLotInfo();
-                                $lotInfo->setAttribute('quantity', $lot_info['quantity']);
-                                $lotInfo->setAttribute('lot_number', $lot_info['lot_number']);
-                                $lotInfo->setAttribute('serial_number', $lot_info['serial_number']);
-                                $lotInfo->setAttribute('package_items_id', $packageItem->id);
-                                $lotInfo->save();
+                    if (is_array($formPackage['package_items'])) {
+                        foreach ($formPackage['package_items'] as $package_item) {
+                            $packageItem = new PackageItem();
+                            $packageItem->setAttribute('quantity', $package_item['quantity']);
+                            $packageItem->setAttribute('sku', $package_item['sku']);
+                            $packageItem->setAttribute('name', $package_item['name']);
+                            $packageItem->setAttribute('package_id', $package->id);
+                            $packageItem->setAttribute('order_id', $order->id);
+                            $packageItem->save();
+                            if (isset($package_item['lot_info'])) {
+                                foreach ($package_item['lot_info'] as $lot_info) {
+                                    $lotInfo = new PackageItemLotInfo();
+                                    $lotInfo->setAttribute('quantity', $lot_info['quantity']);
+                                    $lotInfo->setAttribute('lot_number', $lot_info['lot_number']);
+                                    $lotInfo->setAttribute('serial_number', $lot_info['serial_number']);
+                                    $lotInfo->setAttribute('package_items_id', $packageItem->id);
+                                    $lotInfo->save();
+                                }
                             }
                         }
                     }
