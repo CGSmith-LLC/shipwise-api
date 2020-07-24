@@ -3,13 +3,17 @@
 namespace common\models;
 
 use common\models\shipping\Carrier;
+use yii\helpers\ArrayHelper;
+
 
 /**
- * Class Country
+ * This is the model class for table "country".
  *
- * @package common\models
+ * @property int $id
+ * @property string $name
+ * @property string $abbreviation
  */
-class Country
+class Country extends \yii\db\ActiveRecord
 {
 
     private static $list = [
@@ -263,6 +267,38 @@ class Country
         'ZW' => 'Zimbabwe',
     ];
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'country';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['name', 'abbreviation'], 'required'],
+            [['name'], 'string', 'max' => 64],
+            [['abbreviation'], 'string', 'max' => 2],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'name' => 'Name',
+            'abbreviation' => 'Abbreviation',
+        ];
+    }
+
     public static function exists($isoCode)
     {
         return isset(self::$list[$isoCode]);
@@ -310,12 +346,17 @@ class Country
     }
 
     /**
-     * Returns list of countries as array [code=>name]
+     * Returns list of Countries as array [abbreviation=>name]
+     *
+     * @param string $keyField   Field name to use as key
+     * @param string $valueField Field name to use as value
      *
      * @return array
      */
-    public static function getList()
+    public static function getList($keyField = 'abbreviation', $valueField = 'name')
     {
-        return static::$list;
+        $data = self::find()->orderBy([$valueField => SORT_ASC])->all();
+
+        return ArrayHelper::map($data, $keyField, $valueField);
     }
 }
