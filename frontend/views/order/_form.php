@@ -75,9 +75,8 @@ $item->loadDefaultValues();
                         <?= $form->field($model->order, 'carrier_id')
                                  ->dropdownList($carriers, ['prompt' => ' -- Unknown --']) ?>
 
-                        <?= $form->field($model->order, 'service_id')->dropdownList($services, [
-                            'prompt' => ' -- Unknown --',
-                        ]) ?>
+                        <?= $form->field($model->order, 'service_id')
+                            ->dropdownList($services, ['prompt' => ' -- Unknown --',]) ?>
 
                         <?= $form->field($model->order, 'requested_ship_date', [
                             'inputTemplate' =>
@@ -228,7 +227,9 @@ ob_start(); // output buffer the javascript to register later ?>
             $('#order-carrier_id').off('change').on('change', function () {
                 getCarrierServices();
             });
-
+            $('#address-country').off('change').on('change', function () {
+                getCountryStates();
+            });
             $("#btn-add-item").off('click').on("click", addItem);
 
             // remove item button
@@ -265,7 +266,31 @@ ob_start(); // output buffer the javascript to register later ?>
                 initForm();
             });
         }
+        function getCountryStates() {
 
+            var country = $('#address-country').val() || null;
+
+            if (!country) {
+                return false;
+            }
+
+            var url           = '<?= Url::to(['country-states']) . '?country=' ?>' + country,
+                dropdown      = $('#address-state_id'),
+                previousValue = dropdown.val() || '<?= $model->address->country ?>';
+
+            dropdown.attr('disabled', 'disabled');
+
+            $.get({url: url, dataType: 'json'}, function ( items ) {
+                populateDropdown(dropdown, items, true);
+                if (previousValue && (0 != dropdown.find('option[value=' + previousValue + ']').length)) {
+                    dropdown.val(previousValue);
+                } else {
+                    dropdown.find('option:first-child').attr('selected', 'selected');
+                }
+                dropdown.attr('disabled', false);
+                initForm();
+            });
+        }
         /**
          * Populate drop-down box
          *
@@ -275,7 +300,7 @@ ob_start(); // output buffer the javascript to register later ?>
          */
         function populateDropdown( elem, items, defaultOption = false ) {
 
-            if (items && Object.keys(items).length > 0) {
+            if (items) {
                 elem.empty();
                 if (defaultOption) {
                     elem.append($('<option/>', { value : '', text : ' -- Unknown --' }));
