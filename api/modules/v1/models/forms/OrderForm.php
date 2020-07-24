@@ -87,13 +87,6 @@ use api\modules\v1\models\order\StatusEx;
  *            maxLength = 64
  *        ),
  *     @SWG\Property(
- *            property = "notes",
- *            type = "string",
- *            description = "Order notes",
- *            minLength = 1,
- *            maxLength = 64
- *        ),
- *     @SWG\Property(
  *            property = "carrier_id",
  *            type = "integer",
  *        ),
