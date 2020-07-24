@@ -12,7 +12,7 @@ class m200722_183521_add_countries_to_country_table extends Migration
      */
     public function safeUp()
     {
-        $countries = \common\models\Country::getList();
+        $countries = \common\models\Country::getExistingList();
 
         foreach ($countries as $isoCode => $name) {
             $country = new \common\models\Country([

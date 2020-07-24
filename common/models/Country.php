@@ -359,4 +359,14 @@ class Country extends \yii\db\ActiveRecord
 
         return ArrayHelper::map($data, $keyField, $valueField);
     }
+
+    /**
+     * Helper for database migration script
+     *
+     * @return string[]
+     */
+    public static function getExistingList()
+    {
+        return static::$list;
+    }
 }
