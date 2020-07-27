@@ -23,7 +23,6 @@ class m200727_002352_alter_order_table extends Migration
                     'mediumtext'
                 )
                 ->defaultValue(null)
-                ->comment('Shipping labels file encoded in base64')
         );
 
         $this->addColumn(
@@ -32,7 +31,6 @@ class m200727_002352_alter_order_table extends Migration
             $this
                 ->string(6)
                 ->defaultValue(null)
-                ->comment('File type for label_data field.')
         );
     }
 
