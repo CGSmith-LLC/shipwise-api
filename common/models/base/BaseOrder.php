@@ -21,6 +21,8 @@ namespace common\models\base;
  * @property string $requested_ship_date
  * @property int    $carrier_id
  * @property int    $service_id
+ * @property string $label_data Shipping labels file encoded in base64
+ * @property string $label_type File type for label_data field.
  */
 class BaseOrder extends \yii\db\ActiveRecord
 {
@@ -46,6 +48,8 @@ class BaseOrder extends \yii\db\ActiveRecord
             [['customer_reference', 'origin'], 'string', 'max' => 64],
             [['notes'], 'string', 'max' => 140],
             [['po_number'], 'string', 'max' => 64],
+            [['label_data'], 'string'],
+            [['label_type'], 'string', 'max' => 6],
         ];
     }
 
@@ -68,6 +72,8 @@ class BaseOrder extends \yii\db\ActiveRecord
             'address_id'         => 'Address ID',
             'notes'              => 'Notes',
             'origin'             => 'Origin of Order',
+            'label_data'         => 'Label Data',
+            'label_type'         => 'Label Type',
         ];
     }
 }

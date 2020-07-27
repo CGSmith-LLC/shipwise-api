@@ -143,7 +143,7 @@ class Order extends BaseOrder
         $shipment->sender_address1       = $this->customer->address1;
         $shipment->sender_address2       = $this->customer->address2;
         $shipment->sender_city           = $this->customer->city;
-        $shipment->sender_state          = $this->customer->state->abbreviation;
+        $shipment->sender_state          = $this->customer->state->abbreviation ?? '';
         $shipment->sender_postal_code    = $this->customer->zip;
         $shipment->sender_country        = $this->customer->country;
         $shipment->sender_phone          = $this->customer->phone;
@@ -155,7 +155,7 @@ class Order extends BaseOrder
         $shipment->recipient_address1    = $this->address->address1;
         $shipment->recipient_address2    = $this->address->address2;
         $shipment->recipient_city        = $this->address->city;
-        $shipment->recipient_state       = $this->address->state->abbreviation;
+        $shipment->recipient_state       = $this->address->state->abbreviation ?? '';
         $shipment->recipient_postal_code = $this->address->zip;
         $shipment->recipient_country     = $this->address->country;
         $shipment->recipient_phone       = $this->address->phone;
@@ -175,6 +175,8 @@ class Order extends BaseOrder
             $_pkg->width       = $package->width;
             $_pkg->height      = $package->height;
             $_pkg->description = 'Package'; // @todo TBD
+            $_pkg->reference1  = $this->customer_reference;
+            $_pkg->reference2  = $this->order_reference;
             $shipment->addPackage($_pkg);
         }
 
@@ -182,9 +184,19 @@ class Order extends BaseOrder
         $shipment->service = $this->service;
         $shipment->carrier = $this->service->carrier;
 
-        // References
+        // Shipment References
         $shipment->reference1 = $this->customer_reference;
         $shipment->reference2 = $this->order_reference;
+
+        // Retrieve existing label for this order, if exists
+        if ($this->service->carrier->getReprintBehaviour() == Carrier::REPRINT_BEHAVIOUR_EXISTING) {
+            if (!empty($this->tracking) && !empty($this->label_data) && !empty($this->label_type)) {
+                $shipment->setMasterTrackingNumber($this->tracking);
+                $shipment->setMergedLabelsData($this->label_data);
+                $shipment->setMergedLabelsFormat($this->label_type);
+                return $shipment;
+            }
+        }
 
         // Invoke carrier API call
         try {
