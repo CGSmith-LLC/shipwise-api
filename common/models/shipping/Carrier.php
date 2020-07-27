@@ -39,7 +39,7 @@ class Carrier extends BaseCarrier
      *
      * The re-print behaviour of reprinting existing was implemented for carriers that require purchasing a label.
      * Unlike other carrier APIs such as FedEx or UPS, Amazon MWS API performs a purchasing of a label, so we don't want
-     * to re-purchase a new label each time we reprint.
+     * to re-purchase a new label each time we re-print.
      *
      * @var int[]
      */

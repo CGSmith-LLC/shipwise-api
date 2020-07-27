@@ -10,6 +10,7 @@ use frontend\models\{Order, forms\OrderForm, BulkAction, search\OrderSearch};
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
+
 /**
  * OrderController implements the CRUD actions for Order model.
  */
@@ -51,11 +52,14 @@ class OrderController extends \frontend\controllers\Controller
         $searchModel  = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel'  => $searchModel,
-            'dataProvider' => $dataProvider,
-            'statuses'     => Status::getList(),
-        ]);
+        return $this->render(
+            'index',
+            [
+                'searchModel'  => $searchModel,
+                'dataProvider' => $dataProvider,
+                'statuses'     => Status::getList(),
+            ]
+        );
     }
 
     /**
@@ -68,9 +72,12 @@ class OrderController extends \frontend\controllers\Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        return $this->render(
+            'view',
+            [
+                'model' => $this->findModel($id),
+            ]
+        );
     }
 
     /**
@@ -103,16 +110,19 @@ class OrderController extends \frontend\controllers\Controller
             return $this->redirect(['view', 'id' => $model->order->id]);
         }
 
-        return $this->render('create', [
-            'model'     => $model,
-            'customers' => Yii::$app->user->identity->isAdmin
-                ? Customer::getList()
-                : Yii::$app->user->identity->getCustomerList(),
-            'statuses'  => Status::getList(),
-            'carriers'  => Carrier::getList(),
-            'services'  => Service::getList('id', 'name', $model->order->carrier_id),
-            'states'    => State::getList(),
-        ]);
+        return $this->render(
+            'create',
+            [
+                'model'     => $model,
+                'customers' => Yii::$app->user->identity->isAdmin
+                    ? Customer::getList()
+                    : Yii::$app->user->identity->getCustomerList(),
+                'statuses'  => Status::getList(),
+                'carriers'  => Carrier::getList(),
+                'services'  => Service::getList('id', 'name', $model->order->carrier_id),
+                'states'    => State::getList(),
+            ]
+        );
     }
 
     /**
@@ -141,16 +151,19 @@ class OrderController extends \frontend\controllers\Controller
             return $this->redirect(['view', 'id' => $model->order->id]);
         }
 
-        return $this->render('update', [
-            'model'     => $model,
-            'customers' => Yii::$app->user->identity->isAdmin
-                ? Customer::getList()
-                : Yii::$app->user->identity->getCustomerList(),
-            'statuses'  => Status::getList(),
-            'carriers'  => Carrier::getList(),
-            'services'  => Service::getList('id', 'name', $model->order->carrier_id),
-            'states'    => State::getList(),
-        ]);
+        return $this->render(
+            'update',
+            [
+                'model'     => $model,
+                'customers' => Yii::$app->user->identity->isAdmin
+                    ? Customer::getList()
+                    : Yii::$app->user->identity->getCustomerList(),
+                'statuses'  => Status::getList(),
+                'carriers'  => Carrier::getList(),
+                'services'  => Service::getList('id', 'name', $model->order->carrier_id),
+                'states'    => State::getList(),
+            ]
+        );
     }
 
     /**
@@ -263,9 +276,12 @@ class OrderController extends \frontend\controllers\Controller
 
         $viewName = ($model->print_mode == BulkAction::PRINT_MODE_PDF) ? 'view-pdf' : 'view-qz';
 
-        return $this->render("bulk-result/$viewName", [
-            'model' => $model,
-        ]);
+        return $this->render(
+            "bulk-result/$viewName",
+            [
+                'model' => $model,
+            ]
+        );
     }
 
     /**
@@ -315,8 +331,11 @@ class OrderController extends \frontend\controllers\Controller
             }
         }
 
-        return Yii::$app->response->sendContentAsFile(base64_decode($mergedFileData), $mergedFilename,
-            ['mimeType' => 'application/pdf', 'inline' => true]);
+        return Yii::$app->response->sendContentAsFile(
+            base64_decode($mergedFileData),
+            $mergedFilename,
+            ['mimeType' => 'application/pdf', 'inline' => true]
+        );
     }
 
     /**
@@ -335,9 +354,11 @@ class OrderController extends \frontend\controllers\Controller
         $pdf = new OrderPackingSlip();
         $pdf->generate($order);
 
-        return Yii::$app->response->sendContentAsFile($pdf->Output('S'),
+        return Yii::$app->response->sendContentAsFile(
+            $pdf->Output('S'),
             "PackingSlip_{$order->customer_reference}.pdf",
-            ['mimeType' => 'application/pdf', 'inline' => true]);
+            ['mimeType' => 'application/pdf', 'inline' => true]
+        );
     }
 
     /**
@@ -380,7 +401,7 @@ class OrderController extends \frontend\controllers\Controller
         $order->status_id = Status::SHIPPED;
         $order->save(false);
 
-        $filename = "$order->tracking." . $shipment->mergedLabelsFormat;
+        $filename = "$order->tracking." . strtolower($shipment->mergedLabelsFormat);
 
         return Yii::$app->response->sendContentAsFile(
             base64_decode($shipment->mergedLabelsData),

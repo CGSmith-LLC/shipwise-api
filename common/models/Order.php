@@ -235,4 +235,19 @@ class Order extends BaseOrder
         return $this->hasMany(PackageItemLotInfo::class, ['id' => 'package_id'])
             ->via('packageItems');
     }
+
+    /** {inheritdoc} */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        if (!$insert) {
+            // Unset saved label data if carrier/service are changed.
+            if ((isset($changedAttributes['carrier_id']) && (int)$changedAttributes['carrier_id'] != $this->carrier_id) ||
+                (isset($changedAttributes['service_id']) && (int)$changedAttributes['service_id'] != $this->service_id)) {
+                $this->label_data = null;
+                $this->label_type = null;
+                $this->save(false);
+            }
+        }
+    }
 }

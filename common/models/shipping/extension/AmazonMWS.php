@@ -10,6 +10,7 @@ use common\models\shipping\{
     ShipmentPlugin,
     ShipmentException
 };
+use yii\helpers\FileHelper;
 
 /**
  * Class AmazonMWS
@@ -267,7 +268,7 @@ class AmazonMWS extends ShipmentPlugin
          * Indicates whether the carrier will pick up the package.
          * Note: Scheduled carrier pickup is available only using Dynamex (US), DPD (UK), and Royal Mail (UK).
          */
-        $options->setCarrierWillPickUp('False');
+        $options->setCarrierWillPickUp(false);
 
         /**
          * LabelFormat
@@ -277,10 +278,12 @@ class AmazonMWS extends ShipmentPlugin
          * from that carrier.
          * Must match one of the AvailableLabelFormats returned by GetEligibleShippingServices operation.
          */
-        $options->setLabelFormat('PDF');
+        $options->setLabelFormat('PNG'); // 4x6 PNG Default
         $details->setShippingServiceOptions($options);
         $request->setShipmentRequestDetails($details);
         $this->data = $request;
+
+        Yii::debug($this->data, self::getPluginName() . ' request');
 
         return $this;
     }
@@ -330,7 +333,7 @@ class AmazonMWS extends ShipmentPlugin
 
         try {
             $this->response = $service->CreateShipment($this->data);
-            Yii::debug($this->response);
+            Yii::debug($this->response, self::getPluginName() . ' response');
         } catch (\MWSMerchantFulfillmentService_Exception $ex) {
             Yii::debug($ex, 'Amazon MWS Exception');
 
@@ -404,7 +407,6 @@ class AmazonMWS extends ShipmentPlugin
 
         /**
          * @var ShipmentPackage $package
-         * @todo Pending todo MPS (multiple-piece-shipment)
          */
         $package = &$this->shipment->getPackages()[0];
 
@@ -413,20 +415,33 @@ class AmazonMWS extends ShipmentPlugin
         $package->master_tracking_num = $trackingId;
         //$package->tracking_url        = "{$this->trackingURL}?tracknum=" . $package->tracking_num;
 
+        // Amazon-defined shipment identifier
+        $this->shipment->external_id1 = $shipment->getShipmentId();
+
         /** @var \MWSMerchantFulfillmentService_Model_FileContents $fileContents */
         $fileContents = $label->getFileContents();
 
         // Label data
-        $package->label_data   = $fileContents->getContents(
-        ); // Base64-encoded data for printing labels, GZip-compressed string
+        // According to Amazon MWS docs: "Base64-encoded data for printing labels, GZip-compressed string"
+        $package->label_data   = $fileContents->getContents();
         $package->label_format = strtoupper($label->getLabelFormat());
 
-        // Amazon-defined shipment identifier
-        $this->shipment->external_id1 = $shipment->getShipmentId();
+        // Convert to PDF (using ImageMagick)
+        $dir = Yii::getAlias('@frontend') . '/runtime/pdf/';
+        if (!is_dir($dir)) {
+            FileHelper::createDirectory($dir, 0777, true);
+        }
+        $tempFilename = $dir . 'tmp' . $package->tracking_num . '_' . time() . '.' . strtolower($package->label_format);
+        $fp           = fopen($tempFilename, 'wb');
+        fwrite($fp, gzdecode(base64_decode($package->label_data)));
+        fclose($fp);
+        $newFilename = $dir . $package->tracking_num . '_' . time() . '.pdf';
+        exec("convert {$tempFilename} {$newFilename}");
+        @unlink($tempFilename);
 
-        // @todo For now it's always one label/package. For merging multiple files, refer to UPSPlugin code.
-        $this->shipment->mergedLabelsData   = $package->label_data;
-        $this->shipment->mergedLabelsFormat = $package->label_format;
+        $this->shipment->mergedLabelsData   = base64_encode(file_get_contents($newFilename));
+        $this->shipment->mergedLabelsFormat = $package->label_format = 'PDF';
+        @unlink($newFilename);
 
         $this->isShipped = true;
 
