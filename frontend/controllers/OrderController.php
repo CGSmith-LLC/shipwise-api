@@ -401,11 +401,22 @@ class OrderController extends \frontend\controllers\Controller
         }
 
         $order->tracking = $shipment->getMasterTracking();
+        if ($order->service->carrier->getReprintBehaviour() == Carrier::REPRINT_BEHAVIOUR_EXISTING) {
+            $order->label_data = $shipment->mergedLabelsData;
+            $order->label_type = $shipment->mergedLabelsFormat;
+        }
         $order->status_id = Status::SHIPPED;
         $order->save(false);
 
-        return Yii::$app->response->sendContentAsFile(base64_decode($shipment->mergedLabelsData),
-            "$order->tracking." . $shipment->mergedLabelsFormat,
-            ['mimeType' => 'application/pdf', 'inline' => true]);
+        $filename = "$order->tracking." . strtolower($shipment->mergedLabelsFormat);
+
+        return Yii::$app->response->sendContentAsFile(
+            base64_decode($shipment->mergedLabelsData),
+            $filename,
+            [
+                'mimeType' => FileHelper::getMimeTypeByExtension($filename),
+                'inline'   => true,
+            ]
+        );
     }
 }
