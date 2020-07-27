@@ -5,7 +5,7 @@ namespace frontend\controllers;
 use common\pdf\OrderPackingSlip;
 use frontend\models\Customer;
 use Yii;
-use common\models\{State, Status, shipping\Carrier, shipping\Service};
+use common\models\{Country, State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\{Order, forms\OrderForm, BulkAction, search\OrderSearch};
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
 use yii\helpers\FileHelper;
@@ -24,8 +24,8 @@ class OrderController extends \frontend\controllers\Controller
     public function behaviors()
     {
         return [
-            'verbs'  => [
-                'class'   => 'yii\filters\VerbFilter',
+            'verbs' => [
+                'class' => 'yii\filters\VerbFilter',
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -49,17 +49,14 @@ class OrderController extends \frontend\controllers\Controller
      */
     public function actionIndex()
     {
-        $searchModel  = new OrderSearch();
+        $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render(
-            'index',
-            [
-                'searchModel'  => $searchModel,
-                'dataProvider' => $dataProvider,
-                'statuses'     => Status::getList(),
-            ]
-        );
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'statuses' => Status::getList(),
+        ]);
     }
 
     /**
@@ -72,12 +69,9 @@ class OrderController extends \frontend\controllers\Controller
      */
     public function actionView($id)
     {
-        return $this->render(
-            'view',
-            [
-                'model' => $this->findModel($id),
-            ]
-        );
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+        ]);
     }
 
     /**
@@ -91,13 +85,15 @@ class OrderController extends \frontend\controllers\Controller
     public function actionCreate()
     {
         /** @var OrderForm */
-        $model        = new OrderForm();
+        $model = new OrderForm();
         $model->order = new Order();
 
         // Set default values
         $model->order->loadDefaultValues();
-        $model->order->status_id  = Status::OPEN;
-        $model->order->origin     = Yii::$app->name;
+        $model->address->loadDefaultValues();
+
+        $model->order->status_id = Status::OPEN;
+        $model->order->origin = Yii::$app->name;
         $model->order->address_id = 0; // to avoid validation, as we validate address model separately
 
         // Load from POST
@@ -110,19 +106,18 @@ class OrderController extends \frontend\controllers\Controller
             return $this->redirect(['view', 'id' => $model->order->id]);
         }
 
-        return $this->render(
-            'create',
-            [
-                'model'     => $model,
-                'customers' => Yii::$app->user->identity->isAdmin
-                    ? Customer::getList()
-                    : Yii::$app->user->identity->getCustomerList(),
-                'statuses'  => Status::getList(),
-                'carriers'  => Carrier::getList(),
-                'services'  => Service::getList('id', 'name', $model->order->carrier_id),
-                'states'    => State::getList(),
-            ]
-        );
+        return $this->render('create', [
+            'model' => $model,
+            'customers' => Yii::$app->user->identity->isAdmin
+                ? Customer::getList()
+                : Yii::$app->user->identity->getCustomerList(),
+            'statuses' => Status::getList(),
+            'carriers' => Carrier::getList(),
+            'services' => Service::getList('id', 'name', $model->order->carrier_id),
+            'countries' => Country::getList(),
+            'states' => State::getList('id', 'name', $model->address->country),
+
+        ]);
     }
 
     /**
@@ -139,7 +134,8 @@ class OrderController extends \frontend\controllers\Controller
     public function actionUpdate($id)
     {
         /** @var OrderForm */
-        $model        = new OrderForm();
+        $model = new OrderForm();
+
         $model->order = $this->findModel($id);
         $model->setAttributes(Yii::$app->request->post());
         Yii::debug($model->order);
@@ -151,19 +147,18 @@ class OrderController extends \frontend\controllers\Controller
             return $this->redirect(['view', 'id' => $model->order->id]);
         }
 
-        return $this->render(
-            'update',
-            [
-                'model'     => $model,
-                'customers' => Yii::$app->user->identity->isAdmin
-                    ? Customer::getList()
-                    : Yii::$app->user->identity->getCustomerList(),
-                'statuses'  => Status::getList(),
-                'carriers'  => Carrier::getList(),
-                'services'  => Service::getList('id', 'name', $model->order->carrier_id),
-                'states'    => State::getList(),
-            ]
-        );
+        return $this->render('update', [
+            'model' => $model,
+            'customers' => Yii::$app->user->identity->isAdmin
+                ? Customer::getList()
+                : Yii::$app->user->identity->getCustomerList(),
+            'statuses' => Status::getList(),
+            'carriers' => Carrier::getList(),
+            'services' => Service::getList('id', 'name', $model->order->carrier_id),
+            'countries' => Country::getList(),
+            'states' => State::getList('id', 'name', $model->address->country),
+
+        ]);
     }
 
     /**
@@ -234,6 +229,26 @@ class OrderController extends \frontend\controllers\Controller
 
         return Service::getList('id', 'name', $carrierId);
     }
+    /**
+     * Get list of states for given country.
+     *
+     * @param string $country country.
+     *
+     * @return array JSON array
+     * @throws BadRequestHttpException
+     */
+    public function actionCountryStates($country)
+    {
+
+        $request = Yii::$app->request;
+        if (!$request->isAjax || !($country)) {
+            throw new BadRequestHttpException('Bad request.');
+        }
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return State::getList('id', 'name', $country);
+    }
 
     /**
      * Bulk action
@@ -255,8 +270,8 @@ class OrderController extends \frontend\controllers\Controller
         return [
             'success' => $model->isSuccess(),
             'message' => $model->getMessage(),
-            'errors'  => Html::errorSummary($model, ['header' => false]),
-            'link'    => $model->getLink(),
+            'errors' => Html::errorSummary($model, ['header' => false]),
+            'link' => $model->getLink(),
         ];
     }
 
@@ -276,12 +291,9 @@ class OrderController extends \frontend\controllers\Controller
 
         $viewName = ($model->print_mode == BulkAction::PRINT_MODE_PDF) ? 'view-pdf' : 'view-qz';
 
-        return $this->render(
-            "bulk-result/$viewName",
-            [
-                'model' => $model,
-            ]
-        );
+        return $this->render("bulk-result/$viewName", [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -310,7 +322,7 @@ class OrderController extends \frontend\controllers\Controller
         $tmpFiles = [];
         foreach ($model->getItems()->orderBy('order_id')->all() as $item) {
             $filename = $dir . 'tmp_' . $item->id . '.' . strtolower($item->base64_filetype);
-            $fp       = fopen($filename, 'wb');
+            $fp = fopen($filename, 'wb');
             fwrite($fp, base64_decode($item->base64_filedata));
             fclose($fp);
             $tmpFiles[] = $filename;
@@ -331,11 +343,8 @@ class OrderController extends \frontend\controllers\Controller
             }
         }
 
-        return Yii::$app->response->sendContentAsFile(
-            base64_decode($mergedFileData),
-            $mergedFilename,
-            ['mimeType' => 'application/pdf', 'inline' => true]
-        );
+        return Yii::$app->response->sendContentAsFile(base64_decode($mergedFileData), $mergedFilename,
+            ['mimeType' => 'application/pdf', 'inline' => true]);
     }
 
     /**
@@ -354,11 +363,9 @@ class OrderController extends \frontend\controllers\Controller
         $pdf = new OrderPackingSlip();
         $pdf->generate($order);
 
-        return Yii::$app->response->sendContentAsFile(
-            $pdf->Output('S'),
+        return Yii::$app->response->sendContentAsFile($pdf->Output('S'),
             "PackingSlip_{$order->customer_reference}.pdf",
-            ['mimeType' => 'application/pdf', 'inline' => true]
-        );
+            ['mimeType' => 'application/pdf', 'inline' => true]);
     }
 
     /**
@@ -376,7 +383,7 @@ class OrderController extends \frontend\controllers\Controller
 
         if (empty($order->service)) {
             // @todo Implement here your biz logic for carrier service selection
-            $service           = Service::findByShipWiseCode('UPSGround');
+            $service = Service::findByShipWiseCode('UPSGround');
             $order->service_id = $service->id;
             $order->carrier_id = $service->carrier_id;
         }
