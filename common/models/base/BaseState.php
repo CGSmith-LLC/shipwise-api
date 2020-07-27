@@ -5,7 +5,7 @@ namespace common\models\base;
 /**
  * This is the model class for table "states".
  *
- * @property int    $id
+ * @property int $id
  * @property string $name
  * @property string $abbreviation
  */
@@ -29,6 +29,7 @@ class BaseState extends \yii\db\ActiveRecord
             [['name', 'abbreviation'], 'required'],
             [['name'], 'string', 'max' => 45],
             [['abbreviation'], 'string', 'max' => 12],
+            [['country'],'string','max' => 2],
         ];
     }
 
@@ -38,9 +39,10 @@ class BaseState extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id'           => 'ID',
-            'name'         => 'Name',
-            'abbreviation' => 'Abbreviation',
+            'id'            => 'ID',
+            'name'          => 'Name',
+            'abbreviation'  => 'Abbreviation',
+            'country'       => 'Country'
         ];
     }
 }

@@ -9,6 +9,7 @@ use yii\helpers\Html;
 /* @var $carriers array List of carriers */
 /* @var $services array List of carrier services */
 /* @var $states array List of states */
+/* @var $countries array List of countries */
 
 $this->title = 'Update Order: ' . $model->order->id;
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
@@ -26,6 +27,7 @@ $this->params['breadcrumbs'][] = 'Update';
         'carriers'  => $carriers,
         'services'  => $services,
         'states'    => $states,
+        'countries' => $countries,
     ]) ?>
 
 </div>

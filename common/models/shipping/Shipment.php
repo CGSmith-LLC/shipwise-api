@@ -17,6 +17,7 @@ use yii\db\Expression;
  * @property ShipmentPackage[] $packages
  * @property string            $mergedLabelsData
  * @property string            $mergedLabelsFormat
+ * @property string            $masterTrackingNum
  *
  * @package common\models\shipping
  */
@@ -55,6 +56,13 @@ class Shipment extends BaseShipment
      * @var string
      */
     public $mergedLabelsFormat = '';
+
+    /**
+     * Master tracking number
+     *
+     * @var string
+     */
+    protected $masterTrackingNum;
 
     /**
      * Calculated rates
@@ -272,7 +280,6 @@ class Shipment extends BaseShipment
         try {
             $this->plugin->rate($this);
             return $this;
-
         } catch (Exception $e) {
             throw new ShipmentException(
                 $e->getMessage() . " - in ShipmentPlugin::{$this->plugin->getPluginName()}::rate()"
@@ -394,7 +401,6 @@ class Shipment extends BaseShipment
         try {
             $this->plugin->ship($this);
             return $this;
-
         } catch (Exception $e) {
             Yii::error($e);
             throw new ShipmentException(
@@ -410,6 +416,10 @@ class Shipment extends BaseShipment
      */
     public function getMasterTracking()
     {
+        if (!empty($this->masterTrackingNum)) {
+            return $this->masterTrackingNum;
+        }
+
         $firstPackage = $this->packages[0] ?? null;
 
         if (!$firstPackage) {
@@ -417,5 +427,35 @@ class Shipment extends BaseShipment
         }
 
         return $firstPackage->master_tracking_num;
+    }
+
+    /**
+     * Set shipment master tracking number
+     *
+     * @param string $number
+     */
+    public function setMasterTrackingNumber($number)
+    {
+        $this->masterTrackingNum = $number;
+    }
+
+    /**
+     * Set merged labels data
+     *
+     * @param string $data Base64 data
+     */
+    public function setMergedLabelsData($data)
+    {
+        $this->mergedLabelsData = $data;
+    }
+
+    /**
+     * Set merged labels data format
+     *
+     * @param string $format File format of the merged labels data in base64. eg: PDF
+     */
+    public function setMergedLabelsFormat($format)
+    {
+        $this->mergedLabelsFormat = $format;
     }
 }

@@ -575,15 +575,18 @@ class FedExPlugin extends ShipmentPlugin
     // @todo
     protected function shipmentPrepare()
     {
+        throw new \Exception('Method not implemented');
     }
 
     // @todo
     protected function shipmentExecute()
     {
+        throw new \Exception('Method not implemented');
     }
 
     // @todo
     protected function shipmentProcess()
     {
+        throw new \Exception('Method not implemented');
     }
 }
