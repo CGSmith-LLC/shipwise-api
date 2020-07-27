@@ -106,8 +106,8 @@ class OrderForm extends Model
 {
 
     const SCENARIO_DEFAULT = 'default'; // the create scenario
-    const SCENARIO_UPDATE  = 'update';  // the update scenario
-    const SCENARIO_DELETE  = 'delete';  // the delete scenario
+    const SCENARIO_UPDATE = 'update';  // the update scenario
+    const SCENARIO_DELETE = 'delete';  // the delete scenario
 
     /** @var string */
     public $uuid;
@@ -138,6 +138,7 @@ class OrderForm extends Model
     /** @var ItemForm[] */
     public $items;
 
+
     /**
      * {@inheritdoc}
      */
@@ -158,7 +159,7 @@ class OrderForm extends Model
             [
                 'status',
                 'in',
-                'range'   => StatusEx::getIdsAsArray(),
+                'range' => StatusEx::getIdsAsArray(),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
                     implode(StatusEx::getIdsAsArray(), ', '),
             ],
@@ -198,7 +199,7 @@ class OrderForm extends Model
 
         // Initialize and validate AddressForm object
         if (isset($this->shipTo)) {
-            $values       = (array)$this->shipTo;
+            $values = (array)$this->shipTo;
             // If stateId is not set but state exists then try to reference the state's value in the DB
             if (isset($values['state']) && !isset($values['stateId'])) {
                 $lookup = (strlen($values['state']) == 2) ? 'abbreviation' : 'name';
@@ -212,7 +213,7 @@ class OrderForm extends Model
 
         // Initialize and validate TrackingForm object
         if (isset($this->tracking)) {
-            $values         = (array)$this->tracking;
+            $values = (array)$this->tracking;
             $this->tracking = new TrackingForm();
             $this->tracking->setAttributes($values);
             if ($this->scenario == self::SCENARIO_UPDATE) {
@@ -222,7 +223,7 @@ class OrderForm extends Model
 
         // Initialize and validate ItemForm objects
         if (isset($this->items) && is_array($this->items)) {
-            $params      = $this->items;
+            $params = $this->items;
             $this->items = [];
             foreach ($params as $idx => $values) {
                 $this->items[$idx] = new ItemForm();

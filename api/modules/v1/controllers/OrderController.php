@@ -218,9 +218,9 @@ class OrderController extends PaginatedControllerEx
         $orderForm->setAttributes($this->request->getBodyParams());
 
         // Validate OrderForm and its related models, return errors if any
-        if (!$orderForm->validateAll()) {
-            return $this->unprocessableError($orderForm->getErrorsAll());
-        }
+       if (!$orderForm->validateAll()) {
+           return $this->unprocessableError($orderForm->getErrorsAll());
+       }
 
         // Begin DB transaction
         $transaction = \Yii::$app->db->beginTransaction();
@@ -234,6 +234,8 @@ class OrderController extends PaginatedControllerEx
              * At this stage the required shipTo object should be fully validated.
              */
             $address           = new AddressEx();
+            $address->loadDefaultValues();
+            \Yii::debug($orderForm->shipTo);
             $address->name     = $orderForm->shipTo->name;
             $address->company  = $orderForm->shipTo->company;
             $address->email    = $orderForm->shipTo->email;
@@ -244,7 +246,9 @@ class OrderController extends PaginatedControllerEx
             $address->zip      = $orderForm->shipTo->zip;
             $address->phone    = $orderForm->shipTo->phone;
             $address->notes    = $orderForm->shipTo->notes;
+            $address->country  = $orderForm->shipTo->country;
             $address->save();
+            \Yii::debug($address);
 
             // Create Order
             $order                      = new OrderEx();
@@ -625,6 +629,7 @@ class OrderController extends PaginatedControllerEx
                 $address->city     = $orderForm->shipTo->city;
                 $address->state_id = $orderForm->shipTo->stateId;
                 $address->zip      = $orderForm->shipTo->zip;
+                $address->country  = $orderForm->shipTo->country;
 
                 if (isset($orderForm->shipTo->phone) && !empty($orderForm->shipTo->phone)) {
                     $address->phone = $orderForm->shipTo->phone;

@@ -47,6 +47,7 @@ class AddressEx extends Address
             'zip'      => 'zip',
             'phone'    => 'phone',
             'notes'    => 'notes',
+            'country'  => 'country',
         ];
     }
 }
