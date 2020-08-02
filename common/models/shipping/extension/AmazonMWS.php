@@ -280,7 +280,17 @@ class AmazonMWS extends ShipmentPlugin
          */
         $options->setLabelFormat('PNG'); // 4x6 PNG Default
         $details->setShippingServiceOptions($options);
+
+        /**
+         * Label Customization
+         * The type of standard identifier to print on the label. StandardIdForLabel values: AmazonOrderId.
+         */
+        $labelCustomization = new \MWSMerchantFulfillmentService_Model_LabelCustomization();
+        $labelCustomization->setStandardIdForLabel('AmazonOrderId');
+        $details->setLabelCustomization($labelCustomization);
+
         $request->setShipmentRequestDetails($details);
+
         $this->data = $request;
 
         Yii::debug($this->data, self::getPluginName() . ' request');
