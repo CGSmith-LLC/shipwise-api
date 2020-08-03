@@ -121,6 +121,10 @@ $item->loadDefaultValues();
                     <div class="panel-body">
 
                         <div id="items">
+                            <?= Html::a('<i class="glyphicon glyphicon-plus"></i> add another item', 'javascript:void(0);', [
+                                'id'    => 'btn-add-item',
+                                'class' => 'btn btn-warning btn-sm',
+                            ]) ?>
                             <?php
                             // existing item fields
                             foreach ($model->items as $itemKey => $_item) : ?>
@@ -147,10 +151,7 @@ $item->loadDefaultValues();
                             </div>
                         </div>
 
-                        <?= Html::a('<i class="glyphicon glyphicon-plus"></i> add another item', 'javascript:void(0);', [
-                            'id'    => 'btn-add-item',
-                            'class' => 'btn btn-warning btn-sm',
-                        ]) ?>
+
 
                     </div>
                 </div>
