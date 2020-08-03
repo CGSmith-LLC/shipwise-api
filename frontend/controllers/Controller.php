@@ -23,16 +23,13 @@ class Controller extends \yii\web\Controller
         'user/register',
     ];
 
+    public $customers = [];
+
 
     public function init()
     {
         // Only perform this check if a user is logged in
         if (!Yii::$app->user->isGuest) {
-            /**
-             * Check for conditions 1 2 3 4 5 6
-             *
-             *
-             */
             if (!Yii::$app->session->has(AdminController::ORIGINAL_USER_SESSION_KEY) &&
                 !Yii::$app->user->identity->isAdmin &&
                 Yii::$app->user->identity->isDirectCustomer() &&
@@ -46,6 +43,15 @@ class Controller extends \yii\web\Controller
 
                 //Need to stop the app from continuing to display the Flash Message.
                 Yii::$app->end();
+            }
+
+            /**
+             * Set the customer ids for all controllers
+             */
+            if (!Yii::$app->user->identity->isAdmin) {
+                $this->customers = Yii::$app->user->identity->customerIds;
+            }else {
+                $this->customers = Customer::getList();
             }
         }
 

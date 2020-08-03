@@ -2,12 +2,18 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use common\models\Customer;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Skus';
+$this->title = 'Items';
 $this->params['breadcrumbs'][] = $this->title;
+if ((!Yii::$app->user->identity->getIsAdmin())) {
+    $customerDropdownList = Yii::$app->user->identity->getCustomerList();
+} else {
+    $customerDropdownList = Customer::getList();
+}
 ?>
 <div class="country-index">
 

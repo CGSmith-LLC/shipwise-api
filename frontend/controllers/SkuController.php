@@ -3,7 +3,6 @@
 namespace frontend\controllers;
 
 
-use common\models\Customer;
 use common\models\Sku;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -11,7 +10,7 @@ use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 use Yii;
 
-class SkuController extends \yii\web\Controller
+class SkuController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -32,7 +31,7 @@ class SkuController extends \yii\web\Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -46,8 +45,14 @@ class SkuController extends \yii\web\Controller
      */
     public function actionIndex()
     {
+        $query = Sku::find();
+
+        if (!Yii::$app->user->identity->isAdmin) {
+            $query->andOnCondition([Sku::tableName() . '.customer_id' => $this->customers]);
+        }
+
         $dataProvider = new ActiveDataProvider([
-            'query' => Sku::find(),
+            'query' => $query,
         ]);
 
         return $this->render('index', [
@@ -63,6 +68,15 @@ class SkuController extends \yii\web\Controller
      */
     public function actionView($id)
     {
+
+        if (($order = Sku::find()
+                ->byId($id)
+                ->forCustomers($this->customers)
+                ->one()
+            ) === null) {
+            throw new NotFoundHttpException(Yii::t('app','This order does not exist'));
+        }
+
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
@@ -144,4 +158,6 @@ class SkuController extends \yii\web\Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+
 }
