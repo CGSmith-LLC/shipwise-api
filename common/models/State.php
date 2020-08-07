@@ -32,7 +32,7 @@ class State extends BaseState
      */
     public static function getIdsAsArray()
     {
-        $array = ArrayHelper::getColumn(self::find()->select('id')->asArray()->all(), 'id');
+        $array = ArrayHelper::getColumn(self::find()->select('id')->asArray()->cache(86400)->all(), 'id');
         $array[] = 0;
         return $array;
     }
