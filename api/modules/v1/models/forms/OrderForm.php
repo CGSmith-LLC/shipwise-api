@@ -204,7 +204,11 @@ class OrderForm extends Model
             if (isset($values['state']) && !isset($values['stateId'])) {
                 $lookup = (strlen($values['state']) == 2) ? 'abbreviation' : 'name';
                 $state = State::find()->where([$lookup => $values['state']])->one();
-                $values['stateId'] = $state->id;
+                if ($state) {
+                    $values['stateId'] = $state->id;
+                }else {
+                    $values['stateId'] = 0;
+                }
             }
             $this->shipTo = new AddressForm();
             $this->shipTo->setAttributes($values);
