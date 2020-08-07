@@ -157,6 +157,8 @@ class AddressForm extends Model
     /** @var int */
     public $stateId;
     /** @var string */
+    public $state;
+    /** @var string */
     public $zip;
     /** @var string */
     public $phone;
@@ -187,6 +189,7 @@ class AddressForm extends Model
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
                     implode(StateEx::getIdsAsArray(), ', '),
             ],
+            [['state'], 'safe'],
         ];
     }
 }
