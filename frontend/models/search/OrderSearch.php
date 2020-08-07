@@ -103,24 +103,29 @@ class OrderSearch extends Order
             Yii::$app->session->set("ordersearch", null);
         }
 
-        // Set order search to a session
-        if (!isset($params["OrderSearch"])) {
-            if (isset(Yii::$app->session["ordersearch"])) {
-                $params["OrderSearch"] = Yii::$app->session["ordersearch"];
-            }
+        if (isset($params['batch_id'])) {
+            $query->byBatchId($params['batch_id']);
         } else {
-            Yii::$app->session["ordersearch"] = $params["OrderSearch"];
-        }
-        // add conditions that should always apply here
+            // Set order search to a session
+            if (!isset($params["OrderSearch"])) {
+                if (isset(Yii::$app->session["ordersearch"])) {
+                    $params["OrderSearch"] = Yii::$app->session["ordersearch"];
+                }
+            } else {
+                Yii::$app->session["ordersearch"] = $params["OrderSearch"];
+            }
+            // add conditions that should always apply here
 
-        if (!isset($params['OrderSearch']['status_id'])) {
-            $this->status_id = Status::OPEN;
-            $query->byStatus($this->status_id);
+            if (!isset($params['OrderSearch']['status_id'])) {
+                $this->status_id = Status::OPEN;
+                $query->byStatus($this->status_id);
+            }
+            // If user is not admin, then show orders that ONLY belong to current user
+            if (!Yii::$app->user->identity->isAdmin) {
+                $query->forCustomers(Yii::$app->user->identity->customerIds);
+            }
         }
-        // If user is not admin, then show orders that ONLY belong to current user
-        if (!Yii::$app->user->identity->isAdmin) {
-            $query->forCustomers(Yii::$app->user->identity->customerIds);
-        }
+
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

@@ -2,7 +2,9 @@
 
 namespace common\models\query;
 
+use common\models\base\BaseBatch;
 use common\models\Order;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the ActiveQuery class for [[Order]].
@@ -83,6 +85,13 @@ class OrderQuery extends \yii\db\ActiveQuery
     public function byStatus($id)
     {
         return $this->andOnCondition([Order::tableName() . '.status_id' => (int)$id]);
+    }
+
+    public function byBatchId($id)
+    {
+        $batch = BaseBatch::findOne($id);
+
+        return $this->andOnCondition(['in', Order::tableName() . '.id', array_values(ArrayHelper::map($batch->batchItems, 'id', 'order_id'))]);
     }
 
     /**

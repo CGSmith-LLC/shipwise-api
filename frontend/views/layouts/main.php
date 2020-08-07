@@ -82,18 +82,27 @@ AppAsset::register($this);
         $menuItems = [
             ['label' => 'Home', 'url' => ['/']],
         ];
-        $menuItems[] = ['label' => 'Orders', 'url' => ['/order']];
+        $menuItems[] = [
+            'label' => 'Orders',
+            'url' => ['/order'],
+            'items' => [
+                ['label' => 'Orders', 'url' => ['/order']],
+                ['label' => 'Batches', 'url' => ['/order/batch']],
+            ]
+        ];
         $menuItems[] = ['label' => 'Reports', 'url' => ['/report']];
 
         if (Yii::$app->user->identity->isAdmin) {
             $menuItems[] = ['label' => 'Countries', 'url' => ['/country']];
             $menuItems[] = ['label' => 'Users', 'url' => ['/user/admin/']];
             $menuItems[] = [
-                    'label' => 'Subscriptions', 'url' => ['/subscription'],
-                    'items' => [
+                'label' => 'Subscriptions',
+                'url' => ['/subscription'],
+                'items' => [
                     ['label' => 'Subscriptions', 'url' => ['/subscription']],
                     ['label' => 'One Time Charges', 'url' => ['/one-time-charge']],
-                ]];
+                ]
+            ];
         }
 
         $menuItems[] = [
