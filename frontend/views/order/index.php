@@ -13,7 +13,7 @@ use yii\widgets\Pjax;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $statuses array List of order statuses */
 
-$this->title                   = 'Orders';
+$this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
 /**
  * - Get a dropdown list from the associated customers
@@ -28,7 +28,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
     <div class="order-index">
 
         <?php Pjax::begin([
-            'id'      => 'pjax-orders',
+            'id' => 'pjax-orders',
             'timeout' => 2000,
             //'enablePushState'    => false,
             //'enableReplaceState' => false,
@@ -43,16 +43,16 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                 <?= Html::dropDownList('OrderSearch[pageSize]', $searchModel->pageSize,
                     $searchModel->pageSizeOptions,
                     [
-                        'id'             => 'ordersearch-pagesize',
-                        'class'          => 'form-control',
-                        'data-toggle'    => 'tooltip',
+                        'id' => 'ordersearch-pagesize',
+                        'class' => 'form-control',
+                        'data-toggle' => 'tooltip',
                         'data-placement' => 'right',
-                        'title'          => '# of entries to show per page',
+                        'title' => '# of entries to show per page',
                     ]) ?>
             </div>
             <div class="col-lg-2 col-md-3 col-sm-3 col-xs-4">
                 <?php
-                $statuses     = Status::getList();
+                $statuses = Status::getList();
                 $changeStatus = array_combine(
                     array_map(function ($k) {
                         return BulkAction::ACTION_CHANGE_STATUS . "_$k"; // <action>_<value>
@@ -63,14 +63,17 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                         '' => 'With selected: ',
                     ] +
                     [
+                        'Batch:' => BulkAction::getBatchActionsList(),
+                    ] +
+                    [
                         'Print:' => BulkAction::getPrintActionsList(),
                     ]
                     + ['Change status to:' => $changeStatus],
                     [
-                        'class'          => 'form-control',
-                        'data-toggle'    => 'tooltip',
+                        'class' => 'form-control',
+                        'data-toggle' => 'tooltip',
                         'data-placement' => 'top',
-                        'title'          => 'Apply bulk action to selected orders',
+                        'title' => 'Apply bulk action to selected orders',
                     ]) ?>
             </div>
             <div class="col-lg-9">
@@ -85,23 +88,23 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
         </div>
 
         <?= GridView::widget([
-            'id'             => 'orders-grid-view',
-            'dataProvider'   => $dataProvider,
-            'filterModel'    => $searchModel,
+            'id' => 'orders-grid-view',
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
             'filterSelector' => '#' . Html::getInputId($searchModel, 'pageSize'),
-            'pager'          => [
+            'pager' => [
                 'firstPageLabel' => Yii::t('app', 'First'),
-                'lastPageLabel'  => Yii::t('app', 'Last'),
+                'lastPageLabel' => Yii::t('app', 'Last'),
             ],
-            'columns'        => [
+            'columns' => [
                 [
                     'class' => 'yii\grid\CheckboxColumn',
                 ],
                 [
                     'attribute' => 'customer.name',
                     // Visible if admin or has a count higher than 0 for associated users
-                    'visible'   => ((count($customerDropdownList) > 1) || Yii::$app->user->identity->getIsAdmin()),
-                    'filter'    => Html::activeDropDownList(
+                    'visible' => ((count($customerDropdownList) > 1) || Yii::$app->user->identity->getIsAdmin()),
+                    'filter' => Html::activeDropDownList(
                         $searchModel,
                         'customer_id',
                         $customerDropdownList,
@@ -111,8 +114,20 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                 'customer_reference',
                 'po_number',
                 [
+                    'attribute' => 'carrier_id',
+                    'options' => ['width' => '10%'],
+                    'value' => 'carrier.name',
+                    'filter' => Html::activeDropDownList(
+                        $searchModel,
+                        'carrier_id',
+                        $carriers,
+                        ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
+                    ),
+                ],
+                'service.name',
+                [
                     'attribute' => 'address',
-                    'value'     => 'address.name',
+                    'value' => 'address.name',
                 ],
                 'tracking',
                 'created_date:datetime',
@@ -120,26 +135,29 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                 'notes',
                 [
                     'attribute' => 'status_id',
-                    'options'   => ['width' => '10%'],
-                    'value'     => 'status.name',
-                    'filter'    => Html::activeDropDownList(
+                    'options' => ['width' => '10%'],
+                    'value' => 'status.name',
+                    'filter' => Html::activeDropDownList(
                         $searchModel,
                         'status_id',
                         $statuses,
                         ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
                     ),
                 ],
-                ['class' => 'yii\grid\ActionColumn'],
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'options' => ['width' => '15%'],
+                ],
             ],
         ]); ?>
         <?php Pjax::end(); ?>
     </div>
 
 <?php Modal::begin([
-    'id'            => 'modalBulk',
+    'id' => 'modalBulk',
     'clientOptions' => ['backdrop' => 'static', 'keyboard' => false],
-    'header'        => '<h4>Bulk Action</h4>',
-    'footer'        => '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    'header' => '<h4>Bulk Action</h4>',
+    'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         <button type="button" class="confirm btn btn-primary">Confirm</button>',
 ]);
 Modal::end();
@@ -243,7 +261,8 @@ ob_start(); // output buffer the javascript to register later ?>
 
             var popup = $('#modalBulk'),
                 btnConfirm = popup.find('button.confirm'),
-                printingActions = <?= Json::encode(array_keys(BulkAction::getPrintActionsList())) ?>;
+                printingActions = <?= Json::encode(array_keys(BulkAction::getPrintActionsList())); ?>,
+                batchNames = <?= Json::encode(\common\models\base\BaseBatch::getList('id', 'name', 'created_date', SORT_DESC, ['customer_id' => Yii::$app->user->identity->customer_id]), JSON_OBJECT_AS_ARRAY);?>;
 
             btnConfirm.attr('disabled', false).show();
 
@@ -261,6 +280,22 @@ ob_start(); // output buffer the javascript to register later ?>
                 $('<label />', {'for': 'bulkaction-print_as_pdf', text: ' Print as PDF'}).appendTo(container);
             }
 
+            if (action === '<?=BulkAction::ACTION_BATCH_CREATE;?>') {
+                $('<input />', {type: 'text', id: 'bulkaction-batch_name'}).appendTo(container);
+                $('<label />', {'for': 'bulkaction-batch_name', text: ' Batch Name'}).appendTo(container);
+            }
+
+            if (action === '<?=BulkAction::ACTION_BATCH_ADD;?>') {
+                $('<select />', {type: 'text', id: 'bulkaction-batch_id'}).appendTo(container);
+                $.each(batchNames, function (index, value) {
+                    $('#bulkaction-batch_id').append($('<option/>', {
+                        value: index,
+                        text : value
+                    }));
+                });
+                $('<label />', {'for': 'bulkaction-batch_id', text: ' Batch Name'}).appendTo(container);
+            }
+
             btnConfirm.off().on('click', function () {
                 btnConfirm.attr('disabled', true);
 
@@ -273,7 +308,9 @@ ob_start(); // output buffer the javascript to register later ?>
                             "action": action,
                             "orderIDs": ids,
                             "options": {
-                                "print_as_pdf": $('#bulkaction-print_as_pdf').is(':checked') ? 1 : 0
+                                "print_as_pdf": $('#bulkaction-print_as_pdf').is(':checked') ? 1 : 0,
+                                "batch_name": $('#bulkaction-batch_name').val() ? $('#bulkaction-batch_name').val() : '',
+                                "batch_id": $('#bulkaction-batch_id').val() ? $('#bulkaction-batch_id').val() : '',
                             }
                         }
                     }

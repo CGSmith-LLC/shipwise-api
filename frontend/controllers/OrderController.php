@@ -5,9 +5,10 @@ namespace frontend\controllers;
 use common\pdf\OrderPackingSlip;
 use frontend\models\Customer;
 use Yii;
-use common\models\{Country, State, Status, shipping\Carrier, shipping\Service};
+use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\{Order, forms\OrderForm, BulkAction, search\OrderSearch};
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
+use yii\data\ActiveDataProvider;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
 
@@ -56,6 +57,8 @@ class OrderController extends \frontend\controllers\Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'statuses' => Status::getList(),
+            'carriers' => Carrier::getList(),
+            'services' => Service::getList(),
         ]);
     }
 
@@ -293,6 +296,30 @@ class OrderController extends \frontend\controllers\Controller
 
         return $this->render("bulk-result/$viewName", [
             'model' => $model,
+        ]);
+    }
+
+    public function actionBatch($id = null)
+    {
+        if ($id === null) {
+            $batches = BaseBatch::find()
+                ->where(['customer_id' => Yii::$app->user->identity->customer_id])
+                ->orderBy(['created_date' => SORT_DESC]);
+
+            return $this->render('batch', [
+                'dataProvider' => new ActiveDataProvider(['query' => $batches]),
+            ]);
+        }
+
+        $searchModel = new OrderSearch();
+        $dataProvider = $searchModel->search(['batch_id' => $id]);
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'statuses' => Status::getList(),
+            'carriers' => Carrier::getList(),
+            'services' => Service::getList(),
         ]);
     }
 
