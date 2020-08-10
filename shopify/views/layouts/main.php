@@ -37,6 +37,7 @@ AppAsset::register($this);
         ]);
         $menuItems = [
             ['label' => 'Home', 'url' => ['/site/index']],
+            ['label' => 'Webhooks', 'url' => ['/webhook/index']],
         ];
 
         echo Nav::widget([

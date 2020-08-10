@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "700c84cd5e2a9054dc3348100cd64050",
+    "content-hash": "0b5c7a37c1bdb056189ccce25eb2c618",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -53,7 +53,7 @@
             "version": "3.4.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jquery/jquery-dist.git",
+                "url": "git@github.com:jquery/jquery-dist.git",
                 "reference": "15bc73803f76bc53b654b9fdbbbc096f56d7c03d"
             },
             "dist": {
@@ -71,7 +71,7 @@
             "version": "v1.3.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/bestiejs/punycode.js.git",
+                "url": "git@github.com:bestiejs/punycode.js.git",
                 "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3"
             },
             "dist": {
@@ -86,12 +86,12 @@
             "version": "v3.25.5",
             "source": {
                 "type": "git",
-                "url": "https://github.com/swagger-api/swagger-ui.git",
+                "url": "git@github.com:wordnik/swagger-ui.git",
                 "reference": "28b7d7c54866f3581f0f703f3971422a09ebd649"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swagger-api/swagger-ui/zipball/28b7d7c54866f3581f0f703f3971422a09ebd649",
+                "url": "https://api.github.com/repos/wordnik/swagger-ui/zipball/28b7d7c54866f3581f0f703f3971422a09ebd649",
                 "reference": "28b7d7c54866f3581f0f703f3971422a09ebd649"
             },
             "type": "bower-asset"
@@ -116,6 +116,65 @@
             "license": [
                 "MIT"
             ]
+        },
+        {
+            "name": "caseyamcl/guzzle_retry_middleware",
+            "version": "v2.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/caseyamcl/guzzle_retry_middleware.git",
+                "reference": "a01cdf67ebea566c4edef42d5140a040fbc593b0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/caseyamcl/guzzle_retry_middleware/zipball/a01cdf67ebea566c4edef42d5140a040fbc593b0",
+                "reference": "a01cdf67ebea566c4edef42d5140a040fbc593b0",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3|^7.0",
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "nesbot/carbon": "^2.0",
+                "phpunit/phpunit": "^7.5|^8.0|^9.0",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleRetry\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Casey McLaughlin",
+                    "email": "caseyamcl@gmail.com",
+                    "homepage": "https://caseymclaughlin.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Guzzle middleware that handles HTTP Retry-After middleware",
+            "homepage": "https://github.com/caseyamcl/guzzle_retry_middleware",
+            "keywords": [
+                "Guzzle",
+                "back-off",
+                "caseyamcl",
+                "guzzle_retry_middleware",
+                "middleware",
+                "retry",
+                "retry-after"
+            ],
+            "time": "2020-05-17T17:24:41+00:00"
         },
         {
             "name": "cebe/markdown",
@@ -1067,6 +1126,55 @@
             "time": "2020-01-21T11:26:32+00:00"
         },
         {
+            "name": "osiset/basic-shopify-api",
+            "version": "v9.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/osiset/Basic-Shopify-API.git",
+                "reference": "aece25d8bff2f08eda21a5575b420719dbbadf48"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/osiset/Basic-Shopify-API/zipball/aece25d8bff2f08eda21a5575b420719dbbadf48",
+                "reference": "aece25d8bff2f08eda21a5575b420719dbbadf48",
+                "shasum": ""
+            },
+            "require": {
+                "caseyamcl/guzzle_retry_middleware": "^2.3",
+                "guzzlehttp/guzzle": "^6.5",
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "phpdocumentor/phpdocumentor": "2.*",
+                "phpunit/phpunit": "^6.2",
+                "squizlabs/php_codesniffer": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Osiset\\BasicShopifyAPI\\": "src/Osiset/BasicShopifyAPI"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tyler King",
+                    "email": "tyler@osiset.com"
+                }
+            ],
+            "description": "A basic Shopify API wrapper with REST and GraphQL support, powered by Guzzle.",
+            "keywords": [
+                "api",
+                "graphql",
+                "rest",
+                "shopify"
+            ],
+            "time": "2020-08-04T18:47:25+00:00"
+        },
+        {
             "name": "paragonie/random_compat",
             "version": "v9.99.99",
             "source": {
@@ -1533,6 +1641,53 @@
                 "promise"
             ],
             "time": "2016-01-26T13:27:02+00:00"
+        },
+        {
+            "name": "phpclassic/php-shopify",
+            "version": "v1.1.14",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpclassic/php-shopify.git",
+                "reference": "a233b8d6e22e651402ef2e440b9433aa704146b8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpclassic/php-shopify/zipball/a233b8d6e22e651402ef2e440b9433aa704146b8",
+                "reference": "a233b8d6e22e651402ef2e440b9433aa704146b8",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PHPShopify\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Tareq Mahmood",
+                    "email": "tareqtms@yahoo.com"
+                }
+            ],
+            "description": "PHP SDK for Shopify API",
+            "homepage": "https://github.com/phpclassic/php-shopify",
+            "keywords": [
+                "php",
+                "sdk",
+                "shopify"
+            ],
+            "time": "2020-06-02T05:23:50+00:00"
         },
         {
             "name": "psr/http-client",
