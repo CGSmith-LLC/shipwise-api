@@ -2,8 +2,12 @@
 
 namespace frontend\models;
 
+use common\models\base\BaseBatch;
+use common\models\base\BaseBatchItem;
 use common\models\BulkItem;
-use common\models\Status; // Order Status
+use common\models\Status;
+
+// Order Status
 use common\models\BulkAction as BaseBulkAction;
 use Yii;
 use yii\helpers\Url;
@@ -16,19 +20,21 @@ use yii\helpers\Url;
  *  2. Bulk orders are added to a queue to be executed asynchronously in the background using jobs.
  *
  * @property string $action
- * @property array  $params
- * @property array  $orderIDs
+ * @property array $params
+ * @property array $orderIDs
  */
 class BulkAction extends BaseBulkAction
 {
 
-    const EXECUTION_TYPE_SYNC  = 1;
+    const EXECUTION_TYPE_SYNC = 1;
     const EXECUTION_TYPE_ASYNC = 2;
 
-    const ACTION_CHANGE_STATUS                 = 'changeStatus';
-    const ACTION_PACKING_SLIPS                 = 'packingSlips';
-    const ACTION_SHIPPING_LABELS               = 'shippingLabels';
+    const ACTION_CHANGE_STATUS = 'changeStatus';
+    const ACTION_PACKING_SLIPS = 'packingSlips';
+    const ACTION_SHIPPING_LABELS = 'shippingLabels';
     const ACTION_SHIPPING_LABELS_PACKING_SLIPS = 'shippingLabelsPackingSlips';
+    const ACTION_BATCH_CREATE = 'createNewBatch';
+    const ACTION_BATCH_ADD = 'addToExistingBatch';
 
     /**
      * List of all available actions
@@ -40,6 +46,8 @@ class BulkAction extends BaseBulkAction
         self::ACTION_PACKING_SLIPS,
         self::ACTION_SHIPPING_LABELS,
         self::ACTION_SHIPPING_LABELS_PACKING_SLIPS,
+        self::ACTION_BATCH_CREATE,
+        self::ACTION_BATCH_ADD,
     ];
 
     /**
@@ -49,9 +57,21 @@ class BulkAction extends BaseBulkAction
     public static function getPrintActionsList()
     {
         return [
-            self::ACTION_PACKING_SLIPS                 => static::readable(BulkAction::ACTION_PACKING_SLIPS),
-            self::ACTION_SHIPPING_LABELS               => static::readable(BulkAction::ACTION_SHIPPING_LABELS),
+            self::ACTION_PACKING_SLIPS => static::readable(BulkAction::ACTION_PACKING_SLIPS),
+            self::ACTION_SHIPPING_LABELS => static::readable(BulkAction::ACTION_SHIPPING_LABELS),
             self::ACTION_SHIPPING_LABELS_PACKING_SLIPS => static::readable(BulkAction::ACTION_SHIPPING_LABELS_PACKING_SLIPS),
+        ];
+    }
+
+    /**
+     * List of batch actions
+     * @return array
+     */
+    public static function getBatchActionsList()
+    {
+        return [
+            self::ACTION_BATCH_CREATE => static::readable(BulkAction::ACTION_BATCH_CREATE),
+            self::ACTION_BATCH_ADD => static::readable(BulkAction::ACTION_BATCH_ADD),
         ];
     }
 
@@ -64,7 +84,7 @@ class BulkAction extends BaseBulkAction
      */
     public static function readable($str)
     {
-        $split   = preg_split('/(?=[A-Z])/', $str);
+        $split = preg_split('/(?=[A-Z])/', $str);
         $implode = implode(" ", $split);
         return ucfirst($implode);
     }
@@ -158,7 +178,7 @@ class BulkAction extends BaseBulkAction
      */
     public function validateAction($attribute, $params, $validator)
     {
-        $exploded     = explode("_", $this->$attribute);
+        $exploded = explode("_", $this->$attribute);
         $this->action = $exploded[0];
         $this->params = array_slice($exploded, 1);
 
@@ -175,6 +195,78 @@ class BulkAction extends BaseBulkAction
     public function execute()
     {
         return $this->{$this->action}($this->params);
+    }
+
+    private function addToExistingBatch($params = null)
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $nbUpdated = 0;
+            $batch = BaseBatch::find()->where(['id' => $this->options['batch_id']])->one();
+
+            foreach ($this->orderIDs as $id) {
+                if (($order = Order::findOne($id)) !== null) {
+                    $batchItem = new BaseBatchItem();
+                    $batchItem->setAttributes([
+                        'order_id' => $order->id,
+                        'batch_id' => $batch->id,
+                    ]);
+                    $batchItem->save();
+                    $nbUpdated++;
+                } else {
+                    Yii::warning("Order with ID $id not found.");
+                }
+            }
+            $transaction->commit();
+            $this->_success = true;
+            $this->_message = ($nbUpdated > 0) ? "$nbUpdated orders assigned to batch " . $batch->name . "." : "";
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            $this->addError('action', 'Execution failed. ' . $e->getMessage());
+            return false;
+        }
+
+        return self::EXECUTION_TYPE_SYNC;
+    }
+
+    private function createNewBatch($params = null)
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $nbUpdated = 0;
+            $batch = new BaseBatch();
+            $batch->setAttributes([
+                'name' => $this->options['batch_name'],
+                'customer_id' => Yii::$app->user->identity->customer_id,
+            ]);
+            $batch->validate();
+            $batch->save();
+
+            foreach ($this->orderIDs as $id) {
+                if (($order = Order::findOne($id)) !== null) {
+                    $batchItem = new BaseBatchItem();
+                    $batchItem->setAttributes([
+                        'order_id' => $order->id,
+                        'batch_id' => $batch->id,
+                    ]);
+                    $batchItem->save();
+                    $nbUpdated++;
+                } else {
+                    Yii::warning("Order with ID $id not found.");
+                }
+            }
+            $transaction->commit();
+            $this->_success = true;
+            $this->_message = ($nbUpdated > 0) ? "$nbUpdated orders assigned to batch " . $batch->name . "." : "";
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            $this->addError('action', 'Execution failed. ' . $e->getMessage());
+            return false;
+        }
+
+        return self::EXECUTION_TYPE_SYNC;
     }
 
     /**
@@ -293,7 +385,7 @@ class BulkAction extends BaseBulkAction
      */
     private function createBulkAction()
     {
-        $bulkAction       = new BaseBulkAction();
+        $bulkAction = new BaseBulkAction();
         $bulkAction->code = $this->action;
         $bulkAction->name = self::readable($this->action);
         if (in_array($this->action, array_keys(static::getPrintActionsList()))) {
@@ -313,9 +405,9 @@ class BulkAction extends BaseBulkAction
      * Use Bulk Action to track process.
      *
      * @param BaseBulkAction $bulkAction
-     * @param string         $jobClassName The class name of the console job to be added to the queue
+     * @param string $jobClassName The class name of the console job to be added to the queue
      *                                     eg. `GeneratePackingSlipJob`
-     * @param array|null     $params       Optional
+     * @param array|null $params Optional
      *
      * @return bool|int False on failure, Integer on success
      */
@@ -337,8 +429,8 @@ class BulkAction extends BaseBulkAction
                     $bulkItem = new BulkItem();
 
                     $bulkItem->bulk_action_id = $bulkAction->id;
-                    $bulkItem->order_id       = $order->id;
-                    $bulkItem->job            = $jobClassName;
+                    $bulkItem->order_id = $order->id;
+                    $bulkItem->job = $jobClassName;
 
                     if (!$bulkItem->save()) {
                         Yii::warning("Failed to save Bulk Action.");
@@ -348,7 +440,7 @@ class BulkAction extends BaseBulkAction
 
                     // Add to the execution queue
                     $queueMessageId = Yii::$app->queue->push(new $jobClass([
-                        'orderId'    => $id,
+                        'orderId' => $id,
                         'bulkItemId' => $bulkItem->id,
                     ]));
 
@@ -363,7 +455,7 @@ class BulkAction extends BaseBulkAction
             }
             $this->_success = true;
             $this->_message = ($nbQueued > 0) ? "$nbQueued orders added to execution queue." : "";
-            $this->_link    = Url::toRoute(['/order/bulk-result', 'id' => $bulkAction->id], true);
+            $this->_link = Url::toRoute(['/order/bulk-result', 'id' => $bulkAction->id], true);
 
         } catch (\Exception $e) {
             $this->addError('action', 'Execution failed. ' . $e->getMessage());

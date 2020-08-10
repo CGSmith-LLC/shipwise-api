@@ -222,7 +222,7 @@ class OrderPackingSlip extends \FPDF
         $this->setFontSize($this->fontSize - 1);
         $txt = $order->customer->address1 . ' ' . $order->customer->address2;
         $this->Cell(0, $cellH, $txt, 0, 2, 'R');
-        $txt = $order->customer->city . ', ' . $order->customer->state->abbreviation . ' ' . $order->customer->zip;
+        $txt = $order->customer->city . ', ' . ($order->customer->state->abbreviation ?? '') . ' ' . $order->customer->zip;
         $this->Cell(0, $cellH, $txt, 0, 2, 'R');
         $this->Cell(0, $cellH, $order->customer->country, 0, 2, 'R');
         $this->ln(3);
@@ -240,7 +240,7 @@ class OrderPackingSlip extends \FPDF
         $this->MultiCell($cellW, $cellH, $order->address->name, 0, 'L');
         $txt = $order->address->address1 . ' ' . $order->address->address2;
         $this->MultiCell($cellW, $cellH, $txt, 0, 'L');
-        $txt = $order->address->city . ', ' . $order->address->state->abbreviation . ' ' . $order->address->zip;
+        $txt = $order->address->city . ', ' . ($order->address->state->abbreviation ?? '') . ' ' . $order->address->zip;
         $this->MultiCell($cellW, $cellH, $txt, 0, 'L');
         $this->Cell($cellW, $cellH, $order->address->country, 0, 2);
 

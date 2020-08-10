@@ -854,13 +854,6 @@ class UPSPlugin extends ShipmentPlugin
             ],
         ];
 
-        if ($this->shipment->reference1) {
-            $this->data['Shipment']['ReferenceNumber'] = [
-                // 'Code' => '', // For predefined codes see UPS developer guide (search for "Reference Number Codes")
-                'Value' => $this->shipment->reference1,
-            ];
-        }
-
         /**
          * Shipment items
          */

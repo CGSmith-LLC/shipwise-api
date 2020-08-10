@@ -21,6 +21,18 @@ namespace common\models\base;
  * @property string $requested_ship_date
  * @property int    $carrier_id
  * @property int    $service_id
+ * @property string $label_data Shipping labels file encoded in base64
+ * @property string $label_type File type for label_data field.
+ * @property string $ship_from_contact
+ * @property string $ship_from_company
+ * @property string $ship_from_address1
+ * @property string $ship_from_address2
+ * @property string $ship_from_city
+ * @property string $ship_from_state
+ * @property string $ship_from_postal_code
+ * @property string $ship_from_country
+ * @property string $ship_from_phone
+ * @property string $ship_from_email
  */
 class BaseOrder extends \yii\db\ActiveRecord
 {
@@ -46,6 +58,24 @@ class BaseOrder extends \yii\db\ActiveRecord
             [['customer_reference', 'origin'], 'string', 'max' => 64],
             [['notes'], 'string', 'max' => 140],
             [['po_number'], 'string', 'max' => 64],
+            [['label_data'], 'string'],
+            [['label_type'], 'string', 'max' => 6],
+            [
+                [
+                    'ship_from_contact',
+                    'ship_from_company',
+                    'ship_from_address1',
+                    'ship_from_address2',
+                    'ship_from_city',
+                    'ship_from_state',
+                    'ship_from_postal_code',
+                    'ship_from_country',
+                    'ship_from_phone',
+                    'ship_from_email'
+                ],
+                'safe'
+            ],
+
         ];
     }
 
@@ -68,6 +98,8 @@ class BaseOrder extends \yii\db\ActiveRecord
             'address_id'         => 'Address ID',
             'notes'              => 'Notes',
             'origin'             => 'Origin of Order',
+            'label_data'         => 'Label Data',
+            'label_type'         => 'Label Type',
         ];
     }
 }

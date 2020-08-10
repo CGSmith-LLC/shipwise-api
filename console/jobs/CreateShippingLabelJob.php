@@ -2,7 +2,7 @@
 
 namespace console\jobs;
 
-use common\models\{BulkItem, Order, shipping\Service, Status};
+use common\models\{BulkItem, Order, shipping\Carrier, shipping\Service, Status};
 use Exception;
 use Yii;
 use yii\base\BaseObject;
@@ -56,7 +56,11 @@ class CreateShippingLabelJob extends BaseObject implements JobInterface
                 $bulkItem->errors = Json::encode($order->getErrors());
                 $bulkItem->status = BulkItem::STATUS_ERROR;
             } else {
-                $order->tracking  = $shipment->getMasterTracking();
+                $order->tracking = $shipment->getMasterTracking();
+                if ($order->service->carrier->getReprintBehaviour() == Carrier::REPRINT_BEHAVIOUR_EXISTING) {
+                    $order->label_data = $shipment->mergedLabelsData;
+                    $order->label_type = $shipment->mergedLabelsFormat;
+                }
                 $order->status_id = Status::SHIPPED;
                 $order->save(false);
 

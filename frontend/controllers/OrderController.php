@@ -5,9 +5,10 @@ namespace frontend\controllers;
 use common\pdf\OrderPackingSlip;
 use frontend\models\Customer;
 use Yii;
-use common\models\{Country, State, Status, shipping\Carrier, shipping\Service};
+use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\{Order, forms\OrderForm, BulkAction, search\OrderSearch};
 use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
+use yii\data\ActiveDataProvider;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
 
@@ -56,6 +57,8 @@ class OrderController extends \frontend\controllers\Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'statuses' => Status::getList(),
+            'carriers' => Carrier::getList(),
+            'services' => Service::getList(),
         ]);
     }
 
@@ -296,6 +299,30 @@ class OrderController extends \frontend\controllers\Controller
         ]);
     }
 
+    public function actionBatch($id = null)
+    {
+        if ($id === null) {
+            $batches = BaseBatch::find()
+                ->where(['customer_id' => Yii::$app->user->identity->customer_id])
+                ->orderBy(['created_date' => SORT_DESC]);
+
+            return $this->render('batch', [
+                'dataProvider' => new ActiveDataProvider(['query' => $batches]),
+            ]);
+        }
+
+        $searchModel = new OrderSearch();
+        $dataProvider = $searchModel->search(['batch_id' => $id]);
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'statuses' => Status::getList(),
+            'carriers' => Carrier::getList(),
+            'services' => Service::getList(),
+        ]);
+    }
+
     /**
      * Given BulkAction id, reprints a single combined PDF file merged from bulk items base64 data
      *
@@ -401,11 +428,22 @@ class OrderController extends \frontend\controllers\Controller
         }
 
         $order->tracking = $shipment->getMasterTracking();
+        if ($order->service->carrier->getReprintBehaviour() == Carrier::REPRINT_BEHAVIOUR_EXISTING) {
+            $order->label_data = $shipment->mergedLabelsData;
+            $order->label_type = $shipment->mergedLabelsFormat;
+        }
         $order->status_id = Status::SHIPPED;
         $order->save(false);
 
-        return Yii::$app->response->sendContentAsFile(base64_decode($shipment->mergedLabelsData),
-            "$order->tracking." . $shipment->mergedLabelsFormat,
-            ['mimeType' => 'application/pdf', 'inline' => true]);
+        $filename = "$order->tracking." . strtolower($shipment->mergedLabelsFormat);
+
+        return Yii::$app->response->sendContentAsFile(
+            base64_decode($shipment->mergedLabelsData),
+            $filename,
+            [
+                'mimeType' => FileHelper::getMimeTypeByExtension($filename),
+                'inline'   => true,
+            ]
+        );
     }
 }

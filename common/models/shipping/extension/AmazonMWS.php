@@ -10,6 +10,7 @@ use common\models\shipping\{
     ShipmentPlugin,
     ShipmentException
 };
+use yii\helpers\FileHelper;
 
 /**
  * Class AmazonMWS
@@ -18,6 +19,8 @@ use common\models\shipping\{
  *
  * @see     http://docs.developer.amazonservices.com/en_US/merch_fulfill/MerchFulfill_CreateShipment.html
  * @package common\models\shipping\extension
+ *
+ * @property int $maxRetries
  */
 class AmazonMWS extends ShipmentPlugin
 {
@@ -80,6 +83,12 @@ class AmazonMWS extends ShipmentPlugin
      * @var integer
      */
     protected $mpsSequenceNumber = 0;
+
+    /**
+     * @var int Max number of retries for API calls to Amazon MWS.
+     *          Used in shipmentExecute method to handle throttling
+     */
+    protected $maxRetries = 30;
 
     /**
      * Whether the shipment plugin has tracking API (non URL)
@@ -151,7 +160,7 @@ class AmazonMWS extends ShipmentPlugin
     /**
      * Prepare Shipment Call to carrier API
      *
-     * This function builds UPS shipment request
+     * This function builds AmazonMWS shipment request
      *
      * @return $this
      * @throws \Exception
@@ -194,10 +203,13 @@ class AmazonMWS extends ShipmentPlugin
          * Ship From
          */
         $shipFrom = new \MWSMerchantFulfillmentService_Model_Address();
-        $shipFrom->setName(substr(
-            $this->shipment->sender_company ?? $this->shipment->sender_contact,
-            0,
-            30));
+        $shipFrom->setName(
+            substr(
+                $this->shipment->sender_company ?? $this->shipment->sender_contact,
+                0,
+                30
+            )
+        );
         $shipFrom->setAddressLine1(substr($this->shipment->sender_address1, 0, 180));
         if (!empty($this->shipment->sender_address2)) {
             $shipFrom->setAddressLine2(substr($this->shipment->sender_address2, 0, 60));
@@ -247,14 +259,16 @@ class AmazonMWS extends ShipmentPlugin
          * - DeliveryConfirmationWithoutSignature - Delivery confirmation without signature.
          * - NoTracking - No delivery confirmation.
          */
-        $options->setDeliveryExperience('DeliveryConfirmationWithoutSignature'); // @todo Please review this for your need
+        $options->setDeliveryExperience(
+            'DeliveryConfirmationWithoutSignature'
+        ); // @todo Please review this for your need
 
         /**
          * CarrierWillPickUp
          * Indicates whether the carrier will pick up the package.
          * Note: Scheduled carrier pickup is available only using Dynamex (US), DPD (UK), and Royal Mail (UK).
          */
-        $options->setCarrierWillPickUp('False');
+        $options->setCarrierWillPickUp(false);
 
         /**
          * LabelFormat
@@ -264,10 +278,22 @@ class AmazonMWS extends ShipmentPlugin
          * from that carrier.
          * Must match one of the AvailableLabelFormats returned by GetEligibleShippingServices operation.
          */
-        $options->setLabelFormat('PDF');
+        $options->setLabelFormat('PNG'); // 4x6 PNG Default
         $details->setShippingServiceOptions($options);
+
+        /**
+         * Label Customization
+         * The type of standard identifier to print on the label. StandardIdForLabel values: AmazonOrderId.
+         */
+        $labelCustomization = new \MWSMerchantFulfillmentService_Model_LabelCustomization();
+        $labelCustomization->setStandardIdForLabel('AmazonOrderId');
+        $details->setLabelCustomization($labelCustomization);
+
         $request->setShipmentRequestDetails($details);
+
         $this->data = $request;
+
+        Yii::debug($this->data, self::getPluginName() . ' request');
 
         return $this;
     }
@@ -275,13 +301,18 @@ class AmazonMWS extends ShipmentPlugin
     /**
      * Execute the API Request
      *
+     * @param int $retryNb Retry # increment
+     *
      * @return $this
      * @throws ShipmentException
      * @version 2020.04.15
+     *
+     * Handles throttling. Ref: http://docs.developer.amazonservices.com/en_US/dev_guide/DG_Throttling.html
+     * Amazon MWS CreateShipment operation has a maximum request quota of 10 and a restore rate of five requests every
+     * second. (Error code returned: 'RequestThrottled' (HTTP 503))
      */
-    protected function shipmentExecute()
+    protected function shipmentExecute($retryNb = 0)
     {
-
         $config = [
             'ServiceURL'    => $this->urlProd,
             'ProxyHost'     => null,
@@ -296,7 +327,8 @@ class AmazonMWS extends ShipmentPlugin
             $this->awsSecretKey,
             Yii::$app->name,
             '1.0',
-            $config);
+            $config
+        );
 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates MWSMerchantFulfillmentService
@@ -311,10 +343,15 @@ class AmazonMWS extends ShipmentPlugin
 
         try {
             $this->response = $service->CreateShipment($this->data);
-            Yii::debug($this->response);
-
+            Yii::debug($this->response, self::getPluginName() . ' response');
         } catch (\MWSMerchantFulfillmentService_Exception $ex) {
             Yii::debug($ex, 'Amazon MWS Exception');
+
+            // handle throttling
+            if (($ex->getErrorCode() == 'RequestThrottled') && ($retryNb < $this->maxRetries)) {
+                sleep(1);
+                return $this->shipmentExecute(++$retryNb);
+            }
 
             $msg = "Caught Exception: " . $ex->getMessage() . "\n";
             $msg .= "Response Status Code: " . $ex->getStatusCode() . "\n";
@@ -343,7 +380,6 @@ class AmazonMWS extends ShipmentPlugin
      */
     protected function shipmentProcess()
     {
-
         /** @var \MWSMerchantFulfillmentService_Model_CreateShipmentResponse $response */
         $response = $this->response;
 
@@ -381,7 +417,6 @@ class AmazonMWS extends ShipmentPlugin
 
         /**
          * @var ShipmentPackage $package
-         * @todo Pending todo MPS (multiple-piece-shipment)
          */
         $package = &$this->shipment->getPackages()[0];
 
@@ -390,19 +425,33 @@ class AmazonMWS extends ShipmentPlugin
         $package->master_tracking_num = $trackingId;
         //$package->tracking_url        = "{$this->trackingURL}?tracknum=" . $package->tracking_num;
 
+        // Amazon-defined shipment identifier
+        $this->shipment->external_id1 = $shipment->getShipmentId();
+
         /** @var \MWSMerchantFulfillmentService_Model_FileContents $fileContents */
         $fileContents = $label->getFileContents();
 
         // Label data
-        $package->label_data   = $fileContents->getContents(); // Base64-encoded data for printing labels, GZip-compressed string
+        // According to Amazon MWS docs: "Base64-encoded data for printing labels, GZip-compressed string"
+        $package->label_data   = $fileContents->getContents();
         $package->label_format = strtoupper($label->getLabelFormat());
 
-        // Amazon-defined shipment identifier
-        $this->shipment->external_id1 = $shipment->getShipmentId();
+        // Convert to PDF (using ImageMagick)
+        $dir = Yii::getAlias('@frontend') . '/runtime/pdf/';
+        if (!is_dir($dir)) {
+            FileHelper::createDirectory($dir, 0777, true);
+        }
+        $tempFilename = $dir . 'tmp' . $package->tracking_num . '_' . time() . '.' . strtolower($package->label_format);
+        $fp           = fopen($tempFilename, 'wb');
+        fwrite($fp, gzdecode(base64_decode($package->label_data)));
+        fclose($fp);
+        $newFilename = $dir . $package->tracking_num . '_' . time() . '.pdf';
+        exec("convert {$tempFilename} {$newFilename}");
+        @unlink($tempFilename);
 
-        // @todo For now it's always one label/package. For merging multiple files, refer to UPSPlugin code.
-        $this->shipment->mergedLabelsData   = $package->label_data;
-        $this->shipment->mergedLabelsFormat = $package->label_format;
+        $this->shipment->mergedLabelsData   = base64_encode(file_get_contents($newFilename));
+        $this->shipment->mergedLabelsFormat = $package->label_format = 'PDF';
+        @unlink($newFilename);
 
         $this->isShipped = true;
 
