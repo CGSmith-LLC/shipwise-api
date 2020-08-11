@@ -105,6 +105,7 @@ class OrderSearch extends Order
 
         if (isset($params['batch_id'])) {
             $query->byBatchId($params['batch_id']);
+            $this->pageSize = -1;
         } else {
             // Set order search to a session
             if (!isset($params["OrderSearch"])) {
