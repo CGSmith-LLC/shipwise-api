@@ -1221,7 +1221,11 @@ class UPSPlugin extends ShipmentPlugin
              * Convert GIF to PDF and merge into one file, then delete all temp files.
              */
             if (!empty($tmpFiles)) {
-                $mergedFilename = $packages[0]->master_tracking_num . ".pdf";
+                $dir = Yii::getAlias('@frontend') . '/runtime/pdf/';
+                if (!is_dir($dir)) {
+                    FileHelper::createDirectory($dir, 0777, true);
+                }
+                $mergedFilename = $dir . $packages[0]->master_tracking_num . ".pdf";
                 // using ImageMagick here for merging GIFs into one PDF file
                 exec("convert " . implode(" ", $tmpFiles) . " $mergedFilename");
                 $this->shipment->mergedLabelsData   = base64_encode(file_get_contents($mergedFilename));
