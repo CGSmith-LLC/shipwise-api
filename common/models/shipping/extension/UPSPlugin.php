@@ -12,6 +12,7 @@ use common\models\shipping\{Carrier,
     ShipmentException,
     ShipmentRate
 };
+use yii\helpers\FileHelper;
 
 /**
  * Class UPSPlugin
@@ -1201,7 +1202,11 @@ class UPSPlugin extends ShipmentPlugin
                          * Convert obtained label from UPS to the correct format:
                          *  - Rotate the GIF label 90 degrees clockwise
                          */
-                        $filename = 'tmp_' . $package->tracking_num . '.' . $package->label_format;
+                        $dir = Yii::getAlias('@frontend') . '/runtime/gif/';
+                        if (!is_dir($dir)) {
+                            FileHelper::createDirectory($dir, 0777, true);
+                        }
+                        $filename = $dir . 'tmp_' . $package->tracking_num . '.' . $package->label_format;
                         $fp       = fopen($filename, 'wb');
                         fwrite($fp, base64_decode($package->label_data));
                         fclose($fp);
