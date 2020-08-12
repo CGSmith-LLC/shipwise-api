@@ -59,7 +59,7 @@ class StatusForm extends Model
                 'in',
                 'range' => StatusEx::getIdsAsArray(),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
-                    implode(StatusEx::getIdsAsArray(), ', '),
+                    implode(', ', StatusEx::getIdsAsArray()),
             ],
         ];
     }

@@ -1120,7 +1120,7 @@ class OrderController extends PaginatedControllerEx
             return $this->errorMessage(
                 400,
                 'Incorrect status value. Valid values are: ' .
-                implode(StatusEx::getIdsAsArray(), ', '));
+                implode(', ', StatusEx::getIdsAsArray()));
         }
 
         $updatedDate       = null;

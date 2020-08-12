@@ -192,7 +192,7 @@ class AddressForm extends Model
                 'in',
                 'range' => StateEx::getIdsAsArray(),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
-                    implode(StateEx::getIdsAsArray(), ', '),
+                    implode(', ', StateEx::getIdsAsArray()),
             ],
         ];
     }

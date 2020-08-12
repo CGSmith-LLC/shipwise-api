@@ -81,7 +81,7 @@ class Package extends Model
                 'in',
                 'range'   => PackageType::getList(),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
-                    implode(PackageType::getList(), ', '),
+                    implode(', ', PackageType::getList()),
             ],
         ];
     }

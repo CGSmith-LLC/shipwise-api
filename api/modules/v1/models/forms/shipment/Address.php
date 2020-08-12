@@ -115,7 +115,7 @@ class Address extends Model
                 'in',
                 'range'   => array_keys(Country::getList()),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
-                    implode(array_keys(Country::getList()), ', '),
+                    implode(', ', array_keys(Country::getList())),
             ],
             [['city', 'state'], 'string', 'length' => [2, 64]],
             ['zip', 'string', 'length' => [2, 16]],
@@ -124,7 +124,7 @@ class Address extends Model
                 'in',
                 'range'   => array_keys(Shipment::getAddressTypes()),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
-                    implode(array_keys(Shipment::getAddressTypes()), ', '),
+                    implode(', ', array_keys(Shipment::getAddressTypes())),
             ],
         ];
     }

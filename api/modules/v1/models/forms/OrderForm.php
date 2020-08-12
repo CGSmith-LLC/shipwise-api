@@ -163,7 +163,7 @@ class OrderForm extends Model
                 'in',
                 'range' => StatusEx::getIdsAsArray(),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
-                    implode(StatusEx::getIdsAsArray(), ', '),
+                    implode(', ', StatusEx::getIdsAsArray()),
             ],
             [['items', 'packages'], 'checkIsArray'],
             [['tracking', 'packages', 'service_id', 'carrier_id'], 'safe'],
