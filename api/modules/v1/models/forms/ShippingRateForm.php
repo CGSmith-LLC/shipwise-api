@@ -146,7 +146,7 @@ class ShippingRateForm extends Model
                 'in',
                 'range'   => CarrierEx::getShipwiseCodes(),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
-                    implode(CarrierEx::getShipwiseCodes(), ', '),
+                    implode(', ', CarrierEx::getShipwiseCodes()),
             ],
             [
                 'service',
@@ -154,7 +154,7 @@ class ShippingRateForm extends Model
                     if (!in_array($this->$attribute, ServiceEx::getShipwiseCodes($this->carrier))) {
                         $this->addError($attribute,
                             ucfirst($attribute) . " value is incorrect. Valid values are: " .
-                            implode(ServiceEx::getShipwiseCodes($this->carrier), ', ')
+                            implode(', ', ServiceEx::getShipwiseCodes($this->carrier))
                         );
                     }
                 },

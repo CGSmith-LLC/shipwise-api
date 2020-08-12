@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\models\order;
 
+use api\modules\v1\models\core\AddressEx;
 use common\models\Order;
 use common\models\Package;
 use common\models\PackageItemLotInfo;
@@ -31,6 +32,7 @@ class OrderEx extends Order
     Number from ecommerce side" ),
      *     @SWG\Property( property = "requestedShipDate", type = "string", format = "date-time", description = "When
     the order should ship and be fulfilled" ),
+     *     @SWG\Property( property = "shipFrom", ref = "#/definitions/Address" ),
      *     @SWG\Property( property = "shipTo", ref = "#/definitions/Address" ),
      *     @SWG\Property( property = "tracking", ref = "#/definitions/TrackingInfo" ),
      *     @SWG\Property(
@@ -61,6 +63,7 @@ class OrderEx extends Order
             'orderReference'    => 'order_reference',
             'customerReference' => 'customer_reference',
             'requestedShipDate' => 'requested_ship_date',
+            'shipFrom'          => 'fromAddress',
             'shipTo'            => 'address',
             'tracking'          => 'trackingInfo',
             'items'             => 'items',

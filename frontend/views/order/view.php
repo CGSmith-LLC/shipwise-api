@@ -76,6 +76,7 @@ YiiAsset::register($this);
                         'address2',
                         'city',
                         'state.name',
+                        'country',
                         'zip',
                         'phone',
                         'email',
