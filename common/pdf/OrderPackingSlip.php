@@ -2,6 +2,7 @@
 
 namespace common\pdf;
 
+use api\modules\v1\models\core\AddressEx;
 use common\models\Order;
 use DateTime;
 use Yii;
@@ -214,17 +215,19 @@ class OrderPackingSlip extends \FPDF
         /**
          * Company details
          */
+        /** @var AddressEx $sender */
+        $sender = $order->getFromAddress();
         $this->SetXY($this->pageWidth / 1.5, $yBeforeImage);
         $cellH = 4; // cell height
         $this->setFont($this->fontFamily, 'B', $this->fontSize - 2);
-        $this->Cell(0, $cellH, $order->customer->name, 0, 2, 'R');
+        $this->Cell(0, $cellH, $sender->name, 0, 2, 'R');
         $this->resetFont();
         $this->setFontSize($this->fontSize - 1);
-        $txt = $order->customer->address1 . ' ' . $order->customer->address2;
+        $txt = $sender->address1 . ' ' . $sender->address2;
         $this->Cell(0, $cellH, $txt, 0, 2, 'R');
-        $txt = $order->customer->city . ', ' . ($order->customer->state->abbreviation ?? '') . ' ' . $order->customer->zip;
+        $txt = $sender->city . ', ' . ($sender->state->abbreviation ?? '') . ' ' . $sender->zip;
         $this->Cell(0, $cellH, $txt, 0, 2, 'R');
-        $this->Cell(0, $cellH, $order->customer->country, 0, 2, 'R');
+        $this->Cell(0, $cellH, $sender->country, 0, 2, 'R');
         $this->ln(3);
         $this->setX($this->marginLeft);
 
@@ -256,8 +259,8 @@ class OrderPackingSlip extends \FPDF
         $this->Cell($cellW, $cellH, "Shipped Via:", 0, 2, 'R');
         $this->Cell($cellW, $cellH, "Tracking #:", 0, 2, 'R');
 
-        $this->SetXY($this->pageWidth / 2 + $cellW - 7, $y);
-        $cellW = 37; // cell width
+        $this->SetXY($this->pageWidth / 2 + $cellW - 8, $y);
+        $cellW = 39; // cell width
         $this->setFont($this->fontFamily, '', $this->fontSize - 1);
         $this->Cell($cellW, $cellH, $order->customer_reference, 0, 2, 'R');
         $date = new DateTime($order->created_date);
@@ -301,10 +304,14 @@ class OrderPackingSlip extends \FPDF
          * Ship To
          */
         $cellH = 3.5; // cell height
-        $cellW = 30; // cell width
+        $cellW = 60; // cell width
         $this->setFont($this->fontFamily, 'B', $this->fontSize - 1);
         $y = $this->GetY();
-        $this->Cell($cellW, $cellH + 1, "Notes:", 0, 2);
+
+        $notesName = !is_null(Yii::$app->customerSettings->get('packing_slip_notes_name', $order->customer->id))
+            ? Yii::$app->customerSettings->get('packing_slip_notes_name', $order->customer->id)
+            : 'Notes:';
+        $this->Cell($cellW, $cellH + 1, $notesName, 0, 2);
         $this->setFont($this->fontFamily, '', $this->fontSize - 2);
         $this->MultiCell($cellW, $cellH, $order->address->notes);
     }
