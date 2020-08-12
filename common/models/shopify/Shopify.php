@@ -34,6 +34,7 @@ class Shopify extends \yii\db\ActiveRecord
             [['customer_id'], 'integer'],
             [['created_date'], 'safe'],
             [['shop', 'scopes', 'access_token'], 'string', 'max' => 128],
+            [['shop'], 'unique'],
         ];
     }
 
@@ -50,5 +51,13 @@ class Shopify extends \yii\db\ActiveRecord
             'access_token' => 'Access Token',
             'created_date' => 'Created Date',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCustomer()
+    {
+        return $this->hasOne('common\models\Customer', ['id' => 'customer_id']);
     }
 }

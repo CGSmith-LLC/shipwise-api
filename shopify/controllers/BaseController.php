@@ -3,6 +3,9 @@
 namespace shopify\controllers;
 
 
+use common\models\Customer;
+use common\models\CustomerMeta;
+use common\models\shopify\Shopify;
 use Osiset\BasicShopifyAPI\BasicShopifyAPI;
 use Osiset\BasicShopifyAPI\Options;
 use Osiset\BasicShopifyAPI\Session;
@@ -15,9 +18,62 @@ use yii\web\ServerErrorHttpException;
  */
 class BaseController extends Controller
 {
+    public $customerMeta;
+    public $code;
+    public $accessToken;
+    public $url;
+    /** @var $shopify BasicShopifyAPI */
+    public $shopify;
+    public $shop; // Shopify URL after it's found
+
+    private function findShopifyAppOrCreate()
+    {
+        // Check if we have a shopify session
+        if ($this->shop = Yii::$app->session->get('shopify-url')) {
+            $shopifyApp = Shopify::find()->where(['shop' => $this->shop])->one();
+        } else {
+            $this->shop = Yii::$app->request->getQueryParam('shop', 'error');
+        }
+
+        // If shop fails throw an error
+        if ($this->shop === 'error') {
+            throw new ServerErrorHttpException('No query parameter found for shop');
+        }
+
+        if (!$shopifyApp) {
+            $customerMeta = CustomerMeta::find()->where([
+                    'key' => 'shopify_store_url',
+                    'value' => $this->shop]
+            )->one();
+
+            if (!$customerMeta) {
+                $array = explode('.', $this->shop);
+                $customer = new Customer([
+                    'direct' => 1,
+                    'name' => array_shift($array)
+                ]);
+                $customer->save();
+
+                $customerMeta = new CustomerMeta([
+                    'key' => 'shopify_store_url',
+                    'value' => $this->shop,
+                    'customer_id' => $customer->id,
+                ]);
+                $customerMeta->save();
+
+                Yii::debug($customer);
+            }
+            //Check if we have a shopify URL and it matches in our App table
+            //Check if we have a customer meta data field that matches the store URL
+
+        }
+
+    }
 
     public function init()
     {
+        $this->findShopifyAppOrCreate();
+
 
         // hmac=b39f98818f3f6cf64576900506f8cb2ed66f2ceb89e90cf592af8a97247b3bca
         // shop=cgsmith105.myshopify.com
@@ -30,7 +86,6 @@ class BaseController extends Controller
             $redirect = \yii\helpers\Url::toRoute(['site/callback'], 'https');
             $scopes = ['write_orders'];
 
-            $shopUrl = Yii::$app->request->getQueryParam('shop', 'error');
 
             if ($shopUrl === 'error') {
                 throw new ServerErrorHttpException('Missing shop parameter');
@@ -38,7 +93,7 @@ class BaseController extends Controller
 
             /**
              * 1. configure options
-            2. call api with store
+             * 2. call api with store
              */
             $options = new Options();
             $options->setVersion('2020-04'); // TODO chang ethis in the config
@@ -75,7 +130,6 @@ class BaseController extends Controller
         if ($code === 'error') {
             throw new ServerErrorHttpException('Code not valid');
         }
-
 
         Yii::$app->session->set('shopify-code', $code);
         Yii::$app->session->set('shopify-url', Yii::$app->request->getQueryParam('shop'));
