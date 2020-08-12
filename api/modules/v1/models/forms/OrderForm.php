@@ -131,6 +131,8 @@ class OrderForm extends Model
     public $requestedShipDate;
     /** @var AddressForm */
     public $shipTo;
+    /** @var AddressForm */
+    public $shipFrom;
     /** @var TrackingForm */
     public $tracking;
     /** @var PackageForm[] */
@@ -166,7 +168,7 @@ class OrderForm extends Model
                     implode(', ', StatusEx::getIdsAsArray()),
             ],
             [['items', 'packages'], 'checkIsArray'],
-            [['tracking', 'packages', 'service_id', 'carrier_id'], 'safe'],
+            [['tracking', 'packages', 'service_id', 'carrier_id', 'shipFrom'], 'safe'],
         ];
     }
 
@@ -185,6 +187,21 @@ class OrderForm extends Model
         }
     }
 
+    private function addressStateValidation($address)
+    {
+        $values = (array)$this->$address;
+        \Yii::debug($values);
+        // If stateId is not set but state exists then try to reference the state's value in the DB
+        if (isset($values['state']) && !isset($values['stateId'])) {
+            $lookup = (strlen($values['state']) == 2) ? 'abbreviation' : 'name';
+            $state = State::find()->where([$lookup => $values['state']])->one();
+            $values['stateId'] = ($state) ? $state->id : $values['stateId'] = 0;
+        }
+        $this->$address = new AddressForm();
+        $this->$address->setAttributes($values);
+        return $this->$address->validate();
+    }
+
     /**
      * Performs data validation for this model and its related models
      *
@@ -201,16 +218,12 @@ class OrderForm extends Model
 
         // Initialize and validate AddressForm object
         if (isset($this->shipTo)) {
-            $values = (array)$this->shipTo;
-            // If stateId is not set but state exists then try to reference the state's value in the DB
-            if (isset($values['state']) && !isset($values['stateId'])) {
-                $lookup = (strlen($values['state']) == 2) ? 'abbreviation' : 'name';
-                $state = State::find()->where([$lookup => $values['state']])->one();
-                $values['stateId'] = ($state) ? $state->id : $values['stateId'] = 0;
-            }
-            $this->shipTo = new AddressForm();
-            $this->shipTo->setAttributes($values);
-            $allValidated = $allValidated && $this->shipTo->validate();
+            $allValidated = $allValidated && $this->addressStateValidation('shipTo');
+
+        }
+
+        if (isset($this->shipFrom)) {
+            $allValidated = $allValidated && $this->addressStateValidation('shipFrom');
         }
 
         // Initialize and validate TrackingForm object

@@ -226,16 +226,12 @@ class OrderController extends PaginatedControllerEx
         $transaction = \Yii::$app->db->beginTransaction();
 
         try {
-
-            // @Todo - lookup address and set for ID if it matches.
-
             /**
              * Create Address.
              * At this stage the required shipTo object should be fully validated.
              */
             $address           = new AddressEx();
             $address->loadDefaultValues();
-            \Yii::debug($orderForm->shipTo);
             $address->name     = $orderForm->shipTo->name;
             $address->company  = $orderForm->shipTo->company;
             $address->email    = $orderForm->shipTo->email;
@@ -248,7 +244,6 @@ class OrderController extends PaginatedControllerEx
             $address->notes    = $orderForm->shipTo->notes;
             $address->country  = $orderForm->shipTo->country;
             $address->save();
-            \Yii::debug($address);
 
             // Create Order
             $order                      = new OrderEx();
@@ -265,6 +260,20 @@ class OrderController extends PaginatedControllerEx
             $order->notes               = $orderForm->notes;
             $order->status_id           = isset($orderForm->status) ? $orderForm->status : null;
             $order->address_id          = $address->id;
+
+            // Is ShipFrom address set from order form?
+            if (isset($orderForm->shipFrom)) {
+
+                $order->ship_from_name         = $orderForm->shipFrom->name;
+                $order->ship_from_address1     = $orderForm->shipFrom->address1;
+                $order->ship_from_address2     = $orderForm->shipFrom->address2;
+                $order->ship_from_city         = $orderForm->shipFrom->city;
+                $order->ship_from_state_id     = $orderForm->shipFrom->stateId;
+                $order->ship_from_zip          = $orderForm->shipFrom->zip;
+                $order->ship_from_country_code = $orderForm->shipFrom->country;
+                $order->ship_from_phone        = $orderForm->shipFrom->phone;
+                $order->ship_from_email        = $orderForm->shipFrom->email;
+            }
 
             // Validate the order model itself
             if (!$order->validate()) {
@@ -640,6 +649,21 @@ class OrderController extends PaginatedControllerEx
                 }
 
                 $address->save();
+            }
+
+            // Is ShipFrom address set from order form?
+            // @TODO fix the duplication from above
+            if (isset($orderForm->shipFrom)) {
+
+                $order->ship_from_name         = $orderForm->shipFrom->name;
+                $order->ship_from_address1     = $orderForm->shipFrom->address1;
+                $order->ship_from_address2     = $orderForm->shipFrom->address2;
+                $order->ship_from_city         = $orderForm->shipFrom->city;
+                $order->ship_from_state_id     = $orderForm->shipFrom->stateId;
+                $order->ship_from_zip          = $orderForm->shipFrom->zip;
+                $order->ship_from_country_code = $orderForm->shipFrom->country;
+                $order->ship_from_phone        = $orderForm->shipFrom->phone;
+                $order->ship_from_email        = $orderForm->shipFrom->email;
             }
 
             /**

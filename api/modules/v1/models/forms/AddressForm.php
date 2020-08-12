@@ -178,7 +178,7 @@ class AddressForm extends Model
     public function rules()
     {
         return [
-            [['name', 'address1', 'city', 'zip'], 'required', 'message' => '{attribute} is required.'],
+            [['name', 'address1', 'city', 'zip', 'phone'], 'required', 'message' => '{attribute} is required.'],
             [['name', 'company', 'address1', 'city'], 'string', 'length' => [2, 64]],
             ['email', 'email'],
             ['address2', 'string', 'length' => [1, 64]],
