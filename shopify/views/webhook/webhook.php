@@ -21,8 +21,8 @@ $this->title = Yii::$app->name;
                     <div class="Polaris-SettingAction__Setting">Webhooks are <span
                                 class="Polaris-TextStyle--variationStrong">disabled</span>.
                     </div>
-                    <?php
-                    if (!$webhook_state) { ?>
+                    <
+                 //   if (!$webhook_state) { ?>
                     <div class="Polaris-SettingAction__Action">
                         <button onclick="navigateToShipWise('webhook\/create')" type="button" class="Polaris-Button Polaris-Button--primary">
                             <span class="Polaris-Button__Content">
@@ -30,8 +30,8 @@ $this->title = Yii::$app->name;
                             </span>
                         </button>
                     </div>
-                    <?php
-                        } else { ?>
+                   //<
+                    //    } else { ?>
                             <div class="Polaris-SettingAction__Action">
                                 <button onclick="navigateToShipWise('webhook\/delete')" type="button" class="Polaris-Button">
                             <span class="Polaris-Button__Content">
@@ -40,9 +40,9 @@ $this->title = Yii::$app->name;
                                 </button>
                             </div>
 
-                    <?php
-                        }
-                    ?>
+                   <
+/*                        }
+                    //*/?>
 
                 </div>
             </div>
