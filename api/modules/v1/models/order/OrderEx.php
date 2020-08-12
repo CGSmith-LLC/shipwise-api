@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\models\order;
 
+use api\modules\v1\models\core\AddressEx;
 use common\models\Order;
 use common\models\Package;
 use common\models\PackageItemLotInfo;
@@ -61,6 +62,7 @@ class OrderEx extends Order
             'orderReference'    => 'order_reference',
             'customerReference' => 'customer_reference',
             'requestedShipDate' => 'requested_ship_date',
+            'shipFrom'          => 'fromAddress',
             'shipTo'            => 'address',
             'tracking'          => 'trackingInfo',
             'items'             => 'items',
@@ -215,6 +217,37 @@ class OrderEx extends Order
     public function getService()
     {
         return $this->hasOne('api\modules\v1\models\core\ServiceEx', ['id' => 'service_id']);
+    }
+
+    /*
+     *
+ * @property string $company
+ * @property string $name
+ * @property string $address1
+ * @property string $address2
+ * @property string $city
+ * @property int $state_id
+ * @property string $zip
+ * @property string $phone
+ * @property string $notes
+ * @property string $created_date
+ * @property string $updated_date
+ * @property string $country
+     */
+    public function getFromAddress()
+    {
+        $address = new AddressEx();
+        $address->name = $this->ship_from_name;
+        $address->address1 = $this->ship_from_address1;
+        $address->address2 = $this->ship_from_address2;
+        $address->city = $this->ship_from_city;
+        $address->state_id = $this->ship_from_state_id; // State ID which is mapped on the address
+        $address->zip   = $this->ship_from_zip;
+        $address->country   = $this->ship_from_country_code;
+        $address->phone   = $this->ship_from_phone;
+        $address->email   = $this->ship_from_email;
+
+        return $address;
     }
 
     /**

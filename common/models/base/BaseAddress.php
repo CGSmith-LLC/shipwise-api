@@ -13,6 +13,7 @@ namespace common\models\base;
  * @property string $city
  * @property int $state_id
  * @property string $zip
+ * @property string $email
  * @property string $phone
  * @property string $notes
  * @property string $created_date
