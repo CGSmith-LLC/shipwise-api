@@ -150,7 +150,7 @@ class OrderForm extends Model
                 'required',
                 'message' => '{attribute} is required.',
             ],
-            [['poNumber', 'uuid', 'origin', 'customerReference', 'notes'], 'string', 'length' => [1, 64]],
+            [['poNumber', 'uuid', 'origin', 'customerReference'], 'string', 'length' => [1, 64]],
             ['orderReference', 'string', 'length' => [1, 45]],
             ['notes', 'string', 'length' => [1, 140]],
             ['requestedShipDate', 'date', 'format' => 'php:Y-m-d'],

@@ -71,11 +71,11 @@ class OrderEx extends Order
             'customer'          => 'customer',
             'carrier_id'        => 'carrier_id',
             'carrier_name'      => function () {
-                return $this->carrier['name'];
+                return isset($this->carrier) ? $this->carrier['name'] : '';
             },
             'service_id'        => 'service_id',
             'service_name'      => function () {
-                return $this->service['name'];
+                return isset($this->service) ? $this->service['name'] : '';
             },
             'poNumber'          => 'po_number',
             'uuid'              => 'uuid',

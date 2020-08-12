@@ -256,8 +256,8 @@ class OrderPackingSlip extends \FPDF
         $this->Cell($cellW, $cellH, "Shipped Via:", 0, 2, 'R');
         $this->Cell($cellW, $cellH, "Tracking #:", 0, 2, 'R');
 
-        $this->SetXY($this->pageWidth / 2 + $cellW - 7, $y);
-        $cellW = 37; // cell width
+        $this->SetXY($this->pageWidth / 2 + $cellW - 8, $y);
+        $cellW = 39; // cell width
         $this->setFont($this->fontFamily, '', $this->fontSize - 1);
         $this->Cell($cellW, $cellH, $order->customer_reference, 0, 2, 'R');
         $date = new DateTime($order->created_date);
@@ -301,10 +301,14 @@ class OrderPackingSlip extends \FPDF
          * Ship To
          */
         $cellH = 3.5; // cell height
-        $cellW = 30; // cell width
+        $cellW = 60; // cell width
         $this->setFont($this->fontFamily, 'B', $this->fontSize - 1);
         $y = $this->GetY();
-        $this->Cell($cellW, $cellH + 1, "Notes:", 0, 2);
+
+        $notesName = !is_null(Yii::$app->customerSettings->get('packing_slip_notes_name', $order->customer->id))
+            ? Yii::$app->customerSettings->get('packing_slip_notes_name', $order->customer->id)
+            : 'Notes:';
+        $this->Cell($cellW, $cellH + 1, $notesName, 0, 2);
         $this->setFont($this->fontFamily, '', $this->fontSize - 2);
         $this->MultiCell($cellW, $cellH, $order->address->notes);
     }
