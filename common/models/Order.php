@@ -167,7 +167,7 @@ class Order extends BaseOrder
         $shipment->sender_address1       = $sender->address1;
         $shipment->sender_address2       = $sender->address2;
         $shipment->sender_city           = $sender->city;
-        $shipment->sender_state          = $sender->state;
+        $shipment->sender_state          = $sender->state->abbreviation;
         $shipment->sender_postal_code    = $sender->zip;
         $shipment->sender_country        = $sender->country;
         $shipment->sender_phone          = $sender->phone;
