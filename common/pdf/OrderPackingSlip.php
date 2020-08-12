@@ -2,6 +2,7 @@
 
 namespace common\pdf;
 
+use api\modules\v1\models\core\AddressEx;
 use common\models\Order;
 use DateTime;
 use Yii;
@@ -214,17 +215,19 @@ class OrderPackingSlip extends \FPDF
         /**
          * Company details
          */
+        /** @var AddressEx $sender */
+        $sender = $order->getFromAddress();
         $this->SetXY($this->pageWidth / 1.5, $yBeforeImage);
         $cellH = 4; // cell height
         $this->setFont($this->fontFamily, 'B', $this->fontSize - 2);
-        $this->Cell(0, $cellH, $order->customer->name, 0, 2, 'R');
+        $this->Cell(0, $cellH, $sender->name, 0, 2, 'R');
         $this->resetFont();
         $this->setFontSize($this->fontSize - 1);
-        $txt = $order->customer->address1 . ' ' . $order->customer->address2;
+        $txt = $sender->address1 . ' ' . $sender->address2;
         $this->Cell(0, $cellH, $txt, 0, 2, 'R');
-        $txt = $order->customer->city . ', ' . ($order->customer->state->abbreviation ?? '') . ' ' . $order->customer->zip;
+        $txt = $sender->city . ', ' . ($sender->state->abbreviation ?? '') . ' ' . $sender->zip;
         $this->Cell(0, $cellH, $txt, 0, 2, 'R');
-        $this->Cell(0, $cellH, $order->customer->country, 0, 2, 'R');
+        $this->Cell(0, $cellH, $sender->country, 0, 2, 'R');
         $this->ln(3);
         $this->setX($this->marginLeft);
 
