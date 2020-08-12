@@ -85,7 +85,7 @@ class Dimensions extends Model
                 'in',
                 'range'   => self::$unitsTypes,
                 'message' => 'Dimensions {attribute} value is incorrect. Valid values are: ' .
-                    implode(self::$unitsTypes, ', '),
+                    implode(', ', self::$unitsTypes),
             ],
             [['length', 'width', 'height'], 'double', 'min' => 0.01],
         ];

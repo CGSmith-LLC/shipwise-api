@@ -50,10 +50,12 @@ use api\modules\v1\models\order\StatusEx;
  *     @SWG\Property(
  *            property = "status",
  *            type = "integer",
- *            enum = {1,7,8,9,10,11},
+ *            enum = {1,2,6,7,8,9,10,11},
  *            default = "9",
  *            description = "Order status
  *                    1  - Shipped
+ *                    2  - Amazon Prime
+ *                    6  - On Hold
  *                    7  - Cancelled
  *                    8  - Pending Fulfillment
  *                    9  - Open
@@ -129,6 +131,8 @@ class OrderForm extends Model
     public $requestedShipDate;
     /** @var AddressForm */
     public $shipTo;
+    /** @var AddressForm */
+    public $shipFrom;
     /** @var TrackingForm */
     public $tracking;
     /** @var PackageForm[] */
@@ -161,10 +165,10 @@ class OrderForm extends Model
                 'in',
                 'range' => StatusEx::getIdsAsArray(),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
-                    implode(StatusEx::getIdsAsArray(), ', '),
+                    implode(', ', StatusEx::getIdsAsArray()),
             ],
             [['items', 'packages'], 'checkIsArray'],
-            [['tracking', 'packages', 'service_id', 'carrier_id'], 'safe'],
+            [['tracking', 'packages', 'service_id', 'carrier_id', 'shipFrom'], 'safe'],
         ];
     }
 
@@ -183,6 +187,21 @@ class OrderForm extends Model
         }
     }
 
+    private function addressStateValidation($address)
+    {
+        $values = (array)$this->$address;
+        \Yii::debug($values);
+        // If stateId is not set but state exists then try to reference the state's value in the DB
+        if (isset($values['state']) && !isset($values['stateId'])) {
+            $lookup = (strlen($values['state']) == 2) ? 'abbreviation' : 'name';
+            $state = State::find()->where([$lookup => $values['state']])->one();
+            $values['stateId'] = ($state) ? $state->id : $values['stateId'] = 0;
+        }
+        $this->$address = new AddressForm();
+        $this->$address->setAttributes($values);
+        return $this->$address->validate();
+    }
+
     /**
      * Performs data validation for this model and its related models
      *
@@ -199,20 +218,12 @@ class OrderForm extends Model
 
         // Initialize and validate AddressForm object
         if (isset($this->shipTo)) {
-            $values = (array)$this->shipTo;
-            // If stateId is not set but state exists then try to reference the state's value in the DB
-            if (isset($values['state']) && !isset($values['stateId'])) {
-                $lookup = (strlen($values['state']) == 2) ? 'abbreviation' : 'name';
-                $state = State::find()->where([$lookup => $values['state']])->one();
-                if ($state) {
-                    $values['stateId'] = $state->id;
-                }else {
-                    $values['stateId'] = 0;
-                }
-            }
-            $this->shipTo = new AddressForm();
-            $this->shipTo->setAttributes($values);
-            $allValidated = $allValidated && $this->shipTo->validate();
+            $allValidated = $allValidated && $this->addressStateValidation('shipTo');
+
+        }
+
+        if (isset($this->shipFrom)) {
+            $allValidated = $allValidated && $this->addressStateValidation('shipFrom');
         }
 
         // Initialize and validate TrackingForm object

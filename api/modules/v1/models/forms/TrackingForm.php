@@ -65,7 +65,7 @@ class TrackingForm extends Model
                 'in',
                 'range'   => ServiceEx::getIdsAsArray(),
                 'message' => '{attribute} value is incorrect. Valid values are: ' .
-                    implode(ServiceEx::getIdsAsArray(), ', '),
+                    implode(', ', ServiceEx::getIdsAsArray()),
             ],
         ];
     }

@@ -68,7 +68,7 @@ class Weight extends Model
                 'in',
                 'range'   => self::$unitsTypes,
                 'message' => 'Weight {attribute} value is incorrect. Valid values are: ' .
-                    implode(self::$unitsTypes, ', '),
+                    implode(', ', self::$unitsTypes),
             ],
             ['value', 'double', 'min' => 0.01],
         ];

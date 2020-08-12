@@ -19,6 +19,7 @@ class StateEx extends State
      *     @SWG\Property( property = "id",   type = "integer", description = "State ID" ),
      *     @SWG\Property( property = "name", type = "string", description = "State name" ),
      *     @SWG\Property( property = "abbreviation", type = "string",  description = "State abbreviation" ),
+     *     @SWG\Property( property = "country", type = "string",  description = "Country the state or province originated from" ),
      * )
      */
 
