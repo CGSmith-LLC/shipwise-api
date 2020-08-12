@@ -22,31 +22,15 @@ AppAsset::register($this);
         <?php $this->registerCsrfMetaTags() ?>
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
+        <link
+                rel="stylesheet"
+                href="https://unpkg.com/@shopify/polaris@5.1.0/dist/styles.css"
+        />
     </head>
     <body>
     <?php $this->beginBody() ?>
 
     <div class="wrap">
-        <?php
-        NavBar::begin([
-            'brandLabel' => Yii::$app->name,
-            'brandUrl' => Yii::$app->homeUrl,
-            'options' => [
-                'class' => 'navbar-inverse navbar-fixed-top',
-            ],
-        ]);
-        $menuItems = [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Webhooks', 'url' => ['/webhook/index']],
-        ];
-
-        echo Nav::widget([
-            'options' => ['class' => 'navbar-nav navbar-right'],
-            'items' => $menuItems,
-        ]);
-        NavBar::end();
-        ?>
-
         <div class="container">
             <?= Breadcrumbs::widget([
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],

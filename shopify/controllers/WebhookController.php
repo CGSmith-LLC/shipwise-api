@@ -6,6 +6,8 @@ use Osiset\BasicShopifyAPI\BasicShopifyAPI;
 use Osiset\BasicShopifyAPI\Options;
 use Osiset\BasicShopifyAPI\Session;
 use Yii;
+use yii\db\ActiveRecord;
+use yii\helpers\Html;
 
 
 /**
@@ -18,7 +20,8 @@ class WebhookController extends \yii\web\Controller
     public $url;
     /** @var $shopify BasicShopifyAPI */
     public $shopify;
-
+    public $topics = ['orders/delete', 'orders/updated','orders/create','orders/edited','orders/cancelled' ];
+    const WEBHOOK_ADDRESS = 'https://1320aea60d5b.ngrok.io/v1/webhook';
 
     public function init()
     {
@@ -28,8 +31,12 @@ class WebhookController extends \yii\web\Controller
 
     public function actionIndex()
     {
+        //$webhooks = ActiveRecord::find()->where(['customerasdfasdf'])->count()->all();
 
-        return $this->render('webhook');
+        return $this->render('webhook', [
+            'webhook_state' => 0,
+            ]
+        );
 
     }
 
@@ -44,14 +51,15 @@ class WebhookController extends \yii\web\Controller
         $this->shopify = new BasicShopifyAPI($options);
         $this->shopify->setSession(new Session($this->url));
         $this->shopify->requestAndSetAccess($this->code);
-        $webhook = [
-            'webhook' => [
-            'topic' => 'orders/create',
-            'address' => 'https://1320aea60d5b.ngrok.io/v1/webhook',
-            'format' => 'json'
-            ]
-        ];
-        Yii::debug($this->shopify->rest('POST', 'admin/api/webhooks.json', $webhook));
+        foreach ($this->topics as $topic) {
+            $webhook = [
+                'webhook' => [
+                    'topic' => $topic,
+                    'address' => self::WEBHOOK_ADDRESS,
+                ]
+            ];
+            Yii::debug($this->shopify->rest('POST', 'admin/api/webhooks.json', $webhook));
+        }
 
         return $this->render('webhook', [
 
