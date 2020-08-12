@@ -52,6 +52,15 @@ class BaseController extends Controller
             Yii::$app->response->redirect($redirectUrl);
             Yii::$app->end();
         }
+        $this->code = Yii::$app->session->get('shopify-code');
+        $this->url = Yii::$app->session->get('shopify-url');
+        $options = new Options();
+        $options->setVersion('2020-04');
+        $options->setApiKey(Yii::$app->params['shopifyPublicKey']);
+        $options->setApiSecret(Yii::$app->params['shopifyPrivateKey']);
+        $this->shopify = new BasicShopifyAPI($options);
+        $this->shopify->setSession(new Session($this->url));
+        $this->shopify->requestAndSetAccess($this->code);
     }
 
     public function actionCallback()

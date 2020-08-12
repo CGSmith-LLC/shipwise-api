@@ -38,15 +38,6 @@ class WebhookController extends BaseController
 
     public function actionCreate()
     {
-        $this->code = Yii::$app->session->get('shopify-code');
-        $this->url = Yii::$app->session->get('shopify-url');
-        $options = new Options();
-        $options->setVersion('2020-04');
-        $options->setApiKey(Yii::$app->params['shopifyPublicKey']);
-        $options->setApiSecret(Yii::$app->params['shopifyPrivateKey']);
-        $this->shopify = new BasicShopifyAPI($options);
-        $this->shopify->setSession(new Session($this->url));
-        $this->shopify->requestAndSetAccess($this->code);
         foreach ($this->topics as $topic) {
             $webhook = [
                 'webhook' => [
@@ -59,45 +50,23 @@ class WebhookController extends BaseController
             $body = $shopifyWebhook['body'];
             $container = $body['container'];
             $webhookk = $container['webhook'];
-            $shop = Yii::$app->session->get('shopify-url');
-
-            /** @var CustomerMeta $customerMeta */
-            $customerMeta = Yii::$app->customerSettings->getObjectByValue('shopify_store_url', $shop);
-            //$this->apiConsumer = ApiConsumerEx::find()->where(['customer_id' => $customerMeta->customer_id]);
-            Yii::debug($customerMeta);
 
             $model = new Webhook();
             $model->setAttributes([
                 'shopify_webhook_id' => (string)$webhookk['id'],
-                'customer_id' => $customerMeta->customer_id,
+                'customer_id' => $this->customerMeta->customer_id,
             ]);
             Yii::debug($model);
             $model->save();
         }
 
-
-        return $this->render('webhook', [
-
-        ]);
+        return $this->render('webhook');
     }
 
     public function actionDelete()
     {
-        $this->code = Yii::$app->session->get('shopify-code');
-        $this->url = Yii::$app->session->get('shopify-url');
-        $options = new Options();
-        $options->setVersion('2020-04');
-        $options->setApiKey(Yii::$app->params['shopifyPublicKey']);
-        $options->setApiSecret(Yii::$app->params['shopifyPrivateKey']);
-        $this->shopify = new BasicShopifyAPI($options);
-        $this->shopify->setSession(new Session($this->url));
-        $this->shopify->requestAndSetAccess($this->code);
-        $shop = Yii::$app->session->get('shopify-url');
-        $customerMeta = Yii::$app->customerSettings->getObjectByValue('shopify_store_url', $shop);
-
-
         $customerWebhooks = Webhook::find()
-            ->where(['customer_id' => $customerMeta->customer_id])
+            ->where(['customer_id' => $this->customerMeta->customer_id])
             ->all();
 
 
@@ -106,6 +75,8 @@ class WebhookController extends BaseController
             $response = $this->shopify->rest('DELETE', 'admin/api/webhooks/' . $webhookId . '.json');
             Yii::debug($response);
         }
+
+        return $this->render('webhook');
     }
 }
 
