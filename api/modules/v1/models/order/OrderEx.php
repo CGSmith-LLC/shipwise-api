@@ -221,27 +221,6 @@ class OrderEx extends Order
     }
 
     /**
-     * Return from address
-     *
-     * @return AddressEx
-     */
-    public function getFromAddress()
-    {
-        $address           = new AddressEx();
-        $address->name     = $this->ship_from_name;
-        $address->address1 = $this->ship_from_address1;
-        $address->address2 = $this->ship_from_address2;
-        $address->city     = $this->ship_from_city;
-        $address->state_id = $this->ship_from_state_id; // State ID which is mapped on the address
-        $address->zip      = $this->ship_from_zip;
-        $address->country  = $this->ship_from_country_code;
-        $address->phone    = $this->ship_from_phone;
-        $address->email    = $this->ship_from_email;
-
-        return $address;
-    }
-
-    /**
      * Get Tracking Info
      *
      * @return \yii\db\ActiveQuery

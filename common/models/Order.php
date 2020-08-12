@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use api\modules\v1\models\core\AddressEx;
 use common\models\base\BaseOrder;
 use common\models\query\OrderQuery;
 use common\models\shipping\{Carrier, Service, PackageType, Shipment, ShipmentPackage};
@@ -42,6 +43,27 @@ class Order extends BaseOrder
     public function getCustomer()
     {
         return $this->hasOne('common\models\Customer', ['id' => 'customer_id']);
+    }
+
+    /**
+     * Return from address
+     *
+     * @return AddressEx
+     */
+    public function getFromAddress()
+    {
+        $address           = new AddressEx();
+        $address->name     = isset($this->ship_from_name) ? $this->ship_from_name : $this->customer->name;
+        $address->address1 = isset($this->ship_from_address1) ? $this->ship_from_address1 : $this->customer->address1;
+        $address->address2 = isset($this->ship_from_address2) ? $this->ship_from_address2 : $this->customer->address2;
+        $address->city     = isset($this->ship_from_city) ? $this->ship_from_city : $this->customer->city;
+        $address->state_id = isset($this->ship_from_state_id) ? $this->ship_from_state_id : $this->customer->state_id;
+        $address->zip      = isset($this->ship_from_zip) ? $this->ship_from_zip : $this->customer->zip;
+        $address->country  = isset($this->ship_from_country_code) ? $this->ship_from_country_code : $this->customer->country;
+        $address->phone    = isset($this->ship_from_phone) ? $this->ship_from_phone : $this->customer->phone;
+        $address->email    = isset($this->ship_from_email) ? $this->ship_from_email : $this->customer->email;
+
+        return $address;
     }
 
     /**
@@ -138,16 +160,18 @@ class Order extends BaseOrder
         $shipment->order_id      = $this->id;
 
         // Sender
-        $shipment->sender_contact        = $this->customer->name;
-        $shipment->sender_company        = $this->customer->name;
-        $shipment->sender_address1       = $this->customer->address1;
-        $shipment->sender_address2       = $this->customer->address2;
-        $shipment->sender_city           = $this->customer->city;
-        $shipment->sender_state          = $this->customer->state->abbreviation ?? '';
-        $shipment->sender_postal_code    = $this->customer->zip;
-        $shipment->sender_country        = $this->customer->country;
-        $shipment->sender_phone          = $this->customer->phone;
-        $shipment->sender_email          = $this->customer->email;
+        /** @var AddressEx $sender */
+        $sender = $this->getFromAddress();
+        $shipment->sender_contact        = $sender->name;
+        $shipment->sender_company        = $sender->name;
+        $shipment->sender_address1       = $sender->address1;
+        $shipment->sender_address2       = $sender->address2;
+        $shipment->sender_city           = $sender->city;
+        $shipment->sender_state          = $sender->state;
+        $shipment->sender_postal_code    = $sender->zip;
+        $shipment->sender_country        = $sender->country;
+        $shipment->sender_phone          = $sender->phone;
+        $shipment->sender_email          = $sender->email;
         $shipment->sender_is_residential = false;
 
         // Recipient
