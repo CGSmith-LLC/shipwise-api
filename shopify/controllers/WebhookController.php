@@ -2,7 +2,6 @@
 
 namespace shopify\controllers;
 
-use api\modules\v1\models\core\ApiConsumerEx;
 use common\models\CustomerMeta;
 use common\models\shopify\Webhook;
 use Osiset\BasicShopifyAPI\BasicShopifyAPI;
@@ -10,14 +9,12 @@ use Osiset\BasicShopifyAPI\Options;
 use Osiset\BasicShopifyAPI\ResponseAccess;
 use Osiset\BasicShopifyAPI\Session;
 use Yii;
-use yii\db\ActiveRecord;
-use yii\helpers\Html;
 
 
 /**
- * Site controllwrite_orderswrite_orderser
+ * Webhook Controller
  */
-class WebhookController extends \yii\web\Controller
+class WebhookController extends BaseController
 {
     public $code;
     public $accessToken;
@@ -26,11 +23,6 @@ class WebhookController extends \yii\web\Controller
     public $shopify;
     public $topics = ['orders/delete', 'orders/updated', 'orders/create', 'orders/edited', 'orders/cancelled'];
     const WEBHOOK_ADDRESS = 'https://1320aea60d5b.ngrok.io/v1/webhook';
-
-    public function init()
-    {
-
-    }
 
 
     public function actionIndex()
@@ -91,7 +83,29 @@ class WebhookController extends \yii\web\Controller
 
     public function actionDelete()
     {
+        $this->code = Yii::$app->session->get('shopify-code');
+        $this->url = Yii::$app->session->get('shopify-url');
+        $options = new Options();
+        $options->setVersion('2020-04');
+        $options->setApiKey(Yii::$app->params['shopifyPublicKey']);
+        $options->setApiSecret(Yii::$app->params['shopifyPrivateKey']);
+        $this->shopify = new BasicShopifyAPI($options);
+        $this->shopify->setSession(new Session($this->url));
+        $this->shopify->requestAndSetAccess($this->code);
+        $shop = Yii::$app->session->get('shopify-url');
+        $customerMeta = Yii::$app->customerSettings->getObjectByValue('shopify_store_url', $shop);
 
+
+        $customerWebhooks = Webhook::find()
+            ->where(['customer_id' => $customerMeta->customer_id])
+            ->all();
+
+
+        foreach ($customerWebhooks as $webhook) {
+            $webhookId = $webhook->shopify_webhook_id;
+            $response = $this->shopify->rest('DELETE', 'admin/api/webhooks/' . $webhookId . '.json');
+            Yii::debug($response);
+        }
     }
 }
 
