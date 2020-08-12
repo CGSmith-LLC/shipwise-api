@@ -32,6 +32,7 @@ class OrderEx extends Order
     Number from ecommerce side" ),
      *     @SWG\Property( property = "requestedShipDate", type = "string", format = "date-time", description = "When
     the order should ship and be fulfilled" ),
+     *     @SWG\Property( property = "shipFrom", ref = "#/definitions/Address" ),
      *     @SWG\Property( property = "shipTo", ref = "#/definitions/Address" ),
      *     @SWG\Property( property = "tracking", ref = "#/definitions/TrackingInfo" ),
      *     @SWG\Property(

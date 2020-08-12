@@ -8,7 +8,7 @@ use api\modules\v1\models\core\StateEx;
 /**
  * @SWG\Definition(
  *     definition = "AddressForm",
- *     required   = { "name", "address1", "city", "stateId", "zip" },
+ *     required   = { "name", "address1", "city", "state", "zip" },
  *     @SWG\Property(
  *            property = "name",
  *            type = "string",
@@ -49,6 +49,13 @@ use api\modules\v1\models\core\StateEx;
  *            minLength = 2,
  *            maxLength = 64
  *        ),
+ *     @SWG\Property(
+ *            property = "state",
+ *            type = "string",
+ *            description = "State can be passed as an abbreviation or string. This prevents you from using the enumerations on stateId.
+ * Either `stateId` or `state` field required. It is not necessary to have both.",
+ *            minLength = 2
+ *     ),
  *     @SWG\Property(
  *            property = "stateId",
  *            type = "integer",
