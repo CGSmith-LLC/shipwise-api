@@ -2,6 +2,8 @@
 
 namespace shopify\controllers;
 
+use api\modules\v1\models\core\ApiConsumerEx;
+use common\models\CustomerMeta;
 use common\models\shopify\Webhook;
 use Osiset\BasicShopifyAPI\BasicShopifyAPI;
 use Osiset\BasicShopifyAPI\Options;
@@ -65,11 +67,17 @@ class WebhookController extends \yii\web\Controller
             $body = $shopifyWebhook['body'];
             $container = $body['container'];
             $webhookk = $container['webhook'];
-            Yii::debug($body->container['webhook']);
+            $shop = Yii::$app->session->get('shopify-url');
+
+            /** @var CustomerMeta $customerMeta */
+            $customerMeta = Yii::$app->customerSettings->getObjectByValue('shopify_store_url', $shop);
+            //$this->apiConsumer = ApiConsumerEx::find()->where(['customer_id' => $customerMeta->customer_id]);
+            Yii::debug($customerMeta);
+
             $model = new Webhook();
             $model->setAttributes([
                 'shopify_webhook_id' => (string)$webhookk['id'],
-                'customer_id' =>
+                'customer_id' => $customerMeta->customer_id,
             ]);
             Yii::debug($model);
             $model->save();
