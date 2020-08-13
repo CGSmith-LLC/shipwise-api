@@ -15,6 +15,9 @@ use Yii;
  */
 class OneTimeCharge extends \yii\db\ActiveRecord
 {
+
+    public $decimalAmount;
+
     /**
      * {@inheritdoc}
      */
@@ -32,6 +35,7 @@ class OneTimeCharge extends \yii\db\ActiveRecord
             [['customer_id', 'name', 'amount'], 'required'],
             [['customer_id', 'added_to_invoice'], 'integer'],
             [['amount'], 'double', 'min' => 0],
+            [['decimalAmount'], 'safe'],
             [['name'], 'string', 'max' => 128],
         ];
     }
@@ -44,7 +48,7 @@ class OneTimeCharge extends \yii\db\ActiveRecord
      */
     public function setFromDecimalAmount()
     {
-        return (int) ($this->amount * 100);
+        return (int) ($this->decimalAmount * 100);
     }
 
     /**

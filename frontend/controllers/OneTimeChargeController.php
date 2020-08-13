@@ -6,14 +6,13 @@ use Yii;
 use frontend\models\OneTimeCharge;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * OneTimeChargeController implements the CRUD actions for OneTimeCharge model.
  */
-class OneTimeChargeController extends \frontend\controllers\Controller
+class OneTimeChargeController extends Controller
 {
     /**
      * {@inheritdoc}

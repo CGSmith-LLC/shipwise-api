@@ -12,6 +12,7 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
+    <?= $form->errorSummary($model); ?>
     <?= $form->field($model, 'customer_id')->dropDownList(\frontend\models\Customer::getList()) ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
