@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return ($total / 100);
                 },
                 'format' => 'currency',
-                'footer' => \frontend\models\Subscription::getTotal($dataProvider->models, 'amount'),
+                'footer' => Yii::$app->formatter->asCurrency(\frontend\models\Subscription::getTotal($dataProvider->models, 'amount')),
             ],
             ['class' => 'yii\grid\ActionColumn'],
         ],

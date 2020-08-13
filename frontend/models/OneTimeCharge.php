@@ -24,4 +24,18 @@ class OneTimeCharge extends \common\models\OneTimeCharge
         $this->decimalAmount = $this->getDecimalAmount();
         parent::afterFind();
     }
+
+
+    public static function getTotal($provider, $fieldName)
+    {
+        $total = 0;
+
+        /** @var OneTimeCharge $item */
+        foreach ($provider as $item) {
+            if (!$item->added_to_invoice) {
+                $total += $item->$fieldName;
+            }
+        }
+        return $total / 100;
+    }
 }

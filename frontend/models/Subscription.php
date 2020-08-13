@@ -52,8 +52,6 @@ class Subscription extends BaseSubscription
                 $total += $item->$fieldName;
             }
         }
-        $total = $total / 100;
-        $formatter = \Yii::$app->getFormatter();
-        return $formatter->asCurrency($total);
+        return $total / 100;
     }
 }
