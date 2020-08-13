@@ -12,6 +12,7 @@ use Yii;
  * @property string $name
  * @property int $amount In cents
  * @property int $added_to_invoice
+ * @property int $charge_asap
  */
 class OneTimeCharge extends \yii\db\ActiveRecord
 {
@@ -32,8 +33,8 @@ class OneTimeCharge extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer_id', 'name', 'amount'], 'required'],
-            [['customer_id', 'added_to_invoice'], 'integer'],
+            [['customer_id', 'name', 'amount', 'charge_asap'], 'required'],
+            [['customer_id', 'added_to_invoice', 'charge_asap'], 'integer'],
             [['amount'], 'double', 'min' => 0],
             [['decimalAmount'], 'safe'],
             [['name'], 'string', 'max' => 128],
