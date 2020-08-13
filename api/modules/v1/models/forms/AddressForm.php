@@ -148,6 +148,8 @@ use api\modules\v1\models\core\StateEx;
  */
 class AddressForm extends Model
 {
+    const SCENARIO_DEFAULT = 'default'; // ship to address
+    const SCENARIO_FROM = 'from';  // ship from address
 
     /** @var string */
     public $name;
@@ -178,7 +180,8 @@ class AddressForm extends Model
     public function rules()
     {
         return [
-            [['name', 'address1', 'city', 'zip', 'phone'], 'required', 'message' => '{attribute} is required.'],
+            [['name', 'address1', 'city', 'zip', 'phone'], 'required', 'message' => '{attribute} is required.', 'on' => self::SCENARIO_DEFAULT],
+            [['name'], 'required', 'on' => self::SCENARIO_FROM],
             [['name', 'company', 'address1', 'city'], 'string', 'length' => [2, 64]],
             ['email', 'email'],
             ['address2', 'string', 'length' => [1, 64]],
