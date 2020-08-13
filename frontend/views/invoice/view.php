@@ -29,7 +29,10 @@ $formatter = Yii::$app->getFormatter();
 
                             <td>
                                 <?= Html::encode($this->title) ?><br>
-                                Due: <?= $model->due_date ?><br>
+                                Due: <?php
+                                $date = new DateTime($model->due_date);
+                                echo $date->format('F jS, Y');
+                                ?><br>
                                 <?=$model->getStatusLabel()?>
                             </td>
                         </tr>

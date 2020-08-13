@@ -60,6 +60,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 }
             ],
+            [
+                'attribute' => 'charge_asap',
+                'label' => 'Charged on next invoice run?',
+                'format' => 'raw',
+                'value' => function($model) {
+                    if ($model ->charge_asap) {
+                        return '<p class="label label-primary">Yes</p>';
+                    } else {
+                        return '<p class="label label-default">No</p>';
+                    }
+                }
+            ],
         ],
     ]) ?>
 

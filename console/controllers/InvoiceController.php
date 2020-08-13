@@ -102,6 +102,52 @@ class InvoiceController extends Controller
             $subscription->update();
         }
 
+        /**
+         * Check any onetimes that need to be sent out
+         */
+        $lastASAPCustomer = 0;
+        foreach (OneTimeCharge::find()
+                     ->where(['added_to_invoice' => false])
+                     ->andWhere(['charge_asap' => true])
+                     ->orderBy(['customer_id' => SORT_ASC])
+                     ->all() as $chargeASAP) {
+
+            // Create invoice if this is a new customer ID
+            if ($lastASAPCustomer != $chargeASAP->customer_id) {
+                $totalAmount = 0; // init default value
+                $invoice = new Invoice([
+                    'customer_id' => $chargeASAP->customer_id,
+                    'subscription_id' => 0, // One time charge ASAP - no subscription
+                    'customer_name' => $chargeASAP->customer->name,
+                    'due_date' => date('Y-m-d'),
+                    'status' => Invoice::STATUS_UNPAID,
+                    'amount' => 0,
+                    'balance' => 0,
+                ]);
+                $invoice->save();
+            }
+
+            // create invoice line item
+            $invoiceItem = new InvoiceItems([
+                'name' => $chargeASAP->name,
+                'amount' => $chargeASAP->amount,
+                'invoice_id' => $invoice->id,
+            ]);
+            $invoiceItem->save();
+            $totalAmount += $chargeASAP->amount;
+
+            // Update one time as being added
+            $chargeASAP->added_to_invoice = 1;
+            $chargeASAP->update();
+
+            // update invoice with total amount
+            $invoice->setAttribute('amount', $totalAmount);
+            $invoice->setAttribute('balance', $totalAmount);
+            $invoice->update();
+
+            // set last customer with current customer id
+            $lastASAPCustomer = $chargeASAP->customer_id;
+        }
 
         // send copy of invoice to customer's email address
         $mailer = \Yii::$app->mailer;
@@ -110,15 +156,9 @@ class InvoiceController extends Controller
         foreach ($invoicesToEmail as $invoice_id) {
             /** @var $invoiceToEmail Invoice */
             $invoiceToEmail = Invoice::findOne($invoice_id);
-            /**
-             * 1. search for a User by the $invoiceToEmail->customer_id
-             * 2. get the $user->email
-             */
 
             $customers = User::find()->where(['customer_id' => $invoiceToEmail->customer_id])->all();
             $customerEmails = ArrayHelper::map($customers,'email','email');
-
-
 
             try {
                 $mailer->compose(['html' => 'new-invoice'], ['model' => $invoiceToEmail])

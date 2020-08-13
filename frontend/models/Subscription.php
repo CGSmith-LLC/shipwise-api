@@ -4,7 +4,6 @@
 namespace frontend\models;
 
 use common\models\Subscription as BaseSubscription;
-use phpDocumentor\Reflection\Types\Float_;
 
 
 /**
@@ -42,5 +41,17 @@ class Subscription extends BaseSubscription
         }
 
         return parent::beforeSave($insert);
+    }
+
+    public static function getTotal($provider, $fieldName)
+    {
+        $total = 0;
+
+        foreach ($provider as $subscriptions) {
+            foreach ($subscriptions->items as $item) {
+                $total += $item->$fieldName;
+            }
+        }
+        return $total / 100;
     }
 }

@@ -23,6 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'showFooter' => true,
         'columns' => [
             [
                 'attribute' => 'customer_id',
@@ -48,7 +49,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                     $return .= ' ' . Yii::$app->formatter->asCurrency($model->decimalAmount);
                     return $return;
-                }
+                },
+                'footer' => Yii::$app->formatter->asCurrency(\frontend\models\OneTimeCharge::getTotal($dataProvider->models, 'amount')),
             ],
 
             ['class' => 'yii\grid\ActionColumn'],
