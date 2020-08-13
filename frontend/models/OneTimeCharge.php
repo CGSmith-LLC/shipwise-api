@@ -10,9 +10,18 @@ class OneTimeCharge extends \common\models\OneTimeCharge
     /**
      * @inheritDoc
      */
-    public function beforeSave($insert)
+    public function beforeValidate()
     {
-        $this->amount = $this->setFromDecimalAmount();
-        return parent::beforeSave($insert);
+        $this->setAttribute('amount', $this->setFromDecimalAmount());
+        return parent::beforeValidate();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function afterFind()
+    {
+        $this->decimalAmount = $this->getDecimalAmount();
+        parent::afterFind();
     }
 }
