@@ -101,6 +101,7 @@ AppAsset::register($this);
                 'items' => [
                     ['label' => 'Subscriptions', 'url' => ['/subscription']],
                     ['label' => 'One Time Charges', 'url' => ['/one-time-charge']],
+                    ['label' => 'Invoices', 'url' => ['/invoice']],
                 ]
             ];
         }
