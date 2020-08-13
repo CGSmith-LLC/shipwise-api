@@ -198,6 +198,9 @@ class OrderForm extends Model
             $values['stateId'] = ($state) ? $state->id : $values['stateId'] = 0;
         }
         $this->$address = new AddressForm();
+        if ($address == 'shipFrom') {
+            $this->$address->scenario = AddressForm::SCENARIO_FROM;
+        }
         $this->$address->setAttributes($values);
         return $this->$address->validate();
     }
