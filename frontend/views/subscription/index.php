@@ -19,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'showFooter' => true,
         'columns' => [
             [
                 'attribute' => 'customer_id',
@@ -28,9 +29,19 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'next_invoice',
             'months_to_recur',
-            // YTD
-            // OPEN invoices
-
+            [
+                'label' => 'Monthly Value',
+                'value' => function ($model) {
+                    /** @var \frontend\models\Subscription $model */
+                    $total = $model->getItems()->sum('amount');
+                    if ($model->months_to_recur > 1) {
+                        $total = $total / $model->months_to_recur;
+                    }
+                    return ($total / 100);
+                },
+                'format' => 'currency',
+                'footer' => \frontend\models\Subscription::getTotal($dataProvider->models, 'amount'),
+            ],
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
