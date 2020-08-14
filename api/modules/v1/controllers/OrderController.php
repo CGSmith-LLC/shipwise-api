@@ -248,7 +248,6 @@ class OrderController extends PaginatedControllerEx
             // Create Order
             $order                      = new OrderEx();
             $order->customer_id         = $this->apiConsumer->customer->id;
-            $order->notes               = $orderForm->notes;
             $order->uuid                = $orderForm->uuid;
             $order->po_number           = $orderForm->poNumber;
             $order->origin              = $orderForm->origin;
@@ -722,6 +721,7 @@ class OrderController extends PaginatedControllerEx
             /**
              * Update order.
              */
+            $order->notes              = $orderForm->notes;
             $order->order_reference    = $orderForm->orderReference;
             $order->po_number          = $orderForm->poNumber;
             $order->customer_reference = $orderForm->customerReference;
