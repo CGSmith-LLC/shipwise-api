@@ -29,6 +29,14 @@ class SiteController extends BaseController
         return $this->render('index');
     }
 
+    public function actionCallback()
+    {
+        if ($this->validateCallback()) {
+            $this->redirect(['/site/index']);
+        } else {
+            throw new ServerErrorHttpException('Problem with authentication');
+        }
+    }
 }
 
 
