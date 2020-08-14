@@ -5,6 +5,7 @@ namespace api\modules\v1\controllers;
 use api\modules\v1\components\ControllerEx;
 use api\modules\v1\models\core\ApiConsumerEx;
 use api\modules\v1\models\mappers\ShopifyMapper;
+use common\models\ApiConsumer;
 use common\models\CustomerMeta;
 use Yii;
 use yii\rest\Controller;
@@ -51,7 +52,8 @@ class WebhookController extends ControllerEx
 
         $shopifyData = Yii::$app->request->bodyParams;
         // @todo not the best way to do this and we need to verify that this is the correct shopify user
-        $this->apiConsumer = ApiConsumerEx::find()->where(['customer_id' => $customerMeta->customer_id]);
+        $this->apiConsumer = ApiConsumer::find()->where(['customer_id' => $customerMeta->customer_id])->one();
+        Yii::debug($this->apiConsumer);
         $orderForm = new ShopifyMapper();
         $orderForm->setScenario('create');
         $orderForm->scenario = ShopifyMapper::SCENARIO_DEFAULT;

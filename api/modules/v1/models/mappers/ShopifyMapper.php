@@ -15,18 +15,18 @@ class ShopifyMapper extends OrderForm
     {
         $items = [];
         foreach ($config['line_items'] as $item) {
-            $items[] = new ItemForm([
-                'uuid' => $item['id'],
+            $items[] = [
+                'uuid' => (string)$item['id'],
                 'name' => $item['title'],
                 'sku' => $item['sku'],
                 'quantity' => $item['quantity'],
-            ]);
+            ];
         }
 
         /** @var Country $country */
         $country = Country::find()->where(['name' => $config['shipping_address']['country']])->one();
 
-        $shipAddress = new AddressForm([
+        $shipAddress = [
             'name' => $config['shipping_address']['name'],
             'company' => $config['shipping_address']['company'],
             //'email' => $config[''][''],
@@ -37,15 +37,15 @@ class ShopifyMapper extends OrderForm
             'zip' => $config['shipping_address']['zip'],
             'phone' => $config['shipping_address']['phone'],
             'country' => $country->abbreviation,
-        ]);
+        ];
 
 
         // Assign config var to Shopify request params
         $config = [
-            'uuid' => $config['id'],
+            'uuid' => (string)$config['id'],
             'notes' => $config['note'],
             'origin' => 'Shopify',
-            'customerReference' => $config['order_number'],
+            'customerReference' => (string)$config['order_number'],
             'shipTo' => $shipAddress,
             'status' => StatusEx::OPEN,
             'items' => $items,
