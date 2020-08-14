@@ -54,7 +54,7 @@ class WebhookController extends ControllerEx
         // @todo not the best way to do this and we need to verify that this is the correct shopify user
         $this->apiConsumer = ApiConsumer::find()->where(['customer_id' => $customerMeta->customer_id])->one();
         if (!$this->apiConsumer) {
-            $this->apiConsumer = new ApiConsumerEx(['customer_id' => $customerMeta->customer_id]);
+            $this->apiConsumer = new ApiConsumer(['customer_id' => $customerMeta->customer_id]);
         }
         Yii::debug($this->apiConsumer);
         $orderForm = new ShopifyMapper();
