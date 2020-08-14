@@ -119,11 +119,7 @@ class BaseController extends Controller
             //Check if we have a shopify URL and it matches in our App table\
         }
 
-        if ($this->module->requestedRoute == 'site/callback') {
-            return;
-        }
-
-        if (empty($this->shopifyApp->access_token)) {
+        if (empty($this->shopifyApp->access_token) && $this->module->requestedRoute !== 'site/callback') {
             $this->options = $this->getOptions();
             $api = new BasicShopifyAPI($this->options);
             $api->setSession(new Session($this->shop));
@@ -135,6 +131,10 @@ class BaseController extends Controller
                 $api->getAuthUrl($this->scopes, \yii\helpers\Url::toRoute(['/site/callback'], 'https'))
             );
             Yii::$app->end();
+        }else {
+            $this->options = $this->getOptions();
+            $this->shopify = new BasicShopifyAPI($this->options);
+            $this->shopify->setSession(new Session($this->shop, $this->shopifyApp->access_token));
         }
 
     }
@@ -176,7 +176,6 @@ class BaseController extends Controller
         $this->shopify->setSession(new Session($shop));
         $this->shopify->requestAndSetAccess($code);
         $this->shopifyApp->setAttribute('access_token', $this->shopify->getSession()->getAccessToken());
-        //var_dump($this->shopifyApp->access_token);die;
 
         return $this->shopifyApp->save();
     }
