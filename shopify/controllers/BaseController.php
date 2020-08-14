@@ -9,6 +9,7 @@ use common\models\shopify\Shopify;
 use Osiset\BasicShopifyAPI\BasicShopifyAPI;
 use Osiset\BasicShopifyAPI\Options;
 use Osiset\BasicShopifyAPI\Session;
+use PHPShopify\Shop;
 use Yii;
 use yii\web\Controller;
 use yii\web\ServerErrorHttpException;
@@ -25,28 +26,46 @@ class BaseController extends Controller
     /** @var $shopify BasicShopifyAPI */
     public $shopify;
     public $shop; // Shopify URL after it's found
+    public $scopes = [
+        'write_orders',
+        'read_orders',
+        'read_locations',
+        ];
+
+    public $newCustomer = false;
 
     private function findShopifyAppOrCreate()
     {
-        // Check if we have a shopify session
+        /**
+         * Check if we already have a session or we already have an app available
+         */
         if ($this->shop = Yii::$app->session->get('shopify-url')) {
             $shopifyApp = Shopify::find()->where(['shop' => $this->shop])->one();
         } else {
             $this->shop = Yii::$app->request->getQueryParam('shop', 'error');
         }
 
-        // If shop fails throw an error
+        /**
+         * If shop fails throw an error
+         */
         if ($this->shop === 'error') {
             throw new ServerErrorHttpException('No query parameter found for shop');
         }
 
+        /**
+         * If we don't have the shopify app, then try finding it from customer meta data
+         */
         if (!$shopifyApp) {
             $customerMeta = CustomerMeta::find()->where([
                     'key' => 'shopify_store_url',
                     'value' => $this->shop]
             )->one();
 
+            /**
+             * Create customer if we don't meta data
+             */
             if (!$customerMeta) {
+                $this->newCustomer = true;
                 $array = explode('.', $this->shop);
                 $customer = new Customer([
                     'direct' => 1,
@@ -63,8 +82,17 @@ class BaseController extends Controller
 
                 Yii::debug($customer);
             }
-            //Check if we have a shopify URL and it matches in our App table
+
             //Check if we have a customer meta data field that matches the store URL
+            $shopifyApp = new Shopify([
+                'customer_id' => $customerMeta->customer_id,
+                'shop' => $this->shop,
+                'scopes' => implode(',',$this->scopes),
+            ]);
+            $shopifyApp->save();
+
+
+            //Check if we have a shopify URL and it matches in our App table
 
         }
 
