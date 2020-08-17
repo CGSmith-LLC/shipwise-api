@@ -71,7 +71,7 @@ class WebhookController extends ControllerEx
             $toDelete = Order::find()->where(['uuid' => $shopifyData['id'], 'status_id' => Status::OPEN])->one();
             Yii::debug($toDelete);
             return $toDelete->delete();
-        }elseif ($type == 'orders/cancelled') {
+        } elseif ($type == 'orders/cancelled') {
             $toCancel = Order::find()->where(['uuid' => $shopifyData['id'], 'status_id' => Status::OPEN])->one();
             $toCancel->status = Status::CANCELLED;
             return $toCancel->save();
@@ -81,7 +81,7 @@ class WebhookController extends ControllerEx
             $orderForm->setAttributes($orderForm->parse($shopifyData));
             $toUpdate = Order::find()->where(['uuid' => $shopifyData['id'], 'status_id' => Status::OPEN])->one();
             $id = $toUpdate->id;
-            $this->orderUpdate($orderForm, $id);
+            return $this->orderUpdate($orderForm, $id);
         }
     }
 
