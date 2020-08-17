@@ -216,134 +216,7 @@ class OrderController extends PaginatedControllerEx
         $orderForm           = new OrderForm();
         $orderForm->scenario = OrderForm::SCENARIO_DEFAULT;
         $orderForm->setAttributes($this->request->getBodyParams());
-
-        // Validate OrderForm and its related models, return errors if any
-       if (!$orderForm->validateAll()) {
-           return $this->unprocessableError($orderForm->getErrorsAll());
-       }
-
-        // Begin DB transaction
-        $transaction = \Yii::$app->db->beginTransaction();
-
-        try {
-            /**
-             * Create Address.
-             * At this stage the required shipTo object should be fully validated.
-             */
-            $address           = new AddressEx();
-            $address->loadDefaultValues();
-            $address->name     = $orderForm->shipTo->name;
-            $address->company  = $orderForm->shipTo->company;
-            $address->email    = $orderForm->shipTo->email;
-            $address->address1 = $orderForm->shipTo->address1;
-            $address->address2 = $orderForm->shipTo->address2;
-            $address->city     = $orderForm->shipTo->city;
-            $address->state_id = $orderForm->shipTo->stateId;
-            $address->zip      = $orderForm->shipTo->zip;
-            $address->phone    = $orderForm->shipTo->phone;
-            $address->notes    = $orderForm->shipTo->notes;
-            $address->country  = $orderForm->shipTo->country;
-            $address->save();
-
-            // Create Order
-            $order                      = new OrderEx();
-            $order->customer_id         = $this->apiConsumer->customer->id;
-            $order->uuid                = $orderForm->uuid;
-            $order->po_number           = $orderForm->poNumber;
-            $order->origin              = $orderForm->origin;
-            $order->carrier_id          = $orderForm->carrier_id;
-            $order->service_id          = $orderForm->service_id;
-            $order->order_reference     = $orderForm->orderReference;
-            $order->customer_reference  = $orderForm->customerReference;
-            $order->requested_ship_date = $orderForm->requestedShipDate;
-            $order->notes               = $orderForm->notes;
-            $order->status_id           = isset($orderForm->status) ? $orderForm->status : null;
-            $order->address_id          = $address->id;
-
-            // Is ShipFrom address set from order form?
-            if (isset($orderForm->shipFrom)) {
-
-                $order->ship_from_name         = $orderForm->shipFrom->name;
-                $order->ship_from_address1     = $orderForm->shipFrom->address1;
-                $order->ship_from_address2     = $orderForm->shipFrom->address2;
-                $order->ship_from_city         = $orderForm->shipFrom->city;
-                $order->ship_from_state_id     = $orderForm->shipFrom->stateId;
-                $order->ship_from_zip          = $orderForm->shipFrom->zip;
-                $order->ship_from_country_code = $orderForm->shipFrom->country;
-                $order->ship_from_phone        = $orderForm->shipFrom->phone;
-                $order->ship_from_email        = $orderForm->shipFrom->email;
-            }
-
-            // Validate the order model itself
-            if (!$order->validate()) {
-                // if you get here then you should check if you have enough OrderForm validation rules
-                $transaction->rollBack();
-
-                return $this->unprocessableError($order->getErrors());
-            }
-
-            // Create TrackingInfo
-            if (!empty($orderForm->tracking)) {
-                /**
-                 * This is in preparation of the future transition of
-                 * tracking details into tracking_info DB table:
-                 *
-                 * Until the transition not happened, we save tracking number into orders.tracking field.
-                 * Once the transition happens, save the full tracking object into tracking_info DB table.
-                 * See below.
-                 *
-                 */
-                // The actual "before transition" behaviour:
-                $order->tracking = $orderForm->tracking->trackingNumber;
-
-                // The behaviour to implement after transition:
-                /*
-                $tracking             = new TrackingInfoEx();
-                $tracking->service_id = $orderForm->tracking->serviceId;
-                $tracking->tracking   = $orderForm->tracking->trackingNumber;
-                if ($tracking->save()) {
-                    $order->tracking_id = $tracking;
-                }
-                */
-            }
-
-            // Save Order model
-            if (!$order->save()) {
-                $transaction->rollBack();
-
-                return $this->errorMessage(400, 'Could not save order');
-            }
-
-            /**
-             * Create Items.
-             * At this stage the required items array should be fully validated.
-             */
-            foreach ($orderForm->items as $formItem) {
-                $item           = new ItemEx();
-                $item->order_id = $order->id;
-                $item->uuid     = $formItem->uuid;
-                $item->sku      = $formItem->sku;
-                $item->quantity = $formItem->quantity;
-                $item->name     = $formItem->name;
-                $item->save();
-            }
-
-            // Commit DB transaction
-            $transaction->commit();
-
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-
-            return $this->errorMessage(400, 'Could not save order');
-        } catch (\Throwable $e) {
-            $transaction->rollBack();
-
-            return $this->errorMessage(400, 'Could not save order');
-        }
-
-        $order->refresh();
-
-        return $this->success($order, 201);
+        return $this->orderCreate($orderForm);
     }
 
     /**
@@ -602,6 +475,8 @@ class OrderController extends PaginatedControllerEx
         $orderForm           = new OrderForm();
         $orderForm->scenario = OrderForm::SCENARIO_UPDATE;
         $orderForm->setAttributes($this->request->getBodyParams());
+
+        // return $this->orderUpdate($orderForm, $id);
 
         // Validate OrderForm and its related models, return errors if any
         if (!$orderForm->validateAll()) {
