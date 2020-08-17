@@ -4,13 +4,15 @@ namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
 use api\modules\v1\models\core\ApiConsumerEx;
+use api\modules\v1\models\forms\OrderForm;
 use api\modules\v1\models\mappers\ShopifyMapper;
 use common\models\ApiConsumer;
 use common\models\CustomerMeta;
+use common\models\Order;
+use shopify\controllers\BaseController;
 use Yii;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
-
 /**
  * Class WebhookController
  *
@@ -41,7 +43,6 @@ class WebhookController extends ControllerEx
         //throw new NotFoundHttpException('Unsupported action request.')
 
 
-
         $headers = Yii::$app->request->headers;
 
         $domain = $headers->get('x-shopify-shop-domain');
@@ -49,19 +50,34 @@ class WebhookController extends ControllerEx
 
         /** @var CustomerMeta $customerMeta */
         $customerMeta = Yii::$app->customerSettings->getObjectByValue('shopify_store_url', $domain);
-
         $shopifyData = Yii::$app->request->bodyParams;
-        // @todo not the best way to do this and we need to verify that this is the correct shopify user
-        $this->apiConsumer = ApiConsumer::find()->where(['customer_id' => $customerMeta->customer_id])->one();
-        if (!$this->apiConsumer) {
-            $this->apiConsumer = new ApiConsumer(['customer_id' => $customerMeta->customer_id]);
+
+        if ($type == 'orders/create') {
+            // @todo not the best way to do this and we need to verify that this is the correct shopify user
+            if(!empty(Order::find()->where(['uuid' => $shopifyData['id']])->all())){
+                return $this->errorMessage(400, "An order with this id already exists");
+            }
+            $this->apiConsumer = ApiConsumer::find()->where(['customer_id' => $customerMeta->customer_id])->one();
+            if (!$this->apiConsumer) {
+                $this->apiConsumer = new ApiConsumer(['customer_id' => $customerMeta->customer_id]);
+            }
+            $orderForm = new ShopifyMapper();
+            $orderForm->setScenario('create');
+            $orderForm->scenario = ShopifyMapper::SCENARIO_DEFAULT;
+            $orderForm->setAttributes($orderForm->parse($shopifyData));
+            return $this->orderCreate($orderForm);
         }
-        Yii::debug($this->apiConsumer);
-        $orderForm = new ShopifyMapper();
-        $orderForm->setScenario('create');
-        $orderForm->scenario = ShopifyMapper::SCENARIO_DEFAULT;
-        $orderForm->setAttributes($orderForm->parse($shopifyData));
-        return $this->orderCreate($orderForm);
+        elseif ($type == 'orders/delete') {
+            $toDelete = Order::find()->where(['uuid' => $shopifyData['id'], 'status_id' => 9])->one();
+            Yii::debug($toDelete);
+            return $toDelete->delete();
+        }
+
+
+
+        /**
+         * delete orders with shopify
+         */
 
     }
 
