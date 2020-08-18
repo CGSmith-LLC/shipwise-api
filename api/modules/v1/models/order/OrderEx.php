@@ -40,6 +40,11 @@ class OrderEx extends Order
      *          type = "array",
      *          @SWG\Items( ref = "#/definitions/Item" )
      *     ),
+     *     @SWG\Property(
+     *          property = "packages",
+     *          type = "array",
+     *          @SWG\Items( ref = "#/definitions/Package Shipped" )
+     *     ),
      *     @SWG\Property( property = "createdDate", type = "string", format = "date-time" ),
      *     @SWG\Property( property = "updatedDate", type = "string", format = "date-time" ),
      *     @SWG\Property( property = "status", ref = "#/definitions/Status" ),
@@ -84,48 +89,49 @@ class OrderEx extends Order
             'uuid'              => 'uuid',
             'notes'             => 'notes',
             'origin'            => 'origin',
+            'packages'          => 'packages'
             /**
              * 3/12/2020 CGS
              * I don't like how this is but it doesn't seem that Yii supports many deep relations nested. Best way to come up with in a pinch :/
              */
-            'packages'    => function () {
-                $packageArray = [];
-                $packages = $this->getPackages();
-                /** @var $package Package */
-                $i = 0;
-                foreach ($packages->all() as $package) {
-                    $x = 0;
-                    $packageArray[$i] = [
-                        'tracking' => $package->tracking,
-                        'length'   => $package->length,
-                        'width'    => $package->width,
-                        'height'   => $package->height,
-                        'weight'   => $package->weight,
-                        'createdDate' => $package->created_date,
-                        'items'    => [],
-                    ];
-                    foreach ($package->items as $item) {
-                        $packageArray[$i]['items'][$x] = [
-                            'name'     => $item->name,
-                            'sku'      => $item->sku,
-                            'quantity' => $item->quantity,
-                        ];
-                        $lotInfos = PackageItemLotInfo::findAll(['package_items_id' => $item->id]);
-                        foreach ($lotInfos as $lotInfo) {
-                            $packageArray[$i]['items'][$x]['lot_info'][] = [
-                                'lot_number'    => $lotInfo->lot_number,
-                                'serial_number' => $lotInfo->serial_number,
-                                'quantity'      => $lotInfo->quantity,
-                            ];
-                        }
+            // 'packages'    => function () {
+            //     $packageArray = [];
+            //     $packages = $this->getPackages();
+            //     /** @var $package Package */
+            //     $i = 0;
+            //     foreach ($packages->all() as $package) {
+            //         $x = 0;
+            //         $packageArray[$i] = [
+            //             'tracking' => $package->tracking,
+            //             'length'   => $package->length,
+            //             'width'    => $package->width,
+            //             'height'   => $package->height,
+            //             'weight'   => $package->weight,
+            //             'createdDate' => $package->created_date,
+            //             'items'    => [],
+            //         ];
+            //         foreach ($package->items as $item) {
+            //             $packageArray[$i]['items'][$x] = [
+            //                 'name'     => $item->name,
+            //                 'sku'      => $item->sku,
+            //                 'quantity' => $item->quantity,
+            //             ];
+            //             $lotInfos = PackageItemLotInfo::findAll(['package_items_id' => $item->id]);
+            //             foreach ($lotInfos as $lotInfo) {
+            //                 $packageArray[$i]['items'][$x]['lot_info'][] = [
+            //                     'lot_number'    => $lotInfo->lot_number,
+            //                     'serial_number' => $lotInfo->serial_number,
+            //                     'quantity'      => $lotInfo->quantity,
+            //                 ];
+            //             }
 
-                        $x++;
-                    }
-                    $i++;
-                }
+            //             $x++;
+            //         }
+            //         $i++;
+            //     }
 
-                return $packageArray;
-            },
+            //     return $packageArray;
+            // },
         ];
     }
 
