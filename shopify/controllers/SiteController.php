@@ -37,6 +37,10 @@ class SiteController extends BaseController
             throw new ServerErrorHttpException('Problem with authentication');
         }
     }
+    public function actionFaqs()
+    {
+        return $this->render('faqs');
+    }
 }
 
 

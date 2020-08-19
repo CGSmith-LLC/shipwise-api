@@ -40,6 +40,17 @@ $this->title = Yii::$app->name;
     </a>
 </div>
 <div style="--top-bar-background:#00848e; --top-bar-background-lighter:#1d9ba4; --top-bar-color:#f9fafb; --p-frame-offset:0px;">
+    <a class="Polaris-Button Polaris-Button--outline Polaris-Button--fullWidth" aria-label="View Settings"
+       href="/site/faqs" data-polaris-unstyled="true">
+        <span
+                class="Polaris-Button__Content">
+            <span
+                    class="Polaris-Button__Text">FAQs
+            </span>
+        </span>
+    </a>
+</div>
+<div style="--top-bar-background:#00848e; --top-bar-background-lighter:#1d9ba4; --top-bar-color:#f9fafb; --p-frame-offset:0px;">
         <span class="Polaris-EmptyState__Image Polaris-EmptyState__Image">
             <img
                     src="https://getshipwise.com/wp-content/uploads/2019/03/new-logo.png" alt="ShipWise Logo"

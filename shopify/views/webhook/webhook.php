@@ -2,7 +2,6 @@
 
 /* @var $this yii\web\View */
 
-use common\models\CustomerMeta;
 
 $this->title = Yii::$app->name;
 /* @var $webhooks \common\models\shopify\Webhook*/
