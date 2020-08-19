@@ -17,9 +17,17 @@ $this->title = Yii::$app->name;
     </div>
 </div>
 <div style="--top-bar-background:#00848e; --top-bar-background-lighter:#1d9ba4; --top-bar-color:#f9fafb; --p-frame-offset:0px;">
-    <a class="Polaris-Button Polaris-Button--outline Polaris-Button--fullWidth" aria-label="View Orders"
-       href="app.getshipwise.com" data-polaris-unstyled="true"><span class="Polaris-Button__Content"><span
-                    class="Polaris-Button__Text">View Orders</span></span></a></div>
+    <a target="_blank"
+       class="Polaris-Button Polaris-Button--outline Polaris-Button--monochrome Polaris-Button--fullWidth"
+       href="https://app.getshipwise.com" rel="noopener noreferrer" data-polaris-unstyled="true">
+        <span
+                class="Polaris-Button__Content">
+            <span class="Polaris-Button__Text">View Orders
+            </span>
+        </span>
+    </a>
+</div>
+
 <div style="--top-bar-background:#00848e; --top-bar-background-lighter:#1d9ba4; --top-bar-color:#f9fafb; --p-frame-offset:0px;">
     <a class="Polaris-Button Polaris-Button--outline Polaris-Button--fullWidth" aria-label="View Settings"
        href="/webhook" data-polaris-unstyled="true">

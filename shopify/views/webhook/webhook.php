@@ -2,50 +2,71 @@
 
 /* @var $this yii\web\View */
 
+use common\models\CustomerMeta;
+
 $this->title = Yii::$app->name;
+/* @var $webhooks \common\models\shopify\Webhook*/
 ?>
 
 <div class="body-content">
     <div style="--top-bar-background:#00848e; --top-bar-background-lighter:#1d9ba4; --top-bar-color:#f9fafb; --p-frame-offset:0px;">
         <div class="Polaris-TextContainer">
-            <h2 class="Polaris-Heading">Enable and Disable Webhooks</h2>
-            <p>Webhooks connect your orders to ShipWise. Enable and Disable them to toggle order sync to ShipWise. This can be
-                changed at any time.</p>
+            <h2 class="Polaris-Heading">Settings</h2>
+            <p>Connect your orders to ShipWise. This
+                can be changed at any time.</p>
         </div>
     </div>
-    <?= \yii\helpers\Html::a('Create Webhooks', '/webhook/create') ?>
-    <?= \yii\helpers\Html::a('Delete Webhooks', '/webhook/delete') ?>
-
-    <div style="--top-bar-background:#00848e; --top-bar-background-lighter:#1d9ba4; --top-bar-color:#f9fafb; --p-frame-offset:0px;">
+    <div style="--top-bar-background:#ac1927; --top-bar-background-lighter:#3e0a27; --top-bar-color:#d91275; --p-frame-offset:0px;">
         <div class="Polaris-Card">
             <div class="Polaris-Card__Section">
                 <div class="Polaris-SettingAction">
-                    <div class="Polaris-SettingAction__Setting">Webhooks are <span
-                                class="Polaris-TextStyle--variationStrong">disabled</span>.
-                    </div>
-                    <div class="Polaris-SettingAction__Action">
-                        <button onclick="navigateToShipWise('/webhook\/create')" type="button"
-                                class="Polaris-Button Polaris-Button--primary">
-                            <span class="Polaris-Button__Content">
-                                <span class="Polaris-Button__Text">Create</span>
-                            </span>
-                        </button>
-                    </div>
+                    <?php
+//                    $headers = Yii::$app->request->headers;
+//
+//                    $domain = $headers->get('x-shopify-shop-domain');
+//                    /** @var CustomerMeta $customerMeta */
+//                    $customerMeta = Yii::$app->customerSettings->getObjectByValue('shopify_store_url', $domain);
+//                    $webhooks = \common\models\shopify\Webhook::find()->where(['customer_id' => $customerMeta->customer_id])->all();
 
-                    <div class="Polaris-SettingAction__Action">
-                        <button onclick="navigateToShipWise('/webhook\/delete')" type="button" class="Polaris-Button">
+                    if (!$webhooks) { ?>
+                        <div class="Polaris-SettingAction__Setting">Orders are currently
+                            <span
+                                    class="Polaris-TextStyle--variationStrong">not connected to ShipWise.
+                        </span>
+                        </div>
+                        <div class="Polaris-SettingAction__Action">
+                            <button onclick="navigateToShipWise('/webhook\/create')" type="button"
+                                    class="Polaris-Button Polaris-Button--primary">
+                            <span class="Polaris-Button__Content">
+                                <span class="Polaris-Button__Text">Connect
+                                </span>
+                            </span>
+                            </button>
+                        </div>
+                    <?php } else { ?>
+                        <div class="Polaris-SettingAction__Setting">Orders are currently
+                            <span
+                                    class="Polaris-TextStyle--variationStrong">connected to Shipwise.
+                        </span>
+                        </div>
+                        <div class="Polaris-SettingAction__Action">
+                            <button onclick="navigateToShipWise('/webhook\/delete')" type="button"
+                                    class="Polaris-Button">
                     <span class="Polaris-Button__Content">
-                        <span class="Polaris-Button__Text">Disable</span>
+                        <span class="Polaris-Button__Text">Disconnect
+                        </span>
                     </span>
-                        </button>
-                    </div>
+                            </button>
+                        </div>
+                    <?php } ?>
+
 
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div style="--top-bar-background:#00848e; --top-bar-background-lighter:#1d9ba4; --top-bar-color:#f9fafb; --p-frame-offset:0px;">
+<div style="--top-bar-background:#00848e; --top-bar-background-lighter:#1d9ba4; --top-bar-color:#73217f; --p-frame-offset:0px;">
     <a id="Home" class="Polaris-Button Polaris-Button--outline Polaris-Button--fullWidth" aria-label="Home"
        href="/index" data-polaris-unstyled="true">
         <span

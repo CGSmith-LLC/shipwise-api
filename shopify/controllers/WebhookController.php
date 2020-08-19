@@ -9,6 +9,7 @@ use Osiset\BasicShopifyAPI\Options;
 use Osiset\BasicShopifyAPI\ResponseAccess;
 use Osiset\BasicShopifyAPI\Session;
 use Yii;
+use yii\db\ActiveRecord;
 
 
 /**
@@ -23,10 +24,10 @@ class WebhookController extends BaseController
 
     public function actionIndex()
     {
-        //$webhooks = ActiveRecord::find()->where(['customerasdfasdf'])->count()->all();
+        $webhooks = Webhook::find()->where(['customer_id' => $this->shopifyApp->customer_id])->all();
 
         return $this->render('webhook', [
-                'webhook_state' => 0,
+                'webhooks' => $webhooks,
             ]
         );
 
@@ -57,7 +58,7 @@ class WebhookController extends BaseController
             $model->save();
         }
 
-        return $this->render('webhook');
+        return $this->redirect(['index']);
     }
 
     public function actionDelete()
@@ -73,7 +74,7 @@ class WebhookController extends BaseController
             Yii::debug($response);
         }
 
-        return $this->render('webhook');
+        return $this->redirect(['index']);
     }
 }
 

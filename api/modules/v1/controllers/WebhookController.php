@@ -73,7 +73,7 @@ class WebhookController extends ControllerEx
             return $toDelete->delete();
         } elseif ($type == 'orders/cancelled') {
             $toCancel = Order::find()->where(['uuid' => $shopifyData['id'], 'status_id' => Status::OPEN])->one();
-            $toCancel->status = Status::CANCELLED;
+            $toCancel->status_id = Status::CANCELLED;
             return $toCancel->save();
         } elseif ($type == 'orders/updated') {
             $orderForm = new ShopifyMapper();
