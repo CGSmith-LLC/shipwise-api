@@ -2,14 +2,9 @@
 
 namespace shopify\controllers;
 
-use common\models\CustomerMeta;
 use common\models\shopify\Webhook;
-use Osiset\BasicShopifyAPI\BasicShopifyAPI;
-use Osiset\BasicShopifyAPI\Options;
 use Osiset\BasicShopifyAPI\ResponseAccess;
-use Osiset\BasicShopifyAPI\Session;
 use Yii;
-use yii\db\ActiveRecord;
 
 
 /**
@@ -28,6 +23,8 @@ class WebhookController extends BaseController
 
         return $this->render('webhook', [
                 'webhooks' => $webhooks,
+                'created' => false,
+                'deleted' => false,
             ]
         );
 
@@ -35,6 +32,7 @@ class WebhookController extends BaseController
 
     public function actionCreate()
     {
+        $created = false;
         foreach ($this->topics as $topic) {
             $webhook = [
                 'webhook' => [
@@ -55,14 +53,19 @@ class WebhookController extends BaseController
                 'customer_id' => $this->shopifyApp->customer_id,
             ]);
             Yii::debug($model);
-            $model->save();
+            $created = $model->save();
         }
 
-        return $this->redirect(['index']);
+        return $this->render('webhook', [
+            'webhooks' => Webhook::find()->where(['customer_id' => $this->shopifyApp->customer_id])->all(),
+            'created' => $created,
+            'deleted' => false,
+        ]);
     }
 
     public function actionDelete()
     {
+        $deleted = false;
         $customerWebhooks = Webhook::find()
             ->where(['customer_id' => $this->shopifyApp->customer_id])
             ->all();
@@ -70,11 +73,18 @@ class WebhookController extends BaseController
         foreach ($customerWebhooks as $webhook) {
             $webhookId = $webhook->shopify_webhook_id;
             $response = $this->shopify->rest('DELETE', 'admin/api/webhooks/' . $webhookId . '.json');
-            $webhook->delete();
+            // $webhook->delete();
+           // $webhook->delete();
+            $deleted = $webhook->delete();
+
             Yii::debug($response);
         }
 
-        return $this->redirect(['index']);
+        return $this->render('webhook', [
+            'webhooks' => Webhook::find()->where(['customer_id' => $this->shopifyApp->customer_id])->all(),
+            'deleted' => $deleted,
+            'created' => false,
+        ]);
     }
 }
 

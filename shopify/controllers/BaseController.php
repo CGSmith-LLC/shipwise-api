@@ -51,7 +51,7 @@ class BaseController extends Controller
      */
     private $api_secret;
 
-    const API_VERSION = '2020-04';
+    const API_VERSION = '2020-07';
     /**
      * @var Options
      */

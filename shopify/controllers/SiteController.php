@@ -2,6 +2,7 @@
 
 namespace shopify\controllers;
 
+use common\models\shopify\Webhook;
 use Yii;
 use yii\web\ServerErrorHttpException;
 
@@ -26,7 +27,10 @@ class SiteController extends BaseController
 
     public function actionIndex()
     {
-        return $this->render('index');
+        return $this->render('index', [
+                'webhooks' => Webhook::find()->where(['customer_id' => $this->shopifyApp->customer_id])->all(),
+            ]
+        );
     }
 
     public function actionCallback()
@@ -37,6 +41,7 @@ class SiteController extends BaseController
             throw new ServerErrorHttpException('Problem with authentication');
         }
     }
+
     public function actionFaqs()
     {
         return $this->render('faqs');
