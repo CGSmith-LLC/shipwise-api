@@ -110,6 +110,7 @@ $item->loadDefaultValues();
                         <?= $form->field($model->address, 'zip')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'phone')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'email')->textInput(['maxlength' => true]) ?>
+                        <?= $form->field($model->address, 'notes')->textInput(['maxlength' => true])->label('Notes') ?>
 
                     </div>
                 </div>
