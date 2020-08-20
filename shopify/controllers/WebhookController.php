@@ -14,9 +14,12 @@ class WebhookController extends BaseController
 {
 
     public $topics = ['orders/delete', 'orders/updated', 'orders/create', 'orders/edited', 'orders/cancelled'];
-    const WEBHOOK_ADDRESS = 'https://1320aea60d5b.ngrok.io/v1/webhook';
 
-
+    /**
+     * Show action page to delete or create webhooks
+     *
+     * @return mixed
+     */
     public function actionIndex()
     {
         $webhooks = Webhook::find()->where(['customer_id' => $this->shopifyApp->customer_id])->all();
@@ -30,6 +33,11 @@ class WebhookController extends BaseController
 
     }
 
+    /**
+     * Creates webhooks in Shopify
+     *
+     * @return mixed
+     */
     public function actionCreate()
     {
         $created = false;
@@ -37,7 +45,7 @@ class WebhookController extends BaseController
             $webhook = [
                 'webhook' => [
                     'topic' => $topic,
-                    'address' => self::WEBHOOK_ADDRESS,
+                    'address' => \yii\helpers\Url::toRoute('/v1/webhook', 'https'),
                 ]
             ];
             $shopifyWebhook = $this->shopify->rest('POST', 'admin/api/webhooks.json', $webhook);
@@ -63,6 +71,11 @@ class WebhookController extends BaseController
         ]);
     }
 
+    /**
+     * Deletes webhooks from Shopify
+     *
+     * @return mixed
+     */
     public function actionDelete()
     {
         $deleted = false;
@@ -73,8 +86,6 @@ class WebhookController extends BaseController
         foreach ($customerWebhooks as $webhook) {
             $webhookId = $webhook->shopify_webhook_id;
             $response = $this->shopify->rest('DELETE', 'admin/api/webhooks/' . $webhookId . '.json');
-            // $webhook->delete();
-           // $webhook->delete();
             $deleted = $webhook->delete();
 
             Yii::debug($response);
