@@ -29,7 +29,6 @@ class WebhookController extends ControllerEx
     {
         return [
             'index' => ['GET', 'POST'],
-            'shopify' => ['POST'],
         ];
     }
 
