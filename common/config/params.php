@@ -6,6 +6,11 @@ return [
     'user.passwordResetTokenExpire' => 3600,
     'stripePublicKey'               => '1234',
     'stripePrivateKey'              => '1234',
+    'shopifyPublicKey'              => '5678',
+    'shopifyPrivateKey'             => '5678',
+    /**
+     * Shopify App Parameters and App Credentials
+     */
 
 
     /**

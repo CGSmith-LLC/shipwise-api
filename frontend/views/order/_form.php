@@ -110,6 +110,7 @@ $item->loadDefaultValues();
                         <?= $form->field($model->address, 'zip')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'phone')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'email')->textInput(['maxlength' => true]) ?>
+                        <?= $form->field($model->address, 'notes')->textInput(['maxlength' => true])->label('Notes') ?>
 
                     </div>
                 </div>
@@ -125,6 +126,10 @@ $item->loadDefaultValues();
                     <div class="panel-body">
 
                         <div id="items">
+                            <?= Html::a('<i class="glyphicon glyphicon-plus"></i> add another item', 'javascript:void(0);', [
+                                'id'    => 'btn-add-item',
+                                'class' => 'btn btn-warning btn-sm',
+                            ]) ?>
                             <?php
                             // existing item fields
                             foreach ($model->items as $itemKey => $_item) : ?>
@@ -151,10 +156,7 @@ $item->loadDefaultValues();
                             </div>
                         </div>
 
-                        <?= Html::a('<i class="glyphicon glyphicon-plus"></i> add another item', 'javascript:void(0);', [
-                            'id'    => 'btn-add-item',
-                            'class' => 'btn btn-warning btn-sm',
-                        ]) ?>
+
 
                     </div>
                 </div>
