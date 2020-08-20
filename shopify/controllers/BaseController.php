@@ -35,6 +35,9 @@ class BaseController extends Controller
         'read_locations',
         ];
 
+    /**
+     * @var Shopify
+     */
     protected $shopifyApp;
 
     /**
