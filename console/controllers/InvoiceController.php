@@ -2,7 +2,9 @@
 
 namespace console\controllers;
 
+use common\components\CustomerSettings;
 use common\models\Charge;
+use common\models\CustomerMeta;
 use common\models\Invoice;
 use common\models\InvoiceItems;
 use common\models\OneTimeCharge;
@@ -157,8 +159,13 @@ class InvoiceController extends Controller
             /** @var $invoiceToEmail Invoice */
             $invoiceToEmail = Invoice::findOne($invoice_id);
 
-            $customers = User::find()->where(['customer_id' => $invoiceToEmail->customer_id])->all();
-            $customerEmails = ArrayHelper::map($customers,'email','email');
+            $billingEmail = \Yii::$app->customerSettings->get('billing_email', $invoiceToEmail->customer_id);
+            if (!empty($billingEmail)) {
+                $customerEmails = explode(',', $billingEmail);
+            }else {
+                $customers = User::find()->where(['customer_id' => $invoiceToEmail->customer_id])->all();
+                $customerEmails = ArrayHelper::map($customers, 'email', 'email');
+            }
 
             try {
                 $mailer->compose(['html' => 'new-invoice'], ['model' => $invoiceToEmail])
@@ -172,8 +179,6 @@ class InvoiceController extends Controller
                 die('exception hit');
             }
         }
-
-        die;
     }
 
     /**
@@ -244,7 +249,10 @@ class InvoiceController extends Controller
         foreach ($invoices as $invoice) {
             $customer = Customer::findOne($invoice->customer_id);
             /** @var PaymentMethod $paymentMethod */
-            $paymentMethod = PaymentMethod::find()->where(['customer_id' => $customer->id, 'default' => PaymentMethod::PRIMARY_PAYMENT_METHOD_YES])->one();
+            $paymentMethod = PaymentMethod::find()->where([
+                'customer_id' => $customer->id,
+                'default' => PaymentMethod::PRIMARY_PAYMENT_METHOD_YES
+            ])->one();
 
             if ($paymentMethod) {
                 $this->chargeArray[$invoice->id] = PaymentIntent::create([
