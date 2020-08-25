@@ -190,7 +190,6 @@ class OrderForm extends Model
     private function addressStateValidation($address)
     {
         $values = (array)$this->$address;
-        \Yii::debug($values);
         // If stateId is not set but state exists then try to reference the state's value in the DB
         if (isset($values['state']) && !isset($values['stateId'])) {
             $lookup = (strlen($values['state']) == 2) ? 'abbreviation' : 'name';
