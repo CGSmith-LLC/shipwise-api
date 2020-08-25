@@ -2,8 +2,7 @@
 
 namespace common\models;
 
-use Yii;
-use yii\debug\UserswitchAsset;
+use common\models\query\InvoiceQuery;
 
 /**
  * This is the model class for table "invoice".
@@ -31,6 +30,14 @@ class Invoice extends \yii\db\ActiveRecord
         return 'invoice';
     }
 
+    /**
+     * @inheritdoc
+     * @return InvoiceQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new InvoiceQuery(get_called_class());
+    }
     /**
      * {@inheritdoc}
      */
