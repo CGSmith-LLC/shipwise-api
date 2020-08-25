@@ -6,20 +6,14 @@ use common\models\Charge;
 use common\models\Invoice;
 use common\models\InvoiceItems;
 use common\models\OneTimeCharge;
-use common\models\Status;
 use common\models\Subscription;
 use common\models\SubscriptionItems;
 use common\models\PaymentMethod;
 use dektrium\user\models\User;
-use frontend\models\Charges;
 use frontend\models\Customer;
-use frontend\models\Invoices;
-use frontend\models\Payouts;
-use SebastianBergmann\CodeCoverage\Report\PHP;
-use Stripe\PaymentIntent;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
-use yii\rest\UpdateAction;
+use yii\helpers\Url;
 
 class InvoiceController extends Controller
 {
@@ -125,6 +119,7 @@ class InvoiceController extends Controller
                     'balance' => 0,
                 ]);
                 $invoice->save();
+                $invoicesToEmail[] = $invoice->id;
             }
 
             // create invoice line item
@@ -157,8 +152,13 @@ class InvoiceController extends Controller
             /** @var $invoiceToEmail Invoice */
             $invoiceToEmail = Invoice::findOne($invoice_id);
 
-            $customers = User::find()->where(['customer_id' => $invoiceToEmail->customer_id])->all();
-            $customerEmails = ArrayHelper::map($customers,'email','email');
+            $billingEmail = \Yii::$app->customerSettings->get('billing_email', $invoiceToEmail->customer_id);
+            if (!empty($billingEmail)) {
+                $customerEmails = explode(',', $billingEmail);
+            } else {
+                $customers = User::find()->where(['customer_id' => $invoiceToEmail->customer_id])->all();
+                $customerEmails = ArrayHelper::map($customers, 'email', 'email');
+            }
 
             try {
                 $mailer->compose(['html' => 'new-invoice'], ['model' => $invoiceToEmail])
@@ -172,8 +172,6 @@ class InvoiceController extends Controller
                 die('exception hit');
             }
         }
-
-        die;
     }
 
     /**
@@ -189,6 +187,11 @@ class InvoiceController extends Controller
             ->all();
 
         $this->chargeInvoices($invoices);
+
+        // send copy of invoice to customer's email address
+        $mailer = \Yii::$app->mailer;
+        $mailer->viewPath = '@frontend/views/user/mail';
+        $mailer->getView()->theme = \Yii::$app->view->theme;
 
         foreach ($this->chargeArray as $invoice_id => $charge) {
             /**
@@ -221,6 +224,29 @@ class InvoiceController extends Controller
                     foreach ($invoice->getErrorSummary(true) as $error) {
                         echo 'actionCharge() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
                     }
+                } else {
+                    $billingEmail = \Yii::$app->customerSettings->get('billing_email', $invoice->customer_id);
+                    if (!empty($billingEmail)) {
+                        $customerEmails = explode(',', $billingEmail);
+                    } else {
+                        $customers = User::find()->where(['customer_id' => $invoice->customer_id])->all();
+                        $customerEmails = ArrayHelper::map($customers, 'email', 'email');
+                    }
+
+                    try {
+                        $mailer->compose(['html' => 'new-payment'], [
+                                'model' => $invoice,
+                                'url' => Url::toRoute(['invoice/view', 'id' => $invoice->id], 'https')
+                            ])
+                            ->setTo($customerEmails)
+                            ->setBcc(\Yii::$app->params['adminEmail'])
+                            ->setFrom(\Yii::$app->params['senderEmail'])
+                            ->setSubject('ShipWise Receipt for Invoice #' . $invoice->id)
+                            ->send();
+                    } catch (\Exception $ex) {
+                        var_dump($ex->getMessage());
+                        die('exception hit');
+                    }
                 }
             }
 
@@ -244,7 +270,10 @@ class InvoiceController extends Controller
         foreach ($invoices as $invoice) {
             $customer = Customer::findOne($invoice->customer_id);
             /** @var PaymentMethod $paymentMethod */
-            $paymentMethod = PaymentMethod::find()->where(['customer_id' => $customer->id, 'default' => PaymentMethod::PRIMARY_PAYMENT_METHOD_YES])->one();
+            $paymentMethod = PaymentMethod::find()->where([
+                'customer_id' => $customer->id,
+                'default' => PaymentMethod::PRIMARY_PAYMENT_METHOD_YES
+            ])->one();
 
             if ($paymentMethod) {
                 $this->chargeArray[$invoice->id] = PaymentIntent::create([
@@ -256,7 +285,7 @@ class InvoiceController extends Controller
                     'confirm' => true,
                     'metadata' => [
                         'invoice_id' => $invoice->id,
-                        'invoice_url' => 'https://app.getshipwise.com/invoice/view?id=' . $invoice->id,
+                        'invoice_url' => Url::toRoute(['invoice/view', 'id' => $invoice->id], 'https'),
                     ],
                 ]);
                 $this->chargeArray[$invoice->id]['customer_id'] = $customer->id;

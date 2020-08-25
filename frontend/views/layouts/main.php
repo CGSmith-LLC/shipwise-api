@@ -110,6 +110,9 @@ AppAsset::register($this);
             'label' => 'Account', 'url' => ['/user/settings/account'],
             'items' => [
                 ['label' => 'Account', 'url' => ['/user/settings/account']],
+
+                     ['label' => 'Items', 'url' => ['/sku']],
+
                 [
                     'label' => 'Billing',
                     'url' => ['/billing'],

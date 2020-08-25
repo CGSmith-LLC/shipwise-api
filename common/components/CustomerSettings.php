@@ -42,4 +42,27 @@ class CustomerSettings extends Component
 
         return ($customerMeta->value ?? Yii::$app->params['globalCustomerSettings'][$key] ?? null);
     }
+
+    /**
+     * Get whole meta data object
+     *
+     * If customer for given value exists return it,
+     * if not, return false.
+     *
+     * Usage Example:
+     *
+     * ```php
+     * // get customer meta object if it exists fot key and value pair
+     * Yii::$app->customerSettings->getObjectByValue('cgsmith105.myshopify.com', 'shopify_store_url');
+     * ```
+     *
+     * @param string   $key        Settings key
+     * @param string|null $value Value of meta data
+     *
+     * @return null|string
+     */
+    public static function getObjectByValue($key, $value = null)
+    {
+        return CustomerMeta::findOne(['value' => $value, 'key' => $key]);
+    }
 }

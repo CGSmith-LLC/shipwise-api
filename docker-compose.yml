@@ -22,8 +22,18 @@ services:
       # Mount source-code for development
       - ./:/app
 
+  shopify:
+    build: shopify
+    ports:
+      - 30004:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      # Mount source-code for development
+      - ./:/app
+
   mysql:
-    image: mysql:5.7
+    image: mysql:8
     environment:
       MYSQL_ROOT_PASSWORD: 123
       MYSQL_DATABASE: cgsmpoim_shipwise
