@@ -5,6 +5,8 @@ namespace frontend\controllers;
 
 
 use common\models\Invoice;
+use common\models\query\InventoryQuery;
+use common\models\query\InvoiceQuery;
 use yii\BaseYii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -32,15 +34,44 @@ class InvoiceController extends \frontend\controllers\Controller
         ];
     }
 
-    public function actionView($id)
+    /**
+     * Lists all PaymentMethod models.
+     * @return mixed
+     */
+    public function actionIndex()
     {
-        $model = $this->findModel($id);
-        $dataProvider = new ActiveDataProvider([
-            'query' => Invoice::find()->where(['inv' => $model->id])
+        // If user is not admin, then show orders that ONLY belong to current user
+        $query = Invoice::find();
+        if (!\Yii::$app->user->identity->isAdmin) {
+            $query->forCustomers(\Yii::$app->user->identity->customerIds);
+        }
+        $query->orderBy(['id' => SORT_DESC]);
+
+        $invoiceDataProvider = new ActiveDataProvider([
+            'query' => $query,
         ]);
 
+        return $this->render('index', [
+            'invoiceDataProvider' => $invoiceDataProvider,
+        ]);
+    }
+
+    public function actionView($id)
+    {
+
+        $query = Invoice::find()
+            ->where(['id' => $id]);
+
+        if (!\Yii::$app->user->identity->isAdmin) {
+            $query->andWhere(['in', 'customer_id', \Yii::$app->user->identity->customerIds]);
+        }
+
+        if (($model = $query->one()
+            ) === null) {
+            throw new NotFoundHttpException('Invoice not found');
+        }
+
         return $this->render('view', [
-            'dataProvider' => $dataProvider,
             'model' => $model,
         ]);
     }

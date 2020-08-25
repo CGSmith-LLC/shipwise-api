@@ -96,6 +96,7 @@ $item->loadDefaultValues();
                     <div class="panel-body">
 
                         <?= $form->field($model->address, 'name')->textInput(['maxlength' => true]) ?>
+                        <?= $form->field($model->address, 'company')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'address1')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'address2')->textInput(['maxlength' => true]) ?>
                         <?= $form->field($model->address, 'city')->textInput(['maxlength' => true]) ?>
