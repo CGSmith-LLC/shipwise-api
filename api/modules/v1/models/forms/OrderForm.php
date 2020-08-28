@@ -156,7 +156,7 @@ class OrderForm extends Model
             ],
             [['poNumber', 'uuid', 'origin', 'customerReference'], 'string', 'length' => [1, 64]],
             ['orderReference', 'string', 'length' => [1, 45]],
-            ['notes', 'string', 'length' => [1, 140]],
+            ['notes', 'string', 'length' => [1, 600]],
             ['requestedShipDate', 'date', 'format' => 'php:Y-m-d'],
             ['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
             ['status', 'integer', 'on' => self::SCENARIO_UPDATE],
