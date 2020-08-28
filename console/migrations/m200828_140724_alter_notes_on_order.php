@@ -12,7 +12,7 @@ class m200828_140724_alter_notes_on_order extends Migration
      */
     public function safeUp()
     {
-        $this->alterColumn('%{{orders}}', 'notes', $this->string(600)->null());
+        $this->alterColumn('{{%orders}}', 'notes', $this->string(600)->null());
     }
 
     /**
@@ -20,7 +20,7 @@ class m200828_140724_alter_notes_on_order extends Migration
      */
     public function safeDown()
     {
-        $this->alterColumn('%{{orders}}', 'notes', $this->string(140)->null());
+        $this->alterColumn('{{%orders}}', 'notes', $this->string(140)->null());
     }
 
 }
