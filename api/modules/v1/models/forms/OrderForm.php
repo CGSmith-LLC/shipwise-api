@@ -32,7 +32,7 @@ use api\modules\v1\models\order\StatusEx;
  *            type = "string",
  *            description = "Notes that will display under order info for ShipWise",
  *            minLength = 1,
- *            maxLength = 140
+ *            maxLength = 600
  *        ),
  *     @SWG\Property(
  *            property = "requestedShipDate",
