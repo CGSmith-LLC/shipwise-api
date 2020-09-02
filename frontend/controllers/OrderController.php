@@ -362,7 +362,7 @@ class OrderController extends \frontend\controllers\Controller
         $mergedFilename = $dir . ucfirst($model->code) . ".pdf";
         if (!empty($tmpFiles)) {
             // using GhostScript here for merging
-            exec("gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=$mergedFilename " . implode(" ", $tmpFiles));
+            exec("gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dFitPage -sOutputFile=$mergedFilename " . implode(" ", $tmpFiles));
             $mergedFileData = base64_encode(file_get_contents($mergedFilename));
             @unlink($mergedFilename);
             foreach ($tmpFiles as $filename) {
