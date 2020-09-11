@@ -161,6 +161,8 @@ class ControllerEx extends Controller
                 $item->uuid = $formItem->uuid;
                 $item->sku = $formItem->sku;
                 $item->quantity = $formItem->quantity;
+                $item->alias_sku = $formItem->alias_sku;
+                $item->alias_quantity = $formItem->alias_quantity;
                 $item->name = $formItem->name;
                 $item->save();
             }
