@@ -32,16 +32,18 @@ $this->title = Yii::$app->name;
             <?= $form->field($model, 'start_date', [
                 'inputTemplate' =>
                     '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
+                'inputOptions' => ['autocomplete' => 'off']
             ])->textInput([
                 'value' => (isset($model->start_date)) ? Yii::$app->formatter->asDate($model->start_date) : '',
             ]); ?>
             <?= $form->field($model, 'end_date', [
                 'inputTemplate' =>
                     '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
+                'inputOptions' => ['autocomplete' => 'off']
             ])->textInput([
                 'value' => (isset($model->end_date)) ? Yii::$app->formatter->asDate($model->end_date) : '',
             ]); ?>
-            <?php echo $form->field($model, 'customers')->dropdownList($customers, ['prompt' => ' Please select']); ?>
+            <?php echo $form->field($model, 'customer')->dropdownList($customers, ['prompt' => ' Please select']); ?>
 
             <div class="form-group">
                 <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
