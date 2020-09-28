@@ -105,6 +105,7 @@ class InventoryController extends PaginatedControllerEx
                 'sku' => $inventoryForm->sku,
                 'name' => $inventoryForm->name,
                 'available_quantity' => $inventoryForm->available_quantity,
+                'location' => $inventoryForm->location,
             ]);
             if ($inventory->save()) {
                 $transaction->commit(); // Commit DB transaction
