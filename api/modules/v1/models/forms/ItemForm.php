@@ -51,6 +51,10 @@ class ItemForm extends Model
     public $sku;
     /** @var string */
     public $name;
+    /** @var int */
+    public $alias_quantity;
+    /** @var string */
+    public $alias_sku;
 
     /**
      * {@inheritdoc}
@@ -59,10 +63,9 @@ class ItemForm extends Model
     {
         return [
             [['quantity', 'sku'], 'required', 'message' => '{attribute} is required.'],
-            ['quantity', 'integer'],
+            [['quantity', 'alias_quantity'], 'integer'],
             ['quantity', 'compare', 'compareValue' => 0, 'operator' => '>'],
-            ['uuid', 'string', 'length' => [1, 64]],
-            ['sku', 'string', 'length' => [1, 64]],
+            [['sku', 'alias_sku', 'uuid'], 'string', 'length' => [1, 64]],
             ['name', 'string', 'length' => [1, 128]],
         ];
     }

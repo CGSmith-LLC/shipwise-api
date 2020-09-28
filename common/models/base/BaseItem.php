@@ -10,6 +10,8 @@ namespace common\models\base;
  * @property int    $order_id
  * @property int    $quantity
  * @property string $sku
+ * @property int    $alias_quantity
+ * @property string $alias_sku
  * @property string $name
  */
 class BaseItem extends \yii\db\ActiveRecord
@@ -30,8 +32,8 @@ class BaseItem extends \yii\db\ActiveRecord
     {
         return [
             [['order_id', 'quantity', 'sku'], 'required'],
-            [['order_id', 'quantity'], 'integer'],
-            [['sku', 'uuid'], 'string', 'max' => 64],
+            [['order_id', 'quantity', 'alias_quantity'], 'integer'],
+            [['sku', 'uuid', 'alias_sku'], 'string', 'max' => 64],
             ['name', 'string', 'max' => 128],
         ];
     }

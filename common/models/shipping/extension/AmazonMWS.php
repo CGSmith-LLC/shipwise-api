@@ -193,7 +193,11 @@ class AmazonMWS extends ShipmentPlugin
             if (isset($orderItem->uuid)) { // If the item doesn't have a UUID then we assume it is packaging
                 $_item = new \MWSMerchantFulfillmentService_Model_Item();
                 $_item->setOrderItemId($orderItem->uuid);
-                $_item->setQuantity($orderItem->quantity);
+                if (!is_null($orderItem->alias_quantity)) {
+                    $_item->setQuantity($orderItem->alias_quantity);
+                }else {
+                    $_item->setQuantity($orderItem->quantity);
+                }
                 $itemList[] = $_item;
             }
         }

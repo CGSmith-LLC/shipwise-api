@@ -55,7 +55,7 @@ class BaseOrder extends \yii\db\ActiveRecord
             [['created_date', 'updated_date', 'requested_ship_date', 'carrier_id', 'service_id'], 'safe'],
             [['order_reference', 'tracking'], 'string', 'max' => 45],
             [['customer_reference', 'origin'], 'string', 'max' => 64],
-            [['notes'], 'string', 'max' => 140],
+            [['notes'], 'string', 'max' => 600],
             [['po_number'], 'string', 'max' => 64],
             [['label_data'], 'string'],
             [['label_type'], 'string', 'max' => 6],

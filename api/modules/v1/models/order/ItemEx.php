@@ -21,6 +21,8 @@ class ItemEx extends Item
      *     @SWG\Property( property = "quantity", type = "integer", description = "Quantity" ),
      *     @SWG\Property( property = "sku", type = "string", description = "SKU" ),
      *     @SWG\Property( property = "name", type = "string", description = "Item name" ),
+     *     @SWG\Property( property = "alias_quantity", type = "integer", description = "SKU" ),
+     *     @SWG\Property( property = "alias_sku", type = "integer", description = "SKU used that is an alias" ),
      * )
      */
 
@@ -29,6 +31,6 @@ class ItemEx extends Item
      */
     public function fields()
     {
-        return ['id', 'uuid', 'quantity', 'sku', 'name'];
+        return ['id', 'uuid', 'quantity', 'sku', 'name', 'alias_sku', 'alias_quantity'];
     }
 }

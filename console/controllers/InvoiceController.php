@@ -11,6 +11,7 @@ use common\models\SubscriptionItems;
 use common\models\PaymentMethod;
 use dektrium\user\models\User;
 use frontend\models\Customer;
+use Stripe\PaymentIntent;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;

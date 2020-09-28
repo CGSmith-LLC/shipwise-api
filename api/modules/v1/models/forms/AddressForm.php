@@ -136,7 +136,7 @@ use api\modules\v1\models\core\StateEx;
  *            type = "string",
  *            description = "Notes",
  *            minLength = 2,
- *            maxLength = 140
+ *            maxLength = 600
  *        ),
  * )
  */
@@ -189,7 +189,7 @@ class AddressForm extends Model
             ['address2', 'string', 'length' => [1, 64]],
             ['zip', 'string', 'length' => [2, 16]],
             ['phone', 'string', 'length' => [2, 32]],
-            ['notes', 'string', 'length' => [2, 140]],
+            ['notes', 'string', 'length' => [2, 600]],
             [['country'],'string', 'max' => 2],
             ['stateId', 'integer'],
             [
