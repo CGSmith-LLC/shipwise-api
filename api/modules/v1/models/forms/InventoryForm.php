@@ -21,13 +21,18 @@ use yii\helpers\ArrayHelper;
  *            property = "name",
  *            type = "string",
  *            description = "name",
- *            minLength = 2,
  *            maxLength = 128
  *        ),
  *      @SWG\Property(
  *            property = "available_quantity",
  *            type = "number",
  *            description = "available quantity",
+ *        ),
+ *      @SWG\Property(
+ *            property = "location",
+ *            type = "string",
+ *            description = "Location that the warehouse designates where the inventory is located",
+ *            maxLength = 64
  *        ),
  * )
  */
@@ -50,6 +55,8 @@ class InventoryForm extends Model
     public $name;
     /** @var integer */
     public $customer_id;
+    /** @var string */
+    public $location;
 
     /**
      * {@inheritdoc}
@@ -59,7 +66,7 @@ class InventoryForm extends Model
         return [
             [['customer_id', 'sku'], 'required', 'message' => '{attribute} is required.'],
             [['customer_id', 'id'], 'integer'],
-            [['name', 'sku'], 'string', 'max' => 64],
+            [['name', 'sku', 'location'], 'string', 'max' => 64],
             [['available_quantity'], 'number']
         ];
     }
