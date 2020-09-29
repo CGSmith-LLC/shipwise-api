@@ -32,11 +32,6 @@ use yii\helpers\ArrayHelper;
  *            property = "location",
  *            type = "string",
  *            description = "Location that the warehouse designates where the inventory is located",
- *        ),
- *      @SWG\Property(
- *            property = "location",
- *            type = "string",
- *            description = "warehouse identifier or location identifier",
  *            maxLength = 64
  *        ),
  * )
