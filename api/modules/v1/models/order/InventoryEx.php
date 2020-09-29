@@ -18,7 +18,8 @@ class InventoryEx extends Inventory
      *
      *     @SWG\Property( property = "available_quantity", type = "number", description = "Available Quantity" ),
      *     @SWG\Property( property = "sku", type = "string", description = "SKU" ),
-     *     @SWG\Property( property = "name", type = "string", description = " name" ),
+     *     @SWG\Property( property = "name", type = "string", description = "name" ),
+     *     @SWG\Property( property = "location", type = "string", description = "Warehouse identifier" ),
      * )
      */
 
@@ -27,6 +28,6 @@ class InventoryEx extends Inventory
      */
     public function fields()
     {
-        return ['id', 'sku', 'name', 'available_quantity'];
+        return ['id', 'sku', 'name', 'location', 'available_quantity'];
     }
 }
