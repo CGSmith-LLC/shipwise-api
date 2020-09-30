@@ -17,6 +17,10 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'substitute_1')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'substitute_2')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'substitute_3')->textInput(['maxlength' => true]) ?>
+
     <?= $form->field($model, 'customer_id' )->dropDownList($customers, ['prompt' => 'Please Select'])?>
 
     <div class="form-group">

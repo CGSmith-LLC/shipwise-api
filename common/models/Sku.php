@@ -2,14 +2,18 @@
 
 namespace common\models;
 
-use Yii;
+use common\models\query\SkuQuery;
 
 /**
  * This is the model class for table "sku".
  *
  * @property int $id
+ * @property int $customer_id
  * @property string $sku
  * @property string $name
+ * @property string $substitute_1
+ * @property string $substitute_2
+ * @property string $substitute_3
  */
 class Sku extends \yii\db\ActiveRecord
 {
@@ -28,9 +32,18 @@ class Sku extends \yii\db\ActiveRecord
     {
         return [
             [['sku'], 'string', 'max' => 16],
-            [['name'], 'string', 'max' => 64],
+            [['name', 'substitute_1', 'substitute_2', 'substitute_3'], 'string', 'max' => 64],
             [['customer_id'], 'integer']
         ];
+    }
+
+    /**
+     * @inheritdoc
+     * @return SkuQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new SkuQuery(get_called_class(), ['tableName' => Sku::tableName()]);
     }
 
     /**
@@ -45,6 +58,7 @@ class Sku extends \yii\db\ActiveRecord
             'customer_id' => 'Customer',
         ];
     }
+
     /**
      * Get Customer
      *
