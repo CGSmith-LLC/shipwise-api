@@ -74,7 +74,7 @@ class SkuController extends Controller
                 ->forCustomers($this->customers)
                 ->one()
             ) === null) {
-            throw new NotFoundHttpException(Yii::t('app','This order does not exist'));
+            throw new NotFoundHttpException(Yii::t('app','The SKU does not exist'));
         }
 
         return $this->render('view', [
