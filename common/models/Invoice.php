@@ -7,21 +7,26 @@ use common\models\query\InvoiceQuery;
 /**
  * This is the model class for table "invoice".
  *
- * @property int $id
- * @property int $customer_id Reference to customer
- * @property int $subscription_id Reference to Subscription ID
- * @property string $customer_name Customer Name
- * @property int $amount Total in Cents
- * @property int $balance Balance Due in Cents
- * @property string $due_date Due Date
- * @property string $stripe_charge_id stripe charge id
- * @property int $status Status of transaction
+ * @property int            $id
+ * @property int            $customer_id      Reference to customer
+ * @property int            $subscription_id  Reference to Subscription ID
+ * @property string         $customer_name    Customer Name
+ * @property int            $amount           Total in Cents
+ * @property int            $balance          Balance Due in Cents
+ * @property string         $due_date         Due Date
+ * @property string         $stripe_charge_id stripe charge id
+ * @property int            $status           Status of transaction
+ *
+ * @property Customer       $customer
+ * @property InvoiceItems[] $items
+ * @property Subscription[] $subscription
  */
 class Invoice extends \yii\db\ActiveRecord
 {
-    const STATUS_UNPAID = 1;
-    const STATUS_PAID   = 2;
-    const STATUS_LATE   = 3;
+    public const STATUS_UNPAID = 1;
+    public const STATUS_PAID   = 2;
+    public const STATUS_LATE   = 3;
+
     /**
      * {@inheritdoc}
      */
@@ -38,13 +43,17 @@ class Invoice extends \yii\db\ActiveRecord
     {
         return new InvoiceQuery(get_called_class());
     }
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['customer_id', 'subscription_id', 'customer_name', 'amount', 'balance', 'due_date', 'status'], 'required'],
+            [
+                ['customer_id', 'subscription_id', 'customer_name', 'amount', 'balance', 'due_date', 'status'],
+                'required',
+            ],
             [['customer_id', 'subscription_id', 'amount', 'balance', 'status'], 'integer'],
             [['due_date'], 'safe'],
             [['customer_name'], 'string', 'max' => 64],
@@ -58,20 +67,21 @@ class Invoice extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'customer_id' => 'Customer ID',
-            'subscription_id' => 'Subscription ID',
-            'customer_name' => 'Customer Name',
-            'amount' => 'Amount',
-            'balance' => 'Balance',
-            'due_date' => 'Due Date',
+            'id'               => 'ID',
+            'customer_id'      => 'Customer ID',
+            'subscription_id'  => 'Subscription ID',
+            'customer_name'    => 'Customer Name',
+            'amount'           => 'Amount',
+            'balance'          => 'Balance',
+            'due_date'         => 'Due Date',
             'stripe_charge_id' => 'Stripe Charge ID',
-            'status' => 'Status',
+            'status'           => 'Status',
         ];
     }
 
     /**
      * Returns decimal amount after getting from database
+     *
      * @return float
      */
     public function getDecimalAmount()
@@ -79,18 +89,25 @@ class Invoice extends \yii\db\ActiveRecord
         return $this->amount / 100;
     }
 
-    public function getStatusLabel()
+    /**
+     * Status label
+     *
+     * @param bool $html Whether to return in html format
+     *
+     * @return string
+     */
+    public function getStatusLabel($html = true)
     {
         $status = '';
         switch ($this->status) {
             case self::STATUS_UNPAID:
-                $status = '<p class="label label-primary">Unpaid</p>';
+                $status = $html ? '<p class="label label-primary">Unpaid</p>' : 'Unpaid';
                 break;
             case self::STATUS_PAID:
-                $status = '<p class="label label-success">Paid</p>';
+                $status = $html ? '<p class="label label-success">Paid</p>' : 'Paid';
                 break;
             case self::STATUS_LATE:
-                $status = '<p class="label label-danger">Past Due</p>';
+                $status = $html ? '<p class="label label-danger">Past Due</p>' : 'Past Due';
                 break;
         }
 

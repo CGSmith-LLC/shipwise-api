@@ -38,4 +38,14 @@ return [
         'amazon_mws_aws_secret_key'    => '',
 
     ],
+
+    /**
+     * ShipWise invoicing info
+     */
+    'invoicing' => [
+        'company' => 'ShipWise',
+        'email'   => 'support@getshipwise.com',
+        'phone'   => '(262) 342-6638',
+    ],
+
 ];
