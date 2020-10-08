@@ -1,43 +1,65 @@
 #!/bin/bash
-# located in /usr/local/bin/deploy-api.sh
+# located in /usr/local/bin/deploy.sh
+# deploy.sh build-$BITBUCKET_COMMIT build-$BITBUCKET_COMMIT.zip $BUILD_PATH $BITBUCKET_BRANCH'
+# $1 commit to unzip
+# $2 zip file to unzip
+# $3 Path to unzip to
+# $4 branch path (used for Yii init command)
+
+YII_ENV_INIT="Unknown"
+if [ $4 = "master" ];then
+  YII_ENV_INIT="Production"
+elif [ $4 = "development" ];then
+  YII_ENV_INIT="Development"
+fi
+
 echo "Unzipping build $2"
-unzip -d /var/builds/api/$1/ /var/builds/api/$2 || { echo 'unzip failed on build' ; exit 1; }
+echo "Deploying for $4"
+unzip -q -d /var/builds/$3/$1/ /var/builds/$3/$2 || { echo 'unzip failed on build' ; exit 1; }
 
-# Move current API to old folder
-mv -v /var/www/api /var/www/api.old || { echo 'mv to old failed' ; exit 1; }
-mv -v /var/builds/api/$1/ /var/www/api/ || { echo 'mv to backend failed' ; exit 1; }
+# Move current www to old folder
+mv -v /var/www/$3 /var/www/$3.old || { echo 'mv to old failed' ; exit 1; }
+mv -v /var/builds/$3/$1/ /var/www/$3/ || { echo 'mv to backend failed' ; exit 1; }
 
-# Copy local files to new deployment
+# Sync over all local files to the new directory
+# TODO Cannot get this to work so just moving this
+# rsync -rav --include="*-local.php" --exclude="*" /var/www/$3.old/ /var/www/$3/ || { echo 'failed to move local files'; exit 1;}
 
-## Copy API index and Frontend index
-cp /var/builds/configs/api/api/web/index.php /var/www/api/api/web/index.php || { echo 'mv failed for environment settings' ; exit 1; }
-cp /var/builds/configs/api/frontend/web/index.php /var/www/api/frontend/web/index.php || { echo 'mv failed for environment settings' ; exit 1; }
+# Sync over all local uploads into the new directory
+# This may fail due to no uploads
+# TODO Cannot get this to work so just moving this
+# rsync -rav /var/www/$3.old/frontend/web/uploads/* /var/www/$3/frontend/web/uploads/ > /dev/null
+mkdir -p /var/www/$3/frontend/web/images || { echo ' mkdir failed on uploads'; exit 1; }
+cp -r /var/www/$3.old/frontend/web/images/* /var/www/$3/frontend/web/images/
+
 
 ## Copy main-local and params-local for COMMON configuration
-cp /var/builds/configs/api/common/config/main-local.php /var/www/api/common/config/main-local.php || { echo 'mv failed for environment settings' ; exit 1; }
-cp /var/builds/configs/api/common/config/params-local.php /var/www/api/common/config/params-local.php || { echo 'mv failed for environment settings' ; exit 1; }
-
+cp /var/www/$3.old/common/config/main-local.php /var/www/$3/common/config/main-local.php || { echo 'mv failed for environment settings' ; exit 1; }
+cp /var/www/$3.old/common/config/params-local.php /var/www/$3/common/config/params-local.php || { echo 'mv failed for environment settings' ; exit 1; }
 ## Copy main-local and params-local for CONSOLE configuration
-cp /var/builds/configs/api/console/config/main-local.php /var/www/api/console/config/main-local.php || { echo 'mv failed for environment settings' ; exit 1; }
-cp /var/builds/configs/api/console/config/params-local.php /var/www/api/console/config/params-local.php || { echo 'mv failed for environment settings' ; exit 1; }
-
+cp /var/www/$3.old/console/config/main-local.php /var/www/$3/console/config/main-local.php || { echo 'mv failed for environment settings' ; exit 1; }
+cp /var/www/$3.old/console/config/params-local.php /var/www/$3/console/config/params-local.php || { echo 'mv failed for environment settings' ; exit 1; }
 ## Copy main-local and params-local for API configuration
-cp /var/builds/configs/api/api/config/main-local.php /var/www/api/api/config/main-local.php || { echo 'mv failed for environment settings' ; exit 1; }
-cp /var/builds/configs/api/api/config/params-local.php /var/www/api/api/config/params-local.php || { echo 'mv failed for environment settings' ; exit 1; }
-
+cp /var/www/$3.old/api/config/main-local.php /var/www/$3/api/config/main-local.php || { echo 'mv failed for environment settings' ; exit 1; }
+cp /var/www/$3.old/api/config/params-local.php /var/www/$3/api/config/params-local.php || { echo 'mv failed for environment settings' ; exit 1; }
 ## Copy main-local and params-local for FRONTEND configuration
-cp /var/builds/configs/api/frontend/config/main-local.php /var/www/api/frontend/config/main-local.php || { echo 'mv failed for environment settings' ; exit 1; }
-cp /var/builds/configs/api/frontend/config/params-local.php /var/www/api/frontend/config/params-local.php || { echo 'mv failed for environment settings' ; exit 1; }
+cp /var/www/$3.old/frontend/config/main-local.php /var/www/$3/frontend/config/main-local.php || { echo 'mv failed for environment settings' ; exit 1; }
+cp /var/www/$3.old/frontend/config/params-local.php /var/www/$3/frontend/config/params-local.php || { echo 'mv failed for environment settings' ; exit 1; }
+## Copy API index and Frontend index
+cp /var/www/$3.old/frontend/web/index.php /var/www/$3/frontend/web/index.php || { echo 'mv failed for index.php'; }
+cp /var/www/$3.old/api/web/index.php /var/www/$3/api/web/index.php || { echo 'mv failed for index.php'; }
 
-## Copy Yii over
-cp /var/builds/configs/api/yii /var/www/api/yii || { echo 'mv failed for environment settings' ; exit 1; }
+# Copy local files to new deployment
+# not used at this point
+#php /var/www/$3/init --env=$YII_ENV_INIT --overwrite=n || { echo 'mv failed for environment settings' ; exit 1; }
 
 # Update SQL
-php /var/www/api/yii migrate --migrationPath=@dektrium/yii2-user/migrations --interactive=0 || { echo 'failed user update sql' ; exit 1; }
-php /var/www/api/yii migrate --interactive=0 || { echo 'failed to update SQL' ; exit 1; }
+php /var/www/$3/yii migrate --migrationPath=@dektrium/yii2-user/migrations --interactive=0 || { echo 'failed user update sql' ; exit 1; }
+php /var/www/$3/yii migrate --interactive=0 || { echo 'failed to update SQL' ; exit 1; }
+
 
 function finish {
-  rm -rf /var/www/api.old
+  rm -rf /var/www/$3.old
 }
 
 trap finish EXIT
