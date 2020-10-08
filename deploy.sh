@@ -48,6 +48,8 @@ cp /var/www/$3.old/frontend/config/params-local.php /var/www/$3/frontend/config/
 ## Copy API index and Frontend index
 cp /var/www/$3.old/frontend/web/index.php /var/www/$3/frontend/web/index.php || { echo 'mv failed for index.php'; }
 cp /var/www/$3.old/api/web/index.php /var/www/$3/api/web/index.php || { echo 'mv failed for index.php'; }
+## Move Yii
+cp /var/www/$3.old/yii /var/www/$3/yii || { echo 'mv failed for yii'; }
 
 # Copy local files to new deployment
 # not used at this point
