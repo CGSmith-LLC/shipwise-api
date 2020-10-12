@@ -17,6 +17,9 @@ use yii\base\Event;
  * @property int $customer_id Reference to customer
  * @property string $stripe_payment_method_id
  * @property int $default Is this the customer's default payment method?
+ * @property string $brand
+ * @property string $lastfour
+ * @property string $expiration
  */
 class PaymentMethod extends \yii\db\ActiveRecord
 {

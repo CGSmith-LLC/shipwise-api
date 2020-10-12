@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\query\InvoiceQuery;
+use frontend\models\PaymentIntent;
 
 /**
  * This is the model class for table "invoice".
@@ -20,6 +21,7 @@ use common\models\query\InvoiceQuery;
  * @property Customer       $customer
  * @property InvoiceItems[] $items
  * @property Subscription[] $subscription
+ * @property PaymentIntent  $paymentIntent
  */
 class Invoice extends \yii\db\ActiveRecord
 {
@@ -143,5 +145,15 @@ class Invoice extends \yii\db\ActiveRecord
     public function getSubscription()
     {
         return $this->hasMany(Subscription::class, ['id' => 'subscription_id']);
+    }
+
+    /**
+     * Relation for PaymentIntent
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentIntent()
+    {
+        return $this->hasOne(PaymentIntent::class, ['invoice_id' => 'id']);
     }
 }

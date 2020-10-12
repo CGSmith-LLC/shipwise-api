@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\Invoice;
 use common\pdf\InvoicePDF;
+use common\pdf\ReceiptPDF;
 use dektrium\user\filters\AccessRule;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -129,6 +130,29 @@ class InvoiceController extends Controller
         return Yii::$app->response->sendContentAsFile(
             $pdf->Output('S'),
             "Invoice_{$invoice->id}.pdf",
+            ['mimeType' => 'application/pdf', 'inline' => true]
+        );
+    }
+
+    /**
+     * Generates and outputs Receipt PDF file for a given invoice.
+     *
+     * @param int $id Invoice Id
+     *
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\web\NotFoundHttpException if the model cannot be found
+     */
+    public function actionReceiptPdf(int $id)
+    {
+        $invoice = $this->findModel($id);
+
+        $pdf = new ReceiptPDF();
+        $pdf->generate($invoice);
+
+        return Yii::$app->response->sendContentAsFile(
+            $pdf->Output('S'),
+            "Receipt_{$invoice->id}.pdf",
             ['mimeType' => 'application/pdf', 'inline' => true]
         );
     }

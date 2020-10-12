@@ -2,7 +2,6 @@
 
 namespace common\pdf;
 
-use api\modules\v1\models\core\AddressEx;
 use common\models\Invoice;
 use DateTime;
 use Yii;
@@ -11,7 +10,6 @@ use Yii;
  * Class InvoicePDF
  *
  * This class generates an Invoice PDF file for a given invoice model.
- * Default size of the packing slip is 4x6 inches.
  *
  * @package common\pdf
  *
@@ -88,9 +86,36 @@ class InvoicePDF extends \FPDF
     }
 
     /**
+     * String sanitizing for correct PDF output.
+     *
+     * @param string|null $str
+     *
+     * @return false|string
+     */
+    private function sanitizeOutput($str = null)
+    {
+        $str = str_replace("’", "'", $str);
+
+        return iconv("UTF-8", "ISO-8859-1//IGNORE", $str);
+    }
+
+    /**
+     * Returns sanitized text for correct PDF output.
+     *
+     * @param string|null $str
+     *
+     * @return false|string
+     */
+    private function out($str = null)
+    {
+        return $this->sanitizeOutput($str);
+    }
+
+    /**
      * Generate the PDF
      *
      * This function takes Invoice data and generates the PDF content (without saving neither outputting it)
+     * After successful generation you can call `$pdf->Output('S')` to get the generated data.
      *
      * @param Invoice $invoice Invoice data to populate
      *
@@ -127,24 +152,30 @@ class InvoicePDF extends \FPDF
         $this->Cell(0, $cellH + 3, 'From', 0, 2);
         $this->resetFont();
 
+        $cellH = 4.5; // cell height
         $cellW = 80; // cell width
-        $this->Cell($cellW, $cellH, Yii::$app->params['invoicing']['company'], 0, 2);
-        // @todo Display address?
-        $this->Cell($cellW, $cellH, Yii::$app->params['invoicing']['email'], 0, 2);
-        $this->Cell($cellW, $cellH, Yii::$app->params['invoicing']['phone'], 0, 2);
+        $this->setFont($this->fontFamily, '', $this->fontSize - 1);
+        $this->Cell($cellW, $cellH, $this->out(Yii::$app->params['invoicing']['company']), 0, 2);
+        $this->Cell($cellW, $cellH, $this->out(Yii::$app->params['invoicing']['address']), 0, 2);
+        $txt = Yii::$app->params['invoicing']['city'] . ', ' . Yii::$app->params['invoicing']['state'] . ' ';
+        $txt .= Yii::$app->params['invoicing']['zip'];
+        $this->Cell($cellW, $cellH, $this->out($txt), 0, 2);
+        $this->Cell($cellW, $cellH, $this->out(Yii::$app->params['invoicing']['email']), 0, 2);
+        $this->Cell($cellW, $cellH, $this->out(Yii::$app->params['invoicing']['phone']), 0, 2);
         $this->ln(3);
 
         /**
          * Invoice details
          */
-        $cellW = 20; // cell width
-        $this->SetXY($this->pageWidth / 2 + $cellW, $y);
+        $cellH = 5; // cell height
+        $cellW = 30; // cell width
+        $this->SetXY($this->pageWidth / 2 + $cellW + 5, $y);
         $this->setFont($this->fontFamily, 'B');
         $this->Cell(0, $cellH + 3, 'Details', 0, 2);
         $this->resetFont();
 
-        $this->Cell($cellW, $cellH, "Invoice #:", 0, 2);
-        $this->Cell($cellW, $cellH, "Due Date:", 0, 2);
+        $this->Cell($cellW, $cellH, "Invoice number:", 0, 2);
+        $this->Cell($cellW, $cellH, "Due date:", 0, 2);
         $this->Cell($cellW, $cellH, "Status:", 0, 2);
 
         $cellW = 40; // cell width
@@ -153,22 +184,52 @@ class InvoicePDF extends \FPDF
         $this->Cell($cellW, $cellH, $this->invoice->id, 0, 2, 'R');
         $date = new DateTime($this->invoice->due_date);
         $this->Cell($cellW, $cellH, $date->format("F jS, Y"), 0, 2, 'R');
-        $this->Cell($cellW, $cellH, $this->invoice->getStatusLabel(false), 0, 2, 'R');
+        $this->Cell($cellW, $cellH, $this->out($this->invoice->getStatusLabel(false)), 0, 2, 'R');
         $this->ln(3);
 
         /**
          * For
          */
-        $this->ln(2);
+        $this->ln(7);
         $cellH = 5; // cell height
         $this->setFont($this->fontFamily, 'B');
         $y = $this->GetY();
         $this->Cell(0, $cellH + 3, 'For', 0, 2);
         $this->resetFont();
 
+        $cellH = 4.5; // cell height
         $cellW = 80; // cell width
-        $this->Cell($cellW, $cellH, $this->invoice->customer_name, 0, 2);
-        // @todo Display address?
+        $this->setFont($this->fontFamily, '', $this->fontSize - 1);
+        $txt = $this->invoice->customer_name ?? '';
+        $this->Cell($cellW, $cellH, $this->out($txt), 0, 2);
+
+        if (!is_null($this->invoice->customer)) {
+            $txt = $this->invoice->customer->address1 ?? '';
+            if ($this->invoice->customer->address2) {
+                $txt .= ' ' . $this->invoice->customer->address2;
+            }
+            if (!empty($txt)) {
+                $this->Cell($cellW, $cellH, $this->out($txt), 0, 2);
+            }
+            $txt = $this->invoice->customer->city ?? '';
+            if ($this->invoice->customer->state) {
+                $txt .= ', ' . $this->invoice->customer->state->abbreviation;
+            }
+            if ($this->invoice->customer->zip) {
+                $txt .= ' ' . $this->invoice->customer->zip;
+            }
+            if (!empty($txt)) {
+                $this->Cell($cellW, $cellH, $this->out($txt), 0, 2);
+            }
+            $txt = $this->invoice->customer->email ?? '';
+            if (!empty($txt)) {
+                $this->Cell($cellW, $cellH, $this->out($txt), 0, 2);
+            }
+            $txt = $this->invoice->customer->phone ?? '';
+            if (!empty($txt)) {
+                $this->Cell($cellW, $cellH, $this->out($txt), 0, 2);
+            }
+        }
         $this->ln(3);
 
         /**
@@ -185,12 +246,10 @@ class InvoicePDF extends \FPDF
         $data = [];
         if (is_array($this->invoice->items) && count($this->invoice->items) > 0) {
             foreach ($this->invoice->items as $item) {
-                //for ($i = 0; $i < 50; $i++) { // @todo remove after tests
-                    $data[] = [
-                        $item->name,
-                        $this->asCurrency($item->getDecimalAmount()),
-                    ];
-                //}
+                $data[] = [
+                    $item->name,
+                    $this->asCurrency($item->getDecimalAmount()),
+                ];
             }
         }
 
