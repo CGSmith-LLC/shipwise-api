@@ -38,4 +38,18 @@ return [
         'amazon_mws_aws_secret_key'    => '',
 
     ],
+
+    /**
+     * ShipWise invoicing info
+     */
+    'invoicing' => [
+        'company' => 'ShipWise',
+        'address' => 'PO Box 812',
+        'city'    => 'East Troy',
+        'state'   => 'WI',
+        'zip'     => '53120',
+        'email'   => 'support@getshipwise.com',
+        'phone'   => '(262) 342-6638',
+    ],
+
 ];

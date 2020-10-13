@@ -31,8 +31,6 @@ class OrderPackingSlip extends \FPDF
     protected $pageWidth; // page width without margins
     protected $pageHeight; // page height without margins
 
-    protected $_currency = '$';
-
     /** {@inheritdoc} */
     public function __construct($orientation = 'P', $unit = 'mm', $size = [100, 150])
     {
@@ -79,7 +77,7 @@ class OrderPackingSlip extends \FPDF
      */
     protected function asCurrency($amount)
     {
-        return Yii::$app->formatter->asCurrency($amount, $this->_currency);
+        return Yii::$app->formatter->asCurrency($amount);
     }
 
     /**
