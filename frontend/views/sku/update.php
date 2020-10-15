@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $model common\models\Sku */
 /* @var $customers array of customers */
 
-$this->title = 'Update Sku: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Skus', 'url' => ['index']];
+$this->title = 'Update SKU: ' . $model->name;
+$this->params['breadcrumbs'][] = ['label' => 'SKUs', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>

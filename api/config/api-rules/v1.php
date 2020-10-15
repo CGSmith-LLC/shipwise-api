@@ -45,6 +45,15 @@ return [
         "controller" => ["$version/inventory"],
     ],
 
+    // SKU
+    [
+        "class"      => 'yii\rest\UrlRule',
+        "controller" => ["$version/sku"],
+        "extraPatterns" => [
+            "GET  find" => "find",
+        ],
+    ],
+
     "POST $version/inventory" => "$version/inventory/create",
     "POST $version/webhook" => "$version/webhook",
     "GET $version/inventory" => "$version/inventory",

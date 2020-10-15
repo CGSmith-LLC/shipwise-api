@@ -1,8 +1,10 @@
-image: php:7.3.13
+image: php:7.4
 pipelines:
   branches:
     master:
       - step:
+          caches:
+            - composer
           name: Install OS dependencies, run PHPUnit, create BUILD
           script:
             - apt-get update && apt-get install -y unzip git libxml2-dev zlib1g-dev libzip-dev zip
@@ -14,20 +16,38 @@ pipelines:
             - zip -r build.zip . -x *.git* *tests* *vagrant*
           artifacts:
             - build.zip
+            - deploy.sh
       - step:
           name: Deploy build with SCP to PRODUCTION
           script:
-            - pipe: atlassian/scp-deploy:0.3.3
+            - pipe: atlassian/scp-deploy:0.3.11
               variables:
                 USER: $USER
                 SERVER: $SERVER
-                REMOTE_PATH: '/var/builds/api/build-$BITBUCKET_COMMIT.zip'
+                REMOTE_PATH: '/var/builds/$BUILD_PATH/build-$BITBUCKET_COMMIT.zip'
                 LOCAL_PATH: 'build.zip'
       - step:
-          name: Move current app to OLD and replace with new BUILD ZIP
+          name: Install deploy.sh artifact
           script:
-            - pipe: atlassian/ssh-run:0.2.2
+            - pipe: atlassian/scp-deploy:0.3.11
+              variables:
+                USER: $USER
+                SERVER: $SERVER
+                REMOTE_PATH: '/usr/local/bin/deploy.sh'
+                LOCAL_PATH: 'deploy.sh'
+      - step:
+          name: Set permissions for deploy.sh
+          script:
+            - pipe: atlassian/ssh-run:0.2.5
               variables:
                 SSH_USER: $USER
                 SERVER: $SERVER
-                COMMAND: 'deploy-api.sh build-$BITBUCKET_COMMIT build-$BITBUCKET_COMMIT.zip'
+                COMMAND: 'chmod +x /usr/local/bin/deploy.sh'
+      - step:
+          name: Move current app to OLD and replace with new BUILD ZIP
+          script:
+            - pipe: atlassian/ssh-run:0.2.5
+              variables:
+                SSH_USER: $USER
+                SERVER: $SERVER
+                COMMAND: 'deploy.sh build-$BITBUCKET_COMMIT build-$BITBUCKET_COMMIT.zip $BUILD_PATH $BITBUCKET_BRANCH'

@@ -2,6 +2,7 @@
 
 namespace frontend\models;
 
+use common\models\PaymentMethod;
 
 /**
  * This is the model class for table "payment_intent".
@@ -14,6 +15,8 @@ namespace frontend\models;
  * @property int $amount Total in Cents
  * @property string $status Stripe Status of Payment Intent
  * @property string $created_date Created Date
+ *
+ * @property PaymentMethod $paymentMethod
  */
 class PaymentIntent extends \yii\db\ActiveRecord
 {
@@ -54,5 +57,15 @@ class PaymentIntent extends \yii\db\ActiveRecord
             'status' => 'Status',
             'created_date' => 'Created Date',
         ];
+    }
+
+    /**
+     * Relation for PaymentMethod
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPaymentMethod()
+    {
+        return $this->hasOne(PaymentMethod::class, ['id' => 'payment_method_id']);
     }
 }
