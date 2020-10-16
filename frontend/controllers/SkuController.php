@@ -26,7 +26,7 @@ class SkuController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        //'roles' => ['admin'],
+                        'roles' => ['@'],
                     ],
                 ],
             ],
@@ -68,10 +68,14 @@ class SkuController extends Controller
      */
     public function actionView($id)
     {
+        $query = Sku::find();
 
-        if (($order = Sku::find()
+        if (!Yii::$app->user->identity->isAdmin) {
+            $query->forCustomers($this->customers);
+        }
+
+        if (($query
                 ->byId($id)
-                ->forCustomers($this->customers)
                 ->one()
             ) === null) {
             throw new NotFoundHttpException(Yii::t('app','The SKU does not exist'));
