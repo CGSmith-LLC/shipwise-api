@@ -13,7 +13,8 @@
         "setasign/fpdf": "^1.8",
         "cgsmith/yii2-stripe": "dev-master",
         "serzh/amazon-mws-merchant-fulfillment": "^1.0",
-        "osiset/basic-shopify-api": "^9.1"
+        "osiset/basic-shopify-api": "^9.1",
+        "yii2tech/csv-grid": "^1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
