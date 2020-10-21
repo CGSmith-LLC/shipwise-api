@@ -9,6 +9,8 @@ use common\models\OneTimeCharge;
 use common\models\Subscription;
 use common\models\SubscriptionItems;
 use common\models\PaymentMethod;
+use common\pdf\InvoicePDF;
+use common\pdf\ReceiptPDF;
 use dektrium\user\models\User;
 use frontend\models\Customer;
 use Stripe\PaymentIntent;
@@ -162,12 +164,23 @@ class InvoiceController extends Controller
             }
 
             try {
+
+                // Generate Invoice PDF
+                $pdf = new InvoicePDF();
+                $pdf->generate($invoiceToEmail);
+
+                // Send
                 $mailer->compose(['html' => 'new-invoice'], ['model' => $invoiceToEmail])
-                    ->setTo($customerEmails)
-                    ->setBcc(\Yii::$app->params['adminEmail'])
-                    ->setFrom(\Yii::$app->params['senderEmail'])
-                    ->setSubject('ShipWise Invoice #' . $invoiceToEmail->id)
-                    ->send();
+                       ->setTo($customerEmails)
+                       ->setBcc(\Yii::$app->params['adminEmail'])
+                       ->setFrom(\Yii::$app->params['senderEmail'])
+                       ->setSubject('ShipWise Invoice #' . $invoiceToEmail->id)
+                       ->attachContent(
+                           $pdf->Output('S'),
+                           ['fileName' => "Invoice_{$invoiceToEmail->id}.pdf", 'contentType' => 'application/pdf']
+                       )
+                       ->send();
+
             } catch (\Exception $ex) {
                 var_dump($ex->getMessage());
                 die('exception hit');
@@ -221,6 +234,7 @@ class InvoiceController extends Controller
                 // update invoice.balance to the remaining amount minus stripe's charges
                 $invoice->setAttribute('balance', ($invoice->amount - $charge->amount));
                 $invoice->setAttribute('status', Invoice::STATUS_PAID);
+                $invoice->setAttribute('stripe_charge_id', $charge->id);
                 if ($invoice->update() == false) {
                     foreach ($invoice->getErrorSummary(true) as $error) {
                         echo 'actionCharge() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
@@ -235,6 +249,12 @@ class InvoiceController extends Controller
                     }
 
                     try {
+
+                        // Generate Receipt PDF
+                        $pdf = new ReceiptPDF();
+                        $pdf->generate($invoice);
+
+                        // Send
                         $mailer->compose(['html' => 'new-payment'], [
                                 'model' => $invoice,
                                 'url' => Url::toRoute(['invoice/view', 'id' => $invoice->id], 'https')
@@ -243,7 +263,12 @@ class InvoiceController extends Controller
                             ->setBcc(\Yii::$app->params['adminEmail'])
                             ->setFrom(\Yii::$app->params['senderEmail'])
                             ->setSubject('ShipWise Receipt for Invoice #' . $invoice->id)
+                            ->attachContent(
+                                $pdf->Output('S'),
+                                ['fileName' => "Receipt_{$invoice->id}.pdf", 'contentType' => 'application/pdf']
+                            )
                             ->send();
+
                     } catch (\Exception $ex) {
                         var_dump($ex->getMessage());
                         die('exception hit');

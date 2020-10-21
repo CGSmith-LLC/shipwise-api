@@ -93,3 +93,8 @@
 .rtl table tr td:nth-child(2) {
     text-align: left;
 }
+
+.invoice-toolbar {
+    max-width: 800px;
+    margin: 10px auto;
+}

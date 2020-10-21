@@ -1,5 +1,7 @@
 <?php
 
+use yii\bootstrap\ButtonDropdown;
+use yii\bootstrap\Dropdown;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -16,6 +18,29 @@ $this->registerCssFile('/css/invoice-print.css', ['media' => 'print']);
 $formatter = Yii::$app->getFormatter();
 ?>
 <div class="invoice-view">
+
+    <div class="invoice-toolbar text-right">
+        <?= ButtonDropdown::widget(
+            [
+                'label'         => 'Print',
+                'options' => ['class' => 'btn dropdown-toggle btn-primary'],
+                'dropdown'      => [
+                    'items' => [
+                        [
+                            'label'       => 'Invoice',
+                            'url'         => ['invoice-pdf', 'id' => $model->id],
+                            'linkOptions' => ['target' => '_blank'],
+                        ],
+                        [
+                            'label'       => 'Receipt',
+                            'url'         => ['receipt-pdf', 'id' => $model->id],
+                            'linkOptions' => ['target' => '_blank'],
+                        ],
+                    ],
+                ],
+            ]
+        ) ?>
+    </div>
 
     <div class="invoice-box">
         <table cellpadding="0" cellspacing="0">
@@ -49,9 +74,9 @@ $formatter = Yii::$app->getFormatter();
                             </td>
 
                             <td>
-                                ShipWise<br>
-                                support@getshipwise.com<br>
-                                (262) 342-6638
+                                <?= Yii::$app->params['invoicing']['company'] ?><br>
+                                <?= Yii::$app->params['invoicing']['email'] ?><br>
+                                <?= Yii::$app->params['invoicing']['phone'] ?>
                             </td>
                         </tr>
                     </table>

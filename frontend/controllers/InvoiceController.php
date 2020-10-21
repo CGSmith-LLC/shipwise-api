@@ -1,30 +1,33 @@
 <?php
 
-
 namespace frontend\controllers;
 
-
 use common\models\Invoice;
-use common\models\query\InventoryQuery;
-use common\models\query\InvoiceQuery;
-use yii\BaseYii;
+use common\pdf\InvoicePDF;
+use common\pdf\ReceiptPDF;
+use dektrium\user\filters\AccessRule;
+use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
-use yii\filters\VerbFilter;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-class InvoiceController extends \frontend\controllers\Controller
+/**
+ * Class InvoiceController
+ *
+ * @package frontend\controllers
+ */
+class InvoiceController extends Controller
 {
+    /** {@inheritdoc } */
     public function behaviors()
     {
         return [
             'access' => [
-                'class' => AccessControl::class,
+                'class'      => AccessControl::class,
                 'ruleConfig' => [
-                    'class' => \dektrium\user\filters\AccessRule::class,
+                    'class' => AccessRule::class,
                 ],
-                'rules' => [
+                'rules'      => [
                     [
                         'allow' => true,
                         'roles' => ['@'],
@@ -35,7 +38,8 @@ class InvoiceController extends \frontend\controllers\Controller
     }
 
     /**
-     * Lists all PaymentMethod models.
+     * Lists all Invoice models.
+     *
      * @return mixed
      */
     public function actionIndex()
@@ -47,36 +51,58 @@ class InvoiceController extends \frontend\controllers\Controller
         }
         $query->orderBy(['id' => SORT_DESC]);
 
-        $invoiceDataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
+        $invoiceDataProvider = new ActiveDataProvider(
+            [
+                'query' => $query,
+            ]
+        );
 
-        return $this->render('index', [
-            'invoiceDataProvider' => $invoiceDataProvider,
-        ]);
+        return $this->render(
+            'index',
+            [
+                'invoiceDataProvider' => $invoiceDataProvider,
+            ]
+        );
     }
 
-    public function actionView($id)
+    /**
+     * Displays a single Invoice model.
+     *
+     * @param int $id Invoice id
+     *
+     * @return string
+     * @throws \yii\web\NotFoundHttpException if the model cannot be found
+     */
+    public function actionView(int $id)
     {
-
-        $query = Invoice::find()
-            ->where(['id' => $id]);
+        $query = Invoice::find()->where(['id' => $id]);
 
         if (!\Yii::$app->user->identity->isAdmin) {
             $query->andWhere(['in', 'customer_id', \Yii::$app->user->identity->customerIds]);
         }
 
-        if (($model = $query->one()
-            ) === null) {
+        if (($model = $query->one()) === null) {
             throw new NotFoundHttpException('Invoice not found');
         }
 
-        return $this->render('view', [
-            'model' => $model,
-        ]);
+        return $this->render(
+            'view',
+            [
+                'model' => $model,
+            ]
+        );
     }
 
-    protected function findModel($id)
+    /**
+     * Finds the Invoice model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     *
+     * @param int $id Invoice id
+     *
+     * @return Invoice the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel(int $id)
     {
         if (($model = Invoice::findOne($id)) !== null) {
             return $model;
@@ -85,5 +111,50 @@ class InvoiceController extends \frontend\controllers\Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
+    /**
+     * Generates and outputs Invoice PDF file.
+     *
+     * @param int $id Invoice Id
+     *
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\web\NotFoundHttpException if the model cannot be found
+     */
+    public function actionInvoicePdf(int $id)
+    {
+        $invoice = $this->findModel($id);
+
+        $pdf = new InvoicePDF();
+        $pdf->generate($invoice);
+
+        return Yii::$app->response->sendContentAsFile(
+            $pdf->Output('S'),
+            "Invoice_{$invoice->id}.pdf",
+            ['mimeType' => 'application/pdf', 'inline' => true]
+        );
+    }
+
+    /**
+     * Generates and outputs Receipt PDF file for a given invoice.
+     *
+     * @param int $id Invoice Id
+     *
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\web\NotFoundHttpException if the model cannot be found
+     */
+    public function actionReceiptPdf(int $id)
+    {
+        $invoice = $this->findModel($id);
+
+        $pdf = new ReceiptPDF();
+        $pdf->generate($invoice);
+
+        return Yii::$app->response->sendContentAsFile(
+            $pdf->Output('S'),
+            "Receipt_{$invoice->id}.pdf",
+            ['mimeType' => 'application/pdf', 'inline' => true]
+        );
+    }
 
 }
