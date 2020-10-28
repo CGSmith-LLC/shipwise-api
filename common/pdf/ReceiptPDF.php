@@ -166,7 +166,7 @@ class ReceiptPDF extends \FPDF
         $this->Cell($col2W, $cellH, ":   " . $this->out($txt), 0, 1);
 
         $this->Cell($col1W, $cellH, "Amount", 0, 0);
-        $this->Cell($col2W, $cellH, ":   " . $this->asCurrency($invoice->amount), 0, 1);
+        $this->Cell($col2W, $cellH, ":   " . $this->asCurrency($invoice->getDecimalAmount()), 0, 1);
 
         $this->ln(5);
         $this->Line($this->marginLeft, $this->GetY(), $this->pageWidth + $this->marginRight, $this->GetY());
