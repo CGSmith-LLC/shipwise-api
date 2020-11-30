@@ -207,7 +207,7 @@ class OrderImport extends Model
                     continue;
                 }
 
-                if (!isset($processedOrders[$orderNo])) { // CASE: New order
+                if (!isset($processedOrders[$orderNo])) { // CASE: New order - create Address and Order objects.
 
                     // Address
                     $address           = new Address();
@@ -246,7 +246,6 @@ class OrderImport extends Model
                     // Validate and save Order object
                     if ($order->save()) {
                         $processedOrders[$orderNo] = $order->id;
-                        $orderId                   = $order->id;
                     } else {
                         foreach ($order->getErrors() as $attr => $error) {
                             $msg = 'Row# ' . ($idx + 1) . " (Order# {$orderNo})";
@@ -257,14 +256,11 @@ class OrderImport extends Model
                         $idx++;
                         continue;
                     }
-                } else {
-                    // CASE: Current item will be appended to the previously processed (in this CSV file) order.
-                    $orderId = $processedOrders[$orderNo];
                 }
 
                 // Item
                 $item           = new Item();
-                $item->order_id = $orderId;
+                $item->order_id = $processedOrders[$orderNo];
                 $item->sku      = trim($data['item_sku']);
                 $item->quantity = trim($data['item_quantity']);
                 $item->name     = trim($data['item_name']) ?? null;
@@ -282,7 +278,7 @@ class OrderImport extends Model
 
                 $idx++;
 
-                unset($data, $address, $order, $item, $orderNo, $orderId, $country, $stateId, $service);
+                unset($data, $address, $order, $item, $orderNo, $country, $stateId, $service);
             } // end while
 
             if (!$modelValidated) {
