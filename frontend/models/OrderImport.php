@@ -24,7 +24,7 @@ class OrderImport extends Model
 {
     public $customer;
 
-    // Field to be exported
+    // Fields to be exported
     public static $csvFields = [
         'order_no',           // = orders.customer_reference
         'item_sku',           // = items.sku
@@ -123,8 +123,8 @@ class OrderImport extends Model
     /**
      * Process the import from CSV file into DB
      *
-     * This function will validate read the CSV file line by line. Create a new order/item and address model.
-     * If an order has multiple items, they will be added to the already processed order.
+     * This function will read the CSV file line by line. Create a new order/item and address model.
+     * If an order has multiple items, they will be added to the already processed (in the current CSV file) order.
      *
      * @return bool
      */
@@ -297,6 +297,10 @@ class OrderImport extends Model
             $this->addError('file', 'Import failed. ' . $e->getMessage());
 
             return false;
+        } finally {
+            if (isset($file)) {
+                fclose($file);
+            }
         }
 
         return true;

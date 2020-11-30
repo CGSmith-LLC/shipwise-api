@@ -482,6 +482,7 @@ class OrderController extends \frontend\controllers\Controller
 
     /**
      * Renders the Import Orders page.
+     * Processes the form submission with uploaded file.
      *
      * @return mixed
      * @throws \yii\web\BadRequestHttpException
@@ -500,14 +501,11 @@ class OrderController extends \frontend\controllers\Controller
             throw new BadRequestHttpException('Invalid customer id.');
         }
 
-        if (Yii::$app->request->isPost) {
-            if ($model->import()) {
-                Yii::$app->session->setFlash(
-                    'success',
-                    "Import successfully processed! <br />" .
-                    Html::a('See orders', ['/order'], ['target' => '_blank'])
-                );
-            }
+        if (Yii::$app->request->isPost && $model->import()) {
+            Yii::$app->session->setFlash(
+                'success',
+                "Import successfully processed! <br />" . Html::a('See orders', ['/order'], ['target' => '_blank'])
+            );
         }
 
         return $this->render(
