@@ -7,7 +7,7 @@ use frontend\models\Customer;
 use Yii;
 use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\{Order, forms\OrderForm, BulkAction, OrderImport, search\OrderSearch};
-use yii\web\{BadRequestHttpException, Controller, NotFoundHttpException, Response};
+use yii\web\{BadRequestHttpException, NotFoundHttpException, Response};
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\helpers\FileHelper;
@@ -18,7 +18,6 @@ use yii2tech\csvgrid\CsvGrid;
  * OrderController implements the CRUD actions for Order model.
  */
 class OrderController extends \frontend\controllers\Controller
-
 {
 
     /**
@@ -482,23 +481,42 @@ class OrderController extends \frontend\controllers\Controller
     }
 
     /**
-     * Import orders
+     * Renders the Import Orders page.
      *
      * @return mixed
+     * @throws \yii\web\BadRequestHttpException
      */
     public function actionImport()
     {
+        $customers = Yii::$app->user->identity->isAdmin
+            ? Customer::getList()
+            : Yii::$app->user->identity->getCustomerList();
+
         $model = new OrderImport();
+        $model->load(Yii::$app->request->queryParams);
+
+        // check that selected customer belongs to user
+        if ($model->customer && !isset($customers[$model->customer])) {
+            throw new BadRequestHttpException('Invalid customer id.');
+        }
+
+        if (Yii::$app->request->isPost) {
+            if ($model->import()) {
+                Yii::$app->session->setFlash(
+                    'success',
+                    "Import successfully processed! <br />" .
+                    Html::a('See orders', ['/order'], ['target' => '_blank'])
+                );
+            }
+        }
 
         return $this->render(
             'import',
             [
-                'model'    => $model,
-                'carriers' => Carrier::getShipwiseCodes(),
-                'services' => Service::getShipwiseCodes(),
-                'customers' => Yii::$app->user->identity->isAdmin
-                    ? Customer::getList()
-                    : Yii::$app->user->identity->getCustomerList(),
+                'model'     => $model,
+                'carriers'  => Carrier::getShipwiseCodes(),
+                'services'  => Service::getShipwiseCodes(),
+                'customers' => $customers,
             ]
         );
     }
@@ -518,26 +536,7 @@ class OrderController extends \frontend\controllers\Controller
 
         $exporter = new CsvGrid(
             [
-                /*'dataProvider' => new ActiveDataProvider(
-                    [
-                        'query' => MarketingLead::find()->currentLocation(),
-                    ]
-                ),
-                'columns'      => MarketingLead::$exportFields,*/
-                'dataProvider' => new ArrayDataProvider(
-                    [
-                        'allModels' => OrderImport::$sampleData,
-                    ]
-                ),
-                /*'columns'      => [
-                    [
-                        'attribute' => 'name',
-                    ],
-                    [
-                        'attribute' => 'price',
-                        'format'    => 'decimal',
-                    ],
-                ],*/
+                'dataProvider' => new ArrayDataProvider(['allModels' => OrderImport::getSampleData()]),
                 'columns'      => OrderImport::$csvFields,
             ]
         );

@@ -4,6 +4,7 @@ namespace common\models;
 
 use common\models\base\BaseState;
 use common\models\shipping\Service;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -55,5 +56,31 @@ class State extends BaseState
         $query->orderBy([$keyField => SORT_ASC, $valueField => SORT_ASC]);
 
         return ArrayHelper::map($query->all(), $keyField, $valueField);
+    }
+
+    /**
+     * For given country code find state by either abbreviation or name
+     *
+     * @param string $country
+     * @param string $abbr State abbreviation
+     * @param string $name State name
+     *
+     * @return State|ActiveRecord|bool The State model or False if not found
+     */
+    public static function findByAbbrOrName($country, $abbr = '', $name = '')
+    {
+        if (empty($country) || (empty($abbr) && empty($name))) {
+            return false;
+        }
+
+        if (($state = self::find()->where(['country' => $country, 'abbreviation' => $abbr])->one()) !== null) {
+            return $state;
+        }
+
+        if (($state = self::find()->where(['country' => $country, 'name' => $name])->one()) !== null) {
+            return $state;
+        }
+
+        return false;
     }
 }

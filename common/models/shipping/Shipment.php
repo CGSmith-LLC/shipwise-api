@@ -347,16 +347,16 @@ class Shipment extends BaseShipment
     }
 
     /**
-     * This function will transform US state full-name to abbreviation if necessary.
+     * This function will transform US state or Canada province full-name to abbreviation if necessary.
      *
      * @param string $country Country ISO code
      * @param string $state   State or Province
      *
-     * @return string
+     * @return string Teh abbreviation code, eg. IL. Or the $state param ASIS if not found.
      */
     public static function recognizeState($country, $state)
     {
-        if ($country == 'US') {
+        if (in_array($country, ['US', 'CA'])) {
             $input = strtoupper(trim($state));
             if (strlen($input) == 2) {
                 return $input;

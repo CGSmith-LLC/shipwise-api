@@ -109,7 +109,7 @@ class Carrier extends BaseCarrier
      *
      * @param string $serviceShipwiseCode Service ShipWise code.
      *
-     * @return array|\yii\db\ActiveRecord|null
+     * @return Carrier|\yii\db\ActiveRecord|null
      */
     public static function findByServiceCode($serviceShipwiseCode)
     {

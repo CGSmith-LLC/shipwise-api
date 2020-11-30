@@ -291,3 +291,7 @@ a.desc:after {
     padding: 25px;
     color: #4c4e56;
 }
+
+.m-auto {
+    margin: auto;
+}

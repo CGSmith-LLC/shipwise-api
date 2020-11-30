@@ -12,6 +12,7 @@ use Yii;
  * Base controller responsible for checking if the user has any payment methods
  *
  * @package frontend\controllers
+ * @property array $customers
  */
 class Controller extends \yii\web\Controller
 {
@@ -47,6 +48,7 @@ class Controller extends \yii\web\Controller
 
             /**
              * Set the customer ids for all controllers
+             * @todo This should return same data structure for both cases! Otherwise, it is half useful. (Vitaliy)
              */
             if (!Yii::$app->user->identity->isAdmin) {
                 $this->customers = Yii::$app->user->identity->customerIds;
