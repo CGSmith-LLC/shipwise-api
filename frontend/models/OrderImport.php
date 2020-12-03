@@ -6,6 +6,7 @@ use Yii;
 use yii\base\{
     Exception, Model
 };
+use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\UploadedFile;
 use common\models\{Country, Order, Item, shipping\Carrier, shipping\Service, shipping\Shipment, State, Status};
@@ -176,7 +177,26 @@ class OrderImport extends Model
                     // If the first required column "order_no" is empty then we consider that there is no data in this row.
                     continue;
                 }
+
                 $orderNo = trim($data['order_no']);
+
+                // if order exists in database, abort and show message to user
+                if (!isset($processedOrders[$orderNo])
+                    && ($existingOrder = Order::find()
+                                              ->byCustomerReference($orderNo)
+                                              ->forCustomer($this->customer)
+                                              ->one())) {
+                    $msg = "Order #$orderNo already exists in database. " .
+                           Html::a(
+                               'Open order in new window.',
+                               ['/order/view', 'id' => $existingOrder->id],
+                               ['target' => '_blank']
+                           );
+                    $this->addError('orders' . ($idx + 1) . 'order', $msg);
+                    $modelValidated = false;
+                    $idx++;
+                    continue;
+                }
 
                 /**
                  * Validations
@@ -186,8 +206,6 @@ class OrderImport extends Model
                     $msg = 'Row# ' . ($idx + 1) . " (Order# {$orderNo})";
                     $this->addError('orders' . ($idx + 1) . 'country', "$msg Invalid country.");
                     $modelValidated = false;
-                    $idx++;
-                    continue;
                 }
                 $state   = Shipment::recognizeState($country, trim($data['shipto_state']));
                 $stateId = State::findByAbbrOrName($country, $state, $state)->id ?? null;
@@ -195,14 +213,15 @@ class OrderImport extends Model
                     $msg = 'Row# ' . ($idx + 1) . " (Order# {$orderNo})";
                     $this->addError('orders' . ($idx + 1) . 'state', "$msg Invalid state/province.");
                     $modelValidated = false;
-                    $idx++;
-                    continue;
                 }
                 $service = trim($data['carrier_service']);
                 if (!isset($services[$service])) {
                     $msg = 'Row# ' . ($idx + 1) . " (Order# {$orderNo})";
                     $this->addError('orders' . ($idx + 1) . 'service', "$msg Invalid shipping service code.");
                     $modelValidated = false;
+                }
+
+                if (!$modelValidated) {
                     $idx++;
                     continue;
                 }

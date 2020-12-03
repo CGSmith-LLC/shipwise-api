@@ -71,7 +71,7 @@ if ($model->customer) {
                         'options' => ['enctype' => 'multipart/form-data'],
                     ]
                 ) ?>
-                <?= Html::errorSummary($model, ['class' => 'alert alert-danger']) ?>
+                <?= Html::errorSummary($model, ['class' => 'alert alert-danger', 'encode' => false]) ?>
                 <div class="panel panel-success">
                     <div class="panel-body bg-success">
                         <div class="jumbotron">
