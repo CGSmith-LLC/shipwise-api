@@ -22,13 +22,6 @@ use Yii;
  */
 class ControllerEx extends Controller
 {
-
-    /** @var  \yii\web\Request */
-    public $request;
-
-    /** @var  \yii\web\Response */
-    public $response;
-
     /**
      * API Consumer
      *
@@ -36,14 +29,6 @@ class ControllerEx extends Controller
      */
     public $apiConsumer;
 
-    /** @inheritdoc */
-    public function init()
-    {
-        parent::init();
-
-        $this->request = Yii::$app->request;
-        $this->response = Yii::$app->response;
-    }
 
     /** @inheritdoc */
     public function behaviors()
