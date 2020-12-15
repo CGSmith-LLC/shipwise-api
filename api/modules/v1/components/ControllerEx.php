@@ -374,7 +374,7 @@ class ControllerEx extends Controller
                     }
                     $package->setAttribute('order_id', $order->id);
                     $package->save();
-                    if (is_array($formPackage['package_items'])) {
+                    if (isset($formPackage['package_items']) && is_array($formPackage['package_items'])) {
                         foreach ($formPackage['package_items'] as $package_item) {
                             $packageItem = new PackageItem();
                             $packageItem->setAttribute('quantity', $package_item['quantity']);
