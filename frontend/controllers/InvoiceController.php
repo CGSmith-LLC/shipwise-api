@@ -99,16 +99,22 @@ class InvoiceController extends Controller
      *
      * @param int $id Invoice id
      *
-     * @return Invoice the loaded model
+     * @return array|\common\models\Invoice|\yii\db\ActiveRecord
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel(int $id)
     {
-        if (($model = Invoice::findOne($id)) !== null) {
+        $query = Invoice::find()->where(['id' => $id]);
+
+        if (!\Yii::$app->user->identity->isAdmin) {
+            $query->andWhere(['in', 'customer_id', \Yii::$app->user->identity->customerIds]);
+        }
+
+        if (($model = $query->one()) !== null) {
             return $model;
         }
 
-        throw new NotFoundHttpException('The requested page does not exist.');
+        throw new NotFoundHttpException('Invoice not found.');
     }
 
     /**
