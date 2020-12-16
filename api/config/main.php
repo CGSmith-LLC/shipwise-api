@@ -97,6 +97,10 @@ return [
                                 $data["message"] = $response->data["message"];
                             }
 
+                            if (YII_DEBUG && isset($response->data["debug"])) {
+                                $data["debug"] = $response->data["debug"];
+                            }
+
                             $response->data = $data;
                         }
                     }

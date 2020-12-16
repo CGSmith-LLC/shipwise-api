@@ -252,12 +252,10 @@ class OrderForm extends Model
         if (isset($this->packages) && is_array($this->packages)) {
             $params = $this->packages;
 
-            \Yii::debug($this->packages);
             $this->packages = [];
             foreach ($params as $idx => $values) {
                 $this->packages[$idx] = new PackageForm();
                 $this->packages[$idx]->setAttributes((array) $values);
-                \Yii::debug($this->packages);
                 $allValidated = $allValidated && $this->packages[$idx]->validate();
             }
         }
