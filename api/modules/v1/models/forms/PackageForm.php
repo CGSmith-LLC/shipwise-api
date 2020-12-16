@@ -34,7 +34,9 @@ class PackageForm extends Model
     public $length;
     public $height;
     public $width;
+    public $weight;
     public $tracking;
+    public $package_items;
 
     /**
      * {@inheritdoc}
@@ -42,9 +44,8 @@ class PackageForm extends Model
     public function rules()
     {
         return [
-            [['tracking'], 'required', 'message' => '{attribute} is required.'],
             ['tracking', 'string', 'length' => [2, 100]],
-            [['length', 'height', 'width'], 'safe'],
+            [['length', 'height', 'width', 'weight','package_items'], 'safe'],
         ];
     }
 }

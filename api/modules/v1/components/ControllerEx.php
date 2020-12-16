@@ -22,13 +22,6 @@ use Yii;
  */
 class ControllerEx extends Controller
 {
-
-    /** @var  \yii\web\Request */
-    public $request;
-
-    /** @var  \yii\web\Response */
-    public $response;
-
     /**
      * API Consumer
      *
@@ -36,14 +29,6 @@ class ControllerEx extends Controller
      */
     public $apiConsumer;
 
-    /** @inheritdoc */
-    public function init()
-    {
-        parent::init();
-
-        $this->request = Yii::$app->request;
-        $this->response = Yii::$app->response;
-    }
 
     /** @inheritdoc */
     public function behaviors()
@@ -71,9 +56,6 @@ class ControllerEx extends Controller
         $transaction = \Yii::$app->db->beginTransaction();
 
         try {
-
-            // @Todo - lookup address and set for ID if it matches.
-
             /**
              * Create Address.
              * At this stage the required shipTo object should be fully validated.
@@ -109,7 +91,6 @@ class ControllerEx extends Controller
             $order->notes = $orderForm->notes;
             $order->status_id = isset($orderForm->status) ? $orderForm->status : null;
             $order->address_id = $address->id;
-            \Yii::debug($order);
 
             // Validate the order model itself
             if (!$order->validate()) {
@@ -149,6 +130,48 @@ class ControllerEx extends Controller
                 $transaction->rollBack();
 
                 return $this->errorMessage(400, 'Could not save order');
+            }
+
+            /**
+             * Save order packages
+             */
+            if (!empty($orderForm->packages)) {
+                foreach ($orderForm->packages as $formPackage) {
+                    Yii::debug($formPackage);
+                    $package = new PackageEx();
+                    $package->setAttribute('length', $formPackage['length']);
+                    $package->setAttribute('width', $formPackage['width']);
+                    $package->setAttribute('height', $formPackage['height']);
+                    if (isset($formPackage['weight'])) {
+                        $package->setAttribute('weight', $formPackage['weight']);
+                    }
+                    if (isset($formPackage['tracking']) && !is_null($formPackage['tracking'])) {
+                        $package->setAttribute('tracking', $formPackage['tracking']);
+                    }
+                    $package->setAttribute('order_id', $order->id);
+                    $package->save();
+                    if (isset($formPackage['package_items']) && is_array($formPackage['package_items'])) {
+                        foreach ($formPackage['package_items'] as $package_item) {
+                            $packageItem = new PackageItem();
+                            $packageItem->setAttribute('quantity', $package_item['quantity']);
+                            $packageItem->setAttribute('sku', $package_item['sku']);
+                            $packageItem->setAttribute('name', $package_item['name']);
+                            $packageItem->setAttribute('package_id', $package->id);
+                            $packageItem->setAttribute('order_id', $order->id);
+                            $packageItem->save();
+                            if (isset($package_item['lot_info'])) {
+                                foreach ($package_item['lot_info'] as $lot_info) {
+                                    $lotInfo = new PackageItemLotInfo();
+                                    $lotInfo->setAttribute('quantity', $lot_info['quantity']);
+                                    $lotInfo->setAttribute('lot_number', $lot_info['lot_number']);
+                                    $lotInfo->setAttribute('serial_number', $lot_info['serial_number']);
+                                    $lotInfo->setAttribute('package_items_id', $packageItem->id);
+                                    $lotInfo->save();
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             /**
@@ -351,7 +374,7 @@ class ControllerEx extends Controller
                     }
                     $package->setAttribute('order_id', $order->id);
                     $package->save();
-                    if (is_array($formPackage['package_items'])) {
+                    if (isset($formPackage['package_items']) && is_array($formPackage['package_items'])) {
                         foreach ($formPackage['package_items'] as $package_item) {
                             $packageItem = new PackageItem();
                             $packageItem->setAttribute('quantity', $package_item['quantity']);

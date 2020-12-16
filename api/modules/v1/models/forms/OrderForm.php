@@ -249,6 +249,17 @@ class OrderForm extends Model
             }
         }
 
+        if (isset($this->packages) && is_array($this->packages)) {
+            $params = $this->packages;
+
+            $this->packages = [];
+            foreach ($params as $idx => $values) {
+                $this->packages[$idx] = new PackageForm();
+                $this->packages[$idx]->setAttributes((array) $values);
+                $allValidated = $allValidated && $this->packages[$idx]->validate();
+            }
+        }
+
         return $allValidated;
     }
 
@@ -269,6 +280,19 @@ class OrderForm extends Model
         // tracking
         if (is_object($this->tracking) && $this->tracking->hasErrors()) {
             $errors = ArrayHelper::merge($errors, ['tracking' => $this->tracking->getErrors()]);
+        }
+
+        // packages
+        if (is_array($this->packages) && count($this->packages) > 0) {
+            $packagesErrors = [];
+            foreach ($this->packages as $idx => $package) {
+                if ($package->hasErrors()) {
+                    $packagesErrors["packages_$idx"] = $package->getErrors();
+                }
+            }
+            if (!empty($packagesErrors)) {
+                $errors = ArrayHelper::merge($errors, ['packages' => $packagesErrors]);
+            }
         }
 
         // items
