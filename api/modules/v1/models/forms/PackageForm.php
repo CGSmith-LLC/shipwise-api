@@ -36,6 +36,7 @@ class PackageForm extends Model
     public $width;
     public $weight;
     public $tracking;
+    public $package_items;
 
     /**
      * {@inheritdoc}
@@ -44,7 +45,7 @@ class PackageForm extends Model
     {
         return [
             ['tracking', 'string', 'length' => [2, 100]],
-            [['length', 'height', 'width', 'weight'], 'safe'],
+            [['length', 'height', 'width', 'weight','package_items'], 'safe'],
         ];
     }
 }
