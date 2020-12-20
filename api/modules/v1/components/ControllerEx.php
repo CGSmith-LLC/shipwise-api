@@ -8,7 +8,6 @@ use api\modules\v1\models\forms\OrderForm;
 use api\modules\v1\models\order\ItemEx;
 use api\modules\v1\models\order\OrderEx;
 use api\modules\v1\models\order\PackageEx;
-use common\models\Order;
 use common\models\PackageItem;
 use common\models\PackageItemLotInfo;
 use yii\helpers\ArrayHelper;
@@ -158,6 +157,7 @@ class ControllerEx extends Controller
                             $packageItem->setAttribute('name', $package_item['name']);
                             $packageItem->setAttribute('package_id', $package->id);
                             $packageItem->setAttribute('order_id', $order->id);
+                            $packageItem->setAttribute('uuid', $package_item['uuid']);
                             $packageItem->save();
                             if (isset($package_item['lot_info'])) {
                                 foreach ($package_item['lot_info'] as $lot_info) {
@@ -358,7 +358,6 @@ class ControllerEx extends Controller
             }
 
             // Packages
-
             if (!empty($orderForm->packages)) {
                 PackageEx::deleteAll(['order_id' => $order->id]);
                 foreach ($orderForm->packages as $formPackage) {
@@ -373,15 +372,31 @@ class ControllerEx extends Controller
                         $package->setAttribute('tracking', $formPackage['tracking']);
                     }
                     $package->setAttribute('order_id', $order->id);
+
+                    // Validate the package model itself
+                    if (!$package->validate()) {
+                        // if you get here then you should check if you have enough OrderForm validation rules
+                        $transaction->rollBack();
+                        return $this->unprocessableError($package->getErrors());
+                    }
                     $package->save();
+
                     if (isset($formPackage['package_items']) && is_array($formPackage['package_items'])) {
                         foreach ($formPackage['package_items'] as $package_item) {
+
                             $packageItem = new PackageItem();
                             $packageItem->setAttribute('quantity', $package_item['quantity']);
                             $packageItem->setAttribute('sku', $package_item['sku']);
                             $packageItem->setAttribute('name', $package_item['name']);
                             $packageItem->setAttribute('package_id', $package->id);
                             $packageItem->setAttribute('order_id', $order->id);
+                            $packageItem->setAttribute('uuid', $package_item['uuid']);
+
+                            // Validate the packageItem model itself
+                            if (!$packageItem->validate()) {
+                                $transaction->rollBack();
+                                return $this->unprocessableError($packageItem->getErrors());
+                            }
                             $packageItem->save();
                             if (isset($package_item['lot_info'])) {
                                 foreach ($package_item['lot_info'] as $lot_info) {
@@ -390,6 +405,13 @@ class ControllerEx extends Controller
                                     $lotInfo->setAttribute('lot_number', $lot_info['lot_number']);
                                     $lotInfo->setAttribute('serial_number', $lot_info['serial_number']);
                                     $lotInfo->setAttribute('package_items_id', $packageItem->id);
+                                    // Validate the lot info itself
+                                    if (!$lotInfo->validate()) {
+                                        // if you get here then you should check if you have enough OrderForm validation rules
+                                        $transaction->rollBack();
+
+                                        return $this->unprocessableError($lotInfo->getErrors());
+                                    }
                                     $lotInfo->save();
                                 }
                             }
@@ -410,12 +432,10 @@ class ControllerEx extends Controller
 
         } catch (\Exception $e) {
             $transaction->rollBack();
-
-            return $this->errorMessage(400, 'Could not save order');
+            return $this->errorMessage(400, 'Could not save order', $e);
         } catch (\Throwable $e) {
             $transaction->rollBack();
-
-            return $this->errorMessage(400, 'Could not save order');
+            return $this->errorMessage(400, 'Could not save order', $e);
         }
 
         $order->refresh();
@@ -483,16 +503,26 @@ class ControllerEx extends Controller
     /**
      * Error response
      *
-     * @param int    $code    HTTP code
+     * @param int $code HTTP code
      * @param string $message Error message
+     * @param \Exception $exception
      *
      * @return array
      */
-    public function errorMessage($code, $message)
+    public function errorMessage($code, string $message = 'Unknown Error', \Exception $exception = null)
     {
         $this->response->setStatusCode($code);
+        $return['message'] = $message;
 
-        return ['message' => $message];
+        if (YII_DEBUG) {
+            if (isset($exception)) {
+                Yii::debug($exception->getFile());
+                Yii::debug($exception->getLine());
+                Yii::debug($exception->getMessage());
+                $return['debug'] = $exception->getMessage();
+            }
+        }
+        return $return;
     }
 
     /**
