@@ -19,6 +19,7 @@ class PackageItemEx extends PackageItem
      *     @SWG\Property( property = "id", type = "integer", description = "Package Item ID" ),
      *     @SWG\Property( property = "name", type = "string", description = "Name" ),
      *     @SWG\Property( property = "sku", type = "string", description = "SKU" ),
+     *     @SWG\Property( property = "uuid", type = "string", description = "Unique identifier for integration" ),
      *     @SWG\Property( property = "quantity", type = "integer", description = "Quantity" ),
      *     @SWG\Property(
      *          property = "lot_info",
@@ -33,7 +34,7 @@ class PackageItemEx extends PackageItem
      */
     public function fields()
     {
-        return ['id', 'name', 'quantity', 'sku', 'lot_info'];
+        return ['id', 'name', 'quantity', 'sku', 'uuid', 'lot_info'];
     }
 
     /**

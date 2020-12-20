@@ -157,6 +157,7 @@ class ControllerEx extends Controller
                             $packageItem->setAttribute('name', $package_item['name']);
                             $packageItem->setAttribute('package_id', $package->id);
                             $packageItem->setAttribute('order_id', $order->id);
+                            $packageItem->setAttribute('uuid', $package_item['uuid']);
                             $packageItem->save();
                             if (isset($package_item['lot_info'])) {
                                 foreach ($package_item['lot_info'] as $lot_info) {
@@ -389,6 +390,7 @@ class ControllerEx extends Controller
                             $packageItem->setAttribute('name', $package_item['name']);
                             $packageItem->setAttribute('package_id', $package->id);
                             $packageItem->setAttribute('order_id', $order->id);
+                            $packageItem->setAttribute('uuid', $package_item['uuid']);
 
                             // Validate the packageItem model itself
                             if (!$packageItem->validate()) {
