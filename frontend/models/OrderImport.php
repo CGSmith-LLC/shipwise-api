@@ -31,6 +31,7 @@ class OrderImport extends Model
         'item_sku',           // = items.sku
         'item_quantity',      // = items.quantity
         'item_name',          // = items.name
+        'shipto_company',        // = address.company
         'shipto_name',        // = address.name
         'shipto_address',     // = address.address1
         'shipto_address2',    // = address.address2
@@ -40,6 +41,7 @@ class OrderImport extends Model
         'shipto_country',     // = address.country
         'shipto_phone',       // = address.phone
         'shipto_email',       // = address.email
+        'shipto_notes',       // = address.shiptonotes
         'carrier_service',    // = orders.service_id
         'requested_ship_date',// = orders.requested_ship_date
     ];
@@ -59,6 +61,7 @@ class OrderImport extends Model
                 'item_sku'            => 'FF55',
                 'item_quantity'       => '2',
                 'item_name'           => 'test',
+                'shipto_company'      => 'Acme Corp',
                 'shipto_name'         => 'Andrew DiFeo',
                 'shipto_address'      => '176 N Wells St',
                 'shipto_address2'     => 'suite 100',
@@ -68,6 +71,7 @@ class OrderImport extends Model
                 'shipto_country'      => 'US',
                 'shipto_phone'        => '3123327272',
                 'shipto_email'        => 'example@example.com',
+                'shipto_notes'        => 'Custom note.',
                 'carrier_service'     => 'UPSGround',
                 'requested_ship_date' => $now->format('Y-m-d'),
             ],
@@ -76,6 +80,7 @@ class OrderImport extends Model
                 'item_sku'            => 'FF57',
                 'item_quantity'       => '1',
                 'item_name'           => 'test',
+                'shipto_company'      => 'Acme Corp',
                 'shipto_name'         => 'Andrew DiFeo',
                 'shipto_address'      => '176 N Wells St',
                 'shipto_address2'     => 'suite 100',
@@ -85,6 +90,7 @@ class OrderImport extends Model
                 'shipto_country'      => 'US',
                 'shipto_phone'        => '3123327272',
                 'shipto_email'        => 'example@example.com',
+                'shipto_notes'        => 'Custom note.',
                 'carrier_service'     => 'UPSGround',
                 'requested_ship_date' => $now->format('Y-m-d'),
             ],
@@ -231,6 +237,7 @@ class OrderImport extends Model
                     // Address
                     $address           = new Address();
                     $address->name     = trim($data['shipto_name']);
+                    $address->company  = trim($data['shipto_company']) ?? null;
                     $address->address1 = trim($data['shipto_address']);
                     $address->address2 = trim($data['shipto_address2']) ?? null;
                     $address->city     = trim($data['shipto_city']);
@@ -239,6 +246,7 @@ class OrderImport extends Model
                     $address->zip      = trim($data['shipto_zip']);
                     $address->phone    = trim($data['shipto_phone']);
                     $address->email    = trim($data['shipto_email']) ?? null;
+                    $address->notes    = trim($data['shipto_notes']) ?? null;
                     // Validate and save Address object
                     if (!$address->save()) {
                         foreach ($address->getErrors() as $attr => $error) {
