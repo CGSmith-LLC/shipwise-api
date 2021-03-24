@@ -1,23 +1,20 @@
-# Ship Wise 
-### Multi-Tier Project
+# Ship Wise
 
-This project includes three tiers: api, frontend, and console, each of which
-is a separate Yii application.
+## Multi-Tier Project
 
-Yii 2 Advanced Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
-developing complex Web applications with multiple tiers.
+This project includes three tiers: api, frontend, and console, each of which is a separate Yii application.
 
-The template is designed to work in a team development environment. It supports
-deploying the application in different environments.
+Yii 2 Advanced Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) that was used for developing
+ShipWise.
 
-For the first time installation, please refer to the following guide: 
+The template is designed to work in a team development environment. It supports deploying the application in different
+environments.
+
+For the first time installation, please refer to the following guide:
 https://github.com/yiisoft/yii2-app-advanced/blob/master/docs/guide/start-installation.md
-
-
 
 Deployment is handled by [BitBucket pipelines](bitbucket-pipelines.yml). There is a deploy script on the web server that
 sits in `/usr/local/bin/deploy-api.sh` that can also be [viewed in the repo](deploy-api.sh).
-
 
 ### Cronjobs:
 
@@ -39,13 +36,11 @@ To list existing cronjobs:
 crontab -l
 ```
 
-
 ### Job Workers
 
 **Yii2 Queue** is an extension for running tasks asynchronously via queues.
 
 https://github.com/yiisoft/yii2-queue/blob/master/docs/guide/worker.md
-
 
 `sudo vim /etc/systemd/system/yii-queue@.service`
 
@@ -129,7 +124,7 @@ vendor/                  contains dependent 3rd-party packages
 environments/            contains environment-based overrides
 ```
 
-### Local development with Docker
+# Local development with Docker
 
 Prerequisite: Download and install Docker Desktop for your OS.
 
@@ -137,16 +132,27 @@ Start your Docker container with:
 
 `docker-compose up -d`
 
-
 Example of importing a gzipped mysql dump:
 
 `zcat cgsmpoim_shipwise.sql.gz | mysql -h mysql -u root -p cgsmpoim_shipwise`
+
+1. Run `docker-compose up -d`
+1. Update the SQL database.
+    1. Copy the `devshipwise.sql` file to `/mysql-data/var/lib/mysql/devshipwise.sql`
+    1. Enter MySQL instance `docker exec -it rest-api_mysql_1 bash`
+    1. Run `mysql -u app -p123 cgsmpoim_shipwise < /var/lib/mysql/devshipwise.sql`
+1. Install composer and run `composer install` on the root directory
+1. Run `php init` for development
+
+Frontend: localhost:30000 API: localhost:30001 MySQL: localhost:30002 PhpMyAdmin: localhost:30003 Shopify: localhost:
+30004
 
 ### Running queue jobs locally
 
 When you are developing in a local environment, all you need to have the queue jobs executed is this:
 
-- open the CLI on your local dev server, eg. docker or vagrant instance, then enter this command and keep the terminal open:
+- open the CLI on your local dev server, eg. docker or vagrant instance, then enter this command and keep the terminal
+  open:
 
 `php yii queue/listen --verbose`
 
