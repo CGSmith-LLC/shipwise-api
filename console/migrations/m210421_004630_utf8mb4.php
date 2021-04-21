@@ -32,18 +32,4 @@ class m210421_004630_utf8mb4 extends Migration
         return false;
     }
 
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m210324_004630_utf8mb4 cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }
