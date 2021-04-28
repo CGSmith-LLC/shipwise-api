@@ -3,7 +3,7 @@
 namespace common\models\shipping\extension;
 
 /**
- * Class AmazonUPSPlugin
+ * Class AmazonUSPSPlugin
  *
  * @package common\models\shipping\extension
  */
