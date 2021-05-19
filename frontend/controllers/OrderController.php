@@ -6,7 +6,7 @@ use common\pdf\OrderPackingSlip;
 use frontend\models\Customer;
 use Yii;
 use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
-use frontend\models\{Order, forms\OrderForm, BulkAction, OrderImport, search\OrderSearch};
+use frontend\models\{forms\BulkEditForm, Order, forms\OrderForm, BulkAction, OrderImport, search\OrderSearch};
 use yii\web\{BadRequestHttpException, NotFoundHttpException, Response};
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
@@ -42,6 +42,38 @@ class OrderController extends \frontend\controllers\Controller
                 ],
             ],
         ];
+    }
+
+    public function actionBulkEdit()
+    {
+        /** @var BulkEditForm */
+        $model = new BulkEditForm();
+        $model->setAttributes(Yii::$app->request->post());
+
+        // Validate model and save
+        if (Yii::$app->request->post() && $model->validate()) {
+            /**
+             * 1. Iterate over csv or line breaks to find identifiers
+             * 2. Present confirmation screen and action for modifying
+             * 3. Allow action to run on orders
+             */
+            Yii::$app->getSession()->setFlash('success', 'Orders successfully modified.');
+
+            // Not sure where to return?
+            return $this->redirect(['bulk', 'id' => $model->order->id]);
+        }
+
+        return $this->render(
+            'bulk-edit',
+            [
+                'model'     => $model,
+                // 'actions' => should be enumeration of actions able to perform?
+                'customers' => Yii::$app->user->identity->isAdmin
+                    ? Customer::getList()
+                    : Yii::$app->user->identity->getCustomerList(),
+                'statuses'  => Status::getList(), // Move to meta data to perform actions?
+            ]
+        );
     }
 
     /**

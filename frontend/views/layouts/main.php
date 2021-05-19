@@ -87,6 +87,7 @@ AppAsset::register($this);
             'url' => ['/order'],
             'items' => [
                 ['label' => 'Orders', 'url' => ['/order']],
+                ['label' => 'Bulk Edit', 'url' => ['/order/bulk-edit']],
                 ['label' => 'Batches', 'url' => ['/order/batch']],
                 ['label' => 'Import', 'url' => ['/order/import']],
             ]
