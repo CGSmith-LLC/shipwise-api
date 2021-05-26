@@ -19,6 +19,6 @@ class PackageItem extends BasePackageItem
      */
     public function getLotInfo()
     {
-        return $this->hasMany('common\models\PackageItemLotInfo', ['package_item_id' => 'id']);
+        return $this->hasMany('common\models\PackageItemLotInfo', ['package_items_id' => 'id']);
     }
 }
