@@ -2,12 +2,15 @@
 
 namespace frontend\controllers;
 
+use common\models\Package;
+use common\models\PackageItem;
 use frontend\models\Customer;
 use frontend\models\forms\ReportForm;
 use frontend\models\Item;
 use frontend\models\Order;
 use Yii;
 use yii\db\ActiveQuery;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class ReportController
@@ -57,9 +60,8 @@ class ReportController extends Controller
                         'status',
                         'carrier',
                         'service',
-                        'address' => function (ActiveQuery $query) {
-                            $query->with('state');
-                        },
+                        'packages',
+                        'address.state',
                     ]
                 )
                 ->orderBy('created_date');
@@ -116,17 +118,48 @@ class ReportController extends Controller
             $item->getAttributeLabel('quantity'),
             $item->getAttributeLabel('sku'),
             $item->getAttributeLabel('name'),
+            $item->getAttributeLabel('lot_number'),
         ];
 
         $fp = fopen($dir . $filename, 'w');
 
         // csv header row
         fputcsv($fp, $header);
-
         // csv body
         foreach ($ordersQuery->batch(500) as $orders) {
             foreach ($orders as $order) {
+
+                // @todo no foreach? cleanup code? fine for now? ship toinght? love me long time. oh god my existence is
+                /**
+                 * @var Package $package
+                 */
+                $packageId = [];
+                foreach ($order->packages as $package) {
+                    foreach ($package->items as $packageItems) {
+                        $packageId[] = $packageItems->id;
+                    }
+                }
+
                 foreach ($order->items as $item) {
+                    /**
+                     * Find lot number
+                     */
+                    $lotNumbers = PackageItem::find()
+                        ->with('lotInfo')
+                        ->where(['in', 'id', $packageId])
+                        ->andWhere(['sku' => $item->sku])
+                        ->all();
+                    $lotNumber = ArrayHelper::getColumn($lotNumbers, function($packageItem) {
+                        $lotNumbers = [];
+                        /** @var PackageItem $packageItem */
+                            foreach ($packageItem->lotInfo as $lot) {
+                                $lotNumbers[] = $lot->lot_number;
+                            }
+                        return implode(' ', $lotNumbers);
+                    });
+                    $lotNumber = implode(' ', $lotNumber);
+
+                    // Output csv
                     fputcsv(
                         $fp,
                         [
@@ -150,6 +183,7 @@ class ReportController extends Controller
                             $item->quantity,
                             $item->sku,
                             $item->name,
+                            $lotNumber,
                         ]
                     );
                 }

@@ -38,4 +38,20 @@ class ReportForm extends Model
         ];
     }
 
+    /**
+     * End date should always be set for the end of day for sql to be happy
+     *
+     * @throws \Exception
+     */
+    public function almost_afterValidate()
+    {
+
+        $startDate = new \DateTime($this->start_date);
+        $this->start_date = $startDate->setTime(0,0,0);
+
+        $endDate = new \DateTime($this->end_date);
+        $this->end_date = $endDate->setTime(23,59,59);
+        parent::afterValidate();
+    }
+
 }
