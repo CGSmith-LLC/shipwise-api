@@ -48,8 +48,9 @@ class ReportController extends Controller
         // Generate Report
         if (Yii::$app->request->post()) {
             $model->load(Yii::$app->request->post());
-            $model->start_date = Yii::$app->formatter->asDate($model->start_date, 'php:Y-m-d');
-            $model->end_date   = Yii::$app->formatter->asDate($model->end_date, 'php:Y-m-d');
+            // Always set for beginning of day and end of day for query
+            $model->start_date = Yii::$app->formatter->asDate($model->start_date, 'php:Y-m-d 00:00:00');
+            $model->end_date   = Yii::$app->formatter->asDate($model->end_date, 'php:Y-m-d 23:59:59');
 
             $ordersQuery = Order::find()
                 ->where(['customer_id' => $model->customer])
