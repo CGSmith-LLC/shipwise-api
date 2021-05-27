@@ -29,6 +29,7 @@ class Controller extends \yii\web\Controller
 
     public function init()
     {
+        parent::init();
         // Only perform this check if a user is logged in
         if (!Yii::$app->user->isGuest) {
             if (!Yii::$app->session->has(AdminController::ORIGINAL_USER_SESSION_KEY) &&
@@ -56,8 +57,6 @@ class Controller extends \yii\web\Controller
                 $this->customers = Customer::getList();
             }
         }
-
-        parent::init();
     }
 
 }
