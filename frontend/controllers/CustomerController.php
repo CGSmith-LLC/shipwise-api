@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\State;
 use Yii;
 use common\models\Customer;
 use yii\data\ActiveDataProvider;
@@ -85,6 +86,7 @@ class CustomerController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'states'    => State::getList('id', 'name', 'US'),
         ]);
     }
 
@@ -105,6 +107,7 @@ class CustomerController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'states'    => State::getList('id', 'name', 'US'),
         ]);
     }
 

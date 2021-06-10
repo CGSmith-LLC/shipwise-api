@@ -6,6 +6,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model common\models\Customer */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $states array List of states */
 ?>
 
 <div class="customer-form">
@@ -20,7 +21,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'city')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'state_id')->textInput() ?>
+    <?= $form->field($model, 'state_id')
+        ->dropdownList($states, ['prompt' => ' Please select']) ?>
 
     <?= $form->field($model, 'zip')->textInput(['maxlength' => true]) ?>
 
