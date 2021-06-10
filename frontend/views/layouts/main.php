@@ -40,7 +40,7 @@ AppAsset::register($this);
     <meta name="theme-color" content="#2c9fd6">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <script src ="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <script type="application/javascript">
         var stripe = Stripe('<?=Yii::$app->stripe->publicKey?>');
     </script>
@@ -113,13 +113,17 @@ AppAsset::register($this);
             'items' => [
                 ['label' => 'Account', 'url' => ['/user/settings/account']],
 
-                     ['label' => 'Items', 'url' => ['/sku']],
+                ['label' => 'Items', 'url' => ['/sku']],
 
                 [
                     'label' => 'Billing',
                     'url' => ['/billing'],
                     'visible' => Yii::$app->user->identity->isDirectCustomer()
                 ],
+                [
+                    'label' => 'Api Key',
+                    'url' => '/api-consumer',
+                ]
 
             ]];
         $menuItems[] = '<li>'
