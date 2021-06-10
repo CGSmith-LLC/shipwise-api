@@ -95,6 +95,7 @@ AppAsset::register($this);
 
         if (Yii::$app->user->identity->isAdmin) {
             $menuItems[] = ['label' => 'Countries', 'url' => ['/country']];
+            $menuItems[] = ['label' => 'Customers', 'url' => ['/customer']];
             $menuItems[] = ['label' => 'Users', 'url' => ['/user/admin/']];
             $menuItems[] = [
                 'label' => 'Subscriptions',
