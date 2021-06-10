@@ -2,11 +2,15 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use frontend\assets\ToggleAsset;
+
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Customer */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $states array List of states */
+
+ToggleAsset::register($this);
 ?>
 
 <div class="customer-form">
@@ -29,10 +33,19 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+<label>Direct Customer?</label>
+    <?= $form->field($model, 'direct')->checkbox([
+        'data-toggle' => 'toggle',
+        'data-on' => 'Yes',
+        'data-off' => 'No',
+        'label' => false,
+    ]); ?>
+    
 
-    <?= $form->field($model, 'logo')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'created_date')->textInput() ?>
+    <?= $form->field($model, 'logo')->fileInput([
+
+    ])?>
 
     <?= $form->field($model, 'stripe_customer_id')->textInput(['maxlength' => true]) ?>
 

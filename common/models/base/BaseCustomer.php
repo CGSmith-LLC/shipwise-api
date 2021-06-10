@@ -48,6 +48,7 @@ class BaseCustomer extends \yii\db\ActiveRecord
             [['phone'], 'string', 'max' => 32],
             [['stripe_customer_id'], 'string', 'max' => 128],
             [['logo', 'email'], 'string', 'max' => 255],
+            [['direct'], 'integer']
         ];
     }
 
