@@ -40,6 +40,11 @@ ToggleAsset::register($this);
         'data-off' => 'No',
         'label' => false,
     ]); ?>
+
+<?php /*if($model->logo) : ?>
+    <span>Current Logo:</span>
+    <img src="/<?= $model->logo ?>" width="200"/>
+<?php endif; */?>
     
     <?= $form->field($model, 'imageFile')->fileInput()?>
 

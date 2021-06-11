@@ -111,10 +111,10 @@ class BaseCustomer extends \yii\db\ActiveRecord
             //$savedFileName = null;
             if (isset($this->imageFile)) {
                 Yii::debug($this->imageFile);
-                $savedFileName = 'images/' . uniqid() . '-' . $this->imageFile;
+                $savedFileName = 'logos/' . uniqid() . '-' . $this->imageFile;
                 Yii::debug($savedFileName);
 
-                $this->imageFile->saveAs(Yii::getAlias("@frontend") . '/web/' . $savedFileName);
+                $this->imageFile->saveAs(Yii::getAlias("@frontend") . '/uploads/Customer/' . $savedFileName);
             }
             return $savedFileName;
         } else {
