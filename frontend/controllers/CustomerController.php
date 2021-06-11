@@ -10,6 +10,8 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\UploadForm;
+use yii\web\UploadedFile;
 
 /**
  * CustomerController implements the CRUD actions for Customer model.
@@ -80,15 +82,26 @@ class CustomerController extends Controller
     {
         $model = new Customer();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+//        if (Yii::$app->request->isPost) {
+//            $model->load(Yii::$app->request->post());
+//            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
+////            Yii::debug($model->logo);
+//            if ($savedFileName = $model->upload()) {
+//                $model->logo = $savedFileName;
+//                $model->imageFile = null;
+//                $model->update();
+          //  }
 
-        return $this->render('create', [
-            'model' => $model,
-            'states'    => State::getList('id', 'name', 'US'),
-        ]);
-    }
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+
+            return $this->render('create', [
+                'model' => $model,
+                'states' => State::getList('id', 'name', 'US'),
+            ]);
+        }
+    //}
 
     /**
      * Updates an existing Customer model.
@@ -101,43 +114,58 @@ class CustomerController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isPost) {
+            $model->load(Yii::$app->request->post());
+            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
+//            Yii::debug($model->logo);
+            if ($savedFileName = $model->upload()) {
+                $model->logo = $savedFileName;
+                $model->imageFile = null;
+                $model->update();
+            }
+       }
+
+
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+
+            return $this->render('update', [
+                'model' => $model,
+                'states' => State::getList('id', 'name', 'US'),
+            ]);
         }
 
-        return $this->render('update', [
-            'model' => $model,
-            'states'    => State::getList('id', 'name', 'US'),
-        ]);
-    }
+        /**
+         * Deletes an existing Customer model.
+         * If deletion is successful, the browser will be redirected to the 'index' page.
+         * @param integer $id
+         * @return mixed
+         * @throws NotFoundHttpException if the model cannot be found
+         */
+        public
+        function actionDelete($id)
+        {
+            $this->findModel($id)->delete();
 
-    /**
-     * Deletes an existing Customer model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the Customer model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Customer the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Customer::findOne($id)) !== null) {
-            return $model;
+            return $this->redirect(['index']);
         }
 
-        throw new NotFoundHttpException('The requested page does not exist.');
+
+        /**
+         * Finds the Customer model based on its primary key value.
+         * If the model is not found, a 404 HTTP exception will be thrown.
+         * @param integer $id
+         * @return Customer the loaded model
+         * @throws NotFoundHttpException if the model cannot be found
+         */
+        protected
+        function findModel($id)
+        {
+            if (($model = Customer::findOne($id)) !== null) {
+                return $model;
+            }
+
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
     }
-}

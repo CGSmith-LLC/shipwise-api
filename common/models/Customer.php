@@ -5,6 +5,7 @@ namespace common\models;
 use common\models\base\BaseCustomer;
 use Stripe\Stripe;
 use yii\helpers\ArrayHelper;
+use yii\web\UploadedFile;
 
 /**
  * Class Customer
