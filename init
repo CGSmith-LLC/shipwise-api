@@ -47,23 +47,6 @@ if (!in_array($envName, $envNames)) {
 }
 
 
-$_REQUEST['swaggerName'] = 'api.getshipwise.com';
-if (empty($params['swagger']) || $params['swagger'] === '1') {
-    echo "What is the URI for the API?\n\n";
-
-    echo "\n  Enter the URI, or \"q\" to quit: ";
-    $answer = trim(fgets(STDIN));
-
-    if ($answer === 'q') {
-        echo "\n  Quit initialization.\n";
-        exit(0);
-    }
-
-    $_REQUEST['swaggerName'] = $answer;
-} else {
-    $_REQUEST['swaggerName'] = $params['swagger'];
-}
-
 $env = $envs[$envName];
 
 if (empty($params['env'])) {
@@ -221,17 +204,6 @@ function setCookieValidationKey($root, $paths)
         $bytes = openssl_random_pseudo_bytes($length);
         $key = strtr(substr(base64_encode($bytes), 0, $length), '+/=', '_-.');
         $content = preg_replace('/(("|\')cookieValidationKey("|\')\s*=>\s*)(""|\'\')/', "\\1'$key'", file_get_contents($file));
-        file_put_contents($file, $content);
-    }
-}
-
-function setSwaggerConfig($root, $paths)
-{
-    $swagger = $_REQUEST['swaggerName'];
-    foreach ($paths as $file) {
-        echo "   generate swagger host key in $file\n";
-        $file = $root . '/' . $file;
-        $content = preg_replace('/(("|\')SWAGGER_API_HOST("|\')\s*,\s*)(""|\'\')/', "\\1'$swagger'", file_get_contents($file));
         file_put_contents($file, $content);
     }
 }
