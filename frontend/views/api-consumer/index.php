@@ -1,5 +1,6 @@
 <?php
 
+use common\models\Customer;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -8,6 +9,11 @@ use yii\grid\GridView;
 
 $this->title = 'Api Consumers';
 $this->params['breadcrumbs'][] = $this->title;
+if ((!Yii::$app->user->identity->getIsAdmin())) {
+    $customerDropdownList = Yii::$app->user->identity->getCustomerList();
+} else {
+    $customerDropdownList = Customer::getList();
+}
 ?>
 <div class="api-consumer-index">
 
@@ -20,7 +26,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
 
             'id',
             'auth_key',

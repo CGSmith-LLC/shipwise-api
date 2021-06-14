@@ -5,7 +5,7 @@ namespace frontend\controllers;
 use Yii;
 use common\models\ApiConsumer;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -20,8 +20,20 @@ class ApiConsumerController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'ruleConfig' => [
+                    'class' => \dektrium\user\filters\AccessRule::class,
+                ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -35,8 +47,14 @@ class ApiConsumerController extends Controller
      */
     public function actionIndex()
     {
+        $query = ApiConsumer::find();
+
+        if (!Yii::$app->user->identity->isAdmin) {
+            $query->andOnCondition([ApiConsumer::tableName() . '.customer_id' => $this->customers]);
+        }
+
         $dataProvider = new ActiveDataProvider([
-            'query' => ApiConsumer::find(),
+            'query' => $query,
         ]);
 
         return $this->render('index', [
