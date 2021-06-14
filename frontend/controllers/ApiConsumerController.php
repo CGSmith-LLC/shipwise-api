@@ -84,7 +84,11 @@ class ApiConsumerController extends Controller
     {
         $model = new ApiConsumer();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $model->generateAuthKey();
+            $model->generateAuthSecret();
+            $model->customer_id = (new \common\models\ApiConsumer)->getCustomerId();
+            $model->save();
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

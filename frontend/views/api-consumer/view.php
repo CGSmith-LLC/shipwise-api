@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model common\models\ApiConsumer */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Api Consumers', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'API Keys', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -32,8 +32,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'auth_key',
             'auth_secret',
-            'auth_token',
-            'last_activity',
             'customer_id',
             'status',
             'created_date',

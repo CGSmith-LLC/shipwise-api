@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseApiConsumer;
+use Yii;
 
 /**
  * Class ApiConsumer
@@ -74,12 +75,12 @@ class ApiConsumer extends BaseApiConsumer
      */
     protected function isActive()
     {
-        return (bool)($this->status == self::STATUS_ACTIVE);
+        return $this->status == self::STATUS_ACTIVE;
     }
 
     protected function isSuperuser()
     {
-        return (bool)($this->superuser == self::SUPERUSER_ACTIVE);
+        return $this->superuser == self::SUPERUSER_ACTIVE;
     }
 
     /**
@@ -89,6 +90,38 @@ class ApiConsumer extends BaseApiConsumer
      */
     public function isCustomer()
     {
-        return (bool)isset($this->customer);
+        return isset($this->customer);
     }
+
+
+    /**
+     * @return ApiConsumer
+     * @throws \yii\base\Exception
+     *
+     */
+    public function generateAuthKey(): ApiConsumer
+    {
+        // Generate random string for auth token
+        $this->auth_key = Yii::$app->security->generateRandomString(6);
+//        $this->updateLastActivity();
+
+        return $this;
+    }
+
+    public function generateAuthSecret(): ApiConsumer
+    {
+        // Generate random string for auth token
+        $this->auth_secret = Yii::$app->security->generateRandomString(64);
+//        $this->updateLastActivity();
+
+        return $this;
+    }
+
+    public function getCustomerId()
+    {
+        return Yii::$app->user->identity->customer_id;
+
+    }
+
+
 }

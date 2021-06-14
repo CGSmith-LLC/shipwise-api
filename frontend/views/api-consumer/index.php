@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Api Consumers';
+$this->title = 'API Keys';
 $this->params['breadcrumbs'][] = $this->title;
 if ((!Yii::$app->user->identity->getIsAdmin())) {
     $customerDropdownList = Yii::$app->user->identity->getCustomerList();
@@ -20,18 +20,19 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Api Consumer', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create API Key', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
 
-            'id',
+//            'id',
+            'label',
             'auth_key',
             'auth_secret',
-            'auth_token',
-            'last_activity',
+//            'auth_token',
+//            'last_activity',
             //'customer_id',
             //'status',
             //'created_date',

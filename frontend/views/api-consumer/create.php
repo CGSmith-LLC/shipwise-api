@@ -5,8 +5,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\ApiConsumer */
 
-$this->title = 'Create Api Consumer';
-$this->params['breadcrumbs'][] = ['label' => 'Api Consumers', 'url' => ['index']];
+$this->title = 'Create API Key';
+$this->params['breadcrumbs'][] = ['label' => 'API Keys', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="api-consumer-create">
