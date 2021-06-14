@@ -20,6 +20,7 @@ class Carrier extends BaseCarrier
     const DHL          = 4;
     const AMAZON_UPS   = 5;
     const AMAZON_FEDEX = 6;
+    const AMAZON_USPS  = 11;
 
     /** @var array */
     private static $shipwiseCodes = [
@@ -29,6 +30,7 @@ class Carrier extends BaseCarrier
         self::DHL          => 'DHL',
         self::AMAZON_UPS   => 'AMAZON_UPS',
         self::AMAZON_FEDEX => 'AMAZON_FEDEX',
+        self::AMAZON_USPS  => 'AMAZON_USPS',
     ];
 
     const REPRINT_BEHAVIOUR_CREATE_NEW = 1;
@@ -46,6 +48,7 @@ class Carrier extends BaseCarrier
     private static $reprintExisting = [
         self::AMAZON_UPS,
         self::AMAZON_FEDEX,
+        self::AMAZON_USPS,
     ];
 
     /**
