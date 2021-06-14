@@ -2,8 +2,13 @@
 
 namespace common\models\base;
 
+use common\models\Customer;
 use common\models\PaymentMethod;
+use Stripe\Event;
+use Stripe\Exception\ApiErrorException;
+use Stripe\Stripe;
 use Yii;
+use yii\db\StaleObjectException;
 use yii\web\UploadedFile;
 
 /**
@@ -37,6 +42,67 @@ class BaseCustomer extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'customers';
+    }
+
+    public function init()
+    {
+        parent::init();
+
+        Stripe::setApiKey(\Yii::$app->stripe->privateKey);
+//        if (!YII_ENV_DEV) {
+//             Configure events to call Stripe
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'stripeCreate']);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'stripeUpdate']);
+        $this->on(self::EVENT_BEFORE_DELETE, [$this, 'stripeDelete']);
+    }
+//    }
+
+    /**
+     * Call stripe to create the customer and set our attribute to the stripe token
+     *
+     * @return void
+     * @throws \Stripe\Exception\ApiErrorException
+     */
+    public function stripeCreate($event)
+    {
+
+        $customer = \Stripe\Customer::create([
+            'name' => $event->sender->name,
+        ]);
+
+        /** @var $customer Customer */
+        $this->setAttribute('stripe_customer_id', $customer->id);
+
+
+    }
+
+    /**
+     * @param $event Event
+     * @throws ApiErrorException
+     */
+    public function stripeUpdate($event)
+    {
+        try {
+            \Stripe\Customer::update(
+                $event->sender->stripe_customer_id,
+                [
+                    'name' => $event->sender->name,
+                ]);
+        } catch (StaleObjectException | \Throwable $e) {
+            Yii::debug($event);
+            Yii::debug($e);
+        }
+    }
+
+
+    /**
+     * @param $event Event
+     * @throws ApiErrorException
+     */
+    public function stripeDelete($event)
+    {
+        $customer = \Stripe\Customer::retrieve($event->sender->stripe_customer_id);
+        $customer->delete();
     }
 
     /**
@@ -115,8 +181,8 @@ class BaseCustomer extends \yii\db\ActiveRecord
                 Yii::debug($savedFileName);
 
                 $this->imageFile->saveAs(Yii::getAlias("@frontend") . '/uploads/Customer/' . $savedFileName);
+                return $savedFileName;
             }
-            return $savedFileName;
         } else {
             return false;
         }

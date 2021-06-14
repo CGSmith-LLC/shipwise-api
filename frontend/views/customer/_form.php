@@ -48,7 +48,6 @@ ToggleAsset::register($this);
     
     <?= $form->field($model, 'imageFile')->fileInput()?>
 
-    <?= $form->field($model, 'stripe_customer_id')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
