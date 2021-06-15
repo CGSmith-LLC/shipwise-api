@@ -13,6 +13,7 @@ use yii\data\ArrayDataProvider;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii2tech\csvgrid\CsvGrid;
+use function PHPUnit\Framework\stringEndsWith;
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -48,19 +49,40 @@ class OrderController extends \frontend\controllers\Controller
     {
         /** @var BulkEditForm */
         $model = new BulkEditForm();
-        $model->setAttributes(Yii::$app->request->post());
-
+        $attr = $_POST['BulkEditForm'] ?? null;
+        $model->setAttributes($attr);
         // Validate model and save
         if (Yii::$app->request->post() && $model->validate()) {
-            /**
-             * 1. Iterate over csv or line breaks to find identifiers
-             * 2. Present confirmation screen and action for modifying
-             * 3. Allow action to run on orders
-             */
-            Yii::$app->getSession()->setFlash('success', 'Orders successfully modified.');
+            $orders = [];
+            switch ($model->delimiter) {
+                case 'newlines':
+                    $orders = preg_split("/\\r\\n|\\r|\\n/", $model->order_ids);
+                    break;
+                case 'commas':
+                    $orders = explode(',', $model->order_ids);
+                    break;
+                case 'spaces':
+                    $orders = explode(' ', $model->order_ids);
+                    break;
+                default:
+                    $orders = ['error' => 'Error parsing order list.'];
+            }
+            $action = new BulkAction();
+            $result = $action->getOrdersByCustomerRef($model->customer, $orders);
 
-            // Not sure where to return?
-            return $this->redirect(['bulk', 'id' => $model->order->id]);
+            if (isset($orders['error'])) {
+                Yii::$app->getSession()->setFlash('error', 'Error parsing orders.');
+                return $this->redirect('/order/bulk-edit');
+            }
+
+            return $this->render(
+                'bulk-edit-confirm',
+                [
+                    'model'     => $model,
+                    'result'    => $result,
+                ]
+            );
+
         }
 
         return $this->render(

@@ -19,20 +19,22 @@ class BulkEditForm extends Model
     protected $_orders = [];
 
     /** @var string User input that needs to be parsed into order identifiers*/
-    public $orders_input;
+
     public $customer;
 
     /** @var string Action to be performed */
     public $action;
 
-    /** @var array Variables to pass along to the action to be performed */
-    public $action_variables = [];
+    /** @var string A delineated list of order reference numbers */
+    public $order_ids;
+
+    public $delimiter = 'newlines';
 
     /** {@inheritdoc} */
     public function rules()
     {
         return [
-            [['customer', 'action', 'action_variables', 'orders_input'], 'required'], // @todo validate as text field
+            [['customer', 'action', 'order_ids', 'delimiter'], 'required'], // @todo validate as text field
         ];
     }
 
