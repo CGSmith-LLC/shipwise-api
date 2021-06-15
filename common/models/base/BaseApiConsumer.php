@@ -1,6 +1,9 @@
 <?php
 
 namespace common\models\base;
+use yii\base\Exception;
+use Yii;
+
 
 /**
  * This is the model class for table "api_consumer".
@@ -16,6 +19,8 @@ namespace common\models\base;
  */
 class BaseApiConsumer extends \yii\db\ActiveRecord
 {
+
+
 
     /**
      * {@inheritdoc}

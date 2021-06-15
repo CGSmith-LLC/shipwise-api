@@ -4,6 +4,8 @@ namespace common\models;
 
 use common\models\base\BaseApiConsumer;
 use Yii;
+use yii\base\Exception;
+
 
 /**
  * Class ApiConsumer
@@ -15,10 +17,13 @@ use Yii;
 class ApiConsumer extends BaseApiConsumer
 {
 
-    const STATUS_ACTIVE      = 1;
-    const STATUS_INACTIVE    = 0;
-    const SUPERUSER_ACTIVE   = 1;
+    const STATUS_ACTIVE = 1;
+    const STATUS_INACTIVE = 0;
+    const SUPERUSER_ACTIVE = 1;
     const SUPERUSER_INACTIVE = 0;
+
+    public $plainTextAuthSecret;
+
 
     /**
      * Get Customer
@@ -111,8 +116,8 @@ class ApiConsumer extends BaseApiConsumer
     public function generateAuthSecret(): ApiConsumer
     {
         // Generate random string for auth token
-        $this->auth_secret = Yii::$app->security->generateRandomString(64);
-//        $this->updateLastActivity();
+        $this->plainTextAuthSecret = Yii::$app->security->generateRandomString(64);
+        $this->auth_secret = Yii::$app->getSecurity()->encryptByKey($this->plainTextAuthSecret, Yii::$app->params['encryptionKey']);
 
         return $this;
     }

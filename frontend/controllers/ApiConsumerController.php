@@ -88,6 +88,8 @@ class ApiConsumerController extends Controller
             $model->generateAuthKey();
             $model->generateAuthSecret();
             $model->customer_id = (new \common\models\ApiConsumer)->getCustomerId();
+//            $secret = Yii::$app->getSecurity()->encryptByKey($model->auth_secret, );
+//            $model->auth_secret =
             $model->save();
             return $this->redirect(['view', 'id' => $model->id]);
         }
