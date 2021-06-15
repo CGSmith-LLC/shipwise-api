@@ -10,14 +10,13 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\models\UploadForm;
 use yii\web\UploadedFile;
-
 /**
  * CustomerController implements the CRUD actions for Customer model.
  */
 class CustomerController extends Controller
 {
+
     /**
      * {@inheritdoc}
      */
@@ -83,10 +82,10 @@ class CustomerController extends Controller
         $model = new Customer();
 
 
-
         if ($model->load(Yii::$app->request->post())) {
             $this->fileUpload($model);
             $model->save();
+            Yii::debug($model);
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -95,7 +94,6 @@ class CustomerController extends Controller
             'states' => State::getList('id', 'name', 'US'),
         ]);
     }
-
 
     /**
      * Updates an existing Customer model.
@@ -107,7 +105,6 @@ class CustomerController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
 
 
         if ($model->load(Yii::$app->request->post())) {
@@ -136,7 +133,6 @@ class CustomerController extends Controller
         return $this->redirect(['index']);
     }
 
-
     /**
      * Finds the Customer model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -153,14 +149,15 @@ class CustomerController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
+    /**
+     * @param $model Customer
+     */
     protected function fileUpload($model)
     {
-            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
-            if ($savedFileName = $model->upload()) {
-                $model->logo = $savedFileName;
-                $model->imageFile = null;
-            }
+        if ($savedFileName = $model->upload()) {
+            $model->logo = $savedFileName;
         }
+    }
 }
 
 

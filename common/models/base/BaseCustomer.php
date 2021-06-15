@@ -2,14 +2,20 @@
 
 namespace common\models\base;
 
+use Aws\Result;
 use common\models\Customer;
 use common\models\PaymentMethod;
 use Stripe\Event;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
 use Yii;
+use yii\base\ErrorException;
 use yii\db\StaleObjectException;
+use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
+use \bpsys\yii2\aws\s3\traits\S3MediaTrait;
+
 
 /**
  * This is the model class for table "customers".
@@ -32,7 +38,6 @@ use yii\web\UploadedFile;
  */
 class BaseCustomer extends \yii\db\ActiveRecord
 {
-
 
     public $imageFile;
 
@@ -65,15 +70,18 @@ class BaseCustomer extends \yii\db\ActiveRecord
      */
     public function stripeCreate($event)
     {
+        try {
+            $customer = \Stripe\Customer::create([
+                'name' => $event->sender->name,
+            ]);
 
-        $customer = \Stripe\Customer::create([
-            'name' => $event->sender->name,
-        ]);
+            /** @var $customer Customer */
+            $this->setAttribute('stripe_customer_id', $customer->id);
+        } catch (ErrorException $e) {
+            Yii::error($e);
+            throw new ServerErrorHttpException('Failed to create stripe customer');
 
-        /** @var $customer Customer */
-        $this->setAttribute('stripe_customer_id', $customer->id);
-
-
+        }
     }
 
     /**
@@ -88,9 +96,9 @@ class BaseCustomer extends \yii\db\ActiveRecord
                 [
                     'name' => $event->sender->name,
                 ]);
-        } catch (StaleObjectException | \Throwable $e) {
-            Yii::debug($event);
-            Yii::debug($e);
+        } catch (ErrorException $e) {
+            Yii::error($e);
+            throw new ServerErrorHttpException('Customer not updated on stripe');
         }
     }
 
@@ -101,8 +109,13 @@ class BaseCustomer extends \yii\db\ActiveRecord
      */
     public function stripeDelete($event)
     {
-        $customer = \Stripe\Customer::retrieve($event->sender->stripe_customer_id);
-        $customer->delete();
+        try {
+            $customer = \Stripe\Customer::retrieve($event->sender->stripe_customer_id);
+            $customer->delete();
+        } catch (ErrorException $e) {
+            Yii::error($e);
+            throw new NotFoundHttpException('Customer not found on stripe');
+        }
     }
 
     /**
@@ -112,15 +125,15 @@ class BaseCustomer extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'created_date'], 'safe'],
-            [['state_id'], 'integer'],
+            [['state_id', 'id'], 'integer'],
             [['name'], 'string', 'max' => 45],
             [['address1', 'address2', 'city'], 'string', 'max' => 64],
             [['zip'], 'string', 'max' => 16],
             [['phone'], 'string', 'max' => 32],
             [['stripe_customer_id'], 'string', 'max' => 128],
-            [['email'], 'string', 'max' => 255],
+            [['email', 'logo'], 'string', 'max' => 255],
             [['direct'], 'integer'],
-            [['imageFile'], 'file', 'extensions' => 'png, jpg'],
+            [['imageFile'], 'image', 'extensions' => 'png, jpg', 'maxWidth' => 250, 'maxHeight' => 250],
         ];
     }
 
@@ -164,30 +177,26 @@ class BaseCustomer extends \yii\db\ActiveRecord
         return $this->hasMany(PaymentMethod::class, ['customer_id' => 'id']);
     }
 
-
     /**
      * File Upload for logo
      *
      * @return bool
-     * */
+     * @throws \yii\base\InvalidConfigException
+     */
     public function upload()
     {
-        $validate = $this->validate();
-        if ($validate) {
-            //$savedFileName = null;
+        /*gets received file from user and saves it to digital ocean space*/
+        if ($this->validate()) {
+            $this->imageFile = UploadedFile::getInstance($this, 'imageFile');
             if (isset($this->imageFile)) {
-                Yii::debug($this->imageFile);
-                $savedFileName = 'logos/' . uniqid() . '-' . $this->imageFile;
-                Yii::debug($savedFileName);
-
-                $this->imageFile->saveAs(Yii::getAlias("@frontend") . '/uploads/Customer/' . $savedFileName);
-                return $savedFileName;
+                /** @var \bilberrry\spaces\Service $storage */
+                $storage = Yii::$app->get('storage');
+                $storage->commands()->upload($this->id . '-' . uniqid() . '-' . $this->imageFile, $this->imageFile->tempName)->execute();
+                /* creates a url string varibale to return to get stored as the logo in datarbase */
+                return $storage->getUrl($this->imageFile);
             }
         } else {
             return false;
         }
     }
-
 }
-
-
