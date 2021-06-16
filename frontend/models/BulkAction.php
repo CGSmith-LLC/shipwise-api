@@ -170,9 +170,11 @@ class BulkAction extends BaseBulkAction
     }
 
     public function getOrdersByCustomerRef($cust_id, $order_ids) {
-        return (new \yii\db\Query())->select(['*'])
+        Yii::debug($order_ids);
+        return (new \yii\db\Query())->select(['customer_reference'])
             ->from('orders')
-            ->where(['and', ['customer_id' => $cust_id],['in',['customer_reference','order_ids']]]);
+            ->where(['and', ['customer_id' => $cust_id], ['in', 'customer_reference', $order_ids]])
+            ->all();
     }
 
     /**
@@ -273,10 +275,6 @@ class BulkAction extends BaseBulkAction
         }
 
         return self::EXECUTION_TYPE_SYNC;
-    }
-
-    public function getOrdersByCustomerRef(int $customer_id, array $order_ids) {
-
     }
 
     /**

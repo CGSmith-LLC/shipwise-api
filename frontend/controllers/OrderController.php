@@ -80,6 +80,7 @@ class OrderController extends \frontend\controllers\Controller
                 [
                     'model'     => $model,
                     'result'    => $result,
+                    'status'    => $model->action,
                 ]
             );
 
