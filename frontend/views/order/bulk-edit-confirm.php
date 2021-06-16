@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="order-form">
 
     <?php $form = ActiveForm::begin([
-            'action' => 'order/do-bulk-edit',
+            'action' => '/order/do-bulk-edit',
             'id' => 'form-bulk-edit-confirm',
             'enableClientValidation' => false,
     ]); ?>
