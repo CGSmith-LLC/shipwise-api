@@ -12,7 +12,6 @@ $this->title = 'Bulk Order Edit';
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-Yii::debug($statuses);
 ?>
 
 <div class="order-form">

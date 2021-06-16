@@ -20,8 +20,13 @@ $this->params['breadcrumbs'][] = $this->title;
             'action' => '/order/do-bulk-edit',
             'id' => 'form-bulk-edit-confirm',
             'enableClientValidation' => false,
-    ]); ?>
+    ]);
+    foreach ($result as $order) {
+        echo "<input type='hidden' name='order_ids[]' value='{$order['id']}' />";
+    }
+    ?>
 </div>
+
 <hr>
 <div class="row">
     <div class="col-md-12">
@@ -33,7 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="col-md-12">
         <ul>
         <?php
-        //var_dump($result);
             foreach ($result as $order) {
                 echo '<li>' . $order['customer_reference'] . '</li>';
             }
