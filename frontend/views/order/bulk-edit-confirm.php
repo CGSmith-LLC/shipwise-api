@@ -1,5 +1,6 @@
 <?php
 
+use common\models\Status;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 
@@ -16,14 +17,15 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="order-form">
 
     <?php $form = ActiveForm::begin([
-        'id' => 'form-bulk-edit-confirm',
-        'enableClientValidation' => false,
+            'action' => 'order/do-bulk-edit',
+            'id' => 'form-bulk-edit-confirm',
+            'enableClientValidation' => false,
     ]); ?>
 </div>
 <hr>
 <div class="row">
     <div class="col-md-12">
-        <p>You are about to change <em>all</em> of the orders below to a status of <strong><?= $status ?></strong>. Proceed?</p>
+        <p>You are about to change <em>all</em> of the orders below to a status of <strong><?= (Status::find()->where(['id'=> $status])->one())->name; ?></strong>. Proceed?</p>
         <div class="form-group">
             <?= Html::submitButton('Confirm', ['class' => 'btn btn-lg btn-success']) ?>
         </div>

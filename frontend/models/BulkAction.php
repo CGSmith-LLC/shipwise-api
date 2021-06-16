@@ -171,7 +171,7 @@ class BulkAction extends BaseBulkAction
 
     public function getOrdersByCustomerRef($cust_id, $order_ids) {
         Yii::debug($order_ids);
-        return (new \yii\db\Query())->select(['customer_reference'])
+        return (new \yii\db\Query())->select(['id', 'customer_reference'])
             ->from('orders')
             ->where(['and', ['customer_id' => $cust_id], ['in', 'customer_reference', $order_ids]])
             ->all();
@@ -286,7 +286,7 @@ class BulkAction extends BaseBulkAction
      *
      * @return bool|int False on failure, Integer on success
      */
-    private function changeStatus($params = null)
+    public function changeStatus($params = null)
     {
         if (isset($params[0]) && in_array($params[0], Status::getList('id', 'id'))) {
             $newStatus = $params[0];
