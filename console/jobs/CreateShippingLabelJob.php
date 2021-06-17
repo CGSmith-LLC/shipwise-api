@@ -52,6 +52,7 @@ class CreateShippingLabelJob extends BaseObject implements JobInterface
         // Create Shipping Label, update order tracking, save label as base64 data
         try {
             $shipment = $order->createShipment();
+            Yii::error($shipment);
             if ($order->hasErrors()) {
                 $bulkItem->errors = Json::encode($order->getErrors());
                 $bulkItem->status = BulkItem::STATUS_ERROR;

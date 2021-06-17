@@ -10,6 +10,7 @@ use common\models\ApiConsumer;
 use common\models\CustomerMeta;
 use common\models\Order;
 use common\models\Status;
+use console\jobs\ShopifyJob;
 use shopify\controllers\BaseController;
 use Yii;
 use yii\rest\Controller;
@@ -39,6 +40,13 @@ class WebhookController extends ControllerEx
     {
         $headers = Yii::$app->request->headers;
 
+        $id = Yii::$app->queue->push(new ShopifyJob([
+            'headers' => Yii::$app->request->headers,
+            'body' => Yii::$app->request->bodyParams])
+        );
+
+        return $this->success($id, 201);
+//M9M4-U43C-9ZET-6VBZ
         $domain = $headers->get('x-shopify-shop-domain');
         $type = $headers->get('x-shopify-topic');
 
