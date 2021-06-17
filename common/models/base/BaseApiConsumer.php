@@ -1,8 +1,6 @@
 <?php
 
 namespace common\models\base;
-use yii\base\Exception;
-use Yii;
 
 
 /**
@@ -16,10 +14,10 @@ use Yii;
  * @property int $customer_id         Customer ID
  * @property int $status              API consumer status. 1:active, 0:inactive
  * @property string $created_date        API consumer creation date
+ * @property string $encrypted_secret   Encrypted API secret key
  */
 class BaseApiConsumer extends \yii\db\ActiveRecord
 {
-
 
 
     /**
@@ -36,15 +34,15 @@ class BaseApiConsumer extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id'],'integer'],
-            [['auth_key', 'auth_secret'], 'required'],
-           // [['last_activity', 'created_date'], 'safe'],
+            [['id'], 'integer'],
+            [['auth_key', 'encrypted_secret'], 'required'],
+            [['last_activity', 'created_date'], 'safe'],
             [['customer_id', 'status', 'superuser'], 'integer'],
             [['auth_key'], 'string', 'max' => 6],
-            [['auth_secret',], 'string', 'max' => 128],
             [['auth_key'], 'unique'],
-            [['auth_secret'], 'unique'],
-            [['label'], 'string', 'max' => 128]
+            [['label'], 'string', 'max' => 128],
+            [['encrypted_secret'], 'string'],
+            [['encrypted_secret'], 'unique'],
         ];
     }
 
@@ -54,7 +52,7 @@ class BaseApiConsumer extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'auth_key' => 'Auth Key',
-            'auth_secret' => 'Auth Secret',
+            'encypted_secret' => 'Auth Secret',
             'customer_id' => 'Customer ID',
             'label' => 'Label',
         ];

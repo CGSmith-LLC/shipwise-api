@@ -50,7 +50,7 @@ class ApiConsumerController extends Controller
         $query = ApiConsumer::find();
 
         if (!Yii::$app->user->identity->isAdmin) {
-            $query->andOnCondition([ApiConsumer::tableName() . '.customer_id' => $this->customers]);
+            $query->andOnCondition([ApiConsumer::tableName() . '.customer_id' => Yii::$app->user->identity->customer_id]);
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -62,18 +62,6 @@ class ApiConsumerController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single ApiConsumer model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
 
     /**
      * Creates a new ApiConsumer model.
@@ -88,33 +76,13 @@ class ApiConsumerController extends Controller
             $model->generateAuthKey();
             $model->generateAuthSecret();
             $model->customer_id = (new \common\models\ApiConsumer)->getCustomerId();
-//            $secret = Yii::$app->getSecurity()->encryptByKey($model->auth_secret, );
-//            $model->auth_secret =
             $model->save();
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->render('secret', [
+                'model' => $model,
+            ]);
         }
 
         return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Updates an existing ApiConsumer model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
             'model' => $model,
         ]);
     }

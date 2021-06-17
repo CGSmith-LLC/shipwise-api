@@ -27,16 +27,9 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
         'dataProvider' => $dataProvider,
         'columns' => [
 
-//            'id',
+            'id',
             'label',
             'auth_key',
-            'auth_secret',
-//            'auth_token',
-//            'last_activity',
-            //'customer_id',
-            //'status',
-            //'created_date',
-            //'superuser',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

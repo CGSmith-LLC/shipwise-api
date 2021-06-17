@@ -70,7 +70,7 @@ class ApiConsumer extends BaseApiConsumer
      */
     protected static function findByKeySecret($key, $secret)
     {
-        return static::findOne(['auth_key' => $key, 'auth_secret' => $secret]);
+        return static::findOne(['auth_key' => $key, 'encrypted_secret' => $secret]);
     }
 
     /**
@@ -117,8 +117,8 @@ class ApiConsumer extends BaseApiConsumer
     {
         // Generate random string for auth token
         $this->plainTextAuthSecret = Yii::$app->security->generateRandomString(64);
-        $this->auth_secret = Yii::$app->getSecurity()->encryptByKey($this->plainTextAuthSecret, Yii::$app->params['encryptionKey']);
-
+        $this->encrypted_secret = base64_encode(Yii::$app->getSecurity()->encryptByKey($this->plainTextAuthSecret, Yii::$app->params['encryptionKey']));
+        Yii::debug($this);
         return $this;
     }
 
