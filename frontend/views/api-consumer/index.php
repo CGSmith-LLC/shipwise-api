@@ -28,11 +28,12 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
         'dataProvider' => $dataProvider,
         'columns' => [
 
-            'id',
             'label',
             'auth_key',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'yii\grid\ActionColumn',
+                'template' => '{delete}'],
+
         ],
     ]); ?>
 </div>
