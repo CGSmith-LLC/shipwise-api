@@ -4,8 +4,6 @@ namespace common\models;
 
 use common\models\base\BaseApiConsumer;
 use Yii;
-use yii\base\Exception;
-
 
 /**
  * Class ApiConsumer
@@ -70,7 +68,14 @@ class ApiConsumer extends BaseApiConsumer
      */
     protected static function findByKeySecret($key, $secret)
     {
-        return static::findOne(['auth_key' => $key, 'encrypted_secret' => $secret]);
+        if ($apiConsumer = ApiConsumer::find()->where(['auth_key' => $key])->one()) {
+            /** @var ApiConsumer $apiConsumer */
+            $authSecret = Yii::$app->getSecurity()->decryptByKey(base64_decode($apiConsumer->encrypted_secret), Yii::$app->params['encryptionKey']);
+            if ($authSecret === $secret) {
+                return $apiConsumer;
+            }
+        }
+        return null;
     }
 
     /**
