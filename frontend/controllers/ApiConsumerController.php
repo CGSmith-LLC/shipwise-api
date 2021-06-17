@@ -77,6 +77,8 @@ class ApiConsumerController extends Controller
             $model->generateAuthSecret();
             $model->customer_id = (new \common\models\ApiConsumer)->getCustomerId();
             $model->save();
+            Yii::$app->getSession()->setFlash('warning', 'DO NOT REFRESH THIS PAGE. YOU WILL ONLY SEE THE SECRET KEY ONE TIME. STORE IT IN A SAFE LOCATION AS YOU WILL NOT BE ABLE TO SEE IT AGAIN.');
+
             return $this->render('secret', [
                 'model' => $model,
             ]);
