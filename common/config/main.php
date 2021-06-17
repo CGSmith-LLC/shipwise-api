@@ -22,7 +22,16 @@ return [
             'publicKey' => $params['stripePublicKey'],
             'privateKey' => $params['stripePrivateKey'],
         ],
-
+        'storage' => [
+            'class' => 'bilberrry\spaces\Service',
+            'credentials' => [
+                'key' => $params['digitalOceanKey'],
+                'secret' => $params['digitalOceanSecret'],
+            ],
+            'region' => 'nyc3',
+            'defaultSpace' => 'dev-getshipwise',
+            'defaultAcl' => 'public-read',
+        ],
         'customerSettings' => [
             'class' => 'common\components\CustomerSettings',
         ],
