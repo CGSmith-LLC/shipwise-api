@@ -4,6 +4,8 @@ use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\State */
+/* @var $countries array list of countries */
+
 
 $this->title = 'Update State: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'States', 'url' => ['index']];
@@ -16,6 +18,7 @@ $this->params['breadcrumbs'][] = 'Update';
 
     <?= $this->render('_form', [
         'model' => $model,
+        'countries' => $countries,
     ]) ?>
 
 </div>

@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\Country;
 use Yii;
 use common\models\State;
 use yii\data\ActiveDataProvider;
@@ -72,6 +73,7 @@ class StateController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'countries' => Country::getList(),
         ]);
     }
 
@@ -92,6 +94,8 @@ class StateController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'countries' => Country::getList(),
+
         ]);
     }
 

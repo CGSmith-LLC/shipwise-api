@@ -94,6 +94,7 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Reports', 'url' => ['/report']];
 
         if (Yii::$app->user->identity->isAdmin) {
+            $menuItems[] = ['label' => "States/Provinces", 'url' =>['/state']];
             $menuItems[] = ['label' => 'Countries', 'url' => ['/country']];
             $menuItems[] = ['label' => 'Customers', 'url' => ['/customer']];
             $menuItems[] = ['label' => 'Users', 'url' => ['/user/admin/']];
