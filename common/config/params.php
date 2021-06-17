@@ -8,6 +8,9 @@ return [
     'stripePrivateKey'              => '1234',
     'shopifyPublicKey'              => '5678',
     'shopifyPrivateKey'             => '5678',
+    'encryptionKey'                 => 'secret',
+    'digitalOceanKey'               => 'key',
+    'digitalOceanSecret'            => 'secret',
     /**
      * Shopify App Parameters and App Credentials
      */
