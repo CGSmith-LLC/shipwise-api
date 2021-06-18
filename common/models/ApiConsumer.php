@@ -22,6 +22,9 @@ class ApiConsumer extends BaseApiConsumer
 
     public $plainTextAuthSecret;
 
+    /** @deprecated $auth_secret */
+    public $auth_secret;
+
 
     /**
      * Get Customer
