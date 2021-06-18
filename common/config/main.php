@@ -23,12 +23,19 @@ return [
             'publicKey' => $params['stripePublicKey'],
             'privateKey' => $params['stripePrivateKey'],
         ],
-
-
+        'storage' => [
+            'class' => 'bilberrry\spaces\Service',
+            'credentials' => [
+                'key' => $params['digitalOceanKey'],
+                'secret' => $params['digitalOceanSecret'],
+            ],
+            'region' => 'nyc3',
+            'defaultSpace' => $params['defaultSpace'],
+            'defaultAcl' => 'public-read',
+        ],
         'customerSettings' => [
             'class' => 'common\components\CustomerSettings',
         ],
-
         'queue' => [
             'class' => 'yii\queue\db\Queue',
             'db' => 'db', // DB connection component or its config

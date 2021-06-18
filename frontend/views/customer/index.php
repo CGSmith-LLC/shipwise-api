@@ -21,21 +21,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
             'id',
             'name',
             'address1',
             'address2',
             'city',
-            //'state_id',
-            //'zip',
-            //'phone',
-            //'email:email',
-            //'logo',
-            //'created_date',
-            //'stripe_customer_id',
-            //'direct',
-
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
