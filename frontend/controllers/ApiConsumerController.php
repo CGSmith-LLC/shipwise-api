@@ -2,10 +2,11 @@
 
 namespace frontend\controllers;
 
+use frontend\models\Customer;
 use Yii;
 use common\models\ApiConsumer;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
+use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -20,8 +21,20 @@ class ApiConsumerController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'ruleConfig' => [
+                    'class' => \dektrium\user\filters\AccessRule::class,
+                ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -35,8 +48,14 @@ class ApiConsumerController extends Controller
      */
     public function actionIndex()
     {
+        $query = ApiConsumer::find()->active();
+
+        if (!Yii::$app->user->identity->isAdmin) {
+            $query->andOnCondition([ApiConsumer::tableName() . '.customer_id' => Yii::$app->user->identity->customer_id]);
+        }
+
         $dataProvider = new ActiveDataProvider([
-            'query' => ApiConsumer::find(),
+            'query' => $query,
         ]);
 
         return $this->render('index', [
@@ -44,18 +63,18 @@ class ApiConsumerController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single ApiConsumer model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
+    public function actionSecret($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $model = $this->findModel($id);
+
+        // Don't allow access to view secret after 60 seconds since creation time
+        if (time() > strtotime($model->created_date) + 60) {
+            throw new NotFoundHttpException('Page not found');
+        }
+
+        return $this->render('secret', ['model' => $model]);
     }
+
 
     /**
      * Creates a new ApiConsumer model.
@@ -66,32 +85,21 @@ class ApiConsumerController extends Controller
     {
         $model = new ApiConsumer();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->generateAuthKey();
+            $model->generateAuthSecret();
+            $model->save();
+            Yii::$app->getSession()->setFlash('error', 'Please store your API key and secret in a password manager. You will not be able to see the secret after you leave this page');
+
+            return $this->redirect(['secret', 'id' => $model->id]);
         }
 
         return $this->render('create', [
             'model' => $model,
-        ]);
-    }
+            'customers' => Yii::$app->user->identity->isAdmin
+                ? Customer::getList()
+                : Yii::$app->user->identity->getCustomerList(),
 
-    /**
-     * Updates an existing ApiConsumer model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
         ]);
     }
 
@@ -104,7 +112,11 @@ class ApiConsumerController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $model->status = ApiConsumer::STATUS_INACTIVE;
+        if ($model->update()) {
+            Yii::$app->getSession()->setFlash('success', 'API key deleted');
+        }
 
         return $this->redirect(['index']);
     }
@@ -113,12 +125,18 @@ class ApiConsumerController extends Controller
      * Finds the ApiConsumer model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return ApiConsumer the loaded model
+     * @return array|ApiConsumer|\yii\db\ActiveRecord
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel(int $id)
     {
-        if (($model = ApiConsumer::findOne($id)) !== null) {
+        $query = ApiConsumer::find()->where(['id' => $id]);
+
+        if (!\Yii::$app->user->identity->isAdmin) {
+            $query->andWhere(['in', 'customer_id', \Yii::$app->user->identity->customerIds]);
+        }
+
+        if (($model = $query->one()) !== null) {
             return $model;
         }
 

@@ -121,7 +121,7 @@ AppAsset::register($this);
                     'visible' => Yii::$app->user->identity->isDirectCustomer()
                 ],
                 [
-                    'label' => 'Api Key',
+                    'label' => Yii::t('app', 'API'),
                     'url' => '/api-consumer',
                 ]
 

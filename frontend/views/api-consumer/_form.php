@@ -12,21 +12,10 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'auth_key')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'label')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'auth_secret')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'auth_token')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'last_activity')->textInput() ?>
-
-    <?= $form->field($model, 'customer_id')->textInput() ?>
-
-    <?= $form->field($model, 'status')->textInput() ?>
-
-    <?= $form->field($model, 'created_date')->textInput() ?>
-
-    <?= $form->field($model, 'superuser')->textInput() ?>
+    <?= $form->field($model, 'customer_id')
+        ->dropdownList($customers, ['prompt' => ' Please select']) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
