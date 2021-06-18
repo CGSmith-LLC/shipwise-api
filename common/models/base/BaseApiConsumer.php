@@ -3,6 +3,8 @@
 namespace common\models\base;
 
 
+use common\models\query\ApiConsumerQuery;
+
 /**
  * This is the model class for table "api_consumer".
  *
@@ -56,5 +58,15 @@ class BaseApiConsumer extends \yii\db\ActiveRecord
             'customer_id' => 'Customer ID',
             'label' => 'Label',
         ];
+    }
+
+
+    /**
+     * @inheritdoc
+     * @return ApiConsumerQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new ApiConsumerQuery(get_called_class());
     }
 }

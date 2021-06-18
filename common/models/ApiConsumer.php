@@ -103,7 +103,6 @@ class ApiConsumer extends BaseApiConsumer
         return isset($this->customer);
     }
 
-
     /**
      * Generate a random string for auth token and verify it does not exist
      *
@@ -137,11 +136,14 @@ class ApiConsumer extends BaseApiConsumer
         return $this;
     }
 
+    /**
+     * Gets customer id
+     *
+     * @return mixed
+     */
     public function getCustomerId()
     {
         return Yii::$app->user->identity->customer_id;
 
     }
-
-
 }

@@ -48,7 +48,7 @@ class ApiConsumerController extends Controller
      */
     public function actionIndex()
     {
-        $query = ApiConsumer::find();
+        $query = ApiConsumer::find()->active();
 
         if (!Yii::$app->user->identity->isAdmin) {
             $query->andOnCondition([ApiConsumer::tableName() . '.customer_id' => Yii::$app->user->identity->customer_id]);
@@ -112,7 +112,11 @@ class ApiConsumerController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $model->status = ApiConsumer::STATUS_INACTIVE;
+        if ($model->update()) {
+            Yii::$app->getSession()->setFlash('success', 'API key deleted');
+        }
 
         return $this->redirect(['index']);
     }
