@@ -29,11 +29,23 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
         'columns' => [
 
             'label',
-            'auth_key',
-
-            ['class' => 'yii\grid\ActionColumn',
-                'template' => '{delete}'],
-
+            [
+                'attribute' => 'auth_key',
+                'label' => 'API Key',
+            ],
+            [
+                'attribute' => 'encrypted_secret',
+                'label' => 'API Password',
+                //'class' => 'hidden',
+                'value' => function($model) {
+                    $secret = Yii::$app->getSecurity()->decryptByKey(base64_decode($model->encrypted_secret), Yii::$app->params['encryptionKey']);
+                    return substr($secret, 0,3) .  '...' . substr($secret, -3);
+                }
+            ],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{delete}'
+            ],
         ],
     ]); ?>
 </div>
