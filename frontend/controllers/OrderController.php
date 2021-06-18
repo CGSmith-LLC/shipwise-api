@@ -10,10 +10,10 @@ use frontend\models\{forms\BulkEditForm, Order, forms\OrderForm, BulkAction, Ord
 use yii\web\{BadRequestHttpException, NotFoundHttpException, Response};
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
+use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii2tech\csvgrid\CsvGrid;
-use function PHPUnit\Framework\stringEndsWith;
 
 /**
  * OrderController implements the CRUD actions for Order model.
@@ -27,8 +27,8 @@ class OrderController extends \frontend\controllers\Controller
     public function behaviors()
     {
         return [
-            'verbs'  => [
-                'class'   => 'yii\filters\VerbFilter',
+            'verbs' => [
+                'class' => 'yii\filters\VerbFilter',
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -45,74 +45,65 @@ class OrderController extends \frontend\controllers\Controller
         ];
     }
 
-    public function actionDoBulkEdit() {
-        Yii::debug($_POST);
-        /** @var BulkEditForm */
-        $model = new BulkEditForm();
-        $attr = $_POST ?? null;
-        $model->setAttributes($attr);
-
-        Yii::debug($model);
-        $bulk = new BulkAction();
-        $bulk->orderIDs = $model->order_ids;
-        $bulk->status = $model->action;
-        $bulk->changeStatus();
-        Yii::debug($bulk);
-
-        Yii::$app->getSession()->setFlash('success', 'Successfully edited orders.');
-        return $this->redirect('/order/bulk-edit');
-    }
-
     public function actionBulkEdit()
     {
-        /** @var BulkEditForm */
         $model = new BulkEditForm();
-        $attr = $_POST['BulkEditForm'] ?? null;
-        $model->setAttributes($attr);
+        $model->setAttributes(Yii::$app->request->post('BulkEditForm'));
+        Yii::debug($model);
+
         // Validate model and save
         if (Yii::$app->request->post() && $model->validate()) {
-            $orders = [];
-            switch ($model->delimiter) {
-                case 'newlines':
-                    $orders = preg_split("/\\r\\n|\\r|\\n/", $model->order_ids);
-                    break;
-                case 'commas':
-                    $orders = explode(',', $model->order_ids);
-                    break;
-                case 'spaces':
-                    $orders = explode(' ', $model->order_ids);
-                    break;
-                default:
-                    $orders = ['error' => 'Error parsing order list.'];
-            }
-            $action = new BulkAction();
-            $result = $action->getOrdersByCustomerRef($model->customer, $orders);
+            Yii::debug($model);
 
-            if (isset($orders['error'])) {
-                Yii::$app->getSession()->setFlash('error', 'Error parsing orders.');
-                return $this->redirect('/order/bulk-edit');
+            $orders = Order::find()->forCustomer($model->customer)->andWhere(['in', 'customer_reference', $model->orders])->all();
+            $status = Status::find()->where(['id' => $model->action])->one();
+
+            if ($model->confirmed) {
+                /** @var Order $order */
+                $errors = $success = [];
+                foreach ($orders as $order) {
+                    if (!$order->changeStatus($status->id)) {
+                        $errors[] = $order->customer_reference;
+                    } else {
+                        $success[] = $order->customer_reference;
+                    }
+                }
+
+                if (count($errors) > 0) {
+                    Yii::$app->getSession()->setFlash('error', count($errors) . ' orders failed to changed: <br>' . implode(',', $errors));
+                }
+
+                if (count($success) > 0) {
+                    Yii::$app->getSession()->setFlash('success', count($success) . ' orders changed to <strong>' . $status->name . '</strong>');
+                }
+
+                return $this->redirect('bulk-edit');
             }
+
+            // Set model->order_ids to newlines for order confirmation screen
+            $model->order_ids = implode(PHP_EOL, ArrayHelper::map($orders, 'id', 'customer_reference'));
+            $model->confirmed = true;
+
+            Yii::$app->getSession()->setFlash('warning', 'You are about to change <em>all</em> of the orders below to a status of <strong>' . $status->name);
 
             return $this->render(
-                'bulk-edit-confirm',
+                'bulk-edit',
                 [
-                    'model'     => $model,
-                    'result'    => $result,
-                    'status'    => $model->action,
+                    'model' => $model,
+                    'confirmed' => true,
+                    'customers' => Yii::$app->user->identity->isAdmin ? Customer::getList() : Yii::$app->user->identity->getCustomerList(),
+                    'statuses' => Status::getList(),
                 ]
             );
-
         }
 
         return $this->render(
             'bulk-edit',
             [
-                'model'     => $model,
-                // 'actions' => should be enumeration of actions able to perform?
-                'customers' => Yii::$app->user->identity->isAdmin
-                    ? Customer::getList()
-                    : Yii::$app->user->identity->getCustomerList(),
-                'statuses'  => Status::getList(), // Move to meta data to perform actions?
+                'model' => $model,
+                'confirmed' => false,
+                'customers' => Yii::$app->user->identity->isAdmin ? Customer::getList() : Yii::$app->user->identity->getCustomerList(),
+                'statuses' => Status::getList(),
             ]
         );
     }
@@ -124,17 +115,17 @@ class OrderController extends \frontend\controllers\Controller
      */
     public function actionIndex()
     {
-        $searchModel  = new OrderSearch();
+        $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render(
             'index',
             [
-                'searchModel'  => $searchModel,
+                'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
-                'statuses'     => Status::getList(),
-                'carriers'     => Carrier::getList(),
-                'services'     => Service::getList(),
+                'statuses' => Status::getList(),
+                'carriers' => Carrier::getList(),
+                'services' => Service::getList(),
             ]
         );
     }
@@ -168,15 +159,15 @@ class OrderController extends \frontend\controllers\Controller
     public function actionCreate()
     {
         /** @var OrderForm */
-        $model        = new OrderForm();
+        $model = new OrderForm();
         $model->order = new Order();
 
         // Set default values
         $model->order->loadDefaultValues();
         $model->address->loadDefaultValues();
 
-        $model->order->status_id  = Status::OPEN;
-        $model->order->origin     = Yii::$app->name;
+        $model->order->status_id = Status::OPEN;
+        $model->order->origin = Yii::$app->name;
         $model->order->address_id = 0; // to avoid validation, as we validate address model separately
 
         // Load from POST
@@ -192,16 +183,15 @@ class OrderController extends \frontend\controllers\Controller
         return $this->render(
             'create',
             [
-                'model'     => $model,
+                'model' => $model,
                 'customers' => Yii::$app->user->identity->isAdmin
                     ? Customer::getList()
                     : Yii::$app->user->identity->getCustomerList(),
-                'statuses'  => Status::getList(),
-                'carriers'  => Carrier::getList(),
-                'services'  => Service::getList('id', 'name', $model->order->carrier_id),
+                'statuses' => Status::getList(),
+                'carriers' => Carrier::getList(),
+                'services' => Service::getList('id', 'name', $model->order->carrier_id),
                 'countries' => Country::getList(),
-                'states'    => State::getList('id', 'name', $model->address->country),
-
+                'states' => State::getList('id', 'name', $model->address->country),
             ]
         );
     }
@@ -236,16 +226,15 @@ class OrderController extends \frontend\controllers\Controller
         return $this->render(
             'update',
             [
-                'model'     => $model,
+                'model' => $model,
                 'customers' => Yii::$app->user->identity->isAdmin
                     ? Customer::getList()
                     : Yii::$app->user->identity->getCustomerList(),
-                'statuses'  => Status::getList(),
-                'carriers'  => Carrier::getList(),
-                'services'  => Service::getList('id', 'name', $model->order->carrier_id),
+                'statuses' => Status::getList(),
+                'carriers' => Carrier::getList(),
+                'services' => Service::getList('id', 'name', $model->order->carrier_id),
                 'countries' => Country::getList(),
-                'states'    => State::getList('id', 'name', $model->address->country),
-
+                'states' => State::getList('id', 'name', $model->address->country),
             ]
         );
     }
@@ -359,8 +348,8 @@ class OrderController extends \frontend\controllers\Controller
         return [
             'success' => $model->isSuccess(),
             'message' => $model->getMessage(),
-            'errors'  => Html::errorSummary($model, ['header' => false]),
-            'link'    => $model->getLink(),
+            'errors' => Html::errorSummary($model, ['header' => false]),
+            'link' => $model->getLink(),
         ];
     }
 
@@ -392,8 +381,8 @@ class OrderController extends \frontend\controllers\Controller
     {
         if ($id === null) {
             $batches = BaseBatch::find()
-                                ->where(['customer_id' => Yii::$app->user->identity->customer_id])
-                                ->orderBy(['created_date' => SORT_DESC]);
+                ->where(['customer_id' => Yii::$app->user->identity->customer_id])
+                ->orderBy(['created_date' => SORT_DESC]);
 
             return $this->render(
                 'batch',
@@ -403,17 +392,17 @@ class OrderController extends \frontend\controllers\Controller
             );
         }
 
-        $searchModel  = new OrderSearch();
+        $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(['batch_id' => $id]);
 
         return $this->render(
             'index',
             [
-                'searchModel'  => $searchModel,
+                'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
-                'statuses'     => Status::getList(),
-                'carriers'     => Carrier::getList(),
-                'services'     => Service::getList(),
+                'statuses' => Status::getList(),
+                'carriers' => Carrier::getList(),
+                'services' => Service::getList(),
             ]
         );
     }
@@ -444,7 +433,7 @@ class OrderController extends \frontend\controllers\Controller
         $tmpFiles = [];
         foreach ($model->getItems()->orderBy('order_id')->all() as $item) {
             $filename = $dir . 'tmp_' . $item->id . '.' . strtolower($item->base64_filetype);
-            $fp       = fopen($filename, 'wb');
+            $fp = fopen($filename, 'wb');
             fwrite($fp, base64_decode($item->base64_filedata));
             fclose($fp);
             $tmpFiles[] = $filename;
@@ -515,7 +504,7 @@ class OrderController extends \frontend\controllers\Controller
 
         if (empty($order->service)) {
             // @todo Implement here your biz logic for carrier service selection
-            $service           = Service::findByShipWiseCode('UPSGround');
+            $service = Service::findByShipWiseCode('UPSGround');
             $order->service_id = $service->id;
             $order->carrier_id = $service->carrier_id;
         }
@@ -548,7 +537,7 @@ class OrderController extends \frontend\controllers\Controller
             $filename,
             [
                 'mimeType' => FileHelper::getMimeTypeByExtension($filename),
-                'inline'   => true,
+                'inline' => true,
             ]
         );
     }
@@ -584,9 +573,9 @@ class OrderController extends \frontend\controllers\Controller
         return $this->render(
             'import',
             [
-                'model'     => $model,
-                'carriers'  => Carrier::getShipwiseCodes(),
-                'services'  => Service::getShipwiseCodes(),
+                'model' => $model,
+                'carriers' => Carrier::getShipwiseCodes(),
+                'services' => Service::getShipwiseCodes(),
                 'customers' => $customers,
             ]
         );
@@ -608,7 +597,7 @@ class OrderController extends \frontend\controllers\Controller
         $exporter = new CsvGrid(
             [
                 'dataProvider' => new ArrayDataProvider(['allModels' => OrderImport::getSampleData()]),
-                'columns'      => OrderImport::$csvFields,
+                'columns' => OrderImport::$csvFields,
             ]
         );
 

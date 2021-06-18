@@ -7,7 +7,6 @@ use common\models\base\BaseBatchItem;
 use common\models\BulkItem;
 use common\models\Status;
 
-// Order Status
 use common\models\BulkAction as BaseBulkAction;
 use Yii;
 use yii\helpers\Url;
@@ -167,14 +166,6 @@ class BulkAction extends BaseBulkAction
             ['orderIDs', 'each', 'rule' => ['integer']],
             ['options', 'safe'],
         ];
-    }
-
-    public function getOrdersByCustomerRef($cust_id, $order_ids) {
-        Yii::debug($order_ids);
-        return (new \yii\db\Query())->select(['id', 'customer_reference'])
-            ->from('orders')
-            ->where(['and', ['customer_id' => $cust_id], ['in', 'customer_reference', $order_ids]])
-            ->all();
     }
 
     /**
@@ -475,5 +466,3 @@ class BulkAction extends BaseBulkAction
     }
 
 }
-
-
