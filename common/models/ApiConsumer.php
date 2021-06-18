@@ -68,7 +68,7 @@ class ApiConsumer extends BaseApiConsumer
      */
     protected static function findByKeySecret($key, $secret)
     {
-        if ($apiConsumer = ApiConsumer::find()->where(['auth_key' => $key])->one()) {
+        if ($apiConsumer = static::find()->where(['auth_key' => $key])->one()) {
             /** @var ApiConsumer $apiConsumer */
             $authSecret = Yii::$app->getSecurity()->decryptByKey(base64_decode($apiConsumer->encrypted_secret), Yii::$app->params['encryptionKey']);
             if ($authSecret === $secret) {
