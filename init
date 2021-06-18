@@ -72,7 +72,7 @@ foreach ($files as $file) {
     }
 }
 
-$callbacks = ['setSwaggerConfig', 'setCookieValidationKey', 'setWritable', 'setExecutable', 'createSymlink'];
+$callbacks = ['setCookieValidationKey', 'setWritable', 'setExecutable', 'createSymlink'];
 foreach ($callbacks as $callback) {
     if (!empty($env[$callback])) {
         $callback($root, $env[$callback]);

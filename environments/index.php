@@ -64,9 +64,6 @@ return [
         'setCookieValidationKey' => [
             'api/config/main-local.php',
             'frontend/config/main-local.php',
-        ],
-        'setSwaggerConfig' => [
-            'api/web/index.php',
         ]
     ],
 ];
