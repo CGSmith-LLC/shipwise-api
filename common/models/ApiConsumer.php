@@ -105,25 +105,35 @@ class ApiConsumer extends BaseApiConsumer
 
 
     /**
+     * Generate a random string for auth token and verify it does not exist
+     *
      * @return ApiConsumer
      * @throws \yii\base\Exception
      *
      */
     public function generateAuthKey(): ApiConsumer
     {
-        // Generate random string for auth token
-        $this->auth_key = Yii::$app->security->generateRandomString(6);
-//        $this->updateLastActivity();
+        $this->auth_key = Yii::$app->getSecurity()->generateRandomString(6);
+
+        while (ApiConsumer::find()->where(['auth_key' => $this->auth_key])->exists()) {
+            $this->auth_key = Yii::$app->getSecurity()->generateRandomString(6);
+        }
 
         return $this;
     }
 
+    /**
+     * Generate the encryption and API Secret
+     *
+     * @return $this
+     * @throws \yii\base\Exception
+     */
     public function generateAuthSecret(): ApiConsumer
     {
         // Generate random string for auth token
         $this->plainTextAuthSecret = Yii::$app->security->generateRandomString(64);
         $this->encrypted_secret = base64_encode(Yii::$app->getSecurity()->encryptByKey($this->plainTextAuthSecret, Yii::$app->params['encryptionKey']));
-        Yii::debug($this);
+
         return $this;
     }
 
