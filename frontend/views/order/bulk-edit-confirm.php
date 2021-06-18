@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model frontend\models\forms\BulkEditForm */
 /* @var $result array Orders to show */
-/* @var $status string */
+/* @var $status int */
 
 $this->title = 'Bulk Order Edit Confirm';
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
@@ -24,6 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
     foreach ($result as $order) {
         echo "<input type='hidden' name='order_ids[]' value='{$order['id']}' />";
     }
+    echo "<input type='hidden' name='status' value='{$status}' />";
     ?>
 </div>
 

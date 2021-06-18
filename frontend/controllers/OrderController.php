@@ -46,15 +46,18 @@ class OrderController extends \frontend\controllers\Controller
     }
 
     public function actionDoBulkEdit() {
+        Yii::debug($_POST);
         /** @var BulkEditForm */
         $model = new BulkEditForm();
-        $attr = $_POST['BulkEditForm'] ?? null;
+        $attr = $_POST ?? null;
         $model->setAttributes($attr);
 
         Yii::debug($model);
         $bulk = new BulkAction();
-        $bulk->orderIDs =
-        $bulk->changeStatus([$model->action, $model->order_ids]);
+        $bulk->orderIDs = $model->order_ids;
+        $bulk->status = $model->action;
+        $bulk->changeStatus();
+        Yii::debug($bulk);
 
         Yii::$app->getSession()->setFlash('success', 'Successfully edited orders.');
         return $this->redirect('/order/bulk-edit');
