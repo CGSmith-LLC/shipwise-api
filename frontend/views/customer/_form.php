@@ -26,14 +26,16 @@ ToggleAsset::register($this);
     <?= $form->field($model, 'city')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'state_id')
-        ->dropdownList($states, ['prompt' => ' Please select']) ?>
+        ->dropdownList($states, ['prompt' => ' Please select'])
+        ->label('State')
+    ?>
 
     <?= $form->field($model, 'zip')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-<label>Direct Customer?</label>
+    <label>Direct Customer?</label>
     <?= $form->field($model, 'direct')->checkbox([
         'data-toggle' => 'toggle',
         'data-on' => 'Yes',
@@ -41,12 +43,14 @@ ToggleAsset::register($this);
         'label' => false,
     ]); ?>
 
-<?php /*if($model->logo) : ?>
-    <span>Current Logo:</span>
-    <img src="/<?= $model->logo ?>" width="200"/>
-<?php endif; */?>
-    
-    <?= $form->field($model, 'imageFile')->fileInput()?>
+    <label>Current Logo:</label><br/>
+    <?php if ($model->logo) {
+        echo Html::img($model->logo);
+    } else{ ?>
+        No logo uploaded
+    <?php } ?>
+
+    <?= $form->field($model, 'imageFile')->label('New logo')->fileInput() ?>
 
 
     <div class="form-group">

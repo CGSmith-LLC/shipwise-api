@@ -3,10 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseCustomer;
-use Stripe\Stripe;
 use yii\helpers\ArrayHelper;
-use yii\web\UploadedFile;
-
 /**
  * Class Customer
  *
@@ -18,10 +15,6 @@ class Customer extends BaseCustomer
 {
 
     public $country = 'US';
-
-
-
-
 
     /**
      * Returns list of Countries as array [abbreviation=>name]
