@@ -7,7 +7,6 @@ use common\models\base\BaseBatchItem;
 use common\models\BulkItem;
 use common\models\Status;
 
-// Order Status
 use common\models\BulkAction as BaseBulkAction;
 use Yii;
 use yii\helpers\Url;
@@ -278,8 +277,9 @@ class BulkAction extends BaseBulkAction
      *
      * @return bool|int False on failure, Integer on success
      */
-    private function changeStatus($params = null)
+    public function changeStatus($params = null)
     {
+        Yii::debug($params);
         if (isset($params[0]) && in_array($params[0], Status::getList('id', 'id'))) {
             $newStatus = $params[0];
         } else {
@@ -466,5 +466,3 @@ class BulkAction extends BaseBulkAction
     }
 
 }
-
-
