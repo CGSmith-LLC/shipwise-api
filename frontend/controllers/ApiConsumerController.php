@@ -51,7 +51,7 @@ class ApiConsumerController extends Controller
         $query = ApiConsumer::find()->active();
 
         if (!Yii::$app->user->identity->isAdmin) {
-            $query->andOnCondition([ApiConsumer::tableName() . '.customer_id' => Yii::$app->user->identity->customer_id]);
+            $query->andOnCondition([ApiConsumer::tableName() . '.customer_id' => $this->customers]);
         }
 
         $dataProvider = new ActiveDataProvider([
