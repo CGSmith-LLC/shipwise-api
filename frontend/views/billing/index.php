@@ -20,7 +20,7 @@ $this->registerCssFile('/css/card.css')
         <?php
         // Display card information
         // Iterate over cards, ask stripe for the payment method details
-        /// Display last 4, expiration, and if its default
+        // Display last 4, expiration, and if it's default
 
         /** @var \frontend\models\PaymentMethod $paymentMethod */
 

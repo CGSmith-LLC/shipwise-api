@@ -167,6 +167,10 @@ a.desc:after {
     background-color: #0c4a96;
 }
 
+.navbar-default .navbar-nav > li > .dropdown-menu > .dropdown-submenu {
+    color: #ffffff;
+}
+
 .navbar-default .navbar-nav .open .dropdown-menu > .active > a,
 .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
 .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
