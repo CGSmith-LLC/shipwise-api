@@ -159,7 +159,7 @@ a.desc:after {
 
 .navbar-default .navbar-nav > li > .dropdown-menu > li > a:hover,
 .navbar-default .navbar-nav > li > .dropdown-menu > li > a:focus {
-    color: #ecdbff;
+    color: #000000;
     background-color: #0c4a96;
 }
 
