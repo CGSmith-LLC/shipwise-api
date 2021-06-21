@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\models\Customer;
 use dektrium\user\controllers\AdminController;
 use frontend\models\PaymentMethod;
+use phpDocumentor\Reflection\Types\Parent_;
 use Yii;
 
 /**
@@ -58,5 +59,4 @@ class Controller extends \yii\web\Controller
             }
         }
     }
-
 }
