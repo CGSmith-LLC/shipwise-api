@@ -10,6 +10,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\web\UserEvent;
 
 /**
  * Class AdminController
@@ -18,6 +19,16 @@ use yii\web\Response;
  */
 class AdminController extends BaseAdminController
 {
+
+    /**
+     * Init function
+     */
+    public function init()
+    {
+        parent::init();
+
+        $this->on('afterCreate', [$this, 'linkNewUser']);
+    }
 
     /**
      * {@inheritdoc}
@@ -82,5 +93,24 @@ class AdminController extends BaseAdminController
         }
 
         return $this->redirect(Url::previous('actions-redirect'));
+    }
+
+    /**
+     * Links a newly-created user with the customer it was under (customer_id)
+     *
+     * @param UserEvent $event
+     *
+     * @throws NotFoundHttpException
+     */
+    public function linkNewUser($event)
+    {
+        $user = $event->getUser();
+        $customer_id = $user->customer_id;
+
+        if (($customer = Customer::findOne((int)$customer_id)) === null) {
+            throw new NotFoundHttpException('Customer does not exist');
+        }
+
+        $user->link('customers', $customer);
     }
 }
