@@ -156,6 +156,14 @@ When you are developing in a local environment, all you need to have the queue j
 
 `php yii queue/listen --verbose`
 
+### Image Magick
+
+You must set this in the policy at `/etc/ImageMagic-6/policy.xml` or it will error out:
+
+```xml
+  <policy domain="coder" rights="read|write" pattern="PDF" />
+```
+
 ### Installing GhostScript manually
 
 `apt-get update && apt-get install ghostscript`

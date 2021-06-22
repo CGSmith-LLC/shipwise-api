@@ -48,9 +48,6 @@ return [
             'api/config/main-local.php',
             'frontend/config/main-local.php',
         ],
-        'setSwaggerConfig' => [
-            'api/web/index.php',
-        ]
     ],
     'Production' => [
         'path' => 'prod',
@@ -67,9 +64,6 @@ return [
         'setCookieValidationKey' => [
             'api/config/main-local.php',
             'frontend/config/main-local.php',
-        ],
-        'setSwaggerConfig' => [
-            'api/web/index.php',
         ]
     ],
 ];
