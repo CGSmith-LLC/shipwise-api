@@ -99,6 +99,7 @@ AppAsset::register($this);
                 'url' => ['/'],
                 'items' => [
                     ['label' => 'Countries', 'url' => ['/country']],
+                    ['label' => 'Customers', 'url' => ['/customer']],
                     ['label' => 'Users', 'url' => ['/user/admin/']],
                     [
                         'label' => 'Charges',
