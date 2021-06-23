@@ -10,6 +10,7 @@ use frontend\models\forms\ReportForm;
 use frontend\models\Item;
 use frontend\models\Order;
 use Yii;
+use yii\base\BaseObject;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
@@ -53,23 +54,29 @@ class ReportController extends Controller
             $model->start_date = Yii::$app->formatter->asDate($model->start_date, 'php:Y-m-d 00:00:00');
             $model->end_date   = Yii::$app->formatter->asDate($model->end_date, 'php:Y-m-d 23:59:59');
 
-            $ordersQuery = Order::find()
-                ->where(['customer_id' => $model->customer])
-                ->andWhere(['between', 'created_date', $model->start_date, $model->end_date])
-                ->with(
-                    [
-                        'items',
-                        'status',
-                        'carrier',
-                        'service',
-                        'packages',
-                        'address.state',
-                    ]
-                )
-                ->orderBy('created_date');
+            Yii::$app->queue->push(new CreateReportJob([
+                'customer' => $model->customer,
+                'start_date' => $model->start_date,
+                'end_date' => $model->end_date,
+            ]));
+
+//            $ordersQuery = Order::find()
+//                ->where(['customer_id' => $model->customer])
+//                ->andWhere(['between', 'created_date', $model->start_date, $model->end_date])
+//                ->with(
+//                    [
+//                        'items',
+//                        'status',
+//                        'carrier',
+//                        'service',
+//                        'packages',
+//                        'address.state',
+//                    ]
+//                )
+//                ->orderBy('created_date');
 
 
-            return $this->generateCsv($ordersQuery);
+//            return $this->generateCsv($ordersQuery);
         }
 
 

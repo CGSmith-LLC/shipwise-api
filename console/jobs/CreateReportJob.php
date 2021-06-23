@@ -7,27 +7,46 @@ use common\models\Order;
 use common\models\Package;
 use common\models\PackageItem;
 use Yii;
-use Exception;
-use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\base\BaseObject;
+use yii\queue\JobInterface;
 
-class CreateReportJob extends \yii\base\BaseObject implements \yii\queue\JobInterface
+class CreateReportJob extends BaseObject implements JobInterface
 {
+    /**
+     * @var int $customer
+     */
+    public int $customer;
 
     /**
-     * @var ActiveRecord $ordersQueryId
+     * @var string $start_date
      */
-    public $ordersQueryId;
+    public string $start_date;
+
+    /**
+     * @var string $end_date
+     */
+    public string $end_date;
 
     /**
      * @inheritDoc
      */
     public function execute($queue)
     {
-        if(($ordersQuery = ActiveRecord::findOne($this->ordersQueryId)) === null)
-        {
-            throw new Exception("ActiveQuery not found for ID {$this->ordersQueryId}");
-        }
+        $ordersQuery = \frontend\models\Order::find()
+            ->where(['customer_id' => $this->customer])
+            ->andWhere(['between', 'created_date', $this->start_date, $this->end_date])
+            ->with(
+                [
+                    'items',
+                    'status',
+                    'carrier',
+                    'service',
+                    'packages',
+                    'address.state',
+                ]
+            )
+            ->orderBy('created_date');
 
         $dir      = Yii::getAlias('@frontend') . '/runtime/';
         $filename = Yii::$app->user->id . "_report.csv";
