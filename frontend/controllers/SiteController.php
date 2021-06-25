@@ -8,6 +8,7 @@ use frontend\models\forms\DashboardForm;
 use frontend\models\forms\ReportForm;
 use frontend\models\Order;
 use Yii;
+use yii\base\Response;
 use yii\web\Controller;
 
 /**
@@ -107,12 +108,48 @@ class SiteController extends \frontend\controllers\Controller
             'customers' => Yii::$app->user->identity->isAdmin
                 ? Customer::getList()
                 : Yii::$app->user->identity->getCustomerList(),
-            'openCount'      => $open,
-            'pendingCount'   => $pending,
-            'shippedCount'   => $shipped,
+            'openCount' => $open,
+            'pendingCount' => $pending,
+            'shippedCount' => $shipped,
             'completedCount' => $completed,
-            'errorCount'     => $error,
+            'errorCount' => $error,
         ]);
+    }
+
+    public function actionJson()
+    {
+        Yii::debug($this->customers);
+        foreach ($this->customers as $key => $customer) {
+            $data[] = [$customer,
+                Order::find()
+                    ->where(['customer_id' => $key])
+                    ->andWhere(['between', 'created_date', '2021-03-01 00:00:00', '2021-06-24 23:59:59'])
+                    ->andWhere(['status_id' => Status::OPEN])
+                    ->count(),
+                Order::find()
+                    ->where(['customer_id' => $key])
+                    ->andWhere(['between', 'created_date', '2021-03-01 00:00:00', '2021-06-24 23:59:59'])
+                    ->andWhere(['status_id' => Status::PENDING])
+                    ->count(),
+                Order::find()
+                    ->where(['customer_id' => $key])
+                    ->andWhere(['status_id' => Status::SHIPPED])
+                    ->andWhere(['between', 'created_date', '2021-03-01 00:00:00', '2021-06-24 23:59:59'])
+                    ->count(),
+                Order::find()
+                    ->where(['customer_id' => $key])
+                    ->andWhere(['status_id' => Status::COMPLETED])
+                    ->andWhere(['between', 'created_date', '2021-03-01 00:00:00', '2021-06-24 23:59:59'])
+                    ->count(),
+                Order::find()
+                    ->where(['customer_id' => $key])
+                    ->andWhere(['between', 'created_date', '2021-03-01 00:00:00', '2021-06-24 23:59:59'])
+                    ->andWhere(['status_id' => Status::WMS_ERROR])
+                    ->count()];
+
+        }
+
+        return $this->asJson($data);
     }
 }
 
