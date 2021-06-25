@@ -4,8 +4,142 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4b1fe7f05945424108582c2077a1c66a",
+    "content-hash": "0e3ff3e77fd4b7f3267cddc3776b0629",
     "packages": [
+        {
+            "name": "aws/aws-sdk-php",
+            "version": "3.184.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aws/aws-sdk-php.git",
+                "reference": "2e1e8544258ea1a8f6c6ccaf651c8b5830a03a03"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2e1e8544258ea1a8f6c6ccaf651c8b5830a03a03",
+                "reference": "2e1e8544258ea1a8f6c6ccaf651c8b5830a03a03",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-pcre": "*",
+                "ext-simplexml": "*",
+                "guzzlehttp/guzzle": "^5.3.3|^6.2.1|^7.0",
+                "guzzlehttp/promises": "^1.4.0",
+                "guzzlehttp/psr7": "^1.7.0",
+                "mtdowling/jmespath.php": "^2.6",
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "andrewsville/php-token-reflection": "^1.4",
+                "aws/aws-php-sns-message-validator": "~1.0",
+                "behat/behat": "~3.0",
+                "doctrine/cache": "~1.4",
+                "ext-dom": "*",
+                "ext-openssl": "*",
+                "ext-pcntl": "*",
+                "ext-sockets": "*",
+                "nette/neon": "^2.3",
+                "paragonie/random_compat": ">= 2",
+                "phpunit/phpunit": "^4.8.35|^5.4.3",
+                "psr/cache": "^1.0",
+                "psr/simple-cache": "^1.0",
+                "sebastian/comparator": "^1.2.3"
+            },
+            "suggest": {
+                "aws/aws-php-sns-message-validator": "To validate incoming SNS notifications",
+                "doctrine/cache": "To use the DoctrineCacheAdapter",
+                "ext-curl": "To send requests using cURL",
+                "ext-openssl": "Allows working with CloudFront private distributions and verifying received SNS messages",
+                "ext-sockets": "To use client-side monitoring"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Aws\\": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Amazon Web Services",
+                    "homepage": "http://aws.amazon.com"
+                }
+            ],
+            "description": "AWS SDK for PHP - Use Amazon Web Services in your PHP project",
+            "homepage": "http://aws.amazon.com/sdkforphp",
+            "keywords": [
+                "amazon",
+                "aws",
+                "cloud",
+                "dynamodb",
+                "ec2",
+                "glacier",
+                "s3",
+                "sdk"
+            ],
+            "support": {
+                "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
+                "issues": "https://github.com/aws/aws-sdk-php/issues",
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.184.3"
+            },
+            "time": "2021-06-14T18:18:58+00:00"
+        },
+        {
+            "name": "bilberrry/yii2-digitalocean-spaces",
+            "version": "0.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bilberrry/yii2-digitalocean-spaces.git",
+                "reference": "3fa8904340447313c17933831ef927beda9f0401"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bilberrry/yii2-digitalocean-spaces/zipball/3fa8904340447313c17933831ef927beda9f0401",
+                "reference": "3fa8904340447313c17933831ef927beda9f0401",
+                "shasum": ""
+            },
+            "require": {
+                "aws/aws-sdk-php": "~3.67",
+                "php": ">=7.0.0",
+                "yiisoft/yii2": "~2.0"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "bilberrry\\spaces\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "DigitalOcean Spaces component for Yii2",
+            "homepage": "https://github.com/bilberrry/yii2-digitalocean-spaces",
+            "keywords": [
+                "digitalocean",
+                "do",
+                "spaces",
+                "yii2",
+                "yii2-spaces"
+            ],
+            "support": {
+                "issues": "https://github.com/bilberrry/yii2-digitalocean-spaces/issues",
+                "source": "https://github.com/bilberrry/yii2-digitalocean-spaces/tree/0.1.2"
+            },
+            "time": "2018-09-20T08:49:18+00:00"
+        },
         {
             "name": "bower-asset/bootstrap",
             "version": "v3.4.1",
@@ -116,6 +250,62 @@
             "license": [
                 "MIT"
             ]
+        },
+        {
+            "name": "bp-sys/yii2-aws-s3",
+            "version": "2.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bp-sys/yii2-aws-s3.git",
+                "reference": "b64592da78357934ed47817cbb2dcc197faee51a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bp-sys/yii2-aws-s3/zipball/b64592da78357934ed47817cbb2dcc197faee51a",
+                "reference": "b64592da78357934ed47817cbb2dcc197faee51a",
+                "shasum": ""
+            },
+            "require": {
+                "aws/aws-sdk-php": "~3.17",
+                "php": ">=7.0.0",
+                "yiisoft/yii2": "~2.0"
+            },
+            "require-dev": {
+                "phpro/grumphp": "~0.8",
+                "squizlabs/php_codesniffer": "~2.3"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "bpsys\\yii2\\aws\\s3\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bruno Panatta",
+                    "email": "brunopanatta@gmail.com",
+                    "homepage": "https://bpsys.com.br"
+                }
+            ],
+            "description": "An Amazon S3 component for Yii2",
+            "homepage": "https://github.com/bp-sys/yii2-aws-s3",
+            "keywords": [
+                "aws",
+                "aws-s3",
+                "s3",
+                "yii2",
+                "yii2-aws",
+                "yii2-s3"
+            ],
+            "support": {
+                "issues": "https://github.com/bp-sys/yii2-aws-s3/issues?state=open",
+                "source": "https://github.com/bp-sys/yii2-aws-s3/tree/2.3.0"
+            },
+            "time": "2020-12-07T20:49:21+00:00"
         },
         {
             "name": "caseyamcl/guzzle_retry_middleware",
@@ -1109,6 +1299,67 @@
                 "source": "https://github.com/lichunqiang/yii2-swagger/tree/master"
             },
             "time": "2018-03-30T15:41:30+00:00"
+        },
+        {
+            "name": "mtdowling/jmespath.php",
+            "version": "2.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jmespath/jmespath.php.git",
+                "reference": "42dae2cbd13154083ca6d70099692fef8ca84bfb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jmespath/jmespath.php/zipball/42dae2cbd13154083ca6d70099692fef8ca84bfb",
+                "reference": "42dae2cbd13154083ca6d70099692fef8ca84bfb",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.4 || ^7.0 || ^8.0",
+                "symfony/polyfill-mbstring": "^1.17"
+            },
+            "require-dev": {
+                "composer/xdebug-handler": "^1.4",
+                "phpunit/phpunit": "^4.8.36 || ^7.5.15"
+            },
+            "bin": [
+                "bin/jp.php"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.6-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JmesPath\\": "src/"
+                },
+                "files": [
+                    "src/JmesPath.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Declaratively specify how to extract elements from a JSON document",
+            "keywords": [
+                "json",
+                "jsonpath"
+            ],
+            "support": {
+                "issues": "https://github.com/jmespath/jmespath.php/issues",
+                "source": "https://github.com/jmespath/jmespath.php/tree/2.6.0"
+            },
+            "time": "2020-07-31T21:01:56+00:00"
         },
         {
             "name": "notamedia/yii2-sentry",
@@ -7954,5 +8205,5 @@
         "php": "^7.4.0|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }

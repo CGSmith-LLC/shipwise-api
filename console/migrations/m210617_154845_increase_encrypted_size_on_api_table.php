@@ -14,20 +14,21 @@ class m210617_154845_increase_encrypted_size_on_api_table extends Migration
     {
         // Get all consumers
         $apiConsumers = \common\models\ApiConsumer::find()->all();
-        $this->dropColumn('{{%api_consumer}}', 'encrypted_secret');
+        $this->addColumn('{{%api_consumer}}', 'encrypted_secret',
+            $this->getDb()->getSchema()->createColumnSchemaBuilder('mediumtext'));
 
         // iterate and encrypt consumer with encyrption keys
         foreach ($apiConsumers as $apiConsumer) {
             /** @var $apiConsumer \common\models\ApiConsumer */
-            $apiConsumer->encrypted_secret = base64_encode(Yii::$app->getSecurity()->encryptByKey($apiConsumer->encrypted_secret, Yii::$app->params['encryptionKey']));
+            $apiConsumer->encrypted_secret = base64_encode(Yii::$app->getSecurity()->encryptByKey($apiConsumer->auth_secret, Yii::$app->params['encryptionKey']));
         }
 
-        $this->addColumn('{{%api_consumer}}', 'encrypted_secret',
-            $this->getDb()->getSchema()->createColumnSchemaBuilder('mediumtext'));
 
         foreach ($apiConsumers as $apiConsumer) {
             $apiConsumer->save();
         }
+
+        $this->dropColumn('{{%api_consumer}}', 'auth_secret');
     }
 
     /**
@@ -35,6 +36,8 @@ class m210617_154845_increase_encrypted_size_on_api_table extends Migration
      */
     public function down()
     {
-        $this->alterColumn('{{%api_consumer}}', 'encrypted_secret', $this->string(128));
+        echo "m210617_154845_increase_encrypted_size_on_api_table cannot be reverted.\n";
+
+        return false;
     }
 }

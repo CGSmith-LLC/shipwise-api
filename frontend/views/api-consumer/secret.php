@@ -19,8 +19,17 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'label',
-            'auth_key',
-            'plainTextAuthSecret',
+            [
+                'attribute' => 'auth_key',
+                'label' => 'API Key'
+            ],
+            [
+                'attribute' => 'encrypted_secret',
+                'label' => 'API Secret',
+                'value' => function($model) {
+                    return Yii::$app->getSecurity()->decryptByKey(base64_decode($model->encrypted_secret), Yii::$app->params['encryptionKey']);
+                }
+            ],
         ],
     ]) ?>
 

@@ -11,6 +11,7 @@ return [
     'encryptionKey'                 => 'secret',
     'digitalOceanKey'               => 'key',
     'digitalOceanSecret'            => 'secret',
+    'defaultSpace'                  => 'dev-getshipwise',
     /**
      * Shopify App Parameters and App Credentials
      */

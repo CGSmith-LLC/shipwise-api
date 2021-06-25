@@ -13,6 +13,7 @@ namespace common\models\base;
  * @property int    $alias_quantity
  * @property string $alias_sku
  * @property string $name
+ * @property string $notes
  */
 class BaseItem extends \yii\db\ActiveRecord
 {
@@ -33,7 +34,7 @@ class BaseItem extends \yii\db\ActiveRecord
         return [
             [['order_id', 'quantity', 'sku'], 'required'],
             [['order_id', 'quantity', 'alias_quantity'], 'integer'],
-            [['sku', 'uuid', 'alias_sku'], 'string', 'max' => 64],
+            [['sku', 'uuid', 'alias_sku', 'notes'], 'string', 'max' => 64],
             ['name', 'string', 'max' => 128],
         ];
     }
@@ -49,6 +50,7 @@ class BaseItem extends \yii\db\ActiveRecord
             'quantity' => 'Quantity',
             'sku'      => 'Sku',
             'name'     => 'Name',
+            'notes'    => 'Notes',
         ];
     }
 }

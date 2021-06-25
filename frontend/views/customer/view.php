@@ -34,14 +34,22 @@ $this->params['breadcrumbs'][] = $this->title;
             'address1',
             'address2',
             'city',
-            'state_id',
+            [
+                'attribute' => 'state_id',
+                'label' => 'State',
+                'value' => \common\models\State::findOne($model->state_id)->name,
+            ],
             'zip',
             'phone',
             'email:email',
-            'logo',
-            'created_date',
+            [
+                    'attribute' => 'logo',
+                'format' => 'html',
+                'value' => Html::img($model->logo),
+            ],
+            'created_date:date',
             'stripe_customer_id',
-            'direct',
+            'direct:boolean'
         ],
     ]) ?>
 

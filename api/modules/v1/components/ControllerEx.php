@@ -187,6 +187,7 @@ class ControllerEx extends Controller
                 $item->alias_sku = $formItem->alias_sku;
                 $item->alias_quantity = $formItem->alias_quantity;
                 $item->name = $formItem->name;
+                $item->notes = $formItem->notes;
                 $item->save();
             }
 
@@ -337,6 +338,7 @@ class ControllerEx extends Controller
                 $item->alias_sku = $formItem->alias_sku;
                 $item->alias_quantity = $formItem->alias_quantity;
                 $item->name = $formItem->name;
+                $item->notes = $formItem->notes;
                 $item->save();
             }
 

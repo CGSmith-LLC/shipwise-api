@@ -4,8 +4,6 @@ namespace common\models;
 
 use common\models\base\BaseApiConsumer;
 use Yii;
-use yii\base\Exception;
-
 
 /**
  * Class ApiConsumer
@@ -23,6 +21,9 @@ class ApiConsumer extends BaseApiConsumer
     const SUPERUSER_INACTIVE = 0;
 
     public $plainTextAuthSecret;
+
+    /** @deprecated $auth_secret */
+    public $auth_secret;
 
 
     /**
@@ -70,7 +71,14 @@ class ApiConsumer extends BaseApiConsumer
      */
     protected static function findByKeySecret($key, $secret)
     {
-        return static::findOne(['auth_key' => $key, 'encrypted_secret' => $secret]);
+        if ($apiConsumer = static::find()->where(['auth_key' => $key])->one()) {
+            /** @var ApiConsumer $apiConsumer */
+            $authSecret = Yii::$app->getSecurity()->decryptByKey(base64_decode($apiConsumer->encrypted_secret), Yii::$app->params['encryptionKey']);
+            if ($authSecret === $secret) {
+                return $apiConsumer;
+            }
+        }
+        return null;
     }
 
     /**
@@ -98,35 +106,47 @@ class ApiConsumer extends BaseApiConsumer
         return isset($this->customer);
     }
 
-
     /**
+     * Generate a random string for auth token and verify it does not exist
+     *
      * @return ApiConsumer
      * @throws \yii\base\Exception
      *
      */
     public function generateAuthKey(): ApiConsumer
     {
-        // Generate random string for auth token
-        $this->auth_key = Yii::$app->security->generateRandomString(6);
-//        $this->updateLastActivity();
+        $this->auth_key = Yii::$app->getSecurity()->generateRandomString(6);
+
+        while (ApiConsumer::find()->where(['auth_key' => $this->auth_key])->exists()) {
+            $this->auth_key = Yii::$app->getSecurity()->generateRandomString(6);
+        }
 
         return $this;
     }
 
+    /**
+     * Generate the encryption and API Secret
+     *
+     * @return $this
+     * @throws \yii\base\Exception
+     */
     public function generateAuthSecret(): ApiConsumer
     {
         // Generate random string for auth token
         $this->plainTextAuthSecret = Yii::$app->security->generateRandomString(64);
         $this->encrypted_secret = base64_encode(Yii::$app->getSecurity()->encryptByKey($this->plainTextAuthSecret, Yii::$app->params['encryptionKey']));
-        Yii::debug($this);
+
         return $this;
     }
 
+    /**
+     * Gets customer id
+     *
+     * @return mixed
+     */
     public function getCustomerId()
     {
         return Yii::$app->user->identity->customer_id;
 
     }
-
-
 }

@@ -14,7 +14,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'label')->textInput(['maxlength' => true]) ?>
 
-
+    <?= $form->field($model, 'customer_id')
+        ->dropdownList($customers, ['prompt' => ' Please select']) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

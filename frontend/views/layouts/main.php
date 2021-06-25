@@ -99,12 +99,21 @@ AppAsset::register($this);
             $menuItems[] = ['label' => 'Customers', 'url' => ['/customer']];
             $menuItems[] = ['label' => 'Users', 'url' => ['/user/admin/']];
             $menuItems[] = [
-                'label' => 'Subscriptions',
-                'url' => ['/subscription'],
+                'label' => 'Admin',
+                'url' => ['/'],
                 'items' => [
-                    ['label' => 'Subscriptions', 'url' => ['/subscription']],
-                    ['label' => 'One Time Charges', 'url' => ['/one-time-charge']],
-                    ['label' => 'Invoices', 'url' => ['/invoice']],
+                    ['label' => 'Countries', 'url' => ['/country']],
+                    ['label' => 'Customers', 'url' => ['/customer']],
+                    ['label' => 'Users', 'url' => ['/user/admin/']],
+                    [
+                        'label' => 'Charges',
+                        //'url' => ['/subscription'],
+                        'items' => [
+                            ['label' => 'Subscriptions', 'url' => ['/subscription']],
+                            ['label' => 'One-Time Charges', 'url' => ['/one-time-charge']],
+                            ['label' => 'Invoices', 'url' => ['/invoice']],
+                        ],
+                    ]
                 ]
             ];
         }
