@@ -13,7 +13,7 @@ use yii\filters\VerbFilter;
 /**
  * StateController implements the CRUD actions for State model.
  */
-class StateController extends Controller
+class StateController extends \frontend\controllers\Controller
 {
     /**
      * {@inheritdoc}
@@ -95,7 +95,6 @@ class StateController extends Controller
         return $this->render('update', [
             'model' => $model,
             'countries' => Country::getList(),
-
         ]);
     }
 
@@ -109,7 +108,6 @@ class StateController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
         return $this->redirect(['index']);
     }
 

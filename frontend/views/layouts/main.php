@@ -94,27 +94,18 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Reports', 'url' => ['/report']];
 
         if (Yii::$app->user->identity->isAdmin) {
-            $menuItems[] = ['label' => "States/Provinces", 'url' =>['/state']];
-            $menuItems[] = ['label' => 'Countries', 'url' => ['/country']];
-            $menuItems[] = ['label' => 'Customers', 'url' => ['/customer']];
-            $menuItems[] = ['label' => 'Users', 'url' => ['/user/admin/']];
             $menuItems[] = [
                 'label' => 'Admin',
                 'url' => ['/'],
                 'items' => [
                     ['label' => 'Countries', 'url' => ['/country']],
+                    ['label' => 'States/Provinces', 'url' => ['/state']],
                     ['label' => 'Customers', 'url' => ['/customer']],
                     ['label' => 'Users', 'url' => ['/user/admin/']],
-                    [
-                        'label' => 'Charges',
-                        //'url' => ['/subscription'],
-                        'items' => [
-                            ['label' => 'Subscriptions', 'url' => ['/subscription']],
-                            ['label' => 'One-Time Charges', 'url' => ['/one-time-charge']],
-                            ['label' => 'Invoices', 'url' => ['/invoice']],
-                        ],
-                    ]
-                ]
+                    ['label' => 'Subscriptions', 'url' => ['/subscription']],
+                    ['label' => 'One-Time Charges', 'url' => ['/one-time-charge']],
+                    ['label' => 'Invoices', 'url' => ['/invoice']],
+                ],
             ];
         }
 
