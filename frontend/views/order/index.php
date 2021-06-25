@@ -132,7 +132,12 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                 'tracking',
                 'created_date:datetime',
                 'requested_ship_date:datetime',
-                'notes',
+                [
+                    'attribute' => 'notes',
+                    'value' => function ($model) {
+                        return yii\helpers\StringHelper::truncate($model->notes, 40);
+                    }
+                ],
                 [
                     'attribute' => 'status_id',
                     'options' => ['width' => '10%'],
@@ -290,7 +295,7 @@ ob_start(); // output buffer the javascript to register later ?>
                 $.each(batchNames, function (index, value) {
                     $('#bulkaction-batch_id').append($('<option/>', {
                         value: index,
-                        text : value
+                        text: value
                     }));
                 });
                 $('<label />', {'for': 'bulkaction-batch_id', text: ' Batch Name'}).appendTo(container);
