@@ -118,43 +118,14 @@ class SiteController extends \frontend\controllers\Controller
 
     public function actionJson()
     {
-        Yii::debug($this->customers);
-        foreach ($this->customers as $key => $customer) {
-            $data[] = [$customer,
-                Order::find()
-                    ->where(['customer_id' => $key])
-                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
-                    ->count()];
-
-
-//                    ->where(['customer_id' => $key])
-//                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
-//                    ->andWhere(['status_id' => Status::OPEN])
-//                    ->count(),
-//                Order::find()
-//                    ->where(['customer_id' => $key])
-//                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
-//                    ->andWhere(['status_id' => Status::PENDING])
-//                    ->count(),
-//                Order::find()
-//                    ->where(['customer_id' => $key])
-//                    ->andWhere(['status_id' => Status::SHIPPED])
-//                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
-//                    ->count(),
-//                Order::find()
-//                    ->where(['customer_id' => $key])
-//                    ->andWhere(['status_id' => Status::COMPLETED])
-//                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
-//                    ->count(),
-//                Order::find()
-//                    ->where(['customer_id' => $key])
-//                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
-//                    ->andWhere(['status_id' => Status::WMS_ERROR])
-//                    ->count()];
-
-        }
-
-        return $this->asJson($data);
+        $query = (new \yii\db\Query())
+            ->select(['customer_id', 'status_id', 'COUNT(*)'])
+            ->from('orders')
+            ->where(['between', 'created_date', '2021-03-15 00:00:00', '2021-06-25 23:59:59'])
+            ->groupBy(['customer_id', 'status_id'])
+            ->orderBy('customer_id')
+            ->all();
+        return $this->asJson($query);
     }
 }
 
