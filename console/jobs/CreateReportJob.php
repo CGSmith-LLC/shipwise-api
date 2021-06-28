@@ -6,10 +6,13 @@ use common\models\Item;
 use common\models\Order;
 use common\models\Package;
 use common\models\PackageItem;
+use frontend\models\User;
+use phpDocumentor\Reflection\Types\This;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\base\BaseObject;
 use yii\queue\JobInterface;
+use common\models\Customer;
 
 class CreateReportJob extends BaseObject implements JobInterface
 {
@@ -17,6 +20,11 @@ class CreateReportJob extends BaseObject implements JobInterface
      * @var int $customer
      */
     public int $customer;
+
+    /**
+     * @var int $userId
+     */
+    public int $user_id;
 
     /**
      * @var string $start_date
@@ -48,8 +56,8 @@ class CreateReportJob extends BaseObject implements JobInterface
             )
             ->orderBy('created_date');
 
-        $dir      = Yii::getAlias('@frontend') . '/runtime/';
-        $filename = Yii::$app->user->id . "_report.csv";
+        $dir      = Yii::getAlias('@frontend') . '/runtime/reports/';
+        $filename = $this->user_id . "_report.csv";
 
         // csv header
         $order  = new Order();
@@ -148,12 +156,29 @@ class CreateReportJob extends BaseObject implements JobInterface
         }
         fclose($fp);
 
-        return Yii::$app->response->sendFile(
+        Yii::$app->mailer->compose()
+            ->setFrom(Yii::$app->params['senderEmail'])
+            ->setTo(User::findone(['id' => $this->user_id])->email)
+            ->setSubject('Generated Report for ' . $this->start_date . ' to ' . $this->end_date)
+            ->setTextBody(
+                'Here is your requested CSV Order Report for ' . Customer::findone(['id' => $this->customer])->name .
+                ' from ' . Yii::$app->formatter->asDate($this->start_date, 'php:l, F j, Y') . ' to ' .
+                Yii::$app->formatter->asDate($this->end_date, 'php:l, F j, Y') . '.'
+            )
+            ->attach($dir . $filename, [
+                'shipwise-report-' . date('YmdHi') . '.csv',
+                [
+                    'mimeType' => 'text/csv',
+                ],
+            ])
+            ->send();
+
+        /*return Yii::$app->response->sendFile(
             $dir . $filename,
             'shipwise-report-' . date('YmdHi') . '.csv',
             [
                 'mimeType' => 'text/csv',
             ]
-        );
+        );*/
     }
 }
