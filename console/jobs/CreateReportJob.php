@@ -160,8 +160,14 @@ class CreateReportJob extends BaseObject implements JobInterface
         fclose($fp);
 
         //  Upload CSV to Digital Ocean
+        $storage = Yii::$app->get('storage');
 
+        $date = date('YmdHi');
 
+        $storage->upload('shipwise-report-' . $date . '.csv', $dir . $filename);
+        $url = $storage->getUrl('shipwise-report-' . $date . '.csv');
+
+        //  Send Email
         Yii::$app->mailer->compose()
             ->setFrom(Yii::$app->params['senderEmail'])
             ->setTo($this->user_email)
@@ -169,14 +175,8 @@ class CreateReportJob extends BaseObject implements JobInterface
             ->setHtmlBody(
                 '<p>Here is your requested CSV Order Report for ' . Customer::findone(['id' => $this->customer])->name .
                 ' from ' . Yii::$app->formatter->asDate($this->start_date, 'php:l, F j, Y') . ' to ' .
-                Yii::$app->formatter->asDate($this->end_date, 'php:l, F j, Y') . '.</p><br/><a href="">Click to Download</a>'
+                Yii::$app->formatter->asDate($this->end_date, 'php:l, F j, Y') . '.</p><br/><a href="' . $url . '">Click to Download</a>'
             )
-            ->attach($dir . $filename, [
-                'shipwise-report-' . date('YmdHi') . '.csv',
-                [
-                    'mimeType' => 'text/csv',
-                ],
-            ])
             ->send();
     }
 }

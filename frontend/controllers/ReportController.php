@@ -2,17 +2,11 @@
 
 namespace frontend\controllers;
 
-use common\models\Package;
-use common\models\PackageItem;
 use console\jobs\CreateReportJob;
 use frontend\models\Customer;
 use frontend\models\forms\ReportForm;
-use frontend\models\Item;
-use frontend\models\Order;
+use frontend\models\User;
 use Yii;
-use yii\base\BaseObject;
-use yii\db\ActiveQuery;
-use yii\helpers\ArrayHelper;
 
 /**
  * Class ReportController
@@ -57,7 +51,7 @@ class ReportController extends Controller
             Yii::$app->queue->push(new CreateReportJob([
                 'customer' => $model->customer,
                 'user_id' => Yii::$app->user->id,
-                'user_email' => Yii::$app->user->email,
+                'user_email' => User::findone(['id' => Yii::$app->user->id])->email,
                 'start_date' => $model->start_date,
                 'end_date' => $model->end_date,
             ]));
