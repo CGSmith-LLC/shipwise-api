@@ -123,29 +123,34 @@ class SiteController extends \frontend\controllers\Controller
             $data[] = [$customer,
                 Order::find()
                     ->where(['customer_id' => $key])
-                    ->andWhere(['between', 'created_date', '2021-03-01 00:00:00', '2021-06-24 23:59:59'])
-                    ->andWhere(['status_id' => Status::OPEN])
-                    ->count(),
-                Order::find()
-                    ->where(['customer_id' => $key])
-                    ->andWhere(['between', 'created_date', '2021-03-01 00:00:00', '2021-06-24 23:59:59'])
-                    ->andWhere(['status_id' => Status::PENDING])
-                    ->count(),
-                Order::find()
-                    ->where(['customer_id' => $key])
-                    ->andWhere(['status_id' => Status::SHIPPED])
-                    ->andWhere(['between', 'created_date', '2021-03-01 00:00:00', '2021-06-24 23:59:59'])
-                    ->count(),
-                Order::find()
-                    ->where(['customer_id' => $key])
-                    ->andWhere(['status_id' => Status::COMPLETED])
-                    ->andWhere(['between', 'created_date', '2021-03-01 00:00:00', '2021-06-24 23:59:59'])
-                    ->count(),
-                Order::find()
-                    ->where(['customer_id' => $key])
-                    ->andWhere(['between', 'created_date', '2021-03-01 00:00:00', '2021-06-24 23:59:59'])
-                    ->andWhere(['status_id' => Status::WMS_ERROR])
+                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
                     ->count()];
+
+
+//                    ->where(['customer_id' => $key])
+//                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
+//                    ->andWhere(['status_id' => Status::OPEN])
+//                    ->count(),
+//                Order::find()
+//                    ->where(['customer_id' => $key])
+//                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
+//                    ->andWhere(['status_id' => Status::PENDING])
+//                    ->count(),
+//                Order::find()
+//                    ->where(['customer_id' => $key])
+//                    ->andWhere(['status_id' => Status::SHIPPED])
+//                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
+//                    ->count(),
+//                Order::find()
+//                    ->where(['customer_id' => $key])
+//                    ->andWhere(['status_id' => Status::COMPLETED])
+//                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
+//                    ->count(),
+//                Order::find()
+//                    ->where(['customer_id' => $key])
+//                    ->andWhere(['between', 'created_date', '2021-06-15 00:00:00', '2021-06-24 23:59:59'])
+//                    ->andWhere(['status_id' => Status::WMS_ERROR])
+//                    ->count()];
 
         }
 
