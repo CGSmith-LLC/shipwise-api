@@ -6,8 +6,6 @@ use common\models\Item;
 use common\models\Order;
 use common\models\Package;
 use common\models\PackageItem;
-use frontend\models\User;
-use phpDocumentor\Reflection\Types\This;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\base\BaseObject;
@@ -25,6 +23,11 @@ class CreateReportJob extends BaseObject implements JobInterface
      * @var int $userId
      */
     public int $user_id;
+
+    /**
+     * @var string $user_email;
+     */
+    public string $user_email;
 
     /**
      * @var string $start_date
@@ -156,14 +159,17 @@ class CreateReportJob extends BaseObject implements JobInterface
         }
         fclose($fp);
 
+        //  Upload CSV to Digital Ocean
+
+
         Yii::$app->mailer->compose()
             ->setFrom(Yii::$app->params['senderEmail'])
-            ->setTo(User::findone(['id' => $this->user_id])->email)
+            ->setTo($this->user_email)
             ->setSubject('Generated Report for ' . $this->start_date . ' to ' . $this->end_date)
-            ->setTextBody(
-                'Here is your requested CSV Order Report for ' . Customer::findone(['id' => $this->customer])->name .
+            ->setHtmlBody(
+                '<p>Here is your requested CSV Order Report for ' . Customer::findone(['id' => $this->customer])->name .
                 ' from ' . Yii::$app->formatter->asDate($this->start_date, 'php:l, F j, Y') . ' to ' .
-                Yii::$app->formatter->asDate($this->end_date, 'php:l, F j, Y') . '.'
+                Yii::$app->formatter->asDate($this->end_date, 'php:l, F j, Y') . '.</p><br/><a href="">Click to Download</a>'
             )
             ->attach($dir . $filename, [
                 'shipwise-report-' . date('YmdHi') . '.csv',
@@ -172,13 +178,5 @@ class CreateReportJob extends BaseObject implements JobInterface
                 ],
             ])
             ->send();
-
-        /*return Yii::$app->response->sendFile(
-            $dir . $filename,
-            'shipwise-report-' . date('YmdHi') . '.csv',
-            [
-                'mimeType' => 'text/csv',
-            ]
-        );*/
     }
 }

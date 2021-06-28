@@ -57,6 +57,7 @@ class ReportController extends Controller
             Yii::$app->queue->push(new CreateReportJob([
                 'customer' => $model->customer,
                 'user_id' => Yii::$app->user->id,
+                'user_email' => Yii::$app->user->email,
                 'start_date' => $model->start_date,
                 'end_date' => $model->end_date,
             ]));
