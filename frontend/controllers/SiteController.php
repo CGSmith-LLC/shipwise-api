@@ -10,7 +10,7 @@ use frontend\models\Order;
 use Yii;
 use yii\base\Response;
 use yii\web\Controller;
-
+use DateTime;
 /**
  * Site controller
  */
@@ -118,10 +118,15 @@ class SiteController extends \frontend\controllers\Controller
 
     public function actionJson()
     {
+        $today = new DateTime('now');
+        $today = $today->format('Y-m-d 23:59:59');
+        $_3MonthsAgo = new DateTime('now');
+        $_3MonthsAgo->modify('-90 day');
+        $_3MonthsAgo = $_3MonthsAgo->format('Y-m-d 00:00:00');
         $query = (new \yii\db\Query())
             ->select(['customer_id', 'status_id', 'COUNT(*)'])
             ->from('orders')
-            ->where(['between', 'created_date', '2021-03-15 00:00:00', '2021-06-25 23:59:59'])
+            ->where(['between', 'created_date', $_3MonthsAgo, $today])
             ->groupBy(['customer_id', 'status_id'])
             ->orderBy('customer_id')
             ->all();
