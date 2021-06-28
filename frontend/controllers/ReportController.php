@@ -55,6 +55,8 @@ class ReportController extends Controller
                 'start_date' => $model->start_date,
                 'end_date' => $model->end_date,
             ]));
+
+            Yii::$app->getSession()->setFlash('success', 'The report is being generated. Please check your email in a few minutes.');
         }
 
 
