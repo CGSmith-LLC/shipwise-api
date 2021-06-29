@@ -122,21 +122,21 @@ class SiteController extends \frontend\controllers\Controller
     public function actionJson()
     {
         $request = Yii::$app->request;
-        $start_date = $request->get('start_date');
-        $end_date = $request->get('end_date');
-        $start_date = Yii::$app->formatter->asDate($start_date, 'php:Y-m-d 00:00:00');
-        $end_date = Yii::$app->formatter->asDate($end_date, 'php:Y-m-d 23:59:59');
-
+        $start_date = Yii::$app->formatter->asDate($request->get('start_date'), 'php:Y-m-d 00:00:00');
+        $end_date = Yii::$app->formatter->asDate($request->get('end_date'), 'php:Y-m-d 23:59:59');
+        /**
+         * defaults to past week of data
+         */
         if (!isset($end_date) && !isset($start_date)) {
             $end_date = new DateTime('now');
             $end_date = $end_date->format('Y-m-d 23:59:59');
             $start_date = new DateTime('now');
-            $start_date->modify('-90 day');
+            $start_date->modify('-7 day');
             $start_date = $start_date->format('Y-m-d 00:00:00');
         }
 
         $query = (new \yii\db\Query())
-            ->select(['status.name as Status', 'customers.name as Customer', 'COUNT(*) as Shipments'])
+            ->select(['status.name as status', 'customers.name as customer','orders.customer_id','orders.status_id', 'COUNT(*) as shipments'])
             ->from('orders')
             ->leftJoin('customers', 'orders.customer_id = customers.id')
             ->leftJoin('status', 'orders.status_id = status.id')
