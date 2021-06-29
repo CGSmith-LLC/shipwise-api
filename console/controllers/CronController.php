@@ -50,6 +50,12 @@ class CronController extends Controller
     public function actionFrequent()
     {
         // ...
+        /**
+         * 1. Loop through customers and customer meta data to find ecommerce site
+         * 2. query ecommerce site for new orders
+         * 3. parse the orders
+         * 4. save the orders and create 'SendToFullfilment' job.
+         */
 
         return ExitCode::OK;
     }
