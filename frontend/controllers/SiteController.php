@@ -118,15 +118,17 @@ class SiteController extends \frontend\controllers\Controller
 
     public function actionJson()
     {
-        $today = new DateTime('now');
-        $today = $today->format('Y-m-d 23:59:59');
-        $_3MonthsAgo = new DateTime('now');
-        $_3MonthsAgo->modify('-90 day');
-        $_3MonthsAgo = $_3MonthsAgo->format('Y-m-d 00:00:00');
+        $end_date = new DateTime('now');
+        $end_date = $end_date->format('Y-m-d 23:59:59');
+        $start_date = new DateTime('now');
+        $start_date->modify('-90 day');
+        $start_date = $start_date->format('Y-m-d 00:00:00');
         $query = (new \yii\db\Query())
-            ->select(['customer_id', 'status_id', 'COUNT(*)'])
+            ->select(['status.name as Status','customers.name as Customer', 'COUNT(*) as Shipments' ])
             ->from('orders')
-            ->where(['between', 'created_date', $_3MonthsAgo, $today])
+            ->leftJoin('customers', 'orders.customer_id = customers.id')
+            ->leftJoin('status', 'orders.status_id = status.id')
+            ->where(['between', 'orders.created_date', $start_date, $end_date])
             ->groupBy(['customer_id', 'status_id'])
             ->orderBy('customer_id')
             ->all();
