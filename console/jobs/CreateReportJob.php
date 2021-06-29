@@ -97,7 +97,6 @@ class CreateReportJob extends BaseObject implements JobInterface
         foreach ($ordersQuery->batch(500) as $orders) {
             foreach ($orders as $order) {
 
-                // @todo no foreach? cleanup code? fine for now? ship toinght? love me long time. oh god my existence is
                 /**
                  * @var Package $package
                  */
