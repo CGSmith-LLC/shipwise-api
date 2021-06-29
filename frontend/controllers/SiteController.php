@@ -114,6 +114,11 @@ class SiteController extends \frontend\controllers\Controller
             'errorCount'     => $error,
         ]);
     }
+
+    public function actionConway()
+    {
+        return $this->actionIndex();
+    }
 }
 
 
