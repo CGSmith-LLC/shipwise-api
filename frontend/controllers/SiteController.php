@@ -136,7 +136,7 @@ class SiteController extends \frontend\controllers\Controller
         }
 
         $query = (new \yii\db\Query())
-            ->select(['status.name as status', 'customers.name as customer','orders.customer_id','orders.status_id', 'COUNT(*) as shipments'])
+            ->select(['status.name as status', 'customers.name as customer', 'orders.customer_id', 'orders.status_id', 'COUNT(*) as shipments'])
             ->from('orders')
             ->leftJoin('customers', 'orders.customer_id = customers.id')
             ->leftJoin('status', 'orders.status_id = status.id')
@@ -144,6 +144,22 @@ class SiteController extends \frontend\controllers\Controller
             ->groupBy(['customer_id', 'status_id'])
             ->orderBy('customer_id')
             ->all();
+        Yii::debug($query);
+        $customers = Customer::find()->where($this->customers);
+        Yii::debug($customers);
+        foreach($customers as $customer){
+            foreach ($query as $q){
+
+                $response [$customer->id] =[
+                    'name',
+                    'id',
+
+                ];
+
+
+            }
+        }
+
         return $this->asJson($query);
     }
 }
