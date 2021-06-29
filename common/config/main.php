@@ -43,7 +43,18 @@ return [
             'channel' => 'default', // Queue channel key
             'mutex' => 'yii\mutex\MysqlMutex', // Mutex used to sync queries
             'as log' => 'yii\queue\LogBehavior',
+            'ttr' => 5 * 60, // Max time for anything job handling
+            'attempts' => 3, // Max number of attempts
         ],
+        'fulfillment' => function () {
+            return new \common\components\FulfillmentService();
+        },
+        'coldco' => [
+            'class' => 'common\components\ColdcoFulfillmentService',
+            'baseUrl' => $params['coldco']['baseUrl'],
+            'clientId' => $params['coldco']['clientId'],
+            'secret' => $params['coldco']['secret'],
+        ]
 
     ],
 ];

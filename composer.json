@@ -16,7 +16,9 @@
         "osiset/basic-shopify-api": "^9.1",
         "yii2tech/csv-grid": "^1.0",
         "bp-sys/yii2-aws-s3": "~2.0",
-        "bilberrry/yii2-digitalocean-spaces": "^0.1.2"
+        "bilberrry/yii2-digitalocean-spaces": "^0.1.2",
+      "ext-json": "*",
+        "yiisoft/yii2-httpclient": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

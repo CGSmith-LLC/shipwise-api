@@ -3,6 +3,9 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
+use common\models\Order;
+use common\models\Status;
+use console\jobs\orders\GetTrackingFromFulfillmentJob;
 use yii\console\{Controller, ExitCode};
 
 // To create/edit crontab file: crontab -e
@@ -102,6 +105,8 @@ class CronController extends Controller
             //
         }
 
+        $this->queuePendingOrders();
+
         return ExitCode::OK;
     }
 
@@ -116,6 +121,15 @@ class CronController extends Controller
         $this->cleanBulkActionData();
 
         return ExitCode::OK;
+    }
+
+    private function queuePendingOrders()
+    {
+        $pendingOrders = Order::find()->where(['status_id' => Status::PENDING])->all();
+
+        foreach ($pendingOrders as $pendingOrder) {
+            \Yii::$app->queue->push(new GetTrackingFromFulfillmentJob(['orderId' => $pendingOrder->id]));
+        }
     }
 
     /**
