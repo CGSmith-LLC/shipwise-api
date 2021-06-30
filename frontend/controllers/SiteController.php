@@ -145,26 +145,49 @@ class SiteController extends \frontend\controllers\Controller
             ->orderBy('customer_id')
             ->all();
         Yii::debug($query);
-        $customers = Customer::find()->where($this->customers);
-        Yii::debug($customers);
-        foreach($customers as $customer){
-            foreach ($query as $q){
+        $customers = Customer::find()->where(['in', 'id', array_keys($this->customers)])->all();
+//        Yii::debug($customers);
+        /**
+         * @var Customer $customer
+         */
 
-                $response [$customer->id] =[
-                    'name',
-                    'id',
+        $statuses = Status::find()->all();
+        // $s[status_id] = name;
+        /**
+         * $statuses = [
+         *  stuats_id => [
+         *      'name' =>
+         *      'orders' => 0
+         * ]
+         * ];
+         */
 
-                ];
+        /**
+         * @var Status $status
+         */
+        Yii::debug($statuses);
+        foreach ($statuses as $status) {
+            $status2[] = [
+                'status_id' => $status->id,
+                'name' => $status->name,
+                'orders' => 0,
+            ];
+            Yii::debug($status2);
+        }
 
+        foreach ($customers as $customer) {
+            $response[$customer->id] = [
+                'name' => $customer->name,
+                'customer_id' => $customer->id,
+                'statuses' => $status2,
+
+            ];
+            foreach ($query as $q) {
+                $response[$q['customer_id']]['statuses'][$q['status_id']]['orders'] = $q['shipments'];
 
             }
         }
 
-        return $this->asJson($query);
+        return $this->asJson($response);
     }
 }
-
-
-
-
-
