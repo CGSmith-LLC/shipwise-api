@@ -144,35 +144,20 @@ class SiteController extends \frontend\controllers\Controller
             ->groupBy(['customer_id', 'status_id'])
             ->orderBy('customer_id')
             ->all();
-        Yii::debug($query);
         $customers = Customer::find()->where(['in', 'id', array_keys($this->customers)])->all();
-//        Yii::debug($customers);
         /**
          * @var Customer $customer
          */
-
         $statuses = Status::find()->all();
-        // $s[status_id] = name;
-        /**
-         * $statuses = [
-         *  stuats_id => [
-         *      'name' =>
-         *      'orders' => 0
-         * ]
-         * ];
-         */
 
         /**
          * @var Status $status
          */
-        Yii::debug($statuses);
         foreach ($statuses as $status) {
-            $status2[] = [
-                'status_id' => $status->id,
+            $status2[$status->id] = [
                 'name' => $status->name,
                 'orders' => 0,
             ];
-            Yii::debug($status2);
         }
 
         foreach ($customers as $customer) {
