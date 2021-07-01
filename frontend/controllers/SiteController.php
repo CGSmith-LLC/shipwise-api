@@ -117,7 +117,11 @@ class SiteController extends \frontend\controllers\Controller
 
     public function actionConway()
     {
-        return $this->actionIndex();
+        return $this->render('conway', [
+            'name'   => 'Conway',
+            'width'  => '',
+            'height' => '',
+        ]);
     }
 }
 
