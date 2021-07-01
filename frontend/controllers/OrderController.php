@@ -384,10 +384,20 @@ class OrderController extends \frontend\controllers\Controller
                 ->where(['customer_id' => Yii::$app->user->identity->customer_id])
                 ->orderBy(['created_date' => SORT_DESC]);
 
+            $query = BaseBatch::find();
+
+            if (!Yii::$app->user->identity->isAdmin) {
+                $query->andOnCondition([BaseBatch::tableName() . '.customer_id' => $this->customers]);
+            }
+
+            $dataProvider = new ActiveDataProvider([
+                'query' => $query,
+            ]);
+
             return $this->render(
                 'batch',
                 [
-                    'dataProvider' => new ActiveDataProvider(['query' => $batches]),
+                    'dataProvider' => $dataProvider
                 ]
             );
         }
