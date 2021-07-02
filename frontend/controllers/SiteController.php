@@ -10,6 +10,7 @@ use frontend\models\Order;
 use Yii;
 use yii\base\BaseObject;
 use yii\base\Response;
+use yii\db\Expression;
 use yii\web\Controller;
 use DateTime;
 use yii\web\Request;
@@ -58,65 +59,7 @@ class SiteController extends \frontend\controllers\Controller
      */
     public function actionIndex()
     {
-        $model = new DashboardForm();
-
-        $customers = Yii::$app->user->identity->isAdmin
-            ? Customer::getList()
-            : Yii::$app->user->identity->getCustomerList();
-
-        $model->setAttributes([
-            'start_date' => date('Y-m-d 00:00:00'),
-            'end_date' => date('Y-m-d 23:59:59'),
-            'customers' => array_key_first($customers)
-        ]);
-
-        // Generate Report
-        if (Yii::$app->request->post()) {
-            $model->load(Yii::$app->request->post());
-            // @todo add customer level validation for the user before continuing
-
-            $model->start_date = Yii::$app->formatter->asDate($model->start_date, 'php:Y-m-d 00:00:00');
-            $model->end_date = Yii::$app->formatter->asDate($model->end_date, 'php:Y-m-d 23:59:59');
-
-        }
-
-        $open = Order::find()
-            ->where(['customer_id' => $model->customers])
-            ->andWhere(['between', 'created_date', $model->start_date, $model->end_date])
-            ->andWhere(['status_id' => Status::OPEN])
-            ->count();
-        $pending = Order::find()
-            ->where(['customer_id' => $model->customers])
-            ->andWhere(['between', 'created_date', $model->start_date, $model->end_date])
-            ->andWhere(['status_id' => Status::PENDING])
-            ->count();
-        $shipped = Order::find()
-            ->where(['customer_id' => $model->customers])
-            ->andWhere(['between', 'created_date', $model->start_date, $model->end_date])
-            ->andWhere(['status_id' => Status::SHIPPED])
-            ->count();
-        $completed = Order::find()
-            ->where(['customer_id' => $model->customers])
-            ->andWhere(['between', 'created_date', $model->start_date, $model->end_date])
-            ->andWhere(['status_id' => Status::COMPLETED])
-            ->count();
-        $error = Order::find()
-            ->where(['customer_id' => $model->customers])
-            ->andWhere(['between', 'created_date', $model->start_date, $model->end_date])
-            ->andWhere(['status_id' => Status::WMS_ERROR])
-            ->count();
-
-        return $this->render('index', [
-            'model' => $model,
-            'customers' => Yii::$app->user->identity->isAdmin
-                ? Customer::getList()
-                : Yii::$app->user->identity->getCustomerList(),
-            'openCount' => $open,
-            'pendingCount' => $pending,
-            'shippedCount' => $shipped,
-            'completedCount' => $completed,
-            'errorCount' => $error,
-        ]);
+        return $this->render('index');
     }
 
     public function actionJson()
@@ -125,7 +68,7 @@ class SiteController extends \frontend\controllers\Controller
          * gets default start and end dates of query
          */
         $defaultStart = new DateTime('now');
-        $defaultStart->modify('-180 day');
+        $defaultStart->modify('-90 day');
         $defaultStart = $defaultStart->format('Y-m-d 00:00:00');
         $defaultEnd = new DateTime('now');
         $defaultEnd = $defaultEnd->format('Y-m-d 23:59:59');
@@ -136,13 +79,15 @@ class SiteController extends \frontend\controllers\Controller
         $start_date = Yii::$app->formatter->asDate($request->get('start_date', $defaultStart), 'php:Y-m-d 00:00:00');
         $end_date = Yii::$app->formatter->asDate($request->get('end_date', $defaultEnd), 'php:Y-m-d 23:59:59');
 
+        $statusArray = [Status::OPEN, Status::PENDING, Status::SHIPPED, Status::COMPLETED, Status::WMS_ERROR];
         $query = (new \yii\db\Query())
             ->select(['status.name as status', 'customers.name as customer', 'orders.customer_id', 'orders.status_id', 'COUNT(*) as shipments'])
             ->from('orders')
             ->leftJoin('customers', 'orders.customer_id = customers.id')
             ->leftJoin('status', 'orders.status_id = status.id')
             ->where(['between', 'orders.created_date', $start_date, $end_date])
-            ->andWhere(['in','orders.customer_id', $this->customer_ids])
+            ->andWhere(['in', 'orders.customer_id', $this->customer_ids])
+            ->andWhere(['in', 'orders.status_id', $statusArray])
             ->groupBy(['customer_id', 'status_id'])
             ->orderBy('customer_id')
             ->all();
@@ -150,13 +95,17 @@ class SiteController extends \frontend\controllers\Controller
         /**
          * @var Customer $customer
          */
-        $statuses = Status::find()->all();
+        $statuses = Status::find()
+            ->where(['in', 'id', $statusArray])
+            ->orderBy([new Expression('FIELD(id, 9, 8, 1, 11, 10)')])
+            ->all();
 
         /**
          * @var Status $status
          */
         foreach ($statuses as $status) {
             $status2[$status->id] = [
+                'slug' => $this->lookupSlug($status->id),
                 'name' => $status->name,
                 'orders' => 0,
             ];
@@ -169,10 +118,32 @@ class SiteController extends \frontend\controllers\Controller
                 'statuses' => $status2,
             ];
             foreach ($query as $q) {
-                $response[$q['customer_id']]['statuses'][$q['status_id']]['orders'] = $q['shipments'];
+                $response[$q['customer_id']]['statuses'][$q['status_id']]['orders'] = (int)$q['shipments'];
             }
         }
 
+        foreach ($response as $key => $res) {
+            $statues = $res['statuses'];
+            unset($response[$key]['statuses']);
+            foreach ($statues as $status => $value) {
+                $response[$key]['statuses'][] = $value;
+            }
+        }
+
+        Yii::debug($response);
+
         return $this->asJson($response);
+    }
+
+    private function lookupSlug($id)
+    {
+        switch ($id) {
+            case Status::WMS_ERROR:
+                return 'danger';
+            case Status::COMPLETED:
+                return 'success';
+            default:
+                return 'primary';
+        }
     }
 }
