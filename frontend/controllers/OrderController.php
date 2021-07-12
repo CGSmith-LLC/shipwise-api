@@ -3,8 +3,8 @@
 namespace frontend\controllers;
 
 use common\pdf\OrderPackingSlip;
-use console\jobs\orders\GetTrackingFromFulfillmentJob;
-use console\jobs\orders\SendToFulfillmentJob;
+use console\jobs\orders\DownloadTrackingJob;
+use console\jobs\orders\SendTo3PLJob;
 use frontend\models\Customer;
 use Yii;
 use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
@@ -243,14 +243,14 @@ class OrderController extends \frontend\controllers\Controller
 
     public function actionSendFulfillment($id)
     {
-        $job = Yii::$app->queue->push(new SendToFulfillmentJob(['orderId' => $id]));
+        $job = Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $id]));
         Yii::$app->session->setFlash('success', 'Order sent to fulfillment');
         $this->redirect('/order/view/'. $id);
     }
 
     public function actionGetTracking($id)
     {
-        $job = Yii::$app->queue->push(new GetTrackingFromFulfillmentJob(['orderId' => $id]));
+        $job = Yii::$app->queue->push(new DownloadTrackingJob(['orderId' => $id]));
         Yii::$app->session->setFlash('success', 'Order sent to fulfillment');
         $this->redirect('/order/view/'. $id);
     }

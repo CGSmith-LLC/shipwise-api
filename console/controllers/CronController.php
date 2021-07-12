@@ -5,7 +5,8 @@ namespace console\controllers;
 use common\models\BulkAction;
 use common\models\Order;
 use common\models\Status;
-use console\jobs\orders\GetTrackingFromFulfillmentJob;
+use console\jobs\orders\DownloadTrackingJob;
+use console\jobs\orders\ParseOrderJob;
 use yii\console\{Controller, ExitCode};
 
 // To create/edit crontab file: crontab -e
@@ -53,9 +54,19 @@ class CronController extends Controller
         /**
          * 1. Loop through customers and customer meta data to find ecommerce site
          * 2. query ecommerce site for new orders
-         * 3. parse the orders
-         * 4. save the orders and create 'SendToFullfilment' job.
+         * 3. save the orders and create 'ParseOrders' job.
          */
+
+        if (date('i') % 10 === 0)
+        {
+            /**
+             *  foreach customer:
+             *      foreach integration:
+             *          - Get integration metadata
+             *          - call parseOrder
+             */
+
+        }
 
         return ExitCode::OK;
     }
@@ -134,7 +145,7 @@ class CronController extends Controller
         $pendingOrders = Order::find()->where(['status_id' => Status::PENDING])->all();
 
         foreach ($pendingOrders as $pendingOrder) {
-            \Yii::$app->queue->push(new GetTrackingFromFulfillmentJob(['orderId' => $pendingOrder->id]));
+            \Yii::$app->queue->push(new DownloadTrackingJob(['orderId' => $pendingOrder->id]));
         }
     }
 

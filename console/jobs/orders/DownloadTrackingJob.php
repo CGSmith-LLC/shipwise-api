@@ -7,10 +7,12 @@ namespace console\jobs\orders;
 use common\components\CustomerSettings;
 use common\components\FulfillmentService;
 use common\models\Order;
+use common\models\Status;
 use yii\console\Exception;
 use yii\queue\RetryableJobInterface;
+use \yii\base\BaseObject;
 
-class GetTrackingFromFulfillmentJob extends \yii\base\BaseObject implements RetryableJobInterface
+class DownloadTrackingJob extends BaseObject implements RetryableJobInterface
 {
     /** @var int Order ID */
     public $orderId;
@@ -39,6 +41,13 @@ class GetTrackingFromFulfillmentJob extends \yii\base\BaseObject implements Retr
             $order->tracking = $tracking;
             $order->save();
         }
+
+        /** TODO: Create functioning conditional
+         *  if (order shipped from 3PL) {
+         *      $order->status_id = Status::SHIPPED;
+         *      \Yii::$app->queue->push(new UploadTrackingJob(['orderId' => $this->orderId]));
+         *  }
+         */
     }
 
     /**

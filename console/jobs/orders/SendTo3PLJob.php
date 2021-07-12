@@ -8,8 +8,9 @@ use common\components\ColdcoFulfillmentService;
 use common\models\Order;
 use yii\console\Exception;
 use yii\queue\RetryableJobInterface;
+use \yii\base\BaseObject;
 
-class SendToFulfillmentJob extends \yii\base\BaseObject implements RetryableJobInterface
+class SendTo3PLJob extends BaseObject implements RetryableJobInterface
 {
     /** @var int Order ID */
     public $orderId;
@@ -29,7 +30,6 @@ class SendToFulfillmentJob extends \yii\base\BaseObject implements RetryableJobI
             throw new Exception("Order not found for ID {$this->orderId}");
         }
 
-
         // Find upstream service to ship order to
         /** @var ColdcoFulfillmentService $service */
         $service = \Yii::$app->get('coldco');
@@ -37,7 +37,7 @@ class SendToFulfillmentJob extends \yii\base\BaseObject implements RetryableJobI
 
         //$service->createOrder($order);
 
-
+        \Yii::$app->queue->push(new DownloadTrackingJob(['orderId' => $this->orderId]));
     }
 
     /**
