@@ -9,9 +9,9 @@ use common\models\Order;
 use yii\console\Exception;
 use yii\queue\Queue;
 use \yii\base\BaseObject;
-use \yii\queue\JobInterface;
+use \yii\queue\RetryableJobInterface;
 
-class ParseOrderJob extends BaseObject implements JobInterface
+class ParseOrderJob extends BaseObject implements RetryableJobInterface
 {
 
     /**
@@ -27,6 +27,7 @@ class ParseOrderJob extends BaseObject implements JobInterface
     /**
      * @inheritDoc
      * @throws Exception
+     * @throws \yii\db\Exception
      */
     public function execute($queue)
     {
@@ -41,11 +42,26 @@ class ParseOrderJob extends BaseObject implements JobInterface
                 throw new Exception("Adapter not valid.");
         }
 
-        /**
-         * 2. Add order to db
-         */
+        $transaction = \Yii::$app->db->beginTransaction();
+
+        if (!$order->save(true)) {
+            $transaction->rollBack();
+            throw new Exception("Order could not be saved");
+        }
+
+        $transaction->commit();
 
         \Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $order->id]));
 
+    }
+
+    public function canRetry($attempt, $error)
+    {
+        return ($attempt < 5);
+    }
+
+    public function getTtr()
+    {
+        return 15 * 60;
     }
 }

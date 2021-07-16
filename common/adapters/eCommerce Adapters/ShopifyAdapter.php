@@ -6,19 +6,12 @@ use common\models\Order;
 use common\models\Status;
 use \yii\base\BaseObject;
 use yii\helpers\Json;
-use function PHPUnit\Framework\isEmpty;
 
 class ShopifyAdapter extends BaseObject
 {
 
     public static function parse($orderJSON): Order
     {
-        /** TODO: Make Function
-         * 1. Parse JSON to array/object
-         * 2. Create ShipWise Order object & fill in with JSON details
-         * 3. Return Order object
-         */
-
         $shopifyOrder = Json::decode($orderJSON, true);
 
         $shipwiseOrder = new Order();

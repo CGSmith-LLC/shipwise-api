@@ -63,6 +63,6 @@ class DownloadTrackingJob extends BaseObject implements RetryableJobInterface
      */
     public function canRetry($attempt, $error)
     {
-        return ($attempt < 5); // temporary execption? && ($error instanceof TemporaryException);
+        return ($attempt < 5); // temporary exception? && ($error instanceof TemporaryException);
     }
 }
