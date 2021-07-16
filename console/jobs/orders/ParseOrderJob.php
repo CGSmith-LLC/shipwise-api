@@ -42,8 +42,7 @@ class ParseOrderJob extends BaseObject implements JobInterface
         }
 
         /**
-         * 2. Begin order creation transaction
-         *      (see \api\modules\v1\components\ControllerEx.php, line 47 as an example -- NO COPY PASTE; won't function)
+         * 2. Add order to db
          */
 
         \Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $order->id]));

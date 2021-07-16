@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
+use common\models\Customer;
 use common\models\Order;
 use common\models\Status;
 use console\jobs\orders\DownloadTrackingJob;
@@ -45,7 +46,7 @@ class CronController extends Controller
     /**
      * Action Frequent
      * Called every five minutes
-     *
+
      * @return int exit code
      */
     public function actionFrequent()
@@ -65,6 +66,11 @@ class CronController extends Controller
              *          - Get integration metadata
              *          - call parseOrder
              */
+
+            foreach(Customer::findAll() as $customer)
+            {
+                //foreach()
+            }
 
         }
 
