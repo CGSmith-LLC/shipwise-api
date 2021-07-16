@@ -2,90 +2,92 @@
 
 namespace common\adapters;
 
-use common\models\Order;
-use common\models\Status;
-use \yii\base\BaseObject;
+use common\models\Item;
+use common\models\shipping\Service;
 use yii\helpers\Json;
 
-class ShopifyAdapter extends BaseObject
+class ShopifyAdapter extends ECommerceAdapter
 {
-
-    public static function parse($orderJSON): Order
+    public function __construct($orderJSON)
     {
-        $shopifyOrder = Json::decode($orderJSON, true);
+        $json = Json::decode($orderJSON, true);
 
-        $shipwiseOrder = new Order();
-        $shipwiseOrder = self::setGeneralInfo($shipwiseOrder, $shopifyOrder);
-        $shipwiseOrder = self::setAddressInfo($shipwiseOrder, $shopifyOrder);
-        $shipwiseOrder = self::setShippingInfo($shipwiseOrder, $shopifyOrder);
-        $shipwiseOrder = self::setItemInfo($shipwiseOrder, $shopifyOrder);
-
-        return $shipwiseOrder;
+        parent::__construct($json);
     }
 
-    static function setGeneralInfo($order, $json)
+    protected function buildGeneral($json)
     {
-        $order->setReferenceNumber(str_replace('#', '', $json['name']));
-        $order->setUUID((string)$json['id']);
-        $order->setStatus(Status::OPEN);
-        $order->setOrigin("Shopify");
-        $order->setNotes($json["tags"]);
+        $this->referenceNumber = str_replace('#', '', $json['name']);
+        $this->UUID = (string)$json['id'];
+        $this->origin = "Shopify";
+        $this->notes = $json["tags"];
         if (isset($json["note"]) && !empty($json["note"])) {
-            $order->setOrderNotes($json["note"]);
+            $this->orderNotes = $json["note"];
         }
-
-        return $order;
     }
 
-    static function setAddressInfo($order, $json)
+    protected function buildAddress($json)
     {
-        $order->setShipToEmail($json["email"]);
-        $order->setShipToName($json['shipping_address']['first_name'] . ' ' . $json['shipping_address']['last_name']);
-        $order->setShipToAddress1($json['shipping_address']['address1']);
+        $this->shipToEmail = $json["email"];
+        $this->shipToName = $json['shipping_address']['first_name'] . ' ' . $json['shipping_address']['last_name'];
+        $this->shipToAddress1 = $json['shipping_address']['address1'];
         if (isset($json['shipping_address']['address2'])) {
-            $order->setShipToAddress2($json['shipping_address']['address2']);
+            $this->shipToAddress2 = $json['shipping_address']['address2'];
         }
-        $order->setShipToCompany($json['shipping_address']['company']);
-        $order->setShipToCity($json['shipping_address']['city']);
-        $order->setShipToState($json['shipping_address']['province']);
-        $order->setShipToZip($json['shipping_address']['zip']);
-        $order->setShipToPhone($json['shipping_address']['phone']);
+        $this->shipToCompany = $json['shipping_address']['company'];
+        $this->shipToCity = $json['shipping_address']['city'];
+        $this->shipToState = $json['shipping_address']['province'];
+        $this->shipToZip = $json['shipping_address']['zip'];
+        $this->shipToPhone = $json['shipping_address']['phone'];
         if ($json['shipping_address']['country_code'] !== 'US') {
-            $order->setShipToCountry($json['shipping_address']['country_code']);
+            $this->shipToCountry = $json['shipping_address']['country_code'];
+        }
+    }
+
+    protected function buildShipping($json)
+    {
+        if (!isset($json["shipping_lines"][0]["code"])) {
+            $this->shippingService = Service::findOne(["shipwise_code" => "FedExGround"]);
+            return;
         }
 
-        return $order;
+        switch ($json["shipping_lines"][0]["code"]) {
+            case 'PRIORITY_OVERNIGHT':
+                $this->shippingService = Service::findOne(["shipwise_code" => "FedExPriorityOvernight"]);
+                break;
+            case 'STANDARD_OVERNIGHT':
+            case 'FedEx Standard Overnight':
+                $this->shippingService = Service::findOne(["shipwise_code" => "FedExFirstOvernight"]);
+                break;
+            case 'FEDEX_2_DAY':
+                $this->shippingService = Service::findOne(["shipwise_code" => "FedEx2Day"]);
+                break;
+            case 'GROUND_HOME_DELIVERY':
+            case 'FEDEX_GROUND':
+            default:
+                $this->shippingService = Service::findOne(["shipwise_code" => "FedExGround"]);
+                break;
+        }
     }
 
-    static function setShippingInfo($order, $json)
+    protected function buildItems($json)
     {
-        $order->setShipCarrier();
-
-        $order->setShipService();
-
-        return $order;
-    }
-
-    static function setItemInfo($order, $json)
-    {
-       /* foreach ($json['line_items'] as $item) {
+        foreach ($json['line_items'] as $item) {
             if (!in_array($item['sku'], $this->excludedProducts) && !empty(trim($item['sku']))) {
-                $orderItem = new OrderedItem();
-                $orderItem->setName($item['name']);
-                $orderItem->setQuantity($item['quantity']);
-                $orderItem->setSku(trim($item['sku']));
-                $order['items'][] = $orderItem;
+                $orderItem = [];
+                $orderItem["name"] = $item['name'];
+                $orderItem["quantity"] = $item['quantity'];
+                $orderItem["sku"] = trim($item['sku']);
+                $this->items['items'][] = $orderItem;
             }
         }
         if (!isset($json['items'])) {
             echo 'No items for ' . $json['name'] . PHP_EOL;
         } else {
-            if (count($json['items'])) {
-                $order->setOrderedItems($json['items']);
-                return $order;
+            if (count($json['items']) > 0) {
+                $this->items = $json['items'];
             }
-        }*/
-
-        return $order;
+        }
     }
+
 }

@@ -4,6 +4,7 @@
 namespace console\jobs\orders;
 
 
+use common\adapters\ECommerceAdapter;
 use common\adapters\ShopifyAdapter;
 use common\models\Order;
 use yii\console\Exception;
@@ -33,10 +34,9 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
     {
         // TODO: Handle queue-switching logic when more queues are added --> All Order Jobs
 
-        // TODO: Use 'Strategy' design pattern -> How?
         switch ($this->adapter) {
             case "shopify":
-                $order = ShopifyAdapter::parse($this->order);
+                $order = new ShopifyAdapter($this->order);
                 break;
             default:
                 throw new Exception("Adapter not valid.");
@@ -44,7 +44,7 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
 
         $transaction = \Yii::$app->db->beginTransaction();
 
-        if (!$order->save(true)) {
+        if (!$order->parse()->save(true)) {
             $transaction->rollBack();
             throw new Exception("Order could not be saved");
         }
