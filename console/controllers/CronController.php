@@ -135,8 +135,6 @@ class CronController extends Controller
             //
         }
 
-        $this->queuePendingOrders();
-
         return ExitCode::OK;
     }
 
@@ -151,15 +149,6 @@ class CronController extends Controller
         $this->cleanBulkActionData();
 
         return ExitCode::OK;
-    }
-
-    private function queuePendingOrders()
-    {
-        $pendingOrders = Order::find()->where(['status_id' => Status::PENDING])->all();
-
-        foreach ($pendingOrders as $pendingOrder) {
-            \Yii::$app->queue->push(new DownloadTrackingJob(['orderId' => $pendingOrder->id]));
-        }
     }
 
     /**
