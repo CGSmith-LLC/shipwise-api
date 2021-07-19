@@ -4,11 +4,8 @@
 namespace console\jobs\orders;
 
 
-use common\adapters\ECommerceAdapter;
-use common\adapters\ShopifyAdapter;
-use common\models\Order;
+use common\models\Integration;
 use yii\console\Exception;
-use yii\queue\Queue;
 use \yii\base\BaseObject;
 use \yii\queue\RetryableJobInterface;
 
@@ -21,9 +18,14 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
     public string $order;
 
     /**
-     * @var string $adapter
+     * @var string $ecommerceSite
      */
-    public string $adapter;
+    public string $ecommerceSite;
+
+    /**
+     * @var int $customer_id
+     */
+    public string $customer_id;
 
     /**
      * @inheritDoc
@@ -34,13 +36,7 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
     {
         // TODO: Handle queue-switching logic when more queues are added --> All Order Jobs
 
-        switch ($this->adapter) {
-            case "shopify":
-                $order = new ShopifyAdapter($this->order);
-                break;
-            default:
-                throw new Exception("Adapter not valid.");
-        }
+        $order = Integration::findone(["ecommerce" => $this->ecommerceSite])->getAdapter($this->order, $this->customer_id);
 
         $transaction = \Yii::$app->db->beginTransaction();
 

@@ -9,6 +9,7 @@ use common\models\Status;
 use console\jobs\orders\DownloadTrackingJob;
 use console\jobs\orders\ParseOrderJob;
 use yii\console\{Controller, ExitCode};
+use common\models\Integration;
 
 // To create/edit crontab file: crontab -e
 // To list: crontab -l
@@ -46,7 +47,6 @@ class CronController extends Controller
     /**
      * Action Frequent
      * Called every five minutes
-
      * @return int exit code
      */
     public function actionFrequent()
@@ -58,8 +58,7 @@ class CronController extends Controller
          * 3. save the orders and create 'ParseOrders' job.
          */
 
-        if (date('i') % 10 === 0)
-        {
+        if (date('i') % 10 === 0) {
             /**
              *  foreach customer:
              *      foreach integration:
@@ -67,11 +66,19 @@ class CronController extends Controller
              *          - call parseOrder
              */
 
-            foreach(Customer::findAll() as $customer)
-            {
-                //foreach()
-            }
+            /** @var Integration $integration */
+            foreach (Integration::find()->all() as $integration) {
 
+                $orders = $integration->getInterface()->getOrders();
+
+                foreach ($orders as $order) {
+                    \Yii::$app->queue->push(new ParseOrderJob([
+                        "order" => $order,
+                        "ecommerceSite" => $integration->name,
+                        "customer_id" => $integration->customer_id,
+                    ]));
+                }
+            }
         }
 
         return ExitCode::OK;

@@ -19,6 +19,7 @@ abstract class ECommerceAdapter extends BaseObject
     protected $origin;
     protected $notes;
     protected $orderNotes;
+    protected $customerID;
 
     protected $shipToEmail;
     protected $shipToName;
@@ -35,11 +36,12 @@ abstract class ECommerceAdapter extends BaseObject
 
     protected $items;
 
-    public function __construct($json)
+    public function __construct($json, $customer_id)
     {
         parent::__construct();
 
         $this->status = Status::OPEN;
+        $this->customerID = $customer_id;
 
         $this->buildGeneral($json);
         $this->buildAddress($json);

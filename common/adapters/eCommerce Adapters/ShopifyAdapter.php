@@ -2,17 +2,16 @@
 
 namespace common\adapters;
 
-use common\models\Item;
 use common\models\shipping\Service;
 use yii\helpers\Json;
 
 class ShopifyAdapter extends ECommerceAdapter
 {
-    public function __construct($orderJSON)
+    public function __construct($orderJSON, $customer_id)
     {
         $json = Json::decode($orderJSON, true);
 
-        parent::__construct($json);
+        parent::__construct($json, $customer_id);
     }
 
     protected function buildGeneral($json)
