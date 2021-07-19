@@ -4,7 +4,9 @@
 namespace common\interfaces;
 
 
-class ShopifyInterface extends ECommerceInterface
+use yii\base\BaseObject;
+
+class ShopifyInterface extends BaseObject implements ECommerceInterface
 {
 
     public function getOrders(): array
@@ -12,9 +14,9 @@ class ShopifyInterface extends ECommerceInterface
         $orderarray = [];
 
         /**
+         * TODO: Make work
          * 1. Get all unfulfilled Shopify orders from the last 11 minutes (just to be safe)
-         * 2. Extract all individual order objects-arrays from array
-         * 3. Return
+         * 2. Extract all individual order object-arrays from array
          */
 
         return $orderarray;

@@ -5,15 +5,16 @@ namespace common\models;
 
 use common\adapters\ECommerceAdapter;
 use common\interfaces\ECommerceInterface;
+use yii\base\BaseObject;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "addresses".
+ * This is the model class for table "integration".
  *
  * @property string $name
  * @property int $customer_id
  * @property string $ecommerce
- * @property ??? $metadata
+ * @property BaseObject $metadata
  */
 
 class Integration extends ActiveRecord
@@ -27,6 +28,8 @@ class Integration extends ActiveRecord
     /** @inheritDoc */
     public function rules()
     {
+        // TODO: How do metadata?
+
         return [
             [['name', 'customer_id', 'ecommerce'],"required"],
             [['name', 'ecommerce'], 'string', 'max' => 64],
@@ -37,9 +40,11 @@ class Integration extends ActiveRecord
     /** @inheritDoc */
     public function attributeLabels()
     {
-        // TODO: make
         return [
-
+            'name' => 'Name',
+            'customer_id' => 'Customer ID',
+            'ecommerce' => 'eCommerce Site',
+            'metadata' => 'Metadata'
         ];
     }
 
