@@ -7,6 +7,7 @@ use common\adapters\ECommerceAdapter;
 use common\interfaces\ECommerceInterface;
 use yii\base\BaseObject;
 use yii\db\ActiveRecord;
+use yii\httpclient\Client;
 
 /**
  * This is the model class for table "integration".
@@ -15,6 +16,10 @@ use yii\db\ActiveRecord;
  * @property int $customer_id
  * @property string $ecommerce
  * @property BaseObject $metadata
+ *
+ * @property string $baseURL
+ * @property string $apiKey     TODO: Is this safe to put in the table?
+ * @property string $apiSecret
  */
 
 class Integration extends ActiveRecord
@@ -57,6 +62,7 @@ class Integration extends ActiveRecord
     public function getInterface(): ECommerceInterface
     {
         $interfacename = ucfirst($this->ecommerce) . 'Interface';
-        return new $interfacename();
+        $client = new Client(['baseUrl' => $this->baseURL]);
+        return new $interfacename(['auth' => base64_encode($this->apiKey . ':' . $this->apiSecret), 'client' => $client]);
     }
 }
