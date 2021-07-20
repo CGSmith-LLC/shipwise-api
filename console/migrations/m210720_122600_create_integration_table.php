@@ -17,8 +17,8 @@ class m210720_122600_create_integration_table extends Migration
     public function safeUp()
     {
         $this->createTable($this->tableName, [
-            'id' => $this->primaryKey(),
-            'name' => $this->string()->notNull(),
+            'id'          => $this->primaryKey(),
+            'name'        => $this->string()->notNull(),
             'customer_id' => $this->binary()->notNull(),
             'ecommerce'   => $this->string()->notNull(),
         ]);
@@ -30,5 +30,6 @@ class m210720_122600_create_integration_table extends Migration
     public function safeDown()
     {
         $this->dropTable($this->tableName);
+        $this->dropTable('{{%integration_meta}}');
     }
 }
