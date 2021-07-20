@@ -15,6 +15,10 @@ use yii\db\ActiveRecord;
  * @property int $customer_id
  * @property string $ecommerce
  * @property BaseObject $metadata
+ *      Metadata includes:
+ *          API Key
+ *          API Secret
+ *          API URL
  */
 
 class Integration extends ActiveRecord
@@ -57,6 +61,6 @@ class Integration extends ActiveRecord
     public function getInterface(): ECommerceInterface
     {
         $interfacename = ucfirst($this->ecommerce) . 'Interface';
-        return new $interfacename();
+        return new $interfacename(/*This needs the API key, secret, and URL */);
     }
 }
