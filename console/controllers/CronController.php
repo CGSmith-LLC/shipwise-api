@@ -2,17 +2,10 @@
 
 namespace console\controllers;
 
-use common\interfaces\ShopifyInterface;
 use common\models\BulkAction;
-use common\models\Customer;
-use common\models\Order;
-use common\models\Status;
-use console\jobs\orders\DownloadTrackingJob;
 use console\jobs\orders\ParseOrderJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
-use phpDocumentor\Reflection\Types\True_;
-use yii\httpclient\Client;
 
 // To create/edit crontab file: crontab -e
 // To list: crontab -l
@@ -89,10 +82,6 @@ class CronController extends Controller
 
     public function actionTest()
     {
-       // TODO: DO NOT COMMIT
-        $shopify = new ShopifyInterface(['auth' => base64_encode('537fb667e32cadb69c8a42c47ed8e97c:7b3a88dc57b69822a82bbc8956c3fac5'), 'client' => new Client(['baseUrl' => 'https://hu-kitchen-2.myshopify.com/'])]);
-        $shopify->getOrders();
-
         return ExitCode::OK;
     }
 
