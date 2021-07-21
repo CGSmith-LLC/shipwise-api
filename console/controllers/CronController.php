@@ -3,10 +3,6 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
-use common\models\Customer;
-use common\models\Order;
-use common\models\Status;
-use console\jobs\orders\DownloadTrackingJob;
 use console\jobs\orders\ParseOrderJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
@@ -83,6 +79,12 @@ class CronController extends Controller
 
         return ExitCode::OK;
     }
+
+    public function actionTest()
+    {
+        return ExitCode::OK;
+    }
+
 
     /**
      * Action Quarter

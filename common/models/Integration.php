@@ -5,7 +5,6 @@ namespace common\models;
 
 use common\adapters\ECommerceAdapter;
 use common\interfaces\ECommerceInterface;
-use yii\base\BaseObject;
 use yii\db\ActiveRecord;
 
 /**
@@ -14,11 +13,7 @@ use yii\db\ActiveRecord;
  * @property string $name
  * @property int $customer_id
  * @property string $ecommerce
- * @property BaseObject $metadata
- *      Metadata includes:
- *          API Key
- *          API Secret
- *          API URL
+ *      GET METADATA FROM TABLE
  */
 
 class Integration extends ActiveRecord
