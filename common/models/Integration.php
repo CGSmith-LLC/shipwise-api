@@ -56,6 +56,6 @@ class Integration extends ActiveRecord
     public function getInterface(): ECommerceInterface
     {
         $interfacename = ucfirst($this->ecommerce) . 'Interface';
-        return new $interfacename(/*This needs the API key, secret, and URL */);
+        return new $interfacename(/*This needs a Client and the API key, secret, and URL */);
     }
 }
