@@ -4,10 +4,11 @@ namespace common\interfaces;
 
 interface ECommerceInterface
 {
-    public function getOrders(): array;
+
+    public function getOrders();
 
     /**
-     * TODO: Declare these methods when we need them
+     * TODO: Implement these methods when we need them
      * updateOrderStatus(order_id, status)
      * getOrderInfo(order_id)
      * updateOrderInfo(order_id, field, value)
