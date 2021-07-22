@@ -5,7 +5,6 @@ namespace common\services;
 
 
 use common\models\IntegrationMeta;
-use yii\base\BaseObject;
 use yii\console\Exception;
 use yii\helpers\Json;
 use yii\httpclient\Client;
@@ -85,12 +84,14 @@ class ShopifyService extends BaseService
 
             try {
                 $orders = Json::decode($orders, true);
-            } catch (\yii\base\InvalidArgumentException $e) {}
+            } catch (\yii\base\InvalidArgumentException $e) {
+                $orders = ['error' => "Error on decode: $e"];
+            }
 
             $orders = end($orders);
 
             if(!is_array($orders)){
-                throw new Exception($orders);
+                throw new Exception('$orders is not an array. Orders reads: ' . $orders);
             }
 
             foreach($orders as $order)

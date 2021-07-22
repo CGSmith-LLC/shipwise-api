@@ -4,9 +4,7 @@
 namespace common\models;
 
 use common\adapters\ECommerceAdapter;
-use common\interfaces\ECommerceInterface;
 use common\services\BaseService;
-use yii\httpclient\Client;
 use yii\db\ActiveRecord;
 
 /**
@@ -29,8 +27,6 @@ class Integration extends ActiveRecord
     /** @inheritDoc */
     public function rules()
     {
-        // TODO: How do metadata?
-
         return [
             [['name', 'customer_id', 'ecommerce'],"required"],
             [['name', 'ecommerce'], 'string', 'max' => 64],
