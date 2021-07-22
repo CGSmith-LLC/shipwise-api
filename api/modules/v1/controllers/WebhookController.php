@@ -40,6 +40,26 @@ class WebhookController extends ControllerEx
     {
         $headers = Yii::$app->request->headers;
 
+        // Is Shopify?
+
+        // Is WooCommerce
+        Yii::debug($headers->get('user-agent')); // should be WooCommerce
+
+        $key = 'O=x)W6j6jBzITAwG+{PxV)d>M;;K3M:u2sfkpo6/v;?><P!+}F';
+
+        Yii::debug(base64_encode(hash_hmac('sha256', Yii::$app->request->getRawBody(), $key, true)));
+        if (strpos($headers->get('user-agent'), 'WooCommerce') !== false) {
+            if (strpos($headers->get('X-WC-Webhook-Source'), 'https://bluenestbeef.com') !== false) {
+                return $this->success(200, 'Received');
+            }else {
+                // Webhook was called
+                return $this->errorMessage(200, 'Error saving webhook data');
+            }
+            // X-WC-Webhook-Source = originating Customer URL
+            // X-WC-Webhook-Topic = order.created - create order
+
+        }
+
         $id = Yii::$app->queue->push(new ShopifyJob([
             'headers' => Yii::$app->request->headers,
             'body' => Yii::$app->request->bodyParams])
