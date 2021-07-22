@@ -54,8 +54,7 @@ class ShopifyService extends BaseService
         }
 
         // add semicolon to end for BASIC auth
-        $this->auth = implode(':', $auth);
-
+        $this->auth = base64_encode(implode(':', $auth));
     }
 
     public function getOrders(): array

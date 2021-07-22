@@ -35,19 +35,18 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
     public function execute($queue)
     {
         // TODO: Handle queue-switching logic when more queues are added --> All Order Jobs
-
-        $order = Integration::findone(["ecommerce" => $this->ecommerceSite])->getAdapter($this->order, $this->customer_id);
+        $integration = Integration::findone(["name" => $this->ecommerceSite])->getAdapter($this->order, $this->customer_id);
 
         $transaction = \Yii::$app->db->beginTransaction();
 
-        if (!$order->parse()->save(true)) {
+        if (!$integration->parse()->save(true)) {
             $transaction->rollBack();
             throw new Exception("Order could not be saved");
         }
 
         $transaction->commit();
 
-        \Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $order->id]));
+        \Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $integration->id]));
 
     }
 
