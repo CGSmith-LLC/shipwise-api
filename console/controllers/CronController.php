@@ -56,7 +56,7 @@ class CronController extends Controller
          * 3. save the orders and create 'ParseOrders' job.
          */
 
-        //if (date('i') % 10 === 0) {
+        //if (date('i') % 10 === 0) { TODO: Uncomment If
             /**
              *  foreach customer:
              *      foreach integration:
