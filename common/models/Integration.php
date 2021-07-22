@@ -5,15 +5,16 @@ namespace common\models;
 
 use common\adapters\ECommerceAdapter;
 use common\interfaces\ECommerceInterface;
+use yii\httpclient\Client;
 use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "integration".
  *
+ * @property string $id
  * @property string $name
  * @property int $customer_id
  * @property string $ecommerce
- *      GET METADATA FROM TABLE
  */
 
 class Integration extends ActiveRecord
@@ -43,7 +44,6 @@ class Integration extends ActiveRecord
             'name' => 'Name',
             'customer_id' => 'Customer ID',
             'ecommerce' => 'eCommerce Site',
-            'metadata' => 'Metadata'
         ];
     }
 
@@ -55,7 +55,20 @@ class Integration extends ActiveRecord
 
     public function getInterface(): ECommerceInterface
     {
-        $interfacename = ucfirst($this->ecommerce) . 'Interface';
-        return new $interfacename(/*This needs a Client and the API key, secret, and URL */);
+        $interfacename = '\\common\\interfaces\\' . ucfirst($this->ecommerce) . 'Interface';
+        $metadata = [];
+
+        foreach(IntegrationMeta::findAll(['integration_id' => $this->customer_id]) as $metadatum)
+        {
+            $key   = \Yii::$app->getSecurity()->decryptByKey(base64_decode($metadatum->key),   \Yii::$app->params['integrationSecret']);
+            $value = \Yii::$app->getSecurity()->decryptByKey(base64_decode($metadatum->value), \Yii::$app->params['integrationSecret']);
+            $metadata[$key] = $value;
+        }
+
+
+        $client = new Client(['baseUrl'=>$metadata['url']]);
+        $auth = $metadata['api_key'] . ':' . $metadata['api_secret'];
+
+        return new $interfacename(['client' => $client, 'auth' => $auth]);
     }
 }

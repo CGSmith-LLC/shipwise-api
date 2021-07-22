@@ -5,6 +5,7 @@ namespace common\interfaces;
 
 
 use yii\base\BaseObject;
+use yii\console\Exception;
 use yii\helpers\Json;
 use yii\httpclient\Client;
 
@@ -48,6 +49,10 @@ class ShopifyInterface extends BaseObject implements ECommerceInterface
             } catch (\yii\base\InvalidArgumentException $e) {}
 
             $orders = end($orders);
+
+            if(!is_array($orders)){
+                throw new Exception($orders);
+            }
 
             foreach($orders as $order)
             {

@@ -30,7 +30,7 @@ class BaseIntegrationMeta extends \yii\db\ActiveRecord
     {
         return [
             [['created_date'], 'safe'],
-            [['key', 'value'], 'string', 'max' => 128],
+            [['key', 'value'], 'string', 'max' => 255],
         ];
     }
 

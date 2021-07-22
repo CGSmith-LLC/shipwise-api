@@ -54,7 +54,7 @@ class CronController extends Controller
          * 3. save the orders and create 'ParseOrders' job.
          */
 
-        if (date('i') % 10 === 0) {
+        //if (date('i') % 10 === 0) {
             /**
              *  foreach customer:
              *      foreach integration:
@@ -75,7 +75,7 @@ class CronController extends Controller
                     ]));
                 }
             }
-        }
+    //    }
 
         return ExitCode::OK;
     }
