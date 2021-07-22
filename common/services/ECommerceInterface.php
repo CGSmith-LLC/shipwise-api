@@ -1,6 +1,6 @@
 <?php
 
-namespace common\interfaces;
+namespace common\services;
 
 interface ECommerceInterface
 {

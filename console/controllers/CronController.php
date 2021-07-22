@@ -2,7 +2,10 @@
 
 namespace console\controllers;
 
+use common\adapters\ShopifyAdapter;
 use common\models\BulkAction;
+use common\models\IntegrationMeta;
+use common\services\ShopifyService;
 use console\jobs\orders\ParseOrderJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
@@ -82,6 +85,9 @@ class CronController extends Controller
 
     public function actionTest()
     {
+        IntegrationMeta::addMeta(ShopifyService::META_URL, 'https://hu-kitchens-2.myshopify.com/', 1);
+        IntegrationMeta::addMeta(ShopifyService::META_API_KEY, '537fb667e32cadb69c8a42c47ed8e97c', 1);
+        IntegrationMeta::addMeta(ShopifyService::META_API_SECRET, '7b3a88dc57b69822a82bbc8956c3fac5', 1);
         return ExitCode::OK;
     }
 
