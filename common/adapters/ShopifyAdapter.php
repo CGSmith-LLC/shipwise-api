@@ -71,6 +71,10 @@ class ShopifyAdapter extends ECommerceAdapter
 
     protected function buildItems($json)
     {
+        /* TODO: Create item table with (int)`id`, (int)`customer_id`, (str)`product_id`, and (boolean)`excluded` fields
+         *       $excluded Items::findall(['excluded'=>true,'customer_id'=>$this->customerID]) as array
+         *       use that for excluded products.
+         */
         foreach ($json['line_items'] as $item) {
             if (!in_array($item['sku'], $this->excludedProducts) && !empty(trim($item['sku']))) {
                 $orderItem = [];
