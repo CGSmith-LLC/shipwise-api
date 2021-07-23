@@ -59,7 +59,8 @@ class ShopifyService extends BaseService
 
     public function getOrders(): array
     {
-        $startDate = new \DateTime('-12 minutes', new \DateTimeZone('America/Chicago'));
+        // TODO: Change to -12 minutes; set to -1 hr for testing
+        $startDate = new \DateTime('-1 hour', new \DateTimeZone('America/Chicago'));
 
         $orderarray = [];
 

@@ -10,7 +10,6 @@ use common\models\Order;
 use common\models\shipping\Carrier;
 use common\models\State;
 use common\models\Status;
-use SebastianBergmann\CodeCoverage\Report\PHP;
 use yii\base\BaseObject;
 use yii\db\Exception;
 
@@ -18,56 +17,55 @@ use yii\db\Exception;
  * Class ECommerceAdapter
  * @package common\adapters
  *
- * @var string $referenceNumber;
- * @var int    $UUID;
- * @var int    $status;
- * @var string $origin;
- * @var string $notes;
- * @var string $orderNotes;
- * @var int    $customerID;
+ * @var string $referenceNumber ;
+ * @var int $UUID ;
+ * @var int $status ;
+ * @var string $origin ;
+ * @var string $notes ;
+ * @var string $orderNotes ;
+ * @var int $customerID ;
  *
- * @var string $shipToEmail;
- * @var string $shipToName;
- * @var string $shipToAddress1;
- * @var string $shipToAddress2;
- * @var string $shipToCompany;
- * @var string $shipToCity;
- * @var string $shipToState;
- * @var string $shipToZip;
- * @var string $shipToPhone;
- * @var string $shipToCountry;
+ * @var string $shipToEmail ;
+ * @var string $shipToName ;
+ * @var string $shipToAddress1 ;
+ * @var string $shipToAddress2 ;
+ * @var string $shipToCompany ;
+ * @var string $shipToCity ;
+ * @var string $shipToState ;
+ * @var string $shipToZip ;
+ * @var string $shipToPhone ;
+ * @var string $shipToCountry ;
  *
- * @var string $shippingService;
+ * @var string $shippingService ;
  *
- * @var Item[] $items;
+ * @var Item[] $items ;
  */
-
 abstract class ECommerceAdapter extends BaseObject
 {
 
     // TODO: Add types
     protected ?string $referenceNumber;
-    protected int     $UUID;
-    protected int     $status;
-    protected string  $origin;
+    protected int $UUID;
+    protected int $status;
+    protected string $origin;
     protected ?string $notes;
     protected ?string $orderNotes;
-    protected int     $customerID;
+    protected int $customerID;
 
-    protected string  $shipToEmail;
-    protected string  $shipToName;
-    protected string  $shipToAddress1;
+    protected string $shipToEmail;
+    protected string $shipToName;
+    protected string $shipToAddress1;
     protected ?string $shipToAddress2;
     protected ?string $shipToCompany;
-    protected string  $shipToCity;
-    protected string  $shipToState;
-    protected string  $shipToZip;
+    protected string $shipToCity;
+    protected string $shipToState;
+    protected string $shipToZip;
     protected ?string $shipToPhone;
-    protected string  $shipToCountry;
+    protected string $shipToCountry;
 
-    protected int     $shippingService;
+    protected int $shippingService;
 
-    protected array   $items;
+    protected array $items;
 
     public function __construct($json, $customer_id)
     {
@@ -92,7 +90,37 @@ abstract class ECommerceAdapter extends BaseObject
         $shipwiseOrder = self::setAddressInfo($shipwiseOrder);
         $shipwiseOrder = self::setShippingInfo($shipwiseOrder);
         echo "parsed order" . PHP_EOL . PHP_EOL;
-        return self::setItemInfo($shipwiseOrder);
+        return $shipwiseOrder;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function parseItems(): bool
+    {
+        echo "parsing items..." . PHP_EOL;
+        $transaction = \Yii::$app->db->beginTransaction();
+
+        $id = Order::findOne([
+            'status_id' => Status::OPEN,
+            'origin' => $this->origin,
+            'service_id' => $this->shippingService,
+            'uuid' => $this->UUID,
+            'order_reference' => $this->referenceNumber,
+        ])->id;
+
+        foreach ($this->items as $item) {
+            echo "\tparsing item...\t";
+            if (!(new Item($item))->save(true)) {
+                $transaction->rollBack();
+                return false;
+            }
+            echo "parsed item" . PHP_EOL;
+        }
+
+        $transaction->commit();
+        echo "parsed items" . PHP_EOL . PHP_EOL;
+        return true;
     }
 
     /**
@@ -118,7 +146,7 @@ abstract class ECommerceAdapter extends BaseObject
      */
     private function setAddressInfo(Order $order): Order
     {
-        echo "\tparsing address...\t";
+        echo "\tparsing address..." . PHP_EOL;
 
         $values = [
             'email' => $this->shipToEmail,
@@ -141,21 +169,22 @@ abstract class ECommerceAdapter extends BaseObject
         }
 
         $address = Address::findOne($values);
-        if($address === null) {
+        if ($address === null) {
+            echo "\t\tcreating new address...\t";
             $address = new Address();
             $address->attributes = $values;
 
             $transaction = \Yii::$app->db->beginTransaction();
-            if (!$address->save(true))
-            {
+            if (!$address->save(true)) {
                 $transaction->rollBack();
                 throw new Exception('New address entry could not be created.');
             }
             $transaction->commit();
-        }
+            echo "new address created" . PHP_EOL;
+        } else echo "\t\tfound address" . PHP_EOL;
 
         $order->address_id = $address->id;
-        echo 'parsed address' . PHP_EOL;
+        echo "\tparsed address" . PHP_EOL;
         //$order->ship_from_state_id = State::findByAbbrOrName()->id;
 
         return $order;
@@ -175,20 +204,11 @@ abstract class ECommerceAdapter extends BaseObject
         return $order;
     }
 
-    /**
-     * @param Order $order
-     * @return Order
-     */
-    private function setItemInfo(Order $order): Order
-    {
-        echo "\tparsing items...\t";
-        $order->items = $this->items;
-        echo 'parsed items' . PHP_EOL;
-        return $order;
-    }
-
     protected abstract function buildGeneral($json);
+
     protected abstract function buildAddress($json);
+
     protected abstract function buildShipping($json);
+
     protected abstract function buildItems($json);
 }

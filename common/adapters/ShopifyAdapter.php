@@ -83,13 +83,14 @@ class ShopifyAdapter extends ECommerceAdapter
          *       use that for excluded products.
          */
         echo "\tbuilding items...\t";
+        $this->items = [];
         foreach ($json['line_items'] as $item) {
             if (!in_array($item['sku'], Sku::findall(['excluded' => 'true', 'customer_id' => $this->customerID])) && !empty(trim($item['sku']))) {
                 $orderItem = [];
                 $orderItem["name"] = $item['name'];
                 $orderItem["quantity"] = $item['quantity'];
                 $orderItem["sku"] = trim($item['sku']);
-                $this->items[] = new Item($orderItem);
+                $this->items[] = $orderItem;
             }
         }
         echo 'built items' . PHP_EOL;

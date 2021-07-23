@@ -74,7 +74,7 @@ class CronController extends Controller
 
                 echo "\tpushing orders..." . PHP_EOL;
                 foreach ($orders as $order) {
-                    echo "\t\tpushing order..." . PHP_EOL;
+                    echo "\t\tpushing order...\t";
                     \Yii::$app->queue->push(new ParseOrderJob([
                         "order" => $order,
                         "ecommerceSite" => $integration->name,

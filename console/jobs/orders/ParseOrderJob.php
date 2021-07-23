@@ -44,6 +44,12 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
             throw new Exception("Order could not be saved");
         }
 
+        if(!$adapter->parseItems())
+        {
+            $transaction->rollBack();
+            throw new Exception("Items could not be saved");
+        }
+
         $transaction->commit();
 
         \Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $adapter->id]));
@@ -57,6 +63,6 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
 
     public function getTtr()
     {
-        return 5;//*/15 * 60;
+        return 5;//*/15 * 60;TODO: Return to 15 minutes for production; different time better?
     }
 }
