@@ -14,6 +14,7 @@ use common\models\query\SkuQuery;
  * @property string $substitute_1
  * @property string $substitute_2
  * @property string $substitute_3
+ * @property boolean $excluded
  */
 class Sku extends \yii\db\ActiveRecord
 {

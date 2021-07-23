@@ -57,6 +57,6 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
 
     public function getTtr()
     {
-        return 15 * 60;
+        return 5;//*/15 * 60;
     }
 }

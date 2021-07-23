@@ -74,6 +74,8 @@ class ShopifyService extends BaseService
             ])->setHeaders(['Authorization' => "Basic {$this->auth}"])
             ->send();
 
+        $pages = 1;
+
         do {
             $pagesLeft = false;
 
@@ -110,6 +112,7 @@ class ShopifyService extends BaseService
                 );
 
                 $pagesLeft = true;
+                $pages++;
 
                 $page = $this->client->createRequest()
                     ->setMethod('GET')
@@ -123,6 +126,8 @@ class ShopifyService extends BaseService
          * 1. Get all unfulfilled Shopify orders from the last 12 minutes (just to be safe)
          * 2. Extract all individual order object-arrays from array
          */
+
+        echo "\t$pages page(s) of orders. " . (count($orderarray)) . " order(s) found" . PHP_EOL;
 
         return $orderarray;
     }
