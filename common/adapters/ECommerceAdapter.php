@@ -168,20 +168,17 @@ abstract class ECommerceAdapter extends BaseObject
             $values['notes'] = $this->orderNotes;
         }
 
-        $address = Address::findOne($values);
-        if ($address === null) {
-            echo "\t\tcreating new address...\t";
-            $address = new Address();
-            $address->attributes = $values;
+        echo "\t\tcreating new address...\t";
+        $address = new Address();
+        $address->attributes = $values;
 
-            $transaction = \Yii::$app->db->beginTransaction();
-            if (!$address->save(true)) {
-                $transaction->rollBack();
-                throw new Exception('New address entry could not be created.');
-            }
-            $transaction->commit();
-            echo "new address created" . PHP_EOL;
-        } else echo "\t\tfound address" . PHP_EOL;
+        $transaction = \Yii::$app->db->beginTransaction();
+        if (!$address->save(true)) {
+            $transaction->rollBack();
+            throw new Exception('New address entry could not be created.');
+        }
+        $transaction->commit();
+        echo "new address created" . PHP_EOL;
 
         $order->address_id = $address->id;
         echo "\tparsed address" . PHP_EOL;

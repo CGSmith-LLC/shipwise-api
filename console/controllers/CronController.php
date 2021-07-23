@@ -70,7 +70,7 @@ class CronController extends Controller
             /** @var Integration $integration */
             foreach (Integration::find()->all() as $integration) {
 
-                $orders = $integration->getInterface()->getOrders();
+                $orders = $integration->getService()->getOrders();
 
                 echo "\tpushing orders..." . PHP_EOL;
                 foreach ($orders as $order) {

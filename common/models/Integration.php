@@ -54,11 +54,11 @@ class Integration extends ActiveRecord
     /**
      * @return BaseService
      */
-    public function getInterface(): BaseService
+    public function getService(): BaseService
     {
         $interfacename = '\\common\\services\\' . ucfirst($this->ecommerce) . 'Service';
 
-        /** @var ShopifyService $interface */
+        /** @var BaseService $interface */
         $interface = new $interfacename();
         $interface->applyMeta(IntegrationMeta::findAll(['integration_id' => $this->id]));
 
