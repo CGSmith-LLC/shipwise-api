@@ -13,7 +13,7 @@ use \yii\base\BaseObject;
 class SendTo3PLJob extends BaseObject implements RetryableJobInterface
 {
     /** @var int Order ID */
-    public $orderId;
+    public int $orderId;
 
     /**
      * @inheritDoc
@@ -21,12 +21,13 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
     public function execute($queue)
     {
 
+        throw new \yii\db\Exception('die');
+
         /**
          * Find order
          * @var Order $order
          */
-        if (($this->order = Order::findOne($this->orderId)) === null) {
-
+        if (($order = Order::findOne($this->orderId)) === null) {
             throw new Exception("Order not found for ID {$this->orderId}");
         }
 
@@ -45,7 +46,7 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
      */
     public function getTtr()
     {
-        return 15 * 60;
+        return 5;//15 * 60; TODO
     }
 
     /**
@@ -53,6 +54,6 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
      */
     public function canRetry($attempt, $error)
     {
-        return ($attempt < 5); // temporary exception? && ($error instanceof TemporaryException);
+        return true;//($attempt < 5); // temporary exception? && ($error instanceof TemporaryException); TODO
     }
 }

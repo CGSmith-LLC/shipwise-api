@@ -2,7 +2,6 @@
 
 namespace common\adapters;
 
-use common\models\Item;
 use common\models\shipping\Service;
 use common\models\Sku;
 use yii\helpers\Json;
@@ -18,17 +17,14 @@ class ShopifyAdapter extends ECommerceAdapter
 
     protected function buildGeneral($json)
     {
-        echo "\tbuilding general...\t";
-        $this->referenceNumber = str_replace('#', '', $json['name']);
+        $this->customer_reference = str_replace('#', '', $json['name']);
         $this->UUID = (string)$json['id'];
         $this->origin = "Shopify";
         $this->notes = $json["tags"];
-        echo 'built general' . PHP_EOL;
     }
 
     protected function buildAddress($json)
     {
-        echo "\tbuilding address...\t";
         $this->shipToEmail = $json["email"];
         $this->shipToName = $json['shipping_address']['first_name'] . ' ' . $json['shipping_address']['last_name'];
         $this->shipToAddress1 = $json['shipping_address']['address1'];
@@ -44,12 +40,10 @@ class ShopifyAdapter extends ECommerceAdapter
         if (isset($json["note"]) && !empty($json["note"])) {
             $this->orderNotes = $json["note"];
         }
-        echo 'built address' . PHP_EOL;
     }
 
     protected function buildShipping($json)
     {
-        echo "\tbuilding shipping...\t";
         if (!isset($json["shipping_lines"][0]["code"])) {
             $this->shippingService = Service::findOne(["shipwise_code" => "FedExGround"])->id;
             echo 'built shipping' . PHP_EOL;
@@ -73,16 +67,10 @@ class ShopifyAdapter extends ECommerceAdapter
                 $this->shippingService = Service::findOne(["shipwise_code" => "FedExGround"])->id;
                 break;
         }
-        echo 'built shipping' . PHP_EOL;
     }
 
     protected function buildItems($json)
     {
-        /* TODO: Create item table with (int)`id`, (int)`customer_id`, (str)`product_id`, and (boolean)`excluded` fields
-         *       $excluded Items::findall(['excluded'=>true,'customer_id'=>$this->customerID]) as array
-         *       use that for excluded products.
-         */
-        echo "\tbuilding items...\t";
         $this->items = [];
         foreach ($json['line_items'] as $item) {
             if (!in_array($item['sku'], Sku::findall(['excluded' => 'true', 'customer_id' => $this->customerID])) && !empty(trim($item['sku']))) {
@@ -93,7 +81,5 @@ class ShopifyAdapter extends ECommerceAdapter
                 $this->items[] = $orderItem;
             }
         }
-        echo 'built items' . PHP_EOL;
     }
-
 }

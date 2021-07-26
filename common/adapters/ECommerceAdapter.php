@@ -43,8 +43,7 @@ use yii\db\Exception;
 abstract class ECommerceAdapter extends BaseObject
 {
 
-    // TODO: Add types
-    protected ?string $referenceNumber;
+    protected ?string $customer_reference;
     protected int $UUID;
     protected int $status;
     protected string $origin;
@@ -71,7 +70,6 @@ abstract class ECommerceAdapter extends BaseObject
     {
         parent::__construct();
 
-        echo "building order..." . PHP_EOL;
         $this->status = Status::OPEN;
         $this->customerID = $customer_id;
 
@@ -79,48 +77,36 @@ abstract class ECommerceAdapter extends BaseObject
         $this->buildAddress($json);
         $this->buildShipping($json);
         $this->buildItems($json);
-        echo "built order" . PHP_EOL;
     }
 
     public function parse(): Order
     {
-        echo "parsing order..." . PHP_EOL;
         $shipwiseOrder = new Order();
         $shipwiseOrder = self::setGeneralInfo($shipwiseOrder);
         $shipwiseOrder = self::setAddressInfo($shipwiseOrder);
         $shipwiseOrder = self::setShippingInfo($shipwiseOrder);
-        echo "parsed order" . PHP_EOL . PHP_EOL;
         return $shipwiseOrder;
     }
 
     /**
      * @throws Exception
      */
-    public function parseItems(): bool
+    public function parseItems($id)
     {
-        echo "parsing items..." . PHP_EOL;
-        $transaction = \Yii::$app->db->beginTransaction();
-
-        $id = Order::findOne([
-            'status_id' => Status::OPEN,
-            'origin' => $this->origin,
-            'service_id' => $this->shippingService,
-            'uuid' => $this->UUID,
-            'order_reference' => $this->referenceNumber,
-        ])->id;
+        $out = [];
 
         foreach ($this->items as $item) {
-            echo "\tparsing item...\t";
-            if (!(new Item($item))->save(true)) {
-                $transaction->rollBack();
-                return false;
+            $newitem = new Item($item);
+            $newitem->order_id = $id;
+
+            if (!$newitem->validate()) {
+                throw new Exception(implode(PHP_EOL, $newitem->getErrorSummary(true)));
+            } else {
+                $out[] = $newitem;
             }
-            echo "parsed item" . PHP_EOL;
         }
 
-        $transaction->commit();
-        echo "parsed items" . PHP_EOL . PHP_EOL;
-        return true;
+        return $out;
     }
 
     /**
@@ -129,13 +115,12 @@ abstract class ECommerceAdapter extends BaseObject
      */
     private function setGeneralInfo(Order $order): Order
     {
-        echo "\tparsing general...\t";
-        $order->order_reference = $this->referenceNumber;
+        $order->customer_reference = $this->customer_reference;
+        $order->customer_id = $this->customerID;
         $order->uuid = $this->UUID;
         $order->status_id = Status::OPEN;
         $order->origin = $this->origin;
         $order->notes = $this->notes;
-        echo 'parsed general' . PHP_EOL;
         return $order;
     }
 
@@ -146,8 +131,6 @@ abstract class ECommerceAdapter extends BaseObject
      */
     private function setAddressInfo(Order $order): Order
     {
-        echo "\tparsing address..." . PHP_EOL;
-
         $values = [
             'email' => $this->shipToEmail,
             'name' => $this->shipToName,
@@ -168,21 +151,18 @@ abstract class ECommerceAdapter extends BaseObject
             $values['notes'] = $this->orderNotes;
         }
 
-        echo "\t\tcreating new address...\t";
         $address = new Address();
         $address->attributes = $values;
 
         $transaction = \Yii::$app->db->beginTransaction();
         if (!$address->save(true)) {
             $transaction->rollBack();
-            throw new Exception('New address entry could not be created.');
+            //TODO: Email errors to customer?
+            throw new Exception('New address entry could not be created.' . PHP_EOL . implode(PHP_EOL, $address->getErrorSummary(true)));
         }
         $transaction->commit();
-        echo "new address created" . PHP_EOL;
 
         $order->address_id = $address->id;
-        echo "\tparsed address" . PHP_EOL;
-        //$order->ship_from_state_id = State::findByAbbrOrName()->id;
 
         return $order;
     }
@@ -193,11 +173,8 @@ abstract class ECommerceAdapter extends BaseObject
      */
     private function setShippingInfo(Order $order): Order
     {
-        echo "\tparsing shipping...\t";
         $order->carrier_id = Carrier::findOne(["name" => "FedEx"])->id; //TODO: Add ability to handle different carriers
-
         $order->service_id = $this->shippingService;
-        echo 'parsed shipping' . PHP_EOL;
         return $order;
     }
 

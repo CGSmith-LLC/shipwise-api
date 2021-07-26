@@ -5,7 +5,8 @@ namespace console\jobs\orders;
 
 
 use common\models\Integration;
-use yii\console\Exception;
+use common\models\Item;
+use yii\db\Exception;
 use \yii\base\BaseObject;
 use \yii\queue\RetryableJobInterface;
 
@@ -30,7 +31,6 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
     /**
      * @inheritDoc
      * @throws Exception
-     * @throws \yii\db\Exception
      */
     public function execute($queue)
     {
@@ -39,30 +39,40 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
 
         $transaction = \Yii::$app->db->beginTransaction();
 
-        if (!$adapter->parse()->save(true)) {
+        $object = $adapter->parse();
+
+        if (!$object->save(true)) {
             $transaction->rollBack();
-            throw new Exception("Order could not be saved");
+            throw new Exception("Order could not be saved" . PHP_EOL . implode(PHP_EOL, $object->getErrorSummary(true)));
         }
 
-        if(!$adapter->parseItems())
-        {
+        try {
+            $parsedItems = $adapter->parseItems($object->id);
+
+            /** @var Item[] $parsedItems */
+            foreach ($parsedItems as $parsedItem) {
+                if (!$parsedItem->save()) {
+                    throw new Exception('Could not save item.' . PHP_EOL . implode(PHP_EOL, $parsedItem->getErrorSummary(true)));
+                }
+            }
+
+            $transaction->commit();
+        } catch (Exception $e) {
             $transaction->rollBack();
-            throw new Exception("Items could not be saved");
+            throw new Exception($e);
         }
 
-        $transaction->commit();
-
-        \Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $adapter->id]));
+        \Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $object->id]));
 
     }
 
     public function canRetry($attempt, $error)
     {
-        return ($attempt < 5);
+        return true;//($attempt < 5); TODO: Return to stopping attempts
     }
 
     public function getTtr()
     {
-        return 5;//*/15 * 60;TODO: Return to 15 minutes for production; different time better?
+        return 5;//15 * 60;TODO: Return to 15 minutes for production; different time better?
     }
 }

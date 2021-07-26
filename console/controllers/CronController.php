@@ -3,13 +3,9 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
-use common\models\IntegrationMeta;
-use common\services\ShopifyService;
 use console\jobs\orders\ParseOrderJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
-use PHPUnit\Util\ExcludeList;
-use SebastianBergmann\CodeCoverage\Report\PHP;
 
 // To create/edit crontab file: crontab -e
 // To list: crontab -l
@@ -58,7 +54,7 @@ class CronController extends Controller
          * 3. save the orders and create 'ParseOrders' job.
          */
 
-        //if (date('i') % 10 === 0) { TODO: Uncomment If
+        if (date('i') % 10 === 0) {
             /**
              *  foreach customer:
              *      foreach integration:
@@ -66,35 +62,26 @@ class CronController extends Controller
              *          - call parseOrder
              */
 
-            echo 'processing integrations...' . PHP_EOL;
             /** @var Integration $integration */
             foreach (Integration::find()->all() as $integration) {
 
                 $orders = $integration->getService()->getOrders();
 
-                echo "\tpushing orders..." . PHP_EOL;
                 foreach ($orders as $order) {
-                    echo "\t\tpushing order...\t";
                     \Yii::$app->queue->push(new ParseOrderJob([
                         "order" => $order,
                         "ecommerceSite" => $integration->name,
                         "customer_id" => $integration->customer_id,
                     ]));
-                    echo "\t\tpushed order" . PHP_EOL;
                 }
-                echo "\tpushed orders" . PHP_EOL;
             }
-            echo 'processed integrations' . PHP_EOL . PHP_EOL;
-    //    }
+        }
 
         return ExitCode::OK;
     }
 
     public function actionTest()
     {
-        /*IntegrationMeta::addMeta(ShopifyService::META_URL, 'https://hu-kitchen-2.myshopify.com/', 1);//*/
-        /*IntegrationMeta::addMeta(ShopifyService::META_API_KEY, '537fb667e32cadb69c8a42c47ed8e97c', 1);//*/
-        /*IntegrationMeta::addMeta(ShopifyService::META_API_SECRET, '7b3a88dc57b69822a82bbc8956c3fac5', 1);//*/
         return ExitCode::OK;
     }
 
