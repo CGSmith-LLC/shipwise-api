@@ -15,6 +15,7 @@ use yii\db\ActiveRecord;
  * @property string $name
  * @property int $customer_id
  * @property string $ecommerce
+ * @property string $fulfillment
  */
 
 class Integration extends ActiveRecord

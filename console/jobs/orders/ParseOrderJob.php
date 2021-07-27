@@ -19,9 +19,9 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
     public string $order;
 
     /**
-     * @var string $ecommerceSite
+     * @var string $integration_name
      */
-    public string $ecommerceSite;
+    public string $integration_name;
 
     /**
      * @var int $customer_id
@@ -35,7 +35,8 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
     public function execute($queue)
     {
         // TODO: Handle queue-switching logic when more queues are added --> All Order Jobs
-        $adapter = Integration::findone(["name" => $this->ecommerceSite])->getAdapter($this->order, $this->customer_id);
+        $integration = Integration::findone(["name" => $this->integration_name]);
+        $adapter = $integration->getAdapter($this->order, $this->customer_id);
 
         $transaction = \Yii::$app->db->beginTransaction();
 
@@ -62,7 +63,7 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
             throw new Exception($e);
         }
 
-        \Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $object->id]));
+        \Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $object->id, 'fulfillment_name' => $integration->fulfillment]));
 
     }
 

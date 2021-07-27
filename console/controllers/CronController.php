@@ -71,7 +71,7 @@ class CronController extends Controller
                 foreach ($orders as $order) {
                     \Yii::$app->queue->push(new ParseOrderJob([
                         "order" => $order,
-                        "ecommerceSite" => $integration->name,
+                        "integration_name" => $integration->name,
                         "customer_id" => $integration->customer_id,
                     ]));
                 }

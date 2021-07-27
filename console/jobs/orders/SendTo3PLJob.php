@@ -15,6 +15,9 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
     /** @var int Order ID */
     public int $orderId;
 
+    /** @var int Order ID */
+    public int $fulfillment_name;
+
     /**
      * @inheritDoc
      */
