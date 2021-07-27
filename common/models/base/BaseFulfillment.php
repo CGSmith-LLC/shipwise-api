@@ -6,11 +6,7 @@ namespace common\models\base;
 /**
  * This is the model class for table `fulfillment_meta`
  *
- * @property int    $id
- * @property int    $integration_id
- * @property string $key
- * @property string $value
- * @property string $created_date
+ * @property string $name;
  */
 class BaseFulfillment extends \yii\db\ActiveRecord
 {

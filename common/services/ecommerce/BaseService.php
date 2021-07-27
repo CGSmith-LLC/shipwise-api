@@ -1,7 +1,7 @@
 <?php
 
 
-namespace common\services;
+namespace common\services\ecommerce;
 
 
 class BaseService extends \yii\base\BaseObject implements ECommerceService

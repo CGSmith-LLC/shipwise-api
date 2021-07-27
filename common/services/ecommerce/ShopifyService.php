@@ -1,7 +1,7 @@
 <?php
 
 
-namespace common\services;
+namespace common\services\ecommerce;
 
 
 use common\models\IntegrationMeta;

@@ -1,6 +1,6 @@
 <?php
 
-namespace common\adapters;
+namespace common\adapters\ecommerce;
 
 use common\models\shipping\Service;
 use common\models\Sku;

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace common\adapters;
+namespace common\adapters\fulfillment;
 
 use common\models\Order;
 use yii\base\Component;

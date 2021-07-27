@@ -8,7 +8,7 @@ class Fulfillment extends base\BaseFulfillment
 {
     public function getAdapter()
     {
-
+		$adaptername = "\\common\\adapters\\fulfillment\\" . $this->name . "Adapter";
     }
 
     /**

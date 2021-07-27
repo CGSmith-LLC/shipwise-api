@@ -3,7 +3,9 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
+use common\models\Fulfillment;
 use common\models\IntegrationMeta;
+use common\models\shopify\FulfillmentMeta;
 use console\jobs\orders\ParseOrderJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
@@ -83,20 +85,15 @@ class CronController extends Controller
 
     public function actionTest()
     {
-        /*$newInt = new Integration([
-            'name' => "test",
-            'customer_id' => -1,
-            'ecommerce' => 'shopify',
-            'fulfillment' => 'coldco',
+        $newInt = new Fulfillment([
+            'name' => "Coldco",
         ]);
 
-        $newInt->save();*/
+        $newInt->save();//*/
 
-        //IntegrationMeta::addMeta('url', 'https://cgsmith105.myshopify.com',2);
+        FulfillmentMeta::addMeta('access_token', '', $newInt->id);
         //IntegrationMeta::addMeta('api_key', '4d3f8cfe2fe56cffd14beca0ca583cd2',2);
         //IntegrationMeta::addMeta('api_secret', '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',2);
-
-
 
         return ExitCode::OK;
     }

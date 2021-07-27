@@ -1,7 +1,7 @@
 <?php
 
 
-namespace common\adapters;
+namespace common\adapters\fulfillment;
 
 
 use common\models\Address;
@@ -39,9 +39,16 @@ class ColdcoAdapter extends FulfillmentAdapter
         return $config;
     }
 
-    private function buildCustomerID(array $arr, int $id): array
+    private function buildCustomerID(array $arr, int $shipwiseID): array
 	{
-		$arr['customerIdentifier']['id'] = $id; // Test Id. TODO: Get Coldco customer ID for each customer & handle switching
+		switch($shipwiseID)
+		{
+			default:
+				$coldcoID = 28;
+				break;
+		}
+
+		$arr['customerIdentifier']['id'] = $coldcoID; // Test Id. TODO: Get Coldco customer ID for each customer & handle switching
 		return $arr;
 	}
 

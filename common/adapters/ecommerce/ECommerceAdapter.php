@@ -1,7 +1,7 @@
 <?php
 
 
-namespace common\adapters;
+namespace common\adapters\ecommerce;
 
 
 use common\models\Address;
