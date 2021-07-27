@@ -5,15 +5,17 @@ namespace common\adapters;
 
 
 use common\models\Address;
+use common\models\Item;
 use common\models\Order;
 use common\models\State;
+use function PHPUnit\Framework\isNull;
 
 class ColdcoAdapter extends FulfillmentAdapter
 {
     public const RENO_ID = 2;
     public const ST_LOUIS_ID = 1;
 
-    public function getRequestInfo(Order $order): array
+    public function getRequestInfo(Order $order, bool $deferNotification = false): array
     {
         $config = [];
 
@@ -23,6 +25,11 @@ class ColdcoAdapter extends FulfillmentAdapter
         $config = $this->buildRoutingInfo($config, $order);
         $config = $this->buildShipTo($config, $order->address);
         $config = $this->buildSavedElements($config, $order);
+        $config = $this->buildItems($config, $order->items);
+
+        if($deferNotification) {
+        	$config['defernotification'] = true;
+		}
 
 		$event = new \CartonizationEvent();
 		$event->customer_id = $order->customer_id;
@@ -69,6 +76,7 @@ class ColdcoAdapter extends FulfillmentAdapter
 		$arr['earliestShipDate'] = "";//????
 		$arr['shipCancelDate'] = "";//????
 		$arr['shippingNotes'] = "";// Carrier Notes different from notes ????
+		//if($this->hasInfo($order->purchaseOrder)) $arr['PoNum'] = $order->purchaseOrder
 
 		return $arr;
 	}
@@ -81,6 +89,14 @@ class ColdcoAdapter extends FulfillmentAdapter
 		$routingInfo['carrier'] = $this->getCarrier($order->carrier_id);
 		$routingInfo['mode'] = $this->getService($order->service_id);
 		$routingInfo['account'] = "";
+
+		if($this->hasInfo($order->tracking)) {
+			$routingInfo['TrackingNumber'] = $order->tracking;
+		}
+
+		if($this->hasInfo($order->ship_from_zip)) {
+			$routingInfo['shipPointZip'] = $order->ship_from_zip;
+		}
 
 		$arr['routingInfo'] = $routingInfo;
 		return $arr;
@@ -109,9 +125,19 @@ class ColdcoAdapter extends FulfillmentAdapter
     	$shipto['country'] = $address->country;
     	$shipto['phoneNumber'] = $address->phone;
 
-    	$arr['shipto'] = $shipto;
+    	if($this->hasInfo($address->email)) {
+			$shipto['emailAddress'] = $address->email;
+		}
 
-    	return $arr;
+    	if($this->hasInfo($address->address2)) {
+			$shipto['emailAddress'] = $address->address2;
+		}
+
+		$arr['shipTo'] = $shipto;
+
+		//if($address->isResidential()) $arr['UpsIsResidential'] = true;
+
+		return $arr;
 	}
 
 	private function buildSavedElements(array $arr, Order $order): array
@@ -137,5 +163,31 @@ class ColdcoAdapter extends FulfillmentAdapter
     	$arr['savedElements'] = $savedElements;
 
 		return $arr;
+	}
+
+	/** @var Item[] $items */
+	private function buildItems(array $arr, array $items): array
+	{
+		$orderItems = [];
+
+		$iItem = 0;
+
+		foreach ($items as $item) {
+			$orderItems[$iItem]['itemIdentifier']['sku'] = $item->sku;
+			$orderItems[$iItem]['qty'] = $item->quantity;
+			//if(!isNull($item->????)) $orderItems[$iItem]['serialNumber'] = $item->???? TODO: Serial number?
+			$iItem++;
+		}
+
+		if(!empty($orderItems)) {
+			$arr['orderItems'] = $orderItems;
+		}
+
+		return $arr;
+	}
+
+	private function hasInfo($var): bool
+	{
+		return !is_null($var) && !empty($var);
 	}
 }
