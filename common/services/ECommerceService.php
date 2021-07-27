@@ -2,10 +2,11 @@
 
 namespace common\services;
 
-interface ECommerceInterface
+interface ECommerceService
 {
 
     public function getOrders(): array;
+    public function applyMeta();
 
     /**
      * TODO: Declare these methods when we need them

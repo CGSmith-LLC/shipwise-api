@@ -21,8 +21,6 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
     public function execute($queue)
     {
 
-        throw new \yii\db\Exception('die');
-
         /**
          * Find order
          * @var Order $order
