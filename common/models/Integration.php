@@ -29,8 +29,8 @@ class Integration extends ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'customer_id', 'ecommerce'],"required"],
-            [['name', 'ecommerce'], 'string', 'max' => 64],
+            [['name', 'customer_id', 'ecommerce', 'fulfillment'],"required"],
+            [['name', 'ecommerce', 'fulfillment'], 'string', 'max' => 64],
             [['customer_id'], 'integer'],
         ];
     }

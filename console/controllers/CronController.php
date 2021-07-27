@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
+use common\models\IntegrationMeta;
 use console\jobs\orders\ParseOrderJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
@@ -54,7 +55,7 @@ class CronController extends Controller
          * 3. save the orders and create 'ParseOrders' job.
          */
 
-        if (date('i') % 10 === 0) {
+        //if (date('i') % 10 === 0) {
             /**
              *  foreach customer:
              *      foreach integration:
@@ -75,13 +76,28 @@ class CronController extends Controller
                     ]));
                 }
             }
-        }
+        //}
 
         return ExitCode::OK;
     }
 
     public function actionTest()
     {
+        /*$newInt = new Integration([
+            'name' => "test",
+            'customer_id' => -1,
+            'ecommerce' => 'shopify',
+            'fulfillment' => 'coldco',
+        ]);
+
+        $newInt->save();*/
+
+        //IntegrationMeta::addMeta('url', 'https://cgsmith105.myshopify.com',2);
+        //IntegrationMeta::addMeta('api_key', '4d3f8cfe2fe56cffd14beca0ca583cd2',2);
+        //IntegrationMeta::addMeta('api_secret', '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',2);
+
+
+
         return ExitCode::OK;
     }
 

@@ -46,7 +46,6 @@ class ShopifyAdapter extends ECommerceAdapter
     {
         if (!isset($json["shipping_lines"][0]["code"])) {
             $this->shippingService = Service::findOne(["shipwise_code" => "FedExGround"])->id;
-            echo 'built shipping' . PHP_EOL;
             return;
         }
 
