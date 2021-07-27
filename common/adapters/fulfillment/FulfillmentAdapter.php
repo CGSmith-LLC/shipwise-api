@@ -4,8 +4,11 @@
 namespace common\adapters;
 
 use common\models\Order;
+use yii\base\Component;
 
-interface FulfillmentAdapter
+abstract class FulfillmentAdapter extends Component
 {
-    public function getRequestInfo(Order $order): array;
+	public const EVENT_CARTONIZATION = 'cartonizationEvent'; // TODO: Attach CartonizationEvent::handleEvent to this event
+
+    public abstract function getRequestInfo(Order $order): array;
 }

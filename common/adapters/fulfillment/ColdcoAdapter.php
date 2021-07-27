@@ -5,8 +5,9 @@ namespace common\adapters;
 
 
 use common\models\Order;
+use yii\base\Component;
 
-class ColdcoAdapter implements FulfillmentAdapter
+class ColdcoAdapter extends FulfillmentAdapter
 {
     public const RENO_ID = 2;
     public const ST_LOUIS_ID = 1;
@@ -45,7 +46,10 @@ class ColdcoAdapter implements FulfillmentAdapter
 
         // Dry Ice logic
 
-        // Cartonization
+		$event = new \CartonizationEvent();
+		$event->customer_id = $order->customer_id;
+		$event->items = $order->items;
+        $this->trigger(self::EVENT_CARTONIZATION, $event);
 
         // Sending the Order
 
