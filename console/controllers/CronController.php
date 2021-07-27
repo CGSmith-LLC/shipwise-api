@@ -85,13 +85,14 @@ class CronController extends Controller
 
     public function actionTest()
     {
+    	/*
         $newInt = new Fulfillment([
             'name' => "Coldco",
         ]);
 
         $newInt->save();//*/
 
-        FulfillmentMeta::addMeta('access_token', '', $newInt->id);
+        //FulfillmentMeta::addMeta('access_token', '', 1);
         //IntegrationMeta::addMeta('api_key', '4d3f8cfe2fe56cffd14beca0ca583cd2',2);
         //IntegrationMeta::addMeta('api_secret', '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',2);
 

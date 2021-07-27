@@ -9,7 +9,7 @@ use yii\console\Exception;
 use yii\helpers\Json;
 use yii\httpclient\Client;
 
-class ShopifyService extends BaseService
+class ShopifyService extends BaseEcommerceService
 {
     /**
      * @var Client $client
@@ -30,10 +30,10 @@ class ShopifyService extends BaseService
     /**
      * Ingest an array of the meta data for the service and apply to internal objects where needed
      *
-     * @todo Change function name to buildComponents???
-     * @param array $integrationMeta
+     * @param array $metadata
+     *@todo Change function name to buildComponents???
      */
-    public function applyMeta(array $integrationMeta)
+    public function applyMeta(array $metadata)
     {
         // init variable
         $auth = [];
@@ -41,7 +41,7 @@ class ShopifyService extends BaseService
         /**
          * @var IntegrationMeta $meta
          */
-        foreach ($integrationMeta as $meta) {
+        foreach ($metadata as $meta) {
             if ($meta->key === self::META_URL) {
                 $this->client = new Client(['baseUrl' => $meta->decryptedValue()]);
             }

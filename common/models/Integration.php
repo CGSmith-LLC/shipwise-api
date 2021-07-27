@@ -4,8 +4,7 @@
 namespace common\models;
 
 use common\adapters\ecommerce\ECommerceAdapter;
-use common\services\ecommerce\BaseService;
-use common\services\ecommerce\ShopifyService;
+use common\services\ecommerce\BaseEcommerceService;
 use yii\db\ActiveRecord;
 
 /**
@@ -53,16 +52,16 @@ class Integration extends ActiveRecord
     }
 
     /**
-     * @return BaseService
+     * @return BaseEcommerceService
      */
-    public function getService(): BaseService
+    public function getService(): BaseEcommerceService
     {
-        $interfacename = '\\common\\services\\ecommerce\\' . ucfirst($this->ecommerce) . 'Service';
+        $serviceName = '\\common\\services\\ecommerce\\' . ucfirst($this->ecommerce) . 'Service';
 
-        /** @var BaseService $interface */
-        $interface = new $interfacename();
-        $interface->applyMeta(IntegrationMeta::findAll(['integration_id' => $this->id]));
+        /** @var BaseEcommerceService $service */
+        $service = new $serviceName();
+        $service->applyMeta(IntegrationMeta::findAll(['integration_id' => $this->id]));
 
-        return $interface;
+        return $service;
     }
 }

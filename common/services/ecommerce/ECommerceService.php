@@ -2,11 +2,16 @@
 
 namespace common\services\ecommerce;
 
+
+use common\models\IntegrationMeta;
+
 interface ECommerceService
 {
 
     public function getOrders(): array;
-    public function applyMeta();
+
+    /** @param IntegrationMeta[] $metadata */
+    public function applyMeta(array $metadata);
 
     /**
      * TODO: Declare these methods when we need them

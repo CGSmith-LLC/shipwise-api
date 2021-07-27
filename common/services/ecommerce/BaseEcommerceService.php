@@ -4,10 +4,10 @@
 namespace common\services\ecommerce;
 
 
-class BaseService extends \yii\base\BaseObject implements ECommerceService
+class BaseEcommerceService extends \yii\base\BaseObject implements ECommerceService
 {
 
-    public function applyMeta()
+    public function applyMeta(array $metadata)
     {
         // TODO: Implement applyMeta() method.
     }
