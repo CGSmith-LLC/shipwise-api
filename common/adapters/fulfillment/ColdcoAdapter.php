@@ -10,7 +10,7 @@ use common\models\Order;
 use common\models\State;
 use function PHPUnit\Framework\isNull;
 
-class ColdcoAdapter extends FulfillmentAdapter
+class ColdcoAdapter extends BaseFulfillmentAdapter
 {
     public const RENO_ID = 2;
     public const ST_LOUIS_ID = 1;

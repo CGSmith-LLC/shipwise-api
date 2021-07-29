@@ -3,7 +3,7 @@
 
 namespace common\models;
 
-use common\adapters\ecommerce\ECommerceAdapter;
+use common\adapters\ecommerce\BaseECommerceAdapter;
 use common\services\ecommerce\BaseEcommerceService;
 use yii\db\ActiveRecord;
 
@@ -45,7 +45,7 @@ class Integration extends ActiveRecord
         ];
     }
 
-    public function getAdapter($json, $customer_id): ECommerceAdapter
+    public function getAdapter($json, $customer_id): BaseECommerceAdapter
     {
         $adaptername = '\\common\\adapters\\ecommerce\\' . ucfirst($this->ecommerce) . 'Adapter';
         return new $adaptername($json, $customer_id);
@@ -60,7 +60,7 @@ class Integration extends ActiveRecord
 
         /** @var BaseEcommerceService $service */
         $service = new $serviceName();
-        $service->applyMeta(IntegrationMeta::findAll(['integration_id' => $this->id]));
+        $service->applyMeta(IntegrationMeta::find()->where(['integration_id' => $this->id])->all());
 
         return $service;
     }

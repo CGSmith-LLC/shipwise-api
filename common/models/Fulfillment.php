@@ -23,7 +23,7 @@ class Fulfillment extends base\BaseFulfillment
 
 		/** @var BaseFulfillmentService $service */
 		$service = new $serviceName();
-		$service->applyMeta(FulfillmentMeta::findAll(['integration_id' => $this->id]));
+		$service->applyMeta(FulfillmentMeta::find()->where(['integration_id' => $this->id])->all());
 
 		return $service;
     }

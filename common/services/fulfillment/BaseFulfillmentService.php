@@ -4,10 +4,9 @@ namespace common\services\fulfillment;
 
 use yii\base\BaseObject;
 
-class BaseFulfillmentService extends BaseObject implements FulfillmentService
+abstract class BaseFulfillmentService extends BaseObject implements FulfillmentService
 {
-	public function applyMeta(array $metadata)
-	{
-		// TODO: Implement applyMeta() method.
-	}
+	public abstract function applyMeta(array $metadata);
+
+	public abstract function makeRequest(array $requestInfo): bool;
 }

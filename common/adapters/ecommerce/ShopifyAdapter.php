@@ -6,7 +6,7 @@ use common\models\shipping\Service;
 use common\models\Sku;
 use yii\helpers\Json;
 
-class ShopifyAdapter extends ECommerceAdapter
+class ShopifyAdapter extends BaseECommerceAdapter
 {
     public function __construct($orderJSON, $customer_id)
     {
@@ -72,7 +72,7 @@ class ShopifyAdapter extends ECommerceAdapter
     {
         $this->items = [];
         foreach ($json['line_items'] as $item) {
-            if (!in_array($item['sku'], Sku::findall(['excluded' => 'true', 'customer_id' => $this->customerID])) && !empty(trim($item['sku']))) {
+            if (!in_array($item['sku'], Sku::find()->where(['excluded' => 'true', 'customer_id' => $this->customerID])->all()) && !empty(trim($item['sku']))) {
                 $orderItem = [];
                 $orderItem["name"] = $item['name'];
                 $orderItem["quantity"] = $item['quantity'];
