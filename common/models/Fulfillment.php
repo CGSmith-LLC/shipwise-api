@@ -5,6 +5,7 @@ namespace common\models;
 
 
 use common\models\shopify\FulfillmentMeta;
+use common\services\fulfillment\BaseFulfillmentService;
 
 class Fulfillment extends base\BaseFulfillment
 {
