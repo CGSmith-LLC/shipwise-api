@@ -36,7 +36,7 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
         $service = $fulfillment->getService();
 
         if(!$service->makeCreateOrderRequest($adapter->getRequestInfo($order))) {
-
+			throw new Exception('POST Request failed');
 		}
 
 

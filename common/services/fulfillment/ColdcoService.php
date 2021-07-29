@@ -12,6 +12,7 @@ use yii\httpclient\Exception;
 class ColdcoService extends BaseFulfillmentService
 {
 	private const META_URL = "url";
+	private const META_TOKEN = "access_token";
 
 	private Client $client;
 	private string $access_token;
@@ -23,6 +24,9 @@ class ColdcoService extends BaseFulfillmentService
 			switch ($metadatum->key) {
 				case self::META_URL:
 					$this->client = new Client(['baseUrl' => $metadatum->decryptedValue()]);
+					break;
+				case self::META_TOKEN:
+					$this->access_token = $metadatum->decryptedValue();
 					break;
 			}
 		}
