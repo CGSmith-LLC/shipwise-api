@@ -5,6 +5,7 @@ namespace common\services\ecommerce;
 
 
 use common\models\IntegrationMeta;
+use yii\base\BaseObject;
 use yii\console\Exception;
 use yii\helpers\Json;
 use yii\httpclient\Client;
@@ -42,15 +43,18 @@ class ShopifyService extends BaseEcommerceService
          * @var IntegrationMeta $meta
          */
         foreach ($metadata as $meta) {
-            if ($meta->key === self::META_URL) {
-                $this->client = new Client(['baseUrl' => $meta->decryptedValue()]);
-            }
-            if ($meta->key === self::META_API_KEY) {
-                $auth[0] = $meta->decryptedValue();
-            }
-            if ($meta->key === self::META_API_SECRET) {
-                $auth[1] = $meta->decryptedValue();
-            }
+        	switch($meta->key)
+			{
+				case self::META_URL:
+					$this->client = new Client(['baseUrl' => $meta->decryptedValue()]);
+					break;
+				case self::META_API_KEY:
+					$auth[0] = $meta->decryptedValue();
+					break;
+				case self::META_API_SECRET:
+					$auth[1] = $meta->decryptedValue();
+					break;
+			}
         }
 
         // add semicolon to end for BASIC auth

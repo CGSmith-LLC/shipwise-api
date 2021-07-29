@@ -8,5 +8,5 @@ abstract class BaseFulfillmentService extends BaseObject implements FulfillmentS
 {
 	public abstract function applyMeta(array $metadata);
 
-	public abstract function makeRequest(array $requestInfo): bool;
+	public abstract function makeCreateOrderRequest(array $requestInfo): bool;
 }

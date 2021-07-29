@@ -4,15 +4,45 @@
 namespace common\services\fulfillment;
 
 
+use common\models\FulfillmentMeta;
+use yii\base\InvalidConfigException;
+use yii\httpclient\Client;
+use yii\httpclient\Exception;
+
 class ColdcoService extends BaseFulfillmentService
 {
+	private const META_URL = "url";
+
+	private Client $client;
+	private string $access_token;
+
 	public function applyMeta(array $metadata)
 	{
-		// TODO: Implement applyMeta() method.
+		/** @var FulfillmentMeta $metadatum */
+		foreach ($metadata as $metadatum) {
+			switch ($metadatum->key) {
+				case self::META_URL:
+					$this->client = new Client(['baseUrl' => $metadatum->decryptedValue()]);
+					break;
+			}
+		}
 	}
 
-	public function makeRequest(array $requestInfo): bool
+	public function makeCreateOrderRequest(array $requestInfo): bool
 	{
-		// TODO: Implement makeRequest() method.
+		try {
+			$response = $this->client->createRequest()
+				->setMethod('POST')
+				->setHeaders(['Authorization' => "BEARER {$this->access_token}"])
+				->setContent(implode('', $requestInfo))
+				->send();
+			if ($response->isOk) {
+				return true;
+			}
+		} catch (Exception | InvalidConfigException $e) {
+
+		}
+
+		return false;
 	}
 }

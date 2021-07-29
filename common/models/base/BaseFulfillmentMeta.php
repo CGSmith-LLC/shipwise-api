@@ -3,8 +3,17 @@
 
 namespace common\models\base;
 
-
 use yii\db\ActiveRecord;
+
+/**
+ * This is the model class for table `fulfillment_meta`
+ *
+ * @property int 	$id
+ * @property int 	$fulfillment_id
+ * @property string $key
+ * @property string $value
+ * @property string $created_date
+ */
 
 class BaseFulfillmentMeta extends ActiveRecord
 {

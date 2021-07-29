@@ -3,6 +3,8 @@
 
 namespace common\models\base;
 
+use \yii\db\ActiveRecord;
+
 /**
  * This is the model class for table `integration_meta`
  *
@@ -13,7 +15,7 @@ namespace common\models\base;
  * @property string $created_date
  */
 
-class BaseIntegrationMeta extends \yii\db\ActiveRecord
+class BaseIntegrationMeta extends ActiveRecord
 {
     /**
      * {@inheritdoc}

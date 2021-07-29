@@ -16,7 +16,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
     public const RENO_ID = 2;
     public const ST_LOUIS_ID = 1;
 
-    public function getRequestInfo(Order $order, bool $deferNotification = false): array
+    public function getCreateOrderRequestInfo(Order $order, bool $deferNotification = false): array
     {
         $config = [];
 
