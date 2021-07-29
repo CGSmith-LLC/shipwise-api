@@ -1,13 +1,13 @@
 <?php
 
 
-namespace common\models\shopify;
+namespace common\models;
 
 
-use yii\base\BaseObject;
+use common\models\base\BaseFulfillmentMeta;
 use yii\db\Exception;
 
-class FulfillmentMeta extends \common\models\base\BaseFulfillmentMeta
+class FulfillmentMeta extends BaseFulfillmentMeta
 {
     /**
      * @throws Exception

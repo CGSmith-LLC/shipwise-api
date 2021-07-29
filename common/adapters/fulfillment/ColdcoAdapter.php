@@ -4,11 +4,12 @@
 namespace common\adapters\fulfillment;
 
 
+use CartonizationEvent;
 use common\models\Address;
 use common\models\Item;
 use common\models\Order;
 use common\models\State;
-use function PHPUnit\Framework\isNull;
+use stdClass;
 
 class ColdcoAdapter extends BaseFulfillmentAdapter
 {
@@ -31,7 +32,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
         	$config['defernotification'] = true;
 		}
 
-		$event = new \CartonizationEvent();
+		$event = new CartonizationEvent();
 		$event->customer_id = $order->customer_id;
 		$event->items = $order->items;
         $this->trigger(self::EVENT_CARTONIZATION, $event);
@@ -149,15 +150,15 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 	private function buildSavedElements(array $arr, Order $order): array
 	{
-		$origin = new \stdClass();
+		$origin = new stdClass();
 		$origin->name = 'Origin';
 		$origin->value = is_null($order->origin) ? 'Unknown' : $order->origin;
 
-		$shipwise = new \stdClass();
+		$shipwise = new stdClass();
 		$shipwise->name = 'Shipwise ID';
 		$shipwise->value = $order->id;
 
-		$transit = new \stdClass();
+		$transit = new stdClass();
 		$transit->name = 'Est Transit';
 		//$transit->value = is_null($order->????) ? 'Unknown' : $order->????; TODO: Transit time
 

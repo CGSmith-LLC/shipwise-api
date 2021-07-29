@@ -4,7 +4,6 @@
 namespace common\models;
 
 
-use common\models\shopify\FulfillmentMeta;
 use common\services\fulfillment\BaseFulfillmentService;
 
 class Fulfillment extends base\BaseFulfillment
@@ -19,7 +18,7 @@ class Fulfillment extends base\BaseFulfillment
      */
     public function getService()
     {
-		$serviceName = "\\common\\adapters\\fulfillment\\" . $this->name . "Service";
+		$serviceName = "\\common\\services\\fulfillment\\" . $this->name . "Service";
 
 		/** @var BaseFulfillmentService $service */
 		$service = new $serviceName();

@@ -5,7 +5,6 @@ namespace common\adapters\fulfillment;
 
 use common\models\Order;
 use yii\base\BaseObject;
-use yii\base\Component;
 
 abstract class BaseFulfillmentAdapter extends BaseObject implements FulfillmentAdapter
 {

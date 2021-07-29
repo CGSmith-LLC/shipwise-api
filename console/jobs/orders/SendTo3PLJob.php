@@ -4,7 +4,6 @@
 namespace console\jobs\orders;
 
 
-use common\components\ColdcoFulfillmentService;
 use common\models\Order;
 use yii\console\Exception;
 use yii\queue\RetryableJobInterface;

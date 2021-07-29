@@ -4,7 +4,7 @@
 namespace common\services\fulfillment;
 
 
-use common\models\shopify\FulfillmentMeta;
+use common\models\FulfillmentMeta;
 
 interface FulfillmentService
 {

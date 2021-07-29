@@ -3,12 +3,15 @@
 
 namespace common\models\base;
 
+use yii\db\ActiveRecord;
+
 /**
- * This is the model class for table `fulfillment_meta`
+ * This is the model class for table `fulfillment`
  *
+ * @property int $id;
  * @property string $name;
  */
-class BaseFulfillment extends \yii\db\ActiveRecord
+class BaseFulfillment extends ActiveRecord
 {
     /** @inheritDoc */
     public static function tableName()
