@@ -114,7 +114,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 	private function getCarrier(int $id): string
 	{
-		$carrierIds = array_flip(Carrier::getShipwiseCodes());
+		$carrierIds = array_flip(array: Carrier::getShipwiseCodes());
 
 		return match ($id) {
 			$carrierIds['FedEx'] => 'FedEx',
