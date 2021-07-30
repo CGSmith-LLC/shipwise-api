@@ -29,6 +29,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
 
             'sku',
             'name',
+            'excluded:boolean',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

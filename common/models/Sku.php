@@ -34,7 +34,8 @@ class Sku extends \yii\db\ActiveRecord
         return [
             [['sku'], 'string', 'max' => 16],
             [['name', 'substitute_1', 'substitute_2', 'substitute_3'], 'string', 'max' => 64],
-            [['customer_id'], 'integer']
+            [['customer_id'], 'integer'],
+            [['excluded'], 'integer']
         ];
     }
 
@@ -57,6 +58,7 @@ class Sku extends \yii\db\ActiveRecord
             'sku' => 'Sku',
             'name' => 'Item Name',
             'customer_id' => 'Customer',
+            'excluded' => 'Excluded'
         ];
     }
 
