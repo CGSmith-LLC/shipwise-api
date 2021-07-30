@@ -3,9 +3,6 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
-use common\models\Fulfillment;
-use common\models\IntegrationMeta;
-use common\models\shopify\FulfillmentMeta;
 use console\jobs\orders\ParseOrderJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
@@ -58,26 +55,26 @@ class CronController extends Controller
          */
 
         //if (date('i') % 10 === 0) {
-            /**
-             *  foreach customer:
-             *      foreach integration:
-             *          - Get integration metadata
-             *          - call parseOrder
-             */
+        /**
+         *  foreach customer:
+         *      foreach integration:
+         *          - Get integration metadata
+         *          - call parseOrder
+         */
 
-            /** @var Integration $integration */
-            foreach (Integration::find()->all() as $integration) {
+        /** @var Integration $integration */
+        foreach (Integration::find()->all() as $integration) {
 
-                $orders = $integration->getService()->getOrders();
+            $orders = $integration->getService()->getOrders();
 
-                foreach ($orders as $order) {
-                    \Yii::$app->queue->push(new ParseOrderJob([
-                        "order" => $order,
-                        "integration_name" => $integration->name,
-                        "customer_id" => $integration->customer_id,
-                    ]));
-                }
+            foreach ($orders as $order) {
+                \Yii::$app->queue->push(new ParseOrderJob([
+                    "order" => $order,
+                    "integration_name" => $integration->name,
+                    "customer_id" => $integration->customer_id,
+                ]));
             }
+        }
         //}
 
         return ExitCode::OK;
@@ -85,7 +82,7 @@ class CronController extends Controller
 
     public function actionTest()
     {
-    	/*
+        /*
         $newInt = new Fulfillment([
             'name' => "Coldco",
         ]);

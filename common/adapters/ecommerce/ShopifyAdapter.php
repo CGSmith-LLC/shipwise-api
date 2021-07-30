@@ -4,6 +4,7 @@ namespace common\adapters\ecommerce;
 
 use common\models\shipping\Service;
 use common\models\Sku;
+use common\models\State;
 use yii\helpers\Json;
 
 class ShopifyAdapter extends BaseECommerceAdapter
@@ -33,7 +34,7 @@ class ShopifyAdapter extends BaseECommerceAdapter
         }
         $this->shipToCompany = $json['shipping_address']['company'];
         $this->shipToCity = $json['shipping_address']['city'];
-        $this->shipToState = $json['shipping_address']['province'];
+        $this->shipToState = State::findOne(['name' => $json['shipping_address']['province']])->id;
         $this->shipToZip = $json['shipping_address']['zip'];
         $this->shipToPhone = $json['shipping_address']['phone'];
         $this->shipToCountry = $json['shipping_address']['country_code'];

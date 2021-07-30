@@ -51,7 +51,7 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
     protected ?string $orderNotes;
     protected int $customerID;
 
-    protected string $shipToEmail;
+    protected ?string $shipToEmail;
     protected string $shipToName;
     protected string $shipToAddress1;
     protected ?string $shipToAddress2;
@@ -89,8 +89,8 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
     }
 
     /**
+     * @return Item[]
      * @throws Exception
-	 * @return Item[]
      */
     public function parseItems(int $id): array
     {
@@ -138,7 +138,7 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
             'address1' => $this->shipToAddress1,
             'company' => $this->shipToCompany,
             'city' => $this->shipToCity,
-            'state_id' => State::findByAbbrOrName(country: $this->shipToCountry, name: $this->shipToState)->id,
+            'state_id' => $this->shipToState,
             'zip' => $this->shipToZip,
             'phone' => $this->shipToPhone,
             'country' => $this->shipToCountry,
