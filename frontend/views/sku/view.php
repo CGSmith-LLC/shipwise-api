@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'sku',
             'name',
+            'excluded:boolean',
             [
                 'attribute' => 'customer',
                 'value' => $model->customer->name,
