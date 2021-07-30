@@ -5,7 +5,7 @@ namespace console\controllers;
 use common\models\BulkAction;
 use common\models\Fulfillment;
 use common\models\IntegrationMeta;
-use common\models\shopify\FulfillmentMeta;
+use common\models\FulfillmentMeta;
 use console\jobs\orders\ParseOrderJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;

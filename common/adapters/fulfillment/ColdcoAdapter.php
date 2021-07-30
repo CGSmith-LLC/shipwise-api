@@ -8,42 +8,43 @@ use CartonizationEvent;
 use common\models\Address;
 use common\models\Item;
 use common\models\Order;
+use common\models\shipping\Carrier;
+use common\models\shipping\Service;
 use common\models\State;
 use stdClass;
 
 class ColdcoAdapter extends BaseFulfillmentAdapter
 {
-    public const RENO_ID = 2;
-    public const ST_LOUIS_ID = 1;
+	public const RENO_ID = 2;
+	public const ST_LOUIS_ID = 1;
 
-    public function getCreateOrderRequestInfo(Order $order, bool $deferNotification = false): array
-    {
-        $config = [];
+	public function getCreateOrderRequestInfo(Order $order, bool $deferNotification = false): array
+	{
+		$config = [];
 
 		$config = $this->buildGeneral(arr: $config, order: $order);
 		$config = $this->buildCustomerID(arr: $config, shipwiseID: $this->customer_id);
 		$config = $this->buildFacilityID(arr: $config, state: $order->address->state);
-        $config = $this->buildRoutingInfo(arr: $config, order: $order);
-        $config = $this->buildShipTo(arr: $config, address: $order->address);
-        $config = $this->buildSavedElements(arr: $config, order: $order);
-        $config = $this->buildItems(arr: $config, items: $order->items);
+		$config = $this->buildRoutingInfo(arr: $config, order: $order);
+		$config = $this->buildShipTo(arr: $config, address: $order->address);
+		$config = $this->buildSavedElements(arr: $config, order: $order);
+		$config = $this->buildItems(arr: $config, items: $order->items);
 
-        if($deferNotification) {
-        	$config['defernotification'] = true;
+		if ($deferNotification) {
+			$config['defernotification'] = true;
 		}
 
 		$event = new CartonizationEvent();
 		$event->customer_id = $order->customer_id;
 		$event->items = $order->items;
-        $this->trigger(self::EVENT_CARTONIZATION, $event);
+		$this->trigger(self::EVENT_CARTONIZATION, $event);
 
-        return $config;
-    }
+		return $config;
+	}
 
-    private function buildCustomerID(array $arr, int $shipwiseID): array
+	private function buildCustomerID(array $arr, int $shipwiseID): array
 	{
-		switch($shipwiseID)
-		{
+		switch ($shipwiseID) {
 			default:
 				$coldcoID = 28;
 				break;
@@ -55,8 +56,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 	private function buildFacilityID(array $arr, State $state): array
 	{
-		switch($state->abbreviation)
-		{
+		switch ($state->abbreviation) {
 			case 'CA':
 			case 'OR':
 			case 'WA':
@@ -85,7 +85,8 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		$arr['shipCancelDate'] = "";//????
 		$arr['shippingNotes'] = "";
 		$arr['notes'] = $order->notes . ' ' . (is_null($order->origin) ? '' : $order->origin);
-		//if($this->hasInfo($order->purchaseOrder)) $arr['PoNum'] = $order->purchaseOrder
+
+		if ($this->hasInfo($order->po_number)) $arr['PoNum'] = $order->po_number;
 
 		return $arr;
 	}
@@ -99,11 +100,11 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		$routingInfo['mode'] = $this->getService(id: $order->service_id);
 		$routingInfo['account'] = "";
 
-		if($this->hasInfo($order->tracking)) {
+		if ($this->hasInfo($order->tracking)) {
 			$routingInfo['TrackingNumber'] = $order->tracking;
 		}
 
-		if($this->hasInfo($order->ship_from_zip)) {
+		if ($this->hasInfo($order->ship_from_zip)) {
 			$routingInfo['shipPointZip'] = $order->ship_from_zip;
 		}
 
@@ -113,32 +114,46 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 	private function getCarrier(int $id): string
 	{
-		return "";
+		$carrierIds = array_flip(Carrier::getShipwiseCodes());
+
+		return match ($id) {
+			$carrierIds['FedEx'] => 'FedEx',
+			$carrierIds['UPS'] => 'UPS',
+			//TODO: Add USPS, DHL eCommerce, OnTrack
+		};
 	}
 
 	private function getService(int $id): string
 	{
-		return "";
+		$serviceIds = array_flip(array: Service::getShipwiseCodes());
+
+		return match ($id) {
+			$serviceIds['FedExGround'] => 92,
+			$serviceIds['FedExPriorityOvernight'] => 01,
+			$serviceIds['FedExStandardOvernight'] => 05,
+			$serviceIds['FedEx2Day'] => 03,
+			//TODO: Add the rest of the services
+		};
 	}
 
 	private function buildShipTo(array $arr, Address $address): array
 	{
-    	$shipto = [];
+		$shipto = [];
 
-    	$shipto['companyName'] = $address->company;
-    	$shipto['name'] = $address->name;
-    	$shipto['address1'] = $address->address1;
-    	$shipto['city'] = $address->city;
-    	$shipto['state'] = $address->state->name;
-    	$shipto['zip'] = $address->zip;
-    	$shipto['country'] = $address->country;
-    	$shipto['phoneNumber'] = $address->phone;
+		$shipto['companyName'] = $address->company;
+		$shipto['name'] = $address->name;
+		$shipto['address1'] = $address->address1;
+		$shipto['city'] = $address->city;
+		$shipto['state'] = $address->state->name;
+		$shipto['zip'] = $address->zip;
+		$shipto['country'] = $address->country;
+		$shipto['phoneNumber'] = $address->phone;
 
-    	if($this->hasInfo($address->email)) {
+		if ($this->hasInfo($address->email)) {
 			$shipto['emailAddress'] = $address->email;
 		}
 
-    	if($this->hasInfo($address->address2)) {
+		if ($this->hasInfo($address->address2)) {
 			$shipto['emailAddress'] = $address->address2;
 		}
 
@@ -163,13 +178,13 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		$transit->name = 'Est Transit';
 		//$transit->value = is_null($order->????) ? 'Unknown' : $order->????; TODO: Transit time
 
-    	$savedElements = [
-    		$origin,
+		$savedElements = [
+			$origin,
 			$shipwise,
 			$transit,
 		];
 
-    	$arr['savedElements'] = $savedElements;
+		$arr['savedElements'] = $savedElements;
 
 		return $arr;
 	}
@@ -188,7 +203,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 			$iItem++;
 		}
 
-		if(!empty($orderItems)) {
+		if (!empty($orderItems)) {
 			$arr['orderItems'] = $orderItems;
 		}
 
