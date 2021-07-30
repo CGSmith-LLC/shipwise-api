@@ -66,25 +66,25 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
 
     protected array $items;
 
-    public function __construct($json, $customer_id)
+    public function __construct(array $json, int $customer_id)
     {
         parent::__construct();
 
         $this->status = Status::OPEN;
         $this->customerID = $customer_id;
 
-        $this->buildGeneral($json);
-        $this->buildAddress($json);
-        $this->buildShipping($json);
-        $this->buildItems($json);
+        $this->buildGeneral(json: $json);
+        $this->buildAddress(json: $json);
+        $this->buildShipping(json: $json);
+        $this->buildItems(json: $json);
     }
 
     public function parse(): Order
     {
         $shipwiseOrder = new Order();
-        $shipwiseOrder = self::setGeneralInfo($shipwiseOrder);
-        $shipwiseOrder = self::setAddressInfo($shipwiseOrder);
-        $shipwiseOrder = self::setShippingInfo($shipwiseOrder);
+        $shipwiseOrder = self::setGeneralInfo(order: $shipwiseOrder);
+        $shipwiseOrder = self::setAddressInfo(order: $shipwiseOrder);
+        $shipwiseOrder = self::setShippingInfo(order: $shipwiseOrder);
         return $shipwiseOrder;
     }
 
@@ -92,7 +92,7 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
      * @throws Exception
 	 * @return Item[]
      */
-    public function parseItems($id): array
+    public function parseItems(int $id): array
     {
         $out = [];
 
@@ -101,7 +101,7 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
             $newitem->order_id = $id;
 
             if (!$newitem->validate()) {
-                throw new Exception(implode(PHP_EOL, $newitem->getErrorSummary(true)));
+                throw new Exception(implode(array: $newitem->getErrorSummary(showAllErrors: true), separator: PHP_EOL));
             } else {
                 $out[] = $newitem;
             }
@@ -138,7 +138,7 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
             'address1' => $this->shipToAddress1,
             'company' => $this->shipToCompany,
             'city' => $this->shipToCity,
-            'state_id' => State::findByAbbrOrName($this->shipToCountry, null, $this->shipToState)->id,
+            'state_id' => State::findByAbbrOrName(country: $this->shipToCountry, name: $this->shipToState)->id,
             'zip' => $this->shipToZip,
             'phone' => $this->shipToPhone,
             'country' => $this->shipToCountry,
@@ -156,10 +156,10 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
         $address->attributes = $values;
 
         $transaction = \Yii::$app->db->beginTransaction();
-        if (!$address->save(true)) {
+        if (!$address->save(runValidation: true)) {
             $transaction->rollBack();
             //TODO: Email errors to customer?
-            throw new Exception('New address entry could not be created.' . PHP_EOL . implode(PHP_EOL, $address->getErrorSummary(true)));
+            throw new Exception(message: 'New address entry could not be created.' . PHP_EOL . implode(array: $address->getErrorSummary(showAllErrors: true), separator: PHP_EOL));
         }
         $transaction->commit();
 
@@ -174,16 +174,16 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
      */
     private function setShippingInfo(Order $order): Order
     {
-        $order->carrier_id = Carrier::findOne(["name" => "FedEx"])->id; //TODO: Add ability to handle different carriers
+        $order->carrier_id = Carrier::findOne(condition: ["name" => "FedEx"])->id; //TODO: Add ability to handle different carriers
         $order->service_id = $this->shippingService;
         return $order;
     }
 
-    protected abstract function buildGeneral($json);
+    protected abstract function buildGeneral(array $json);
 
-    protected abstract function buildAddress($json);
+    protected abstract function buildAddress(array $json);
 
-    protected abstract function buildShipping($json);
+    protected abstract function buildShipping(array $json);
 
-    protected abstract function buildItems($json);
+    protected abstract function buildItems(array $json);
 }

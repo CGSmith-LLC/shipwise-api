@@ -20,14 +20,14 @@ use yii\db\ActiveRecord;
 class Integration extends ActiveRecord
 {
     /** @inheritDoc */
-    public static function tableName()
-    {
+    public static function tableName(): string
+	{
         return "integration";
     }
 
     /** @inheritDoc */
-    public function rules()
-    {
+    public function rules(): array
+	{
         return [
             [['name', 'customer_id', 'ecommerce', 'fulfillment'],"required"],
             [['name', 'ecommerce', 'fulfillment'], 'string', 'max' => 64],
@@ -36,7 +36,7 @@ class Integration extends ActiveRecord
     }
 
     /** @inheritDoc */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'name' => 'Name',
@@ -48,7 +48,7 @@ class Integration extends ActiveRecord
     public function getAdapter($json, $customer_id): BaseECommerceAdapter
     {
         $adaptername = '\\common\\adapters\\ecommerce\\' . ucfirst($this->ecommerce) . 'Adapter';
-        return new $adaptername($json, $customer_id);
+        return new $adaptername(json: $json, customer_id: $customer_id);
     }
 
     /**
@@ -60,7 +60,7 @@ class Integration extends ActiveRecord
 
         /** @var BaseEcommerceService $service */
         $service = new $serviceName();
-        $service->applyMeta(IntegrationMeta::find()->where(['integration_id' => $this->id])->all());
+        $service->applyMeta(metadata: IntegrationMeta::find()->where(['integration_id' => $this->id])->all());
 
         return $service;
     }

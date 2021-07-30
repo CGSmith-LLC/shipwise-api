@@ -35,7 +35,7 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
         $adapter = $fulfillment->getAdapter();
         $service = $fulfillment->getService();
 
-        if(!$service->makeCreateOrderRequest($adapter->getRequestInfo($order))) {
+        if(!$service->makeCreateOrderRequest(requestInfo: $adapter->getRequestInfo(order: $order))) {
 			throw new Exception('POST Request failed');
 		}
 
@@ -48,7 +48,7 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
 
         //$service->createOrder($order);
 
-        \Yii::$app->queue->push(new DownloadTrackingJob(['orderId' => $this->orderId]));
+        //\Yii::$app->queue->push(new DownloadTrackingJob(['orderId' => $this->orderId]));
     }
 
     /**

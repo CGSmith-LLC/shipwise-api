@@ -36,11 +36,12 @@ class ColdcoService extends BaseFulfillmentService
 	{
 		try {
 			$response = $this->client->createRequest()
-				->setMethod('POST')
+				->setMethod(method: 'POST')
 				->setHeaders(['Authorization' => "BEARER {$this->access_token}"])
-				->setContent(implode('', $requestInfo))
+				->setContent(implode(array: $requestInfo))
 				->send();
 			if ($response->isOk) {
+				var_dump($response);
 				return true;
 			}
 		} catch (Exception | InvalidConfigException $e) {

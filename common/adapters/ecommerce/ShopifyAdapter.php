@@ -8,22 +8,22 @@ use yii\helpers\Json;
 
 class ShopifyAdapter extends BaseECommerceAdapter
 {
-    public function __construct($orderJSON, $customer_id)
+    public function __construct(string $orderJSON, int $customer_id)
     {
-        $json = Json::decode($orderJSON, true);
+        $json = Json::decode(json: $orderJSON, asArray: true);
 
-        parent::__construct($json, $customer_id);
+        parent::__construct(json: $json, customer_id: $customer_id);
     }
 
-    protected function buildGeneral($json)
+    protected function buildGeneral(array $json)
     {
-        $this->customer_reference = str_replace('#', '', $json['name']);
+        $this->customer_reference = str_replace(search:'#', replace: '', subject: $json['name']);
         $this->UUID = (string)$json['id'];
         $this->origin = "Shopify";
         $this->notes = $json["tags"];
     }
 
-    protected function buildAddress($json)
+    protected function buildAddress(array $json)
     {
         $this->shipToEmail = $json["email"];
         $this->shipToName = $json['shipping_address']['first_name'] . ' ' . $json['shipping_address']['last_name'];
@@ -42,37 +42,26 @@ class ShopifyAdapter extends BaseECommerceAdapter
         }
     }
 
-    protected function buildShipping($json)
+    protected function buildShipping(array $json)
     {
         if (!isset($json["shipping_lines"][0]["code"])) {
             $this->shippingService = Service::findOne(["shipwise_code" => "FedExGround"])->id;
             return;
         }
 
-        switch ($json["shipping_lines"][0]["code"]) {
-            case 'PRIORITY_OVERNIGHT':
-                $this->shippingService = Service::findOne(["shipwise_code" => "FedExPriorityOvernight"])->id;
-                break;
-            case 'STANDARD_OVERNIGHT':
-            case 'FedEx Standard Overnight':
-                $this->shippingService = Service::findOne(["shipwise_code" => "FedExFirstOvernight"])->id;
-                break;
-            case 'FEDEX_2_DAY':
-                $this->shippingService = Service::findOne(["shipwise_code" => "FedEx2Day"])->id;
-                break;
-            case 'GROUND_HOME_DELIVERY':
-            case 'FEDEX_GROUND':
-            default:
-                $this->shippingService = Service::findOne(["shipwise_code" => "FedExGround"])->id;
-                break;
-        }
+		$this->shippingService = match ($json["shipping_lines"][0]["code"]) {
+			'PRIORITY_OVERNIGHT' => Service::findOne(["shipwise_code" => "FedExPriorityOvernight"])->id,
+			'STANDARD_OVERNIGHT', 'FedEx Standard Overnight' => Service::findOne(["shipwise_code" => "FedExFirstOvernight"])->id,
+			'FEDEX_2_DAY' => Service::findOne(["shipwise_code" => "FedEx2Day"])->id,
+			default => Service::findOne(["shipwise_code" => "FedExGround"])->id,
+		};
     }
 
-    protected function buildItems($json)
+    protected function buildItems(array $json)
     {
         $this->items = [];
         foreach ($json['line_items'] as $item) {
-            if (!in_array($item['sku'], Sku::find()->where(['excluded' => 'true', 'customer_id' => $this->customerID])->all()) && !empty(trim($item['sku']))) {
+            if (!in_array($item['sku'], Sku::findAll(condition: ['excluded' => 'true', 'customer_id' => $this->customerID])) && !empty(trim($item['sku']))) {
                 $orderItem = [];
                 $orderItem["name"] = $item['name'];
                 $orderItem["quantity"] = $item['quantity'];

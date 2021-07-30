@@ -35,8 +35,8 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
     public function execute($queue)
     {
         // TODO: Handle queue-switching logic when more queues are added --> All Order Jobs
-        $integration = Integration::findone(["name" => $this->integration_name]);
-        $adapter = $integration->getAdapter($this->order, $this->customer_id);
+        $integration = Integration::findone(condition: ["name" => $this->integration_name]);
+        $adapter = $integration->getAdapter(json: $this->order, customer_id: $this->customer_id);
 
         $transaction = \Yii::$app->db->beginTransaction();
 
@@ -44,16 +44,16 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
 
         if (!$object->save(true)) {
             $transaction->rollBack();
-            throw new Exception("Order could not be saved" . PHP_EOL . implode(PHP_EOL, $object->getErrorSummary(true)));
+            throw new Exception(message: "Order could not be saved" . PHP_EOL . implode(array: $object->getErrorSummary(true), separator:PHP_EOL));
         }
 
         try {
-            $parsedItems = $adapter->parseItems($object->id);
+            $parsedItems = $adapter->parseItems(id: $object->id);
 
             /** @var Item[] $parsedItems */
             foreach ($parsedItems as $parsedItem) {
                 if (!$parsedItem->save()) {
-                    throw new Exception('Could not save item.' . PHP_EOL . implode(PHP_EOL, $parsedItem->getErrorSummary(true)));
+                    throw new Exception(message: 'Could not save item.' . PHP_EOL . implode(array: $parsedItem->getErrorSummary(showAllErrors: true), separator: PHP_EOL));
                 }
             }
 

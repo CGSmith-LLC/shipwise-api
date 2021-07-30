@@ -20,13 +20,13 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
     {
         $config = [];
 
-		$config = $this->buildGeneral($config, $order);
-		$config = $this->buildCustomerID($config, $order->customer_id);
-		$config = $this->buildFacilityID($config, $order->address->state);
-        $config = $this->buildRoutingInfo($config, $order);
-        $config = $this->buildShipTo($config, $order->address);
-        $config = $this->buildSavedElements($config, $order);
-        $config = $this->buildItems($config, $order->items);
+		$config = $this->buildGeneral(arr: $config, order: $order);
+		$config = $this->buildCustomerID(arr: $config, shipwiseID: $this->customer_id);
+		$config = $this->buildFacilityID(arr: $config, state: $order->address->state);
+        $config = $this->buildRoutingInfo(arr: $config, order: $order);
+        $config = $this->buildShipTo(arr: $config, address: $order->address);
+        $config = $this->buildSavedElements(arr: $config, order: $order);
+        $config = $this->buildItems(arr: $config, items: $order->items);
 
         if($deferNotification) {
         	$config['defernotification'] = true;
@@ -66,7 +66,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 			case 'AK':
 			case 'HI':
 			case 'NV':
-			$arr['facilityIdentifier']['id'] = self::RENO_ID;
+				$arr['facilityIdentifier']['id'] = self::RENO_ID;
 				break;
 			default:
 				$arr['facilityIdentifier']['id'] = self::ST_LOUIS_ID;
@@ -83,7 +83,8 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		$arr['billingCode'] = "";// Billing Info ????
 		$arr['earliestShipDate'] = "";//????
 		$arr['shipCancelDate'] = "";//????
-		$arr['shippingNotes'] = "";// Carrier Notes different from notes ????
+		$arr['shippingNotes'] = "";
+		$arr['notes'] = $order->notes . ' ' . (is_null($order->origin) ? '' : $order->origin);
 		//if($this->hasInfo($order->purchaseOrder)) $arr['PoNum'] = $order->purchaseOrder
 
 		return $arr;
@@ -94,8 +95,8 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		$routingInfo = [];
 
 		// TODO: Set info properly
-		$routingInfo['carrier'] = $this->getCarrier($order->carrier_id);
-		$routingInfo['mode'] = $this->getService($order->service_id);
+		$routingInfo['carrier'] = $this->getCarrier(id: $order->carrier_id);
+		$routingInfo['mode'] = $this->getService(id: $order->service_id);
 		$routingInfo['account'] = "";
 
 		if($this->hasInfo($order->tracking)) {
