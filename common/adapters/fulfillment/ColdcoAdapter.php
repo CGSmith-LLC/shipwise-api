@@ -80,9 +80,9 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 	{
 		//	Todo: Set properly
 		$arr['referenceNum'] = $order->customer_reference;
-		$arr['billingCode'] = "";// Billing Info ????
-		$arr['earliestShipDate'] = "";//????
-		$arr['shipCancelDate'] = "";//????
+		$arr['billingCode'] = "";
+		$arr['earliestShipDate'] = "";
+		$arr['shipCancelDate'] = "";
 		$arr['shippingNotes'] = "";
 		$arr['notes'] = $order->notes . ' ' . (is_null($order->origin) ? '' : $order->origin);
 
