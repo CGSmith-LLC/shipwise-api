@@ -8,5 +8,5 @@ use common\models\Order;
 
 interface FulfillmentAdapter
 {
-	public function getRequestInfo(Order $order): array;
+	public function getCreateOrderRequestInfo(Order $order): array;
 }

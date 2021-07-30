@@ -5,6 +5,7 @@ namespace common\services\ecommerce;
 
 
 use common\models\IntegrationMeta;
+use yii\base\BaseObject;
 use yii\console\Exception;
 use yii\helpers\Json;
 use yii\httpclient\Client;
@@ -42,19 +43,22 @@ class ShopifyService extends BaseEcommerceService
          * @var IntegrationMeta $meta
          */
         foreach ($metadata as $meta) {
-            if ($meta->key === self::META_URL) {
-                $this->client = new Client(['baseUrl' => $meta->decryptedValue()]);
-            }
-            if ($meta->key === self::META_API_KEY) {
-                $auth[0] = $meta->decryptedValue();
-            }
-            if ($meta->key === self::META_API_SECRET) {
-                $auth[1] = $meta->decryptedValue();
-            }
+        	switch($meta->key)
+			{
+				case self::META_URL:
+					$this->client = new Client(['baseUrl' => $meta->decryptedValue()]);
+					break;
+				case self::META_API_KEY:
+					$auth[0] = $meta->decryptedValue();
+					break;
+				case self::META_API_SECRET:
+					$auth[1] = $meta->decryptedValue();
+					break;
+			}
         }
 
         // add semicolon to end for BASIC auth
-        $this->auth = base64_encode(implode(':', $auth));
+        $this->auth = base64_encode(implode(array: $auth, separator: ':'));
     }
 
     public function getOrders(): array
@@ -64,10 +68,10 @@ class ShopifyService extends BaseEcommerceService
         $orderarray = [];
 
         $page = $this->client->createRequest()
-            ->setMethod('GET')
-            ->setUrl(self::BASE_SHOPIFY_URL . 'orders.json')
+            ->setMethod(method: 'GET')
+            ->setUrl(url: self::BASE_SHOPIFY_URL . 'orders.json')
             ->setData([
-                'created_at_min' => $startDate->format(DATE_ISO8601),
+                'created_at_min' => $startDate->format(format: DATE_ISO8601),
                 'status' => 'open',
                 'fulfillment_status' => null,
                 'limit' => 250,
@@ -84,15 +88,15 @@ class ShopifyService extends BaseEcommerceService
             $headers = $page->getHeaders();
 
             try {
-                $orders = Json::decode($orders, true);
+                $orders = Json::decode($orders, asArray: true);
             } catch (\yii\base\InvalidArgumentException $e) {
                 $orders = ['error' => "Error on decode: $e"];
             }
 
-            $orders = end($orders);
+            $orders = end(array:$orders);
 
             if(!is_array($orders)){
-                throw new Exception('$orders is not an array. Orders reads: ' . $orders);
+                throw new Exception(message: '$orders is not an array. Orders reads: ' . $orders);
             }
 
             foreach($orders as $order)
@@ -102,20 +106,20 @@ class ShopifyService extends BaseEcommerceService
             }
 
             if (isset($headers['link'])) {
-                $pageLinks = explode(', ', $headers['link']);
-                $nextPageLink = preg_grep("/rel=\"next\"$/", $pageLinks);
-                $nextPageLink = end($nextPageLink);
+                $pageLinks = explode(string: $headers['link'], separator: ', ');
+                $nextPageLink = preg_grep(pattern:"/rel=\"next\"$/", array: $pageLinks);
+                $nextPageLink = end(array: $nextPageLink);
                 $nextPageLink = substr(
-                    substr(
-                        $nextPageLink, 1, strlen($nextPageLink)
-                    ), 0, strpos($nextPageLink, '>;') - 1
+                    string: substr(
+                        string: $nextPageLink, offset: 1, length: strlen($nextPageLink)
+                    ), offset: 0, length: strpos($nextPageLink, '>;') - 1
                 );
 
                 $pagesLeft = true;
                 $pages++;
 
                 $page = $this->client->createRequest()
-                    ->setMethod('GET')
+                    ->setMethod(method: 'GET')
                     ->setUrl($nextPageLink)
                     ->setHeaders(['Authorization' => "Basic {$this->auth}"])
                     ->send();

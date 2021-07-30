@@ -14,5 +14,5 @@ interface FulfillmentService
 	/**
 	 * @return bool if succeeded
 	 */
-	public function makeRequest(array $requestInfo): bool;
+	public function makeCreateOrderRequest(array $requestInfo): bool;
 }

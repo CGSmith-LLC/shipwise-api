@@ -10,5 +10,5 @@ abstract class BaseFulfillmentAdapter extends BaseObject implements FulfillmentA
 {
 	public const EVENT_CARTONIZATION = 'cartonizationEvent'; // TODO: Attach CartonizationEvent::handleEvent to this event
 
-    public abstract function getRequestInfo(Order $order): array;
+    public abstract function getCreateOrderRequestInfo(Order $order): array;
 }
