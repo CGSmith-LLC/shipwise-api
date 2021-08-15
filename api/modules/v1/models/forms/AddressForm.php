@@ -121,7 +121,7 @@ use api\modules\v1\models\core\StateEx;
  *            property = "zip",
  *            type = "string",
  *            description = "ZIP / Postal Code",
- *            minLength = 2,
+ *            minLength = 1,
  *            maxLength = 16
  *        ),
  *     @SWG\Property(
@@ -187,7 +187,7 @@ class AddressForm extends Model
             [['name', 'company', 'address1', 'city'], 'string', 'length' => [2, 64]],
             ['email', 'email'],
             ['address2', 'string', 'length' => [1, 64]],
-            ['zip', 'string', 'length' => [2, 16]],
+            ['zip', 'string', 'length' => [1, 16]],
             ['phone', 'string', 'length' => [2, 32]],
             ['notes', 'string', 'length' => [2, 600]],
             [['country'],'string', 'max' => 2],
