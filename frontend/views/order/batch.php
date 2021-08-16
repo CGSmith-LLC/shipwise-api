@@ -1,5 +1,6 @@
 <?php
 
+use frontend\models\Customer;
 use yii\grid\GridView;
 use yii\helpers\Html;
 
@@ -10,7 +11,11 @@ use yii\helpers\Html;
 
 $this->title = 'Batches';
 $this->params['breadcrumbs'][] = $this->title;
-
+if ((!Yii::$app->user->identity->getIsAdmin())) {
+    $customerDropdownList = Yii::$app->user->identity->getCustomerList();
+} else {
+    $customerDropdownList = Customer::getList();
+}
 ?>
 <div class="order-batch">
 
