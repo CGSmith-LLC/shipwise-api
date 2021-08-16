@@ -10,7 +10,7 @@ class Fulfillment extends base\BaseFulfillment
 {
     public function getAdapter()
     {
-		$adaptername = "\\common\\adapters\\fulfillment\\" . $this->name . "Adapter";
+		$adaptername = "\\common\\adapters\\fulfillment\\" . ucfirst($this->name) . "Adapter";
 		return new $adaptername();
     }
 
@@ -18,11 +18,11 @@ class Fulfillment extends base\BaseFulfillment
      */
     public function getService()
     {
-		$serviceName = "\\common\\services\\fulfillment\\" . $this->name . "Service";
+		$serviceName = "\\common\\services\\fulfillment\\" . ucfirst($this->name) . "Service";
 
 		/** @var BaseFulfillmentService $service */
 		$service = new $serviceName();
-		$service->applyMeta(FulfillmentMeta::findAll(condition: ['integration_id' => $this->id]));
+		$service->applyMeta(FulfillmentMeta::findAll(condition: ['fulfillment_id' => $this->id]));
 
 		return $service;
     }

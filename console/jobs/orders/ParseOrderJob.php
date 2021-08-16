@@ -63,7 +63,7 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
             throw new Exception($e);
         }
 
-        \Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $object->id, 'fulfillment_name' => $integration->fulfillment]));
+        \Yii::$app->queue->push(new SendTo3PLJob(['order_id' => $object->id, 'fulfillment_name' => $integration->fulfillment]));
 
     }
 

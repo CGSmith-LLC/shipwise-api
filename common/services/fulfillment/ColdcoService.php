@@ -5,28 +5,69 @@ namespace common\services\fulfillment;
 
 
 use common\models\FulfillmentMeta;
+use yii\base\ErrorException;
 use yii\base\InvalidConfigException;
+use yii\helpers\Json;
 use yii\httpclient\Client;
 use yii\httpclient\Exception;
 
 class ColdcoService extends BaseFulfillmentService
 {
 	private const META_URL = "url";
-	private const META_TOKEN = "access_token";
+	private const META_CLIENT_ID = "client_id";
+	private const META_SECRET = "secret";
+	private const META_3PL_KEY = "key";
+	private const META_3PL_ID = "3pl_id";
+	private const META_LOGIN = "username";
+	private const META_TOKEN = "auth_token";
+	private const META_TOKEN_EXPIRE = "auth_token_expiration";
+
+	private const AUTH_URI = "AuthServer/api/Token";
 
 	private Client $client;
-	private string $access_token;
+	private string $clientid;
+	private string $clientsecret;
+	private string $user_login;
+	private ?string $access_token = null;
 
 	public function applyMeta(array $metadata)
 	{
 		/** @var FulfillmentMeta $metadatum */
 		foreach ($metadata as $metadatum) {
 			switch ($metadatum->key) {
+				/** Set URL */
 				case self::META_URL:
 					$this->client = new Client(['baseUrl' => $metadatum->decryptedValue()]);
 					break;
+				/** Set Client ID */
+				case self::META_CLIENT_ID:
+					$this->clientid = $metadatum->decryptedValue();
+					break;
+				/** Set Secret Key */
+				case self::META_SECRET:
+					$this->clientsecret = $metadatum->decryptedValue();
+					break;
+				/** Set User Login Info */
+				case self::META_LOGIN:
+					$this->user_login = $metadatum->decryptedValue();
+					break;
+				/** Check if token is expired. If so, generate a new one and set it. Update expiration time & token in DB */
+				case self::META_TOKEN_EXPIRE:
+					$response = null;
+					if($metadatum->decryptedValue() < time()) {
+						$response = $this->generateNewAccessToken();
+					}
+					if(!is_null($response)) {
+						$metadatum->updateMeta(newval: $response['expire_time']);
+						FulfillmentMeta::findOne(['fulfillment_id' => $metadatum->fulfillment_id, 'key' => self::META_TOKEN])
+							->updateMeta(newval: $response['access_token']);
+					}
+					break;
+				/** Check if token has not been set yet. If so, get the token. */
 				case self::META_TOKEN:
-					$this->access_token = $metadatum->decryptedValue();
+					if(!is_null($this->access_token)) {
+						$this->access_token = $metadatum->decryptedValue();
+					}
 					break;
 			}
 		}
@@ -37,6 +78,7 @@ class ColdcoService extends BaseFulfillmentService
 		try {
 			$response = $this->client->createRequest()
 				->setMethod(method: 'POST')
+				->setUrl(url: 'orders')
 				->setHeaders(['Authorization' => "BEARER {$this->access_token}"])
 				->setContent(implode(array: $requestInfo))
 				->send();
@@ -49,5 +91,47 @@ class ColdcoService extends BaseFulfillmentService
 		}
 
 		return false;
+	}
+
+	/**
+	 * @throws InvalidConfigException|Exception
+	 */
+	public function generateNewAccessToken()
+	{
+		/**
+		 * We need to authenticate with 3PL
+		 * @link http://api.3plcentral.com/rels/auth
+		 */
+
+		$json = Json::encode([
+			'grant_type' => 'client_credentials',
+			'user_login' => $this->user_login,
+		]);
+
+		$response = $this->client->createRequest()
+			->setMethod(method: 'POST')
+			->setUrl(url: self::AUTH_URI)
+			->setHeaders(headers: [
+				'Authorization' => 'Basic ' . base64_encode($this->clientid . ':' . $this->clientsecret),
+				'Content-Type' => 'application/json; charset=utf-8',
+				'Accept' => 'application/json',
+				'Content-Length' => strlen($json),
+			])
+			->setContent($json)
+			->send();
+
+		$body = Json::decode($response->getContent());
+
+		try {
+			$this->access_token = $body['access_token'];
+		} catch (ErrorException $e) {
+			echo 'Uhhh.....' . PHP_EOL . $e . PHP_EOL;
+			die();
+		}
+
+		return [
+			'access_token' => $body['access_token'],
+			'expire_time' => $body['expires_in'] + time(),
+		];
 	}
 }

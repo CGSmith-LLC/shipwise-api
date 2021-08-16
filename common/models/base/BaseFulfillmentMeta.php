@@ -32,7 +32,7 @@ class BaseFulfillmentMeta extends ActiveRecord
     {
         return [
             [['created_date'], 'safe'],
-            [['key', 'value'], 'string', 'max' => 127],
+            [['key', 'value'], 'string', 'max' => 255],
         ];
     }
 

@@ -3,9 +3,12 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
+use common\models\FulfillmentMeta;
 use console\jobs\orders\ParseOrderJob;
+use console\jobs\orders\SendTo3PLJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
+use yii\db\Exception;
 
 // To create/edit crontab file: crontab -e
 // To list: crontab -l
@@ -82,6 +85,7 @@ class CronController extends Controller
 
     public function actionTest()
     {
+
         /*
         $newInt = new Fulfillment([
             'name' => "Coldco",
@@ -95,6 +99,24 @@ class CronController extends Controller
 
         return ExitCode::OK;
     }
+
+    public function actionCreateFulfillmentMeta($key, $val, $fulfillment_id)
+	{
+		try {
+			FulfillmentMeta::addMeta(key: $key, value: $val, id: $fulfillment_id);
+		} catch (Exception $e) {
+			echo $e->getMessage();
+		}
+	}
+
+	public function actionCreateSendTo3PLJob($order, $fulfillment)
+	{
+		try {
+			\Yii::$app->queue->push(new SendTo3PLJob(['order_id' => $order, 'fulfillment_name' => $fulfillment]));
+		} catch (Exception $e) {
+			echo $e->getMessage();
+		}
+	}
 
 
     /**

@@ -13,42 +13,35 @@ use common\models\Fulfillment;
 class SendTo3PLJob extends BaseObject implements RetryableJobInterface
 {
     /** @var int Order ID */
-    public int $orderId;
+    public int $order_id;
 
-    /** @var int Order ID */
-    public int $fulfillment_name;
+    /** @var string Name of Fulfillment */
+    public string $fulfillment_name;
 
     /**
      * @inheritDoc
      */
     public function execute($queue)
     {
-        /**
-         * Find order
-         * @var Order $order
-         */
-        if (($order = Order::findOne($this->orderId)) === null) {
-            throw new Exception("Order not found for ID {$this->orderId}");
-        }
+		/**
+		 * Find order
+		 * @var Order $order
+		 */
 
-        $fulfillment = Fulfillment::findOne(['name' => $this->fulfillment_name]);
-        $adapter = $fulfillment->getAdapter();
-        $service = $fulfillment->getService();
+		if (($order = Order::findOne($this->order_id)) === null) {
+			throw new Exception("Order not found for ID {$this->order_id}");
+		}
 
-        if(!$service->makeCreateOrderRequest(requestInfo: $adapter->getRequestInfo(order: $order))) {
+		$fulfillment = Fulfillment::findOne(['name' => $this->fulfillment_name]);
+		$adapter = $fulfillment->getAdapter();
+		$service = $fulfillment->getService();
+
+
+		if(!$service->makeCreateOrderRequest(requestInfo: $adapter->getCreateOrderRequestInfo(order: $order))) {
 			throw new Exception('POST Request failed');
 		}
 
 
-
-        // Find upstream service to ship order to
-        //** @var ColdcoFulfillmentService $service */
-        //$service = \Yii::$app->get('coldco');
-        //$service->fulfillmentService(CustomerSettings::getObjectByValue('fulfillment_api', $order->customer_id))->generateNewToken();
-
-        //$service->createOrder($order);
-
-        //\Yii::$app->queue->push(new DownloadTrackingJob(['orderId' => $this->orderId]));
     }
 
     /**

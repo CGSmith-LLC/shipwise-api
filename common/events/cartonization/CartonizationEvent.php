@@ -1,5 +1,6 @@
 <?php
 
+namespace common\events\cartonization;
 
 use common\models\Customer;
 use common\models\Item;

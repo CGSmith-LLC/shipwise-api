@@ -4,7 +4,7 @@
 namespace common\adapters\fulfillment;
 
 
-use CartonizationEvent;
+use common\events\cartonization\CartonizationEvent;
 use common\models\Address;
 use common\models\Item;
 use common\models\Order;
@@ -23,7 +23,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		$config = [];
 
 		$config = $this->buildGeneral(arr: $config, order: $order);
-		$config = $this->buildCustomerID(arr: $config, shipwiseID: $this->customer_id);
+		$config = $this->buildCustomerID(arr: $config, shipwiseID: $order->customer_id);
 		$config = $this->buildFacilityID(arr: $config, state: $order->address->state);
 		$config = $this->buildRoutingInfo(arr: $config, order: $order);
 		$config = $this->buildShipTo(arr: $config, address: $order->address);
@@ -37,18 +37,16 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		$event = new CartonizationEvent();
 		$event->customer_id = $order->customer_id;
 		$event->items = $order->items;
-		$this->trigger(self::EVENT_CARTONIZATION, $event);
+		$this->trigger(name: self::EVENT_CARTONIZATION, event: $event);
 
 		return $config;
 	}
 
 	private function buildCustomerID(array $arr, int $shipwiseID): array
 	{
-		switch ($shipwiseID) {
-			default:
-				$coldcoID = 28;
-				break;
-		}
+		$coldcoID = match ($shipwiseID) {
+			default => 28,
+		};
 
 		$arr['customerIdentifier']['id'] = $coldcoID; // Test Id. TODO: Get Coldco customer ID for each customer & handle switching
 		return $arr;
@@ -67,9 +65,11 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 			case 'HI':
 			case 'NV':
 				$arr['facilityIdentifier']['id'] = self::RENO_ID;
+				// TODO: Reno Event
 				break;
 			default:
 				$arr['facilityIdentifier']['id'] = self::ST_LOUIS_ID;
+				// TODO: St. Louis Event
 				break;
 		}
 
@@ -78,12 +78,15 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 	private function buildGeneral(array $arr, Order $order): array
 	{
-		//	Todo: Set properly
+		//	Todo: Help with some things
 		$arr['referenceNum'] = $order->customer_reference;
-		$arr['billingCode'] = "";
-		$arr['earliestShipDate'] = "";
-		$arr['shipCancelDate'] = "";
-		$arr['shippingNotes'] = "";
+//		$arr['billingCode'] = "";		// This stuff is set by customer logic. TODO: Add event to hook logic in, or use integration meta?
+//		$arr['earliestShipDate'] = "";	/* Not always set by customer logic. Is this the earliest allowed to ship or just when it should be shipped?
+//										 *		If it's the former, why is the shipment canceled at that exact time too? Please explain. */
+//		$arr['shipCancelDate'] = "";	// Not always set by customer logic. Some customers have both ^ & this, others have just this.
+//		$arr['shippingNotes'] = "";		/* Seems to be set by customer logic? Seems to be either Transit time, just the order notes, or unused.
+//										 *		TODO: Events. More of them
+//		*/
 		$arr['notes'] = $order->notes . ' ' . (is_null($order->origin) ? '' : $order->origin);
 
 		if ($this->hasInfo($order->po_number)) $arr['PoNum'] = $order->po_number;
@@ -95,10 +98,9 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 	{
 		$routingInfo = [];
 
-		// TODO: Set info properly
 		$routingInfo['carrier'] = $this->getCarrier(id: $order->carrier_id);
 		$routingInfo['mode'] = $this->getService(id: $order->service_id);
-		$routingInfo['account'] = "";
+		//$routingInfo['account'] = ""; // This is the shipping account. Varies by customer & (occasionally) by location. TODO: Event to hook in and set account?
 
 		if ($this->hasInfo($order->tracking)) {
 			$routingInfo['TrackingNumber'] = $order->tracking;
@@ -159,7 +161,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 		$arr['shipTo'] = $shipto;
 
-		//if($address->isResidential()) $arr['UpsIsResidential'] = true;
+		//if($address->isResidential()) $arr['UpsIsResidential'] = true; TODO: FedEx or UPS Residential API call & logic
 
 		return $arr;
 	}
@@ -176,7 +178,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 		$transit = new stdClass();
 		$transit->name = 'Est Transit';
-		//$transit->value = is_null($order->????) ? 'Unknown' : $order->????; TODO: Transit time
+		//$transit->value = is_null($order->????) ? 'Unknown' : $order->????; TODO: Transit time (More shipping API calls)
 
 		$savedElements = [
 			$origin,

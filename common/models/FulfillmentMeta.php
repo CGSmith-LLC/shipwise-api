@@ -18,16 +18,54 @@ class FulfillmentMeta extends BaseFulfillmentMeta
 
         $newvalue = base64_encode(\Yii::$app->getSecurity()->encryptByKey($value, \Yii::$app->params['encryptionKey']));
 
-        $newMeta = (new FulfillmentMeta(['key' => $key, 'value' => $newvalue, 'created_date' => date('Y-m-d H:i:s'), 'integration_id' => $id]));
+        $newMeta = (new FulfillmentMeta(['key' => $key, 'value' => $newvalue, 'created_date' => date('Y-m-d H:i:s'), 'fulfillment_id' => $id]));
 
         if ($newMeta->save(runValidation: true)) {
             $transaction->commit();
         } else {
             $transaction->rollBack();
             var_dump($newMeta->getErrorSummary(showAllErrors: false));
-            throw new Exception(message: 'New metadatum could not be saved.');
+            throw new Exception(message: 'New metadatum could not be saved.' . PHP_EOL);
         }
     }
+
+	/**
+	 * @throws \yii\db\StaleObjectException
+	 * @throws \Throwable
+	 * @throws Exception
+	 */
+	public function updateMeta($newkey = null, $newval = null)
+	{
+		if(!is_null($newkey))
+		{
+			$transaction = \Yii::$app->db->beginTransaction();
+
+			$this->key = $newkey;
+
+			if($this->update(runValidation: true)) {
+				$transaction->commit();
+			} else {
+				$message = 'Metadatum Key could not be updated.';
+				if(!is_null($newval)) $message .= ' Metadatum Value was not attempted.';
+				throw new Exception(message: $message . implode(separator: PHP_EOL, array: $this->getErrors()));
+			}
+		}
+
+		if(!is_null($newval))
+		{
+			$transaction = \Yii::$app->db->beginTransaction();
+
+			$this->value = base64_encode(\Yii::$app->getSecurity()->encryptByKey($newval, \Yii::$app->params['encryptionKey']));
+
+			if($this->update(runValidation: true)) {
+				$transaction->commit();
+			} else {
+				$message = 'Metadatum Value could not be updated.';
+				if(!is_null($newkey)) $message .= ' Metadatum Key was saved successfully.';
+				throw new Exception(message: $message . implode(separator: PHP_EOL, array: $this->getErrors()));
+			}
+		}
+	}
 
     /**
      * Returns decrypted value of model
