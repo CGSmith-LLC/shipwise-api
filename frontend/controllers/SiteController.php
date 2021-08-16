@@ -68,7 +68,7 @@ class SiteController extends \frontend\controllers\Controller
          * gets default start and end dates of query
          */
         $defaultStart = new DateTime('now');
-        $defaultStart->modify('-90 day');
+        $defaultStart->modify('-7 day');
         $defaultStart = $defaultStart->format('Y-m-d 00:00:00');
         $defaultEnd = new DateTime('now');
         $defaultEnd = $defaultEnd->format('Y-m-d 23:59:59');
@@ -106,6 +106,7 @@ class SiteController extends \frontend\controllers\Controller
         foreach ($statuses as $status) {
             $status2[$status->id] = [
                 'slug' => $this->lookupSlug($status->id),
+                'colwidth' => $this->lookupColumn($status->id),
                 'name' => $status->name,
                 'orders' => 0,
             ];
@@ -113,7 +114,9 @@ class SiteController extends \frontend\controllers\Controller
 
         foreach ($customers as $customer) {
             $response[$customer->id] = [
-                'name' => $customer->name,
+                'name' => $this->trimName($customer->name),
+                'avatar' => $this->lookupAvatar($customer->name),
+                'avatarcolor' => $this->lookupAvatarColor($this->lookupAvatar($customer->name)),
                 'customer_id' => $customer->id,
                 'statuses' => $status2,
             ];
@@ -135,15 +138,55 @@ class SiteController extends \frontend\controllers\Controller
         return $this->asJson($response);
     }
 
+    private function lookupAvatar($name)
+    {
+        $exploded = explode(' ', $name);
+
+        if (isset($exploded[1])) {
+            $return = substr($name, 0, 1) . substr($exploded[1], 0, 1);
+        }
+        $return = substr($name, 0, 1);
+
+        return strtoupper($return);
+    }
+
+    private function lookupAvatarColor($avatar)
+    {
+        $colors = ['#00AA55', '#009FD4', '#B381B3', '#939393', '#E3BC00', '#D47500', '#DC2A2A'];
+        $int = ord($avatar);
+
+        return $colors[$int % count($colors)];
+    }
+
+    private function trimName($name)
+    {
+        if (strlen($name) > 12) {
+            $name = substr($name, 0, 12) . '...';
+        }
+
+        return $name;
+    }
+
     private function lookupSlug($id)
     {
         switch ($id) {
             case Status::WMS_ERROR:
-                return 'danger';
+                return 'red';
             case Status::COMPLETED:
-                return 'success';
+                return 'green';
             default:
-                return 'primary';
+                return 'blue';
+        }
+    }
+    private function lookupColumn($id)
+    {
+        switch ($id) {
+            case Status::WMS_ERROR:
+                return '1';
+            case Status::COMPLETED:
+                return '2';
+            default:
+                return '1';
         }
     }
 }
