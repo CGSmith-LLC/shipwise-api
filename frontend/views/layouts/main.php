@@ -89,6 +89,7 @@ AppAsset::register($this);
                 ['label' => 'Orders', 'url' => ['/order']],
                 ['label' => 'Batches', 'url' => ['/order/batch']],
                 ['label' => 'Import', 'url' => ['/order/import']],
+                ['label' => 'Bulk Edit', 'url' => ['/order/bulk-edit']],
             ]
         ];
         $menuItems[] = ['label' => 'Reports', 'url' => ['/report']];
