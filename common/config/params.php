@@ -2,6 +2,7 @@
 return [
 
     'adminEmail'                    => 'admin@example.com',
+    'senderEmail'                   => 'noreply@example.com',
     'supportEmail'                  => 'support@example.com',
     'user.passwordResetTokenExpire' => 3600,
     'stripePublicKey'               => '1234',

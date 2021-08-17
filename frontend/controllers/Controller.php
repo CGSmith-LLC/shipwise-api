@@ -6,6 +6,7 @@ use common\models\Customer;
 use dektrium\user\controllers\AdminController;
 use frontend\models\PaymentMethod;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Controller
@@ -24,7 +25,11 @@ class Controller extends \yii\web\Controller
         'user/register',
     ];
 
+    /** @var array Customers that belong to the current user */
     public $customers = [];
+
+    /** @var array Customer IDs as values that belong to the current user */
+    public $customer_ids = [];
 
 
     public function init()
@@ -49,13 +54,11 @@ class Controller extends \yii\web\Controller
 
             /**
              * Set the customer ids for all controllers
-             * @todo This should return same data structure for both cases! Otherwise, it is half useful. (Vitaliy)
              */
-            if (!Yii::$app->user->identity->isAdmin) {
-                $this->customers = Yii::$app->user->identity->customerIds;
-            }else {
-                $this->customers = Customer::getList();
-            }
+            $query = Customer::find();
+            $query = (!Yii::$app->user->identity->isAdmin) ? $query->where(['in', 'id', Yii::$app->user->identity->customerIds]): $query;
+            $this->customers = $query->all();
+            $this->customer_ids = ArrayHelper::map($this->customers, 'name', 'id');
         }
     }
 }

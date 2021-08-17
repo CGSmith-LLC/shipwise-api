@@ -46,7 +46,7 @@ use yii\base\Model;
  *            property = "zip",
  *            type = "string",
  *            description = "ZIP / Postal Code",
- *            minLength = 2,
+ *            minLength = 1,
  *            maxLength = 16
  *        ),
  *     @SWG\Property(
@@ -118,7 +118,7 @@ class Address extends Model
                     implode(', ', array_keys(Country::getList())),
             ],
             [['city', 'state'], 'string', 'length' => [2, 64]],
-            ['zip', 'string', 'length' => [2, 16]],
+            ['zip', 'string', 'length' => [1, 16]],
             [
                 'type',
                 'in',

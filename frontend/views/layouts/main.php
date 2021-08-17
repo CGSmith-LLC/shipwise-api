@@ -87,9 +87,9 @@ AppAsset::register($this);
             'url' => ['/order'],
             'items' => [
                 ['label' => 'Orders', 'url' => ['/order']],
-                ['label' => 'Bulk Edit', 'url' => ['/order/bulk-edit']],
                 ['label' => 'Batches', 'url' => ['/order/batch']],
                 ['label' => 'Import', 'url' => ['/order/import']],
+                ['label' => 'Bulk Edit', 'url' => ['/order/bulk-edit']],
             ]
         ];
         $menuItems[] = ['label' => 'Reports', 'url' => ['/report']];
@@ -100,18 +100,13 @@ AppAsset::register($this);
                 'url' => ['/'],
                 'items' => [
                     ['label' => 'Countries', 'url' => ['/country']],
+                    ['label' => 'States/Provinces', 'url' => ['/state']],
                     ['label' => 'Customers', 'url' => ['/customer']],
                     ['label' => 'Users', 'url' => ['/user/admin/']],
-                    [
-                        'label' => 'Charges',
-                        //'url' => ['/subscription'],
-                        'items' => [
-                            ['label' => 'Subscriptions', 'url' => ['/subscription']],
-                            ['label' => 'One-Time Charges', 'url' => ['/one-time-charge']],
-                            ['label' => 'Invoices', 'url' => ['/invoice']],
-                        ],
-                    ]
-                ]
+                    ['label' => 'Subscriptions', 'url' => ['/subscription']],
+                    ['label' => 'One-Time Charges', 'url' => ['/one-time-charge']],
+                    ['label' => 'Invoices', 'url' => ['/invoice']],
+                ],
             ];
         }
 
@@ -119,7 +114,9 @@ AppAsset::register($this);
             'label' => 'Account', 'url' => ['/user/settings/account'],
             'items' => [
                 ['label' => 'Account', 'url' => ['/user/settings/account']],
+
                 ['label' => 'Items', 'url' => ['/sku']],
+
                 [
                     'label' => 'Billing',
                     'url' => ['/billing'],
