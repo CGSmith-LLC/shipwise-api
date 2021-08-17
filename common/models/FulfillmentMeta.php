@@ -45,9 +45,10 @@ class FulfillmentMeta extends BaseFulfillmentMeta
 			if($this->update(runValidation: true)) {
 				$transaction->commit();
 			} else {
+				$transaction->rollBack();
 				$message = 'Metadatum Key could not be updated.';
 				if(!is_null($newval)) $message .= ' Metadatum Value was not attempted.';
-				throw new Exception(message: $message . implode(separator: PHP_EOL, array: $this->getErrors()));
+				throw new Exception(message: $message . PHP_EOL . implode(separator: PHP_EOL, array: $this->getErrorSummary(showAllErrors: true)));
 			}
 		}
 
@@ -60,9 +61,10 @@ class FulfillmentMeta extends BaseFulfillmentMeta
 			if($this->update(runValidation: true)) {
 				$transaction->commit();
 			} else {
+				$transaction->rollBack();
 				$message = 'Metadatum Value could not be updated.';
 				if(!is_null($newkey)) $message .= ' Metadatum Key was saved successfully.';
-				throw new Exception(message: $message . implode(separator: PHP_EOL, array: $this->getErrors()));
+				throw new Exception(message: $message . PHP_EOL . implode(separator: PHP_EOL, array: $this->getErrorSummary(showAllErrors: true)));
 			}
 		}
 	}

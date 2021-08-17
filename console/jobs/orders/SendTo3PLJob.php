@@ -18,9 +18,10 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
     /** @var string Name of Fulfillment */
     public string $fulfillment_name;
 
-    /**
-     * @inheritDoc
-     */
+	/**
+	 * @inheritDoc
+	 * @throws Exception
+	 */
     public function execute($queue)
     {
 		/**
@@ -29,7 +30,7 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
 		 */
 
 		if (($order = Order::findOne($this->order_id)) === null) {
-			throw new Exception("Order not found for ID {$this->order_id}");
+			throw new Exception(message: "Order not found for ID {$this->order_id}");
 		}
 
 		$fulfillment = Fulfillment::findOne(['name' => $this->fulfillment_name]);
@@ -37,11 +38,10 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
 		$service = $fulfillment->getService();
 
 
-		if(!$service->makeCreateOrderRequest(requestInfo: $adapter->getCreateOrderRequestInfo(order: $order))) {
-			throw new Exception('POST Request failed');
-		}
+		$service->makeCreateOrderRequest(requestInfo: $adapter->getCreateOrderRequestInfo(order: $order));
 
-
+		throw new Exception(message: 'The job dies');
+		\Yii::$app->queue->push(new UploadTrackingJob());
     }
 
     /**

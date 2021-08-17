@@ -30,6 +30,13 @@ class ColdcoService extends BaseFulfillmentService
 	private string $user_login;
 	private ?string $access_token = null;
 
+	/**
+	 * @throws \Throwable
+	 * @throws \yii\db\Exception
+	 * @throws InvalidConfigException
+	 * @throws Exception
+	 * @throws \yii\db\StaleObjectException
+	 */
 	public function applyMeta(array $metadata)
 	{
 		/** @var FulfillmentMeta $metadatum */
@@ -56,16 +63,25 @@ class ColdcoService extends BaseFulfillmentService
 					$response = null;
 					if($metadatum->decryptedValue() < time()) {
 						$response = $this->generateNewAccessToken();
-					}
-					if(!is_null($response)) {
-						$metadatum->updateMeta(newval: $response['expire_time']);
-						FulfillmentMeta::findOne(['fulfillment_id' => $metadatum->fulfillment_id, 'key' => self::META_TOKEN])
-							->updateMeta(newval: $response['access_token']);
+
+						$transaction = \Yii::$app->db->beginTransaction();
+
+						try {
+							$metadatum->updateMeta(newval: $response['expire_time']);
+							FulfillmentMeta::findOne(['fulfillment_id' => $metadatum->fulfillment_id, 'key' => self::META_TOKEN])
+								->updateMeta(newval: $response['access_token']);
+							$transaction->commit();
+						} catch (\yii\db\Exception $e) {
+							echo $e->getMessage();
+							$transaction->rollBack();
+							throw new \yii\base\Exception(message: 'Token Update Error');
+						}
+
 					}
 					break;
 				/** Check if token has not been set yet. If so, get the token. */
 				case self::META_TOKEN:
-					if(!is_null($this->access_token)) {
+					if(is_null($this->access_token)) {
 						$this->access_token = $metadatum->decryptedValue();
 					}
 					break;
@@ -73,24 +89,31 @@ class ColdcoService extends BaseFulfillmentService
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 * @throws InvalidConfigException
+	 */
 	public function makeCreateOrderRequest(array $requestInfo): bool
 	{
-		try {
-			$response = $this->client->createRequest()
-				->setMethod(method: 'POST')
-				->setUrl(url: 'orders')
-				->setHeaders(['Authorization' => "BEARER {$this->access_token}"])
-				->setContent(implode(array: $requestInfo))
-				->send();
-			if ($response->isOk) {
-				var_dump($response);
-				return true;
-			}
-		} catch (Exception | InvalidConfigException $e) {
+		$rqInfo = Json::encode($requestInfo);
 
+		$response = $this->client->createRequest()
+			->setMethod(method: 'POST')
+			->setUrl(url: '/orders')
+			->setHeaders([
+				'Authorization' => "BEARER {$this->access_token}",
+				'Content-Type' => 'application/json; charset=utf-8',
+				'Accept' => 'application/json',
+				'Content-Length' => strlen($rqInfo),
+			])
+			->setContent($rqInfo)
+			->send();
+		var_dump($response);
+		if ($response->isOk) {
+			return true;
 		}
 
-		return false;
+		throw new Exception(message: "Response Not OK." . PHP_EOL . $response->toString());
 	}
 
 	/**

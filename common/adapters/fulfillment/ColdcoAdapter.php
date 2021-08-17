@@ -80,13 +80,14 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 	{
 		//	Todo: Help with some things
 		$arr['referenceNum'] = $order->customer_reference;
-//		$arr['billingCode'] = "";		// This stuff is set by customer logic. TODO: Add event to hook logic in, or use integration meta?
+		$arr['billingCode'] = "sender";	/* This stuff is set by customer logic.
+										 *		TODO: Add event to hook logic in, or use integration meta? Currently temp val for testing*/
 //		$arr['earliestShipDate'] = "";	/* Not always set by customer logic. Is this the earliest allowed to ship or just when it should be shipped?
 //										 *		If it's the former, why is the shipment canceled at that exact time too? Please explain. */
 //		$arr['shipCancelDate'] = "";	// Not always set by customer logic. Some customers have both ^ & this, others have just this.
 //		$arr['shippingNotes'] = "";		/* Seems to be set by customer logic? Seems to be either Transit time, just the order notes, or unused.
-//										 *		TODO: Events. More of them
-//		*/
+//										 *		TODO: Events. More of them*/
+
 		$arr['notes'] = $order->notes . ' ' . (is_null($order->origin) ? '' : $order->origin);
 
 		if ($this->hasInfo($order->po_number)) $arr['PoNum'] = $order->po_number;
@@ -100,7 +101,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 		$routingInfo['carrier'] = $this->getCarrier(id: $order->carrier_id);
 		$routingInfo['mode'] = $this->getService(id: $order->service_id);
-		//$routingInfo['account'] = ""; // This is the shipping account. Varies by customer & (occasionally) by location. TODO: Event to hook in and set account?
+		$routingInfo['account'] = "865593465"; // This is the shipping account. Varies by customer & by location. TODO: Event to hook in and set account? Currently testing val
 
 		if ($this->hasInfo($order->tracking)) {
 			$routingInfo['TrackingNumber'] = $order->tracking;
