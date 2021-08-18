@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseCustomer;
+use frontend\models\User;
 use yii\helpers\ArrayHelper;
 /**
  * Class Customer
@@ -31,5 +32,16 @@ class Customer extends BaseCustomer
         return ArrayHelper::map($data, $keyField, $valueField);
     }
 
+	public function getCustomerEmails()
+	{
+		$billingEmail = \Yii::$app->customerSettings->get('billing_email', $this->id);
+		if (!empty($billingEmail)) {
+			$customerEmails = explode(',', $billingEmail);
+		} else {
+			$customers = User::find()->where(['customer_id' => $this->id])->all();
+			$customerEmails = ArrayHelper::map($customers, 'email', 'email');
+		}
 
+		return $customerEmails;
+	}
 }
