@@ -2,6 +2,7 @@
 
 namespace console\jobs;
 
+use bilberrry\spaces\Service;
 use common\models\Item;
 use common\models\Order;
 use common\models\Package;
@@ -9,10 +10,11 @@ use common\models\PackageItem;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\base\BaseObject;
-use yii\queue\JobInterface;
 use common\models\Customer;
+use yii\helpers\FileHelper;
+use yii\queue\RetryableJobInterface;
 
-class CreateReportJob extends BaseObject implements JobInterface
+class CreateReportJob extends BaseObject implements RetryableJobInterface
 {
     /**
      * @var int $customer
@@ -25,7 +27,7 @@ class CreateReportJob extends BaseObject implements JobInterface
     public int $user_id;
 
     /**
-     * @var string $user_email;
+     * @var string $user_email ;
      */
     public string $user_email;
 
@@ -59,12 +61,13 @@ class CreateReportJob extends BaseObject implements JobInterface
             )
             ->orderBy('created_date');
 
-        $dir      = Yii::getAlias('@frontend') . '/runtime/reports/';
-        $filename = $this->user_id . "_report.csv";
+        $dir = Yii::getAlias('@console') . '/runtime/reports/';
+        FileHelper::createDirectory($dir);
+        $filename = time() . '_' . $this->user_id . "_report.csv";
 
         // csv header
-        $order  = new Order();
-        $item   = new Item();
+        $order = new Order();
+        $item = new Item();
         $header = [
             $order->getAttributeLabel('customer_reference'),
             $order->getAttributeLabel('created_date'),
@@ -116,7 +119,7 @@ class CreateReportJob extends BaseObject implements JobInterface
                         ->where(['in', 'id', $packageId])
                         ->andWhere(['sku' => $item->sku])
                         ->all();
-                    $lotNumber = ArrayHelper::getColumn($lotNumbers, function($packageItem) {
+                    $lotNumber = ArrayHelper::getColumn($lotNumbers, function ($packageItem) {
                         $lotNumbers = [];
                         /** @var PackageItem $packageItem */
                         foreach ($packageItem->lotInfo as $lot) {
@@ -158,7 +161,11 @@ class CreateReportJob extends BaseObject implements JobInterface
         }
         fclose($fp);
 
+        // NEVER use 777 - except for here... Systemd runs as www-data but the runtime folder is root:root
+        // since this uploads to storage... locally 777 is fine.
+        chmod($dir . $filename, 0777);
         //  Upload CSV to Digital Ocean
+        /** @var Service $storage */
         $storage = Yii::$app->get('storage');
 
         $date = date('YmdHi');
@@ -166,16 +173,33 @@ class CreateReportJob extends BaseObject implements JobInterface
         $storage->upload('shipwise-report-' . $date . '.csv', $dir . $filename);
         $url = $storage->getUrl('shipwise-report-' . $date . '.csv');
 
-        //  Send Email
-        Yii::$app->mailer->compose()
+        // Send Email
+        $mailer = \Yii::$app->mailer;
+        $mailer->viewPath = '@frontend/views/mail';
+        $mailer->getView()->theme = \Yii::$app->view->theme;
+
+        $formatter = Yii::$app->getFormatter();
+        $startDate = $formatter->asDate($this->start_date, 'php:F j, Y');
+        $endDate = $formatter->asDate($this->end_date, 'php:F j, Y');
+        $mailer->compose(['html' => 'report'],[
+                'url' => $url,
+                'start_date' => $this->start_date,
+                'end_date' => $this->end_date,
+                'customerName' => Customer::findone(['id' => $this->customer])->name,
+            ])
             ->setFrom(Yii::$app->params['senderEmail'])
             ->setTo($this->user_email)
-            ->setSubject('Generated Report for ' . $this->start_date . ' to ' . $this->end_date)
-            ->setHtmlBody(
-                '<p>Here is your requested CSV Order Report for ' . Customer::findone(['id' => $this->customer])->name .
-                ' from ' . Yii::$app->formatter->asDate($this->start_date, 'php:l, F j, Y') . ' to ' .
-                Yii::$app->formatter->asDate($this->end_date, 'php:l, F j, Y') . '.</p><br/><a href="' . $url . '">Click to Download</a>'
-            )
+            ->setSubject('Generated Report for ' . $startDate . ' to ' . $endDate)
             ->send();
+    }
+
+    public function getTtr()
+    {
+        return 60; // seconds
+    }
+
+    public function canRetry($attempt, $error)
+    {
+        return ($attempt < 3);
     }
 }
