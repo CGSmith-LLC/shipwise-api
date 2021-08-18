@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use frontend\models\forms\IntegrationForm;
 use Yii;
 use common\models\Integration;
 use yii\data\ActiveDataProvider;
@@ -64,10 +65,12 @@ class IntegrationController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Integration();
+        $model = new IntegrationForm();
+        Yii::debug(Yii::$app->request->post());
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->save();
+            return $this->redirect(['view', 'id' => $model->integration->id]);
         }
 
         return $this->render('create', [
