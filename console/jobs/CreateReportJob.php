@@ -161,6 +161,9 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
         }
         fclose($fp);
 
+        // NEVER use 777 - except for here... Systemd runs as www-data but the runtime folder is root:root
+        // since this uploads to storage... locally 777 is fine.
+        chmod($dir . $filename, 0777);
         //  Upload CSV to Digital Ocean
         /** @var Service $storage */
         $storage = Yii::$app->get('storage');
