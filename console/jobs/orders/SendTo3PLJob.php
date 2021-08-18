@@ -6,6 +6,7 @@ namespace console\jobs\orders;
 
 use common\models\Order;
 use yii\console\Exception;
+use yii\helpers\Json;
 use yii\queue\RetryableJobInterface;
 use \yii\base\BaseObject;
 use common\models\Fulfillment;
@@ -37,6 +38,7 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
 		$adapter = $fulfillment->getAdapter();
 		$service = $fulfillment->getService();
 
+		echo Json::encode($adapter->getCreateOrderRequestInfo(order: $order));
 
 		$service->makeCreateOrderRequest(requestInfo: $adapter->getCreateOrderRequestInfo(order: $order));
 

@@ -108,7 +108,7 @@ class ColdcoService extends BaseFulfillmentService
 			])
 			->setContent($rqInfo)
 			->send();
-		var_dump($response);
+
 		if ($response->isOk) {
 			return true;
 		}

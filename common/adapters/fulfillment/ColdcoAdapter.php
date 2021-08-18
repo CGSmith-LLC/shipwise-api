@@ -31,7 +31,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		$config = $this->buildItems(arr: $config, items: $order->items);
 
 		if ($deferNotification) {
-			$config['defernotification'] = true;
+			$config['deferNotification'] = true;
 		}
 
 		$event = new CartonizationEvent();
@@ -80,8 +80,8 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 	{
 		//	Todo: Help with some things
 		$arr['referenceNum'] = $order->customer_reference;
-		$arr['billingCode'] = "sender";	/* This stuff is set by customer logic.
-										 *		TODO: Add event to hook logic in, or use integration meta? Currently temp val for testing*/
+		$arr['billingCode'] = "Sender";	/* This stuff is set by customer logic.
+//										 *		TODO: Add event to hook logic in, or use integration meta? Currently has hardcoded value for testing */
 //		$arr['earliestShipDate'] = "";	/* Not always set by customer logic. Is this the earliest allowed to ship or just when it should be shipped?
 //										 *		If it's the former, why is the shipment canceled at that exact time too? Please explain. */
 //		$arr['shipCancelDate'] = "";	// Not always set by customer logic. Some customers have both ^ & this, others have just this.
@@ -90,7 +90,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 		$arr['notes'] = $order->notes . ' ' . (is_null($order->origin) ? '' : $order->origin);
 
-		if ($this->hasInfo($order->po_number)) $arr['PoNum'] = $order->po_number;
+		if ($this->hasInfo($order->po_number)) $arr['poNum'] = $order->po_number;
 
 		return $arr;
 	}
@@ -101,10 +101,10 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 		$routingInfo['carrier'] = $this->getCarrier(id: $order->carrier_id);
 		$routingInfo['mode'] = $this->getService(id: $order->service_id);
-		$routingInfo['account'] = "865593465"; // This is the shipping account. Varies by customer & by location. TODO: Event to hook in and set account? Currently testing val
+//		$routingInfo['account'] = "865593465"; // This is the shipping account. Varies by customer & by location. TODO: Event to hook in and set account?
 
 		if ($this->hasInfo($order->tracking)) {
-			$routingInfo['TrackingNumber'] = $order->tracking;
+			$routingInfo['trackingNumber'] = $order->tracking;
 		}
 
 		if ($this->hasInfo($order->ship_from_zip)) {
@@ -157,7 +157,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		}
 
 		if ($this->hasInfo($address->address2)) {
-			$shipto['emailAddress'] = $address->address2;
+			$shipto['address2'] = $address->address2;
 		}
 
 		$arr['shipTo'] = $shipto;
@@ -177,14 +177,14 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		$shipwise->name = 'Shipwise ID';
 		$shipwise->value = $order->id;
 
-		$transit = new stdClass();
-		$transit->name = 'Est Transit';
+		//$transit = new stdClass();
+		//$transit->name = 'Est Transit';
 		//$transit->value = is_null($order->????) ? 'Unknown' : $order->????; TODO: Transit time (More shipping API calls)
 
 		$savedElements = [
 			$origin,
 			$shipwise,
-			$transit,
+			//$transit,
 		];
 
 		$arr['savedElements'] = $savedElements;
