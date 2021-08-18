@@ -11,9 +11,12 @@ use common\models\SubscriptionItems;
 use common\models\PaymentMethod;
 use common\pdf\InvoicePDF;
 use common\pdf\ReceiptPDF;
+use console\jobs\SendEmailJob;
 use dektrium\user\models\User;
 use frontend\models\Customer;
+use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentIntent;
+use yii\base\BaseObject;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -148,20 +151,11 @@ class InvoiceController extends Controller
         }
 
         // send copy of invoice to customer's email address
-        $mailer = \Yii::$app->mailer;
-        $mailer->viewPath = '@frontend/views/mail';
-        $mailer->getView()->theme = \Yii::$app->view->theme;
         foreach ($invoicesToEmail as $invoice_id) {
             /** @var $invoiceToEmail Invoice */
             $invoiceToEmail = Invoice::findOne($invoice_id);
 
-            $billingEmail = \Yii::$app->customerSettings->get('billing_email', $invoiceToEmail->customer_id);
-            if (!empty($billingEmail)) {
-                $customerEmails = explode(',', $billingEmail);
-            } else {
-                $customers = User::find()->where(['customer_id' => $invoiceToEmail->customer_id])->all();
-                $customerEmails = ArrayHelper::map($customers, 'email', 'email');
-            }
+            $customerEmails = $invoiceToEmail->customer->getCustomerEmails();
 
             try {
 
@@ -170,16 +164,18 @@ class InvoiceController extends Controller
                 $pdf->generate($invoiceToEmail);
 
                 // Send
-                $mailer->compose(['html' => 'new-invoice'], ['model' => $invoiceToEmail])
-                       ->setTo($customerEmails)
-                       ->setBcc(\Yii::$app->params['adminEmail'])
-                       ->setFrom(\Yii::$app->params['senderEmail'])
-                       ->setSubject('ShipWise Invoice #' . $invoiceToEmail->id)
-                       ->attachContent(
-                           $pdf->Output('S'),
-                           ['fileName' => "Invoice_{$invoiceToEmail->id}.pdf", 'contentType' => 'application/pdf']
-                       )
-                       ->send();
+				\Yii::$app->queue->push(new SendEmailJob([
+					'view' => 'new-invoice',
+					'params' => serialize(['model' => $invoiceToEmail]),
+					'to' => implode(separator: PHP_EOL, array: $customerEmails),
+					'bcc' => \Yii::$app->params['adminEmail'],
+					'from' => \Yii::$app->params['senderEmail'],
+					'subject' => 'ShipWise Invoice #' . $invoiceToEmail->id,
+					'attachments' => serialize([[
+						'content' => $pdf->Output('S'),
+						'options' => ['fileName' => "Invoice_{$invoiceToEmail->id}.pdf", 'contentType' => 'application/pdf'],
+					]])
+				]));
 
             } catch (\Exception $ex) {
                 var_dump($ex->getMessage());
@@ -201,11 +197,6 @@ class InvoiceController extends Controller
             ->all();
 
         $this->chargeInvoices($invoices);
-
-        // send copy of invoice to customer's email address
-        $mailer = \Yii::$app->mailer;
-        $mailer->viewPath = '@frontend/views/user/mail';
-        $mailer->getView()->theme = \Yii::$app->view->theme;
 
         foreach ($this->chargeArray as $invoice_id => $charge) {
             /**
@@ -240,13 +231,7 @@ class InvoiceController extends Controller
                         echo 'actionCharge() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
                     }
                 } else {
-                    $billingEmail = \Yii::$app->customerSettings->get('billing_email', $invoice->customer_id);
-                    if (!empty($billingEmail)) {
-                        $customerEmails = explode(',', $billingEmail);
-                    } else {
-                        $customers = User::find()->where(['customer_id' => $invoice->customer_id])->all();
-                        $customerEmails = ArrayHelper::map($customers, 'email', 'email');
-                    }
+					$customerEmails = $invoice->customer->getCustomerEmails();
 
                     try {
 
@@ -255,19 +240,21 @@ class InvoiceController extends Controller
                         $pdf->generate($invoice);
 
                         // Send
-                        $mailer->compose(['html' => 'new-payment'], [
-                                'model' => $invoice,
-                                'url' => Url::toRoute(['invoice/view', 'id' => $invoice->id], 'https')
-                            ])
-                            ->setTo($customerEmails)
-                            ->setBcc(\Yii::$app->params['adminEmail'])
-                            ->setFrom(\Yii::$app->params['senderEmail'])
-                            ->setSubject('ShipWise Receipt for Invoice #' . $invoice->id)
-                            ->attachContent(
-                                $pdf->Output('S'),
-                                ['fileName' => "Receipt_{$invoice->id}.pdf", 'contentType' => 'application/pdf']
-                            )
-                            ->send();
+						\Yii::$app->queue->push(new SendEmailJob([
+							'view' => 'new_payment',
+							'params' => serialize([
+								'model' => $invoice,
+								'url' => Url::toRoute(['invoice/view', 'id' => $invoice->id], 'https'),
+							]),
+							'to' => implode(separator: PHP_EOL, array: $customerEmails),
+							'bcc' => \Yii::$app->params['adminEmail'],
+							'from' => \Yii::$app->params['senderEmail'],
+							'subject' => 'ShipWise Receipt for Invoice #' . $invoice->id,
+							'attachments' => serialize([
+								'content' => $pdf->Output('S'),
+								'options' => ['fileName' => "Receipt_{$invoice->id}.pdf", 'contentType' => 'application/pdf'],
+							]),
+						]));
 
                     } catch (\Exception $ex) {
                         var_dump($ex->getMessage());
@@ -288,7 +275,6 @@ class InvoiceController extends Controller
      * Charge invoices that are available
      * @param $invoices array of Invoice object
      * @return InvoiceController
-     * @throws \Stripe\Exception\ApiErrorException
      */
     protected function chargeInvoices($invoices)
     {
@@ -301,24 +287,46 @@ class InvoiceController extends Controller
                 'default' => PaymentMethod::PRIMARY_PAYMENT_METHOD_YES
             ])->one();
 
-            if ($paymentMethod) {
-                $this->chargeArray[$invoice->id] = PaymentIntent::create([
-                    'amount' => $invoice->balance,
-                    'currency' => 'usd',
-                    'customer' => $customer->stripe_customer_id,
-                    'description' => 'Invoice #' . $invoice->id,
-                    'payment_method' => $paymentMethod->stripe_payment_method_id,
-                    'confirm' => true,
-                    'metadata' => [
-                        'invoice_id' => $invoice->id,
-                        'invoice_url' => Url::toRoute(['invoice/view', 'id' => $invoice->id], 'https'),
-                    ],
-                ]);
-                $this->chargeArray[$invoice->id]['customer_id'] = $customer->id;
-                $this->chargeArray[$invoice->id]['payment_method_id'] = $paymentMethod->id;
-            } else {
-                $this->stderr('Payment method does not exist for invoice #' . $invoice->id . PHP_EOL);
-            }
+			try {
+				if ($paymentMethod) {
+					$this->chargeArray[$invoice->id] = PaymentIntent::create([
+						'amount' => $invoice->balance,
+						'currency' => 'usd',
+						'customer' => $customer->stripe_customer_id,
+						'description' => 'Invoice #' . $invoice->id,
+						'payment_method' => $paymentMethod->stripe_payment_method_id,
+						'confirm' => true,
+						'metadata' => [
+							'invoice_id' => $invoice->id,
+							'invoice_url' => Url::toRoute(['invoice/view', 'id' => $invoice->id], 'https'),
+						],
+					]);
+					$this->chargeArray[$invoice->id]['customer_id'] = $customer->id;
+					$this->chargeArray[$invoice->id]['payment_method_id'] = $paymentMethod->id;
+				} else {
+					$this->stderr('Payment method does not exist for invoice #' . $invoice->id . PHP_EOL);
+				}
+			} catch (ApiErrorException $e) {
+				$this->stderr(string: "There was an error processing invoice #{$invoice->id}: {$e->getMessage()}" . PHP_EOL . 'See Log for more details.' . PHP_EOL);
+				\Yii::error($e->getError()->toJSON());
+
+				$content = '<h1>Error for Invoice #' . $invoice->id . '</h1>'
+					. '<p>There was an error completeing invoice #' . $invoice->id . '.</p>'
+					. '<p>The error message reads: ' . $e->getMessage() . '</p>';
+
+				$customerEmails = $invoice->customer->getCustomerEmails();
+
+				\Yii::$app->queue->push(new SendEmailJob([
+					'view' => 'layouts/html',
+					'params' => serialize([
+						'content' => $content,
+					]),
+					'to' => implode(separator: PHP_EOL, array: $customerEmails),
+					'bcc' => \Yii::$app->params['adminEmail'],
+					'from' => \Yii::$app->params['senderEmail'],
+					'subject' => 'Error for Invoice #' . $invoice->id,
+				]));
+			}
         }
         return $this;
     }
