@@ -41,7 +41,7 @@ class Integration extends ActiveRecord
         return [
             'name' => 'Name',
             'customer_id' => 'Customer ID',
-            'ecommerce' => 'eCommerce Site',
+            'ecommerce' => 'Ecommerce Platform',
         ];
     }
 
