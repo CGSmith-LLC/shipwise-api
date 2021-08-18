@@ -11,12 +11,9 @@ use common\models\SubscriptionItems;
 use common\models\PaymentMethod;
 use common\pdf\InvoicePDF;
 use common\pdf\ReceiptPDF;
-use console\jobs\SendEmailJob;
 use dektrium\user\models\User;
 use frontend\models\Customer;
-use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentIntent;
-use yii\base\BaseObject;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -275,6 +272,7 @@ class InvoiceController extends Controller
      * Charge invoices that are available
      * @param $invoices array of Invoice object
      * @return InvoiceController
+     * @throws \Stripe\Exception\ApiErrorException
      */
     protected function chargeInvoices($invoices)
     {
