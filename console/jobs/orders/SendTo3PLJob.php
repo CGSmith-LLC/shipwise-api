@@ -42,8 +42,7 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
 
 		$service->makeCreateOrderRequest(requestInfo: $adapter->getCreateOrderRequestInfo(order: $order));
 
-		throw new Exception(message: 'The job dies');
-		\Yii::$app->queue->push(new UploadTrackingJob());
+		\Yii::$app->queue->push(new DownloadTrackingJob(['$orderId' => $this->order_id]));
     }
 
     /**

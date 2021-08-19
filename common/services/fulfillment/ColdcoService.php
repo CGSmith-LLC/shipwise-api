@@ -102,7 +102,7 @@ class ColdcoService extends BaseFulfillmentService
 			->setHeaders([
 				'Authorization' => "BEARER {$this->access_token}",
 				'Content-Type' => 'application/json; charset=utf-8',
-				'Accept' => 'application/json',
+				'Accept' => 'application/hal+json',
 				'Content-Length' => strlen($rqInfo),
 			])
 			->setContent($rqInfo)
