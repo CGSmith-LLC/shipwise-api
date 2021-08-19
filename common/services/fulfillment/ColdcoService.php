@@ -72,9 +72,8 @@ class ColdcoService extends BaseFulfillmentService
 								->updateMeta(newval: $response['access_token']);
 							$transaction->commit();
 						} catch (\yii\db\Exception $e) {
-							echo $e->getMessage();
 							$transaction->rollBack();
-							throw new \yii\base\Exception(message: 'Token Update Error');
+							throw new \yii\base\Exception(message: 'Token Update Error. ' . $e->getMessage());
 						}
 
 					}
@@ -148,8 +147,7 @@ class ColdcoService extends BaseFulfillmentService
 		try {
 			$this->access_token = $body['access_token'];
 		} catch (ErrorException $e) {
-			echo 'Uhhh.....' . PHP_EOL . $e . PHP_EOL;
-			die();
+			die('Error happened in ColdcoService.php::generateNewAccessToken' . $e->getMessage());
 		}
 
 		return [

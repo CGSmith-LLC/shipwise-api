@@ -207,7 +207,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		}
 
 		if (!empty($orderItems)) {
-			$arr['orderItems'] = $orderItems;
+			$arr['_embedded']['http://api.3plCentral.com/rels/orders/import'] = $orderItems;
 		}
 
 		return $arr;
