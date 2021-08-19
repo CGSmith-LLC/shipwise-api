@@ -30,17 +30,17 @@ class DownloadTrackingJob extends BaseObject implements RetryableJobInterface
             throw new Exception("Order not found for ID {$this->orderId}");
         }
 
-        // Find upstream service to ship order to
-        /** @var FulfillmentService $service */
-        $name = CustomerSettings::get('fulfillment_api', $order->customer_id);
-        var_dump($name);
-        $service = \Yii::$app->get($name);
-        $service->init();
-
-        if ($tracking = $service->getTracking()) {
-            $order->tracking = $tracking;
-            $order->save();
-        }
+//        // Find upstream service to ship order to
+//        /** @var FulfillmentService $service */
+//        $name = CustomerSettings::get('fulfillment_api', $order->customer_id);
+//        var_dump($name);
+//        $service = \Yii::$app->get($name);
+//        $service->init();
+//
+//        if ($tracking = $service->getTracking()) {
+//            $order->tracking = $tracking;
+//            $order->save();
+//        }
 
         /** TODO: Create functioning conditional
          *  if (order shipped from 3PL) {

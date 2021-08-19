@@ -48,7 +48,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 			default => 28,
 		};
 
-		$arr['customerIdentifier']['id'] = $coldcoID; // Test Id. TODO: Get Coldco customer ID for each customer & handle switching
+		$arr['customerIdentifier']['id'] = (string) $coldcoID; // Test Id. TODO: Get Coldco customer ID for each customer & handle switching
 		return $arr;
 	}
 
@@ -64,11 +64,11 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 			case 'AK':
 			case 'HI':
 			case 'NV':
-				$arr['facilityIdentifier']['id'] = self::RENO_ID;
+				$arr['facilityIdentifier']['id'] = (string) self::RENO_ID;
 				// TODO: Reno Event
 				break;
 			default:
-				$arr['facilityIdentifier']['id'] = self::ST_LOUIS_ID;
+				$arr['facilityIdentifier']['id'] = (string) self::ST_LOUIS_ID;
 				// TODO: St. Louis Event
 				break;
 		}
@@ -78,14 +78,13 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 	private function buildGeneral(array $arr, Order $order): array
 	{
-		//	Todo: Help with some things
 		$arr['referenceNum'] = $order->customer_reference;
 		$arr['billingCode'] = "Sender";	/* This stuff is set by customer logic.
 //										 *		TODO: Add event to hook logic in, or use integration meta? Currently has hardcoded value for testing */
 //		$arr['earliestShipDate'] = "";	/* Not always set by customer logic. Is this the earliest allowed to ship or just when it should be shipped?
 //										 *		If it's the former, why is the shipment canceled at that exact time too? Please explain. */
 //		$arr['shipCancelDate'] = "";	// Not always set by customer logic. Some customers have both ^ & this, others have just this.
-//		$arr['shippingNotes'] = "";		/* Seems to be set by customer logic? Seems to be either Transit time, just the order notes, or unused.
+		$arr['shippingNotes'] = "";		/* Seems to be set by customer logic? Seems to be either Transit time, just the order notes, or unused.
 //										 *		TODO: Events. More of them*/
 
 		$arr['notes'] = $order->notes . ' ' . (is_null($order->origin) ? '' : $order->origin);
@@ -101,7 +100,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 		$routingInfo['carrier'] = $this->getCarrier(id: $order->carrier_id);
 		$routingInfo['mode'] = $this->getService(id: $order->service_id);
-//		$routingInfo['account'] = "865593465"; // This is the shipping account. Varies by customer & by location. TODO: Event to hook in and set account?
+		$routingInfo['account'] = "865593465"; // This is the shipping account. Varies by customer & by location. TODO: Event to hook in and set account
 
 		if ($this->hasInfo($order->tracking)) {
 			$routingInfo['trackingNumber'] = $order->tracking;
@@ -175,7 +174,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 
 		$shipwise = new stdClass();
 		$shipwise->name = 'Shipwise ID';
-		$shipwise->value = $order->id;
+		$shipwise->value = (string) $order->id;
 
 		//$transit = new stdClass();
 		//$transit->name = 'Est Transit';
@@ -207,7 +206,7 @@ class ColdcoAdapter extends BaseFulfillmentAdapter
 		}
 
 		if (!empty($orderItems)) {
-			$arr['_embedded']['http://api.3plCentral.com/rels/orders/import'] = $orderItems;
+			$arr['orderItems'] = $orderItems;
 		}
 
 		return $arr;
