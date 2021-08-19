@@ -8,6 +8,7 @@ use yii\widgets\ActiveForm;
 /* @var $model IntegrationForm */
 /* @var $form yii\widgets\ActiveForm */
 /* @var $customers array of customers */
+/* @var $ecommercePlatforms array of platforms */
 
 ?>
 
@@ -15,9 +16,17 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
+    <?php
+    if (Yii::$app->request->post()) {
+        $model->errorSummary($form);
+        die;
+    }
+    ?>
+    <?php ?>
+
     <?= $form->field($model->integration, 'customer_id')->dropDownList($customers, ['prompt' => 'Please Select']) ?>
 
-    <?= $form->field($model->integration, 'ecommerce')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model->integration, 'ecommerce')->dropdownList($ecommercePlatforms, ['disabled' => $model->integration->isNewRecord, 'prompt'   => ' -- Unknown --',]) ?>
 
     <?= $form->field($model->integration, 'fulfillment')->textInput(['maxlength' => true]) ?>
 
