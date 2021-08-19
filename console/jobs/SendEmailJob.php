@@ -10,40 +10,42 @@ use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
 /**
- * @property string		$view			The email's view is set as frontend\mail\{$view}.php
- * @property ?string	$params			Parameters for the view, serialized array
- * @property ?string	$to				Destination emails, imploded array, PHP_EOL separator
- * @property ?string	$cc				Carbon Copy emails, imploded array, PHP_EOL separator
- * @property ?string	$bcc			Blind Carbon Copy emails, imploded array, PHP_EOL separator
- * @property string		$from			The sender(s) of the email, imploded array, PHP_EOL separator
- * @property string		$subject		The subject of the email
- * @property ?string	$attachments	Any attachments, serialized 2D Array. Inner arrays must have 'content' and 'options' keys.
+ * @property string					$view			The email's view is set as frontend\mail\{$view}.php
+ * @property ?array					$params			Parameters for the view
+ * @property string[]|string		$to				Destination emails
+ * @property string[]|string|null	$cc				Carbon Copy emails
+ * @property string[]|string|null	$bcc			Blind Carbon Copy emails, imploded array, PHP_EOL separator
+ * @property string[]|string		$from			The sender(s) of the email, imploded array, PHP_EOL separator
+ * @property string					$subject		The subject of the email
+ * @property ?array					$attachments	Any attachments, 2D Array. Inner arrays must have 'content' and 'options' keys.
+ *
+ * Example Call:
+ *	\Yii::$app->queue->push(new SendEmailJob([
+ *		'view' => 'layouts/html',
+ *		'params' => [
+ *			'content' => $content,
+ *		],
+ *		'to' => 'ceo@corporation.net',
+ * 		'cc' => ['cfo@corporation.net', 'coo@corporation.net', 'cid@corporation.net']
+ *		'bcc' => 'admin@company.com',
+ *		'from' => 'sender@company.com',
+ *		'subject' => 'Test CSV',
+ *		'attachments' => [[
+ *			'content' => 'data,data,data,data' . PHP_EOL . 'data,data,data,data',
+ *			'options' => ['fileName' => "test.csv", 'contentType' => 'application/csv'],
+ *		]],
+ *	]));
  */
 class SendEmailJob extends BaseObject implements RetryableJobInterface
 {
-	/** The email's view is set as frontend\mail\{$view}.php */
-	public string $view;
-
-	/** Parameters for the view, serialized array */
-	public ?string $params = null;
-
-	/** Destination emails, imploded array, PHP_EOL separator */
-	public ?string $to = null;
-
-	/** Carbon Copy emails, imploded array, PHP_EOL separator */
-	public ?string $cc = null;
-
-	/** Blind Carbon Copy emails, imploded array, PHP_EOL separator */
-	public ?string $bcc = null;
-
-	/** The sender(s) of the email, imploded array, PHP_EOL separator */
-	public string $from;
-
-	/** The subject of the email */
-	public string $subject;
-
-	/** Any attachments, serialized 2D Array. Inner arrays must have 'content' and 'options' keys. */
-	public ?string $attachments = null;
+	public string				$view;
+	public ?array				$params = null;
+	public array|string			$to;
+	public array|string|null	$cc = null;
+	public array|string|null	$bcc = null;
+	public array|string			$from;
+	public string				$subject;
+	public ?array				$attachments = null;
 
 	/**
 	 * @inheritDoc
@@ -51,24 +53,19 @@ class SendEmailJob extends BaseObject implements RetryableJobInterface
 	 */
 	public function execute($queue)
 	{
-		if(is_null($this->to) && is_null($this->cc) && is_null($this->bcc))
-		{
-			throw new Exception('Email needs a destination.');
-		}
-
 		$mailer = \Yii::$app->mailer;
 		$mailer->viewPath = '@frontend/views/mail';
 		$mailer->getView()->theme = \Yii::$app->view->theme;
-		$message = $mailer->compose(['html' => $this->view], unserialize($this->params))
-			->setFrom(explode(separator: PHP_EOL, string: $this->from))
+		$message = $mailer->compose(['html' => $this->view], $this->params)
+			->setFrom($this->from)
 			->setSubject($this->subject);
 
-		if (!is_null($this->to )) $message->setTo (explode(separator: PHP_EOL, string: $this->to ));
-		if (!is_null($this->cc )) $message->setCc (explode(separator: PHP_EOL, string: $this->cc ));
-		if (!is_null($this->bcc)) $message->setBcc(explode(separator: PHP_EOL, string: $this->bcc));
+		if (!is_null($this->to )) $message->setTo ($this->to );
+		if (!is_null($this->cc )) $message->setCc ($this->cc );
+		if (!is_null($this->bcc)) $message->setBcc($this->bcc);
 
 		if (!is_null($this->attachments)) {
-			foreach (unserialize($this->attachments) as $attachment)
+			foreach ($this->attachments as $attachment)
 			{
 				$message->attachContent(content: $attachment['content'], options: $attachment['options']);
 			}

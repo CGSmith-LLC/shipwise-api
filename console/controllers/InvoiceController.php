@@ -11,11 +11,11 @@ use common\models\SubscriptionItems;
 use common\models\PaymentMethod;
 use common\pdf\InvoicePDF;
 use common\pdf\ReceiptPDF;
-use dektrium\user\models\User;
+use console\jobs\SendEmailJob;
 use frontend\models\Customer;
+use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentIntent;
 use yii\console\Controller;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 
 class InvoiceController extends Controller
@@ -101,6 +101,7 @@ class InvoiceController extends Controller
 
         /**
          * Check any onetimes that need to be sent out
+		 * @var OneTimeCharge $chargeASAP
          */
         $lastASAPCustomer = 0;
         foreach (OneTimeCharge::find()
@@ -163,15 +164,15 @@ class InvoiceController extends Controller
                 // Send
 				\Yii::$app->queue->push(new SendEmailJob([
 					'view' => 'new-invoice',
-					'params' => serialize(['model' => $invoiceToEmail]),
-					'to' => implode(separator: PHP_EOL, array: $customerEmails),
+					'params' => ['model' => $invoiceToEmail],
+					'to' => $customerEmails,
 					'bcc' => \Yii::$app->params['adminEmail'],
 					'from' => \Yii::$app->params['senderEmail'],
 					'subject' => 'ShipWise Invoice #' . $invoiceToEmail->id,
-					'attachments' => serialize([[
+					'attachments' => [[
 						'content' => $pdf->Output('S'),
 						'options' => ['fileName' => "Invoice_{$invoiceToEmail->id}.pdf", 'contentType' => 'application/pdf'],
-					]])
+					]]
 				]));
 
             } catch (\Exception $ex) {
@@ -239,18 +240,18 @@ class InvoiceController extends Controller
                         // Send
 						\Yii::$app->queue->push(new SendEmailJob([
 							'view' => 'new_payment',
-							'params' => serialize([
+							'params' => [
 								'model' => $invoice,
 								'url' => Url::toRoute(['invoice/view', 'id' => $invoice->id], 'https'),
-							]),
-							'to' => implode(separator: PHP_EOL, array: $customerEmails),
+							],
+							'to' => $customerEmails,
 							'bcc' => \Yii::$app->params['adminEmail'],
 							'from' => \Yii::$app->params['senderEmail'],
 							'subject' => 'ShipWise Receipt for Invoice #' . $invoice->id,
-							'attachments' => serialize([
+							'attachments' => [[
 								'content' => $pdf->Output('S'),
 								'options' => ['fileName' => "Receipt_{$invoice->id}.pdf", 'contentType' => 'application/pdf'],
-							]),
+							]],
 						]));
 
                     } catch (\Exception $ex) {
@@ -316,10 +317,10 @@ class InvoiceController extends Controller
 
 				\Yii::$app->queue->push(new SendEmailJob([
 					'view' => 'layouts/html',
-					'params' => serialize([
+					'params' => [
 						'content' => $content,
-					]),
-					'to' => implode(separator: PHP_EOL, array: $customerEmails),
+					],
+					'to' => $customerEmails,
 					'bcc' => \Yii::$app->params['adminEmail'],
 					'from' => \Yii::$app->params['senderEmail'],
 					'subject' => 'Error for Invoice #' . $invoice->id,
