@@ -18,7 +18,7 @@ use frontend\models\{Order, Address, Item};
  *
  * @package frontend\models\forms
  */
-class OrderForm extends Model
+class OrderForm extends BaseForm
 {
 
     /** @var Order */
@@ -36,15 +36,6 @@ class OrderForm extends Model
         return [
             [['Order', 'Address', 'Items'], 'required'],
         ];
-    }
-
-    /** {@inheritdoc} */
-    public function afterValidate()
-    {
-        if (!Model::validateMultiple($this->getAllModels())) {
-            $this->addError(null); // add an empty error to prevent saving
-        }
-        parent::afterValidate();
     }
 
     /**
@@ -213,27 +204,6 @@ class OrderForm extends Model
             }
         }
     }
-
-    /**
-     * @param $form
-     *
-     * @return string
-     */
-    public function errorSummary($form)
-    {
-        $errorLists = [];
-        foreach ($this->getAllModels() as $id => $model) {
-            $errorList    = $form->errorSummary($model, [
-                'header' => '<p>Please fix the following errors for <b>' . $id . '</b></p>',
-                'class'  => 'alert alert-danger',
-            ]);
-            $errorList    = str_replace('<li></li>', '', $errorList); // remove the empty error
-            $errorLists[] = $errorList;
-        }
-
-        return implode('', $errorLists);
-    }
-
     /**
      * @return array
      */

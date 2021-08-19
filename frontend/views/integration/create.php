@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model IntegrationForm */
 /* @var $customers array of customers */
-
+/* @var $ecommercePlatforms array of platforms */
 
 $this->title = 'Create Integration';
 $this->params['breadcrumbs'][] = ['label' => 'Integrations', 'url' => ['index']];
@@ -19,6 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $this->render('_form', [
         'model' => $model,
         'customers' => $customers,
+        'ecommercePlatforms' => $ecommercePlatforms
     ]) ?>
 
 </div>

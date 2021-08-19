@@ -66,10 +66,12 @@ class IntegrationController extends Controller
     public function actionCreate()
     {
         $model = new IntegrationForm();
-        Yii::debug(Yii::$app->request->post());
+        $ecommercePlatforms = $this->getPlatforms();
 
         if ($model->load(Yii::$app->request->post())) {
-            $model->save();
+            if (!$model->save()) {
+                Yii::debug($model);
+            }
             return $this->redirect(['view', 'id' => $model->integration->id]);
         }
 
@@ -80,6 +82,28 @@ class IntegrationController extends Controller
                 : Yii::$app->user->identity->getCustomerList(),
 
         ]);
+    }
+
+    /**
+     * Return a list of eCommerce platforms so the form can render the proper keys and values required
+     *
+     * @return array key value of [class] => Public Name
+     */
+    protected function getPlatforms(): array {
+        $return = [];
+
+        $namespace = 'frontend\models\forms\integrations';
+        $path = __DIR__ . '/../models/forms/integrations';
+        $allFiles = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
+        $phpFiles = new \RegexIterator($allFiles, '/\.php$/');
+        /** @var \SplFileInfo $file */
+        foreach ($phpFiles as $file) {
+            $reflection = new \ReflectionClass($namespace . '\\'. substr($file->getFilename(), 0,(strlen($file->getFilename()) - 4)));
+            $return[$file->getBasename()] = \ReflectionProperty::class->getFilename();
+            Yii::debug($reflection);
+        }
+
+        return $return;
     }
 
     /**

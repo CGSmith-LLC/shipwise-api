@@ -31,6 +31,7 @@ class BaseIntegrationMeta extends ActiveRecord
     public function rules(): array
 	{
         return [
+            [['key', 'value'], 'required'],
             [['created_date'], 'safe'],
             [['key', 'value'], 'string', 'max' => 255],
         ];
