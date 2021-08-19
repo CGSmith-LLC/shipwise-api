@@ -3,12 +3,15 @@
 namespace frontend\controllers;
 
 use frontend\models\forms\IntegrationForm;
+use frontend\models\forms\integrations\WooCommerceForm;
 use Yii;
 use common\models\Integration;
 use yii\data\ActiveDataProvider;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * IntegrationController implements the CRUD actions for Integration model.
@@ -66,7 +69,6 @@ class IntegrationController extends Controller
     public function actionCreate()
     {
         $model = new IntegrationForm();
-        $ecommercePlatforms = $this->getPlatforms();
 
         if ($model->load(Yii::$app->request->post())) {
             if (!$model->save()) {
@@ -77,6 +79,7 @@ class IntegrationController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'ecommercePlatforms' => $this->getPlatforms(),
             'customers' => Yii::$app->user->identity->isAdmin
                 ? \frontend\models\Customer::getList()
                 : Yii::$app->user->identity->getCustomerList(),
@@ -98,9 +101,12 @@ class IntegrationController extends Controller
         $phpFiles = new \RegexIterator($allFiles, '/\.php$/');
         /** @var \SplFileInfo $file */
         foreach ($phpFiles as $file) {
+            Yii::debug($file);
             $reflection = new \ReflectionClass($namespace . '\\'. substr($file->getFilename(), 0,(strlen($file->getFilename()) - 4)));
-            $return[$file->getBasename()] = \ReflectionProperty::class->getFilename();
             Yii::debug($reflection);
+            $name = $reflection->getProperty('dropDownName')->getValue();
+            Yii::debug($name);
+            $return[substr($file->getFilename(), 0,(strlen($file->getFilename()) - 8))] = $name;
         }
 
         return $return;
@@ -148,6 +154,18 @@ class IntegrationController extends Controller
         return $this->render('_wooForm', [
             'model' => $this->findModel($id)
         ]);
+    }
+
+    public function actionFormBuilder($form){
+
+        $request = Yii::$app->request;
+        if (!$request->isAjax || !($form)) {
+            throw new BadRequestHttpException('Bad request.');
+        }
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return ;
     }
 
     /**
