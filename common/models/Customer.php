@@ -32,7 +32,7 @@ class Customer extends BaseCustomer
         return ArrayHelper::map($data, $keyField, $valueField);
     }
 
-	public function getCustomerEmails()
+	public function getBillingEmail()
 	{
 		$billingEmail = \Yii::$app->customerSettings->get('billing_email', $this->id);
 		if (!empty($billingEmail)) {

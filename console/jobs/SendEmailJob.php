@@ -60,13 +60,20 @@ class SendEmailJob extends BaseObject implements RetryableJobInterface
 			->setFrom($this->from)
 			->setSubject($this->subject);
 
-		if (!is_null($this->to )) $message->setTo ($this->to );
-		if (!is_null($this->cc )) $message->setCc ($this->cc );
-		if (!is_null($this->bcc)) $message->setBcc($this->bcc);
+		if (!is_null($this->to)) {
+			$message->setTo($this->to);
+		}
+
+		if (!is_null($this->cc)) {
+			$message->setCc($this->cc);
+		}
+
+		if (!is_null($this->bcc)) {
+			$message->setBcc($this->bcc);
+		}
 
 		if (!is_null($this->attachments)) {
-			foreach ($this->attachments as $attachment)
-			{
+			foreach ($this->attachments as $attachment) {
 				$message->attachContent(content: $attachment['content'], options: $attachment['options']);
 			}
 		}
