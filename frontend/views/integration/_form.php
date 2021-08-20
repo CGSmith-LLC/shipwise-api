@@ -2,6 +2,7 @@
 
 use frontend\models\forms\IntegrationForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -26,7 +27,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model->integration, 'customer_id')->dropDownList($customers, ['prompt' => 'Please Select']) ?>
 
-    <?= $form->field($model->integration, 'ecommerce')->dropdownList($ecommercePlatforms, ['disabled' => $model->integration->isNewRecord, 'prompt'   => ' -- Unknown --',]) ?>
+    <?= $form->field($model->integration, 'ecommerce')->dropdownList($ecommercePlatforms, ['disabled' => !$model->integration->isNewRecord, 'prompt'   => ' -- Unknown --',]) ?>
 
     <?= $form->field($model->integration, 'fulfillment')->textInput(['maxlength' => true]) ?>
 
@@ -40,3 +41,24 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
+
+<script>
+
+    function getPlatformMeta(){
+
+        var platform = $('#integration-ecommerce').val() || null:
+
+        if (!platform) {
+            return false;
+        }
+
+        var url    = '<?= Url::to(['form-builder']) . '?platform=' ?>' + platform,
+
+
+
+    }
+
+
+
+
+</script>
