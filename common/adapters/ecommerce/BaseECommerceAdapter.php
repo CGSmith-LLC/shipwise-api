@@ -99,12 +99,7 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
         foreach ($this->items as $item) {
             $newitem = new Item($item);
             $newitem->order_id = $id;
-
-            if (!$newitem->validate()) {
-                throw new Exception(implode(array: $newitem->getErrorSummary(showAllErrors: true), separator: PHP_EOL));
-            } else {
-                $out[] = $newitem;
-            }
+            $out[] = $newitem;
         }
 
         return $out;
@@ -159,7 +154,7 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
         if (!$address->save(runValidation: true)) {
             $transaction->rollBack();
             //TODO: Email errors to customer?
-            throw new Exception(message: 'New address entry could not be created.' . PHP_EOL . implode(array: $address->getErrorSummary(showAllErrors: true), separator: PHP_EOL));
+            throw new Exception(message: 'New address entry could not be created.' . PHP_EOL . implode(separator: PHP_EOL, array: $address->getErrorSummary(showAllErrors: true)));
         }
         $transaction->commit();
 
@@ -174,7 +169,7 @@ abstract class BaseECommerceAdapter extends BaseObject implements ECommerceAdapt
      */
     private function setShippingInfo(Order $order): Order
     {
-        $order->carrier_id = Carrier::findOne(condition: ["name" => "FedEx"])->id; //TODO: Add ability to handle different carriers
+        $order->carrier_id = Carrier::findOne(condition: ["name" => "FedEx"])->id; //TODO: Add ability to handle different carriers. Update Test when accomplished
         $order->service_id = $this->shippingService;
         return $order;
     }

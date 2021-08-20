@@ -38,8 +38,6 @@ class SendTo3PLJob extends BaseObject implements RetryableJobInterface
 		$adapter = $fulfillment->getAdapter();
 		$service = $fulfillment->getService();
 
-		echo Json::encode($adapter->getCreateOrderRequestInfo(order: $order)) . PHP_EOL . strlen(Json::encode($adapter->getCreateOrderRequestInfo(order: $order))) . PHP_EOL;
-
 		$service->makeCreateOrderRequest(requestInfo: $adapter->getCreateOrderRequestInfo(order: $order));
 
 		\Yii::$app->queue->push(new DownloadTrackingJob(['$orderId' => $this->order_id]));

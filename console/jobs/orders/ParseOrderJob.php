@@ -52,7 +52,7 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
 
             /** @var Item[] $parsedItems */
             foreach ($parsedItems as $parsedItem) {
-                if (!$parsedItem->save()) {
+                if (!$parsedItem->save(true)) {
                     throw new Exception(message: 'Could not save item.' . PHP_EOL . implode(array: $parsedItem->getErrorSummary(showAllErrors: true), separator: PHP_EOL));
                 }
             }
