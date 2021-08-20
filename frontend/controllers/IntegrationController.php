@@ -159,13 +159,14 @@ class IntegrationController extends Controller
     public function actionFormBuilder($form){
 
         $request = Yii::$app->request;
-        if (!$request->isAjax || !($form)) {
+        $platform = new $form;
+        if (!$request->isAjax || !($platform)) {
             throw new BadRequestHttpException('Bad request.');
         }
 
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return ;
+        return $platform->getMeta();
     }
 
     /**

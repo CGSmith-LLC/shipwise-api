@@ -27,9 +27,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model->integration, 'customer_id')->dropDownList($customers, ['prompt' => 'Please Select']) ?>
 
-    <?= $form->field($model->integration, 'ecommerce')->dropdownList($ecommercePlatforms, ['disabled' => !$model->integration->isNewRecord, 'prompt'   => ' -- Unknown --',]) ?>
-
     <?= $form->field($model->integration, 'fulfillment')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model->integration, 'ecommerce')->dropdownList($ecommercePlatforms, ['disabled' => !$model->integration->isNewRecord, 'prompt'   => ' -- Unknown --',]) ?>
 
     <?= $form->field($model->metaData[0], 'key')->textInput(['name' => 'metaData[]'])?>
     <?= $form->field($model->metaData[0], 'value')->textInput(['name' => 'metaData[]'])?>
@@ -52,13 +52,23 @@ use yii\widgets\ActiveForm;
             return false;
         }
 
-        var url    = '<?= Url::to(['form-builder']) . '?platform=' ?>' + platform,
+        var url    = '<?= Url::to(['form-builder']) . '?form=' ?>' + platform + 'Form';
+
+        $.get({url: url, dataType: 'json'}, function ( meta ) {
+            addMetaFields(meta);
+        }
 
 
 
     }
 
+function addMetaFields( meta ){
+        $.ajax({
+            url:
+        })
 
+    }
+}
 
 
 </script>
