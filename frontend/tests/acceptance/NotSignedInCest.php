@@ -1,5 +1,6 @@
 <?php
 
+use frontend\tests\AcceptanceTester;
 /**
  * Class NotSignedInCest
  */

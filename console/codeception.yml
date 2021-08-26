@@ -1,10 +1,10 @@
-namespace: common\tests
-actor_suffix: Tester
+namespace: console\tests
+actor: Tester
 paths:
     tests: tests
-    output: tests/_output
+    log: tests/_output
     data: tests/_data
-    support: tests/_support
+    helpers: tests/_support
 bootstrap: _bootstrap.php
 settings:
     colors: true
