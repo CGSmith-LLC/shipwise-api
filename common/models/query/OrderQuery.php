@@ -5,6 +5,8 @@ namespace common\models\query;
 use common\models\base\BaseBatch;
 use common\models\Order;
 use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 /**
  * This is the ActiveQuery class for [[Order]].
@@ -60,7 +62,7 @@ class OrderQuery extends \yii\db\ActiveQuery
         if (!empty($ids)) {
             return $this->andOnCondition([Order::tableName() . '.customer_id' => $ids]);
         } else {
-        	return $this->andWhere(['id' => -2]);
+        	throw new ServerErrorHttpException('There was an issue processing your request.');
 		}
     }
 

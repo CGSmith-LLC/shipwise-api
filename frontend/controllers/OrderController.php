@@ -284,7 +284,6 @@ class OrderController extends \frontend\controllers\Controller
      *
      * @return Order the loaded model
      * @throws NotFoundHttpException if the model cannot be found
-	 * @throws ForbiddenHttpException if the user cannot access the model.
      */
     protected function findModel($id)
     {
@@ -295,12 +294,8 @@ class OrderController extends \frontend\controllers\Controller
 			$customerIDs[] = $userCustomer->customer_id;
 		}
     	
-        if (($model = Order::findOne($id)) !== null) {
-        	if (in_array(needle: $model->customer_id, haystack: $customerIDs)) {
-        		return $model;
-			} else {
-        		throw new ForbiddenHttpException('No, you are not allowed to mess with other customers\' orders');
-			}
+        if (($model = Order::find()->byId($id)->forCustomers($customerIDs)->one()) !== null) {
+        	return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
