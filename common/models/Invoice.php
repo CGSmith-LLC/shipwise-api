@@ -220,12 +220,12 @@ class Invoice extends \yii\db\ActiveRecord
 		 * Save Stripe ID after charging the customer
 		 */
 		$paymentIntent = new \frontend\models\PaymentIntent([
-			'invoice_id' => $invoice_id,
-			'stripe_payment_intent_id' => $charge->id,
-			'amount' => $charge->amount,
-			'status' => $charge->status,
-			'customer_id' => $charge['customer_id'],
-			'payment_method_id' => $charge['payment_method_id'],
+			'invoice_id' => $this->id,
+			'stripe_payment_intent_id' => $chargeItem->id,
+			'amount' => $chargeItem->amount,
+			'status' => $chargeItem->status,
+			'customer_id' => $chargeItem['customer_id'],
+			'payment_method_id' => $chargeItem['payment_method_id'],
 		]);
 		$paymentIntent->save();
 		
@@ -235,14 +235,14 @@ class Invoice extends \yii\db\ActiveRecord
 		 * 3. Update status maybe?
 		 * 4. update()
 		 */
-		$invoice = Invoice::findOne($invoice_id);
+		$invoice = Invoice::findOne($this->id);
 		
 		// check stripe's status
-		if ($charge->status == 'succeeded') {
+		if ($chargeItem->status == 'succeeded') {
 			// update invoice.balance to the remaining amount minus stripe's charges
-			$invoice->setAttribute('balance', ($invoice->amount - $charge->amount));
+			$invoice->setAttribute('balance', ($invoice->amount - $chargeItem->amount));
 			$invoice->setAttribute('status', Invoice::STATUS_PAID);
-			$invoice->setAttribute('stripe_charge_id', $charge->id);
+			$invoice->setAttribute('stripe_charge_id', $chargeItem->id);
 			if ($invoice->update() == false) {
 				foreach ($invoice->getErrorSummary(true) as $error) {
 					echo 'actionCharge() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
@@ -278,10 +278,10 @@ class Invoice extends \yii\db\ActiveRecord
 			}
 		}
 		
-		if ($charge->status == 'succeeded' || $charge->status == 'processing') {
-			$this->stdout("Charge successful for invoice #" . $invoice_id . PHP_EOL);
+		if ($chargeItem->status == 'succeeded' || $chargeItem->status == 'processing') {
+			$this->stdout("Charge successful for invoice #" . $this->id . PHP_EOL);
 		} else {
-			$this->stdout("Charge is NOT successful for invoice #" . $invoice_id . " - " . $charge->status . PHP_EOL);
+			$this->stdout("Charge is NOT successful for invoice #" . $this->id . " - " . $chargeItem->status . PHP_EOL);
 		}
 		
 	}
