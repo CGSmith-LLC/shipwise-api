@@ -4,6 +4,7 @@ namespace frontend\models\search;
 
 use common\models\Address;
 use common\models\Status;
+use frontend\models\UserCustomer;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -113,7 +114,7 @@ class OrderSearch extends Order
                     $params["OrderSearch"] = Yii::$app->session["ordersearch"];
                 }
             } else {
-                Yii::$app->session["ordersearch"] = $params["OrderSearch"];
+                Yii::$app->session->set("ordersearch", $params["OrderSearch"]);
             }
             // add conditions that should always apply here
 

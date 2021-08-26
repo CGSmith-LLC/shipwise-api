@@ -6,8 +6,14 @@ use common\pdf\OrderPackingSlip;
 use frontend\models\Customer;
 use Yii;
 use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
-use frontend\models\{forms\BulkEditForm, Order, forms\OrderForm, BulkAction, OrderImport, search\OrderSearch};
-use yii\web\{BadRequestHttpException, NotFoundHttpException, Response};
+use frontend\models\{forms\BulkEditForm,
+	Order,
+	forms\OrderForm,
+	BulkAction,
+	OrderImport,
+	search\OrderSearch,
+	UserCustomer};
+use yii\web\{BadRequestHttpException, ForbiddenHttpException, NotFoundHttpException, Response};
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\helpers\ArrayHelper;
@@ -278,11 +284,23 @@ class OrderController extends \frontend\controllers\Controller
      *
      * @return Order the loaded model
      * @throws NotFoundHttpException if the model cannot be found
+	 * @throws ForbiddenHttpException if the user cannot access the model.
      */
     protected function findModel($id)
     {
+    	$userCustomers = UserCustomer::findAll(['user_id' => \Yii::$app->user->id]);
+    	
+    	$customerIDs = [];
+    	foreach ($userCustomers as $userCustomer) {
+			$customerIDs[] = $userCustomer->customer_id;
+		}
+    	
         if (($model = Order::findOne($id)) !== null) {
-            return $model;
+        	if (in_array(needle: $model->customer_id, haystack: $customerIDs)) {
+        		return $model;
+			} else {
+        		throw new ForbiddenHttpException('No, you are not allowed to mess with other customers\' orders');
+			}
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');

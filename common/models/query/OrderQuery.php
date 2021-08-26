@@ -59,8 +59,9 @@ class OrderQuery extends \yii\db\ActiveQuery
     {
         if (!empty($ids)) {
             return $this->andOnCondition([Order::tableName() . '.customer_id' => $ids]);
-        }
-        return $this;
+        } else {
+        	return $this->andWhere(['id' => -2]);
+		}
     }
 
     /**
