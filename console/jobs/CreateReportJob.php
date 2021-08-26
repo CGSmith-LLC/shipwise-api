@@ -195,7 +195,7 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
 
     public function getTtr()
     {
-        return 60; // seconds
+        return 300; // seconds
     }
 
     public function canRetry($attempt, $error)
