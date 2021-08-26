@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5dc666ef76ed56755a9a74fd07305d1d",
+    "content-hash": "dfdf90662a412ac1ad9ce57a7944d19f",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.190.3",
+            "version": "3.191.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "4e641e25cc8f4d04002404afe050e25035fad0f3"
+                "reference": "15e97fe060decf30fa103be091b113adcc578c5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/4e641e25cc8f4d04002404afe050e25035fad0f3",
-                "reference": "4e641e25cc8f4d04002404afe050e25035fad0f3",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/15e97fe060decf30fa103be091b113adcc578c5d",
+                "reference": "15e97fe060decf30fa103be091b113adcc578c5d",
                 "shasum": ""
             },
             "require": {
@@ -92,9 +92,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.190.3"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.191.0"
             },
-            "time": "2021-08-16T18:13:42+00:00"
+            "time": "2021-08-19T18:15:49+00:00"
         },
         {
             "name": "bilberrry/yii2-digitalocean-spaces",
@@ -2506,16 +2506,16 @@
         },
         {
             "name": "stripe/stripe-php",
-            "version": "v7.93.0",
+            "version": "v7.94.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "c739cf6841bb3498e23bd52ecfadfcb21c521a14"
+                "reference": "03cd6b5c1c4fc9087ddd1dd046457bff274294d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/c739cf6841bb3498e23bd52ecfadfcb21c521a14",
-                "reference": "c739cf6841bb3498e23bd52ecfadfcb21c521a14",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/03cd6b5c1c4fc9087ddd1dd046457bff274294d6",
+                "reference": "03cd6b5c1c4fc9087ddd1dd046457bff274294d6",
                 "shasum": ""
             },
             "require": {
@@ -2561,9 +2561,9 @@
             ],
             "support": {
                 "issues": "https://github.com/stripe/stripe-php/issues",
-                "source": "https://github.com/stripe/stripe-php/tree/v7.93.0"
+                "source": "https://github.com/stripe/stripe-php/tree/v7.94.0"
             },
-            "time": "2021-08-11T18:48:54+00:00"
+            "time": "2021-08-19T14:15:27+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -8351,7 +8351,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.0"
+        "php": "^8.0",
+        "ext-json": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"
