@@ -3,7 +3,13 @@
 namespace common\models;
 
 use common\models\query\InvoiceQuery;
+use common\pdf\ReceiptPDF;
+use console\jobs\SendEmailJob;
+use frontend\models\Customer;
 use frontend\models\PaymentIntent;
+use Stripe\Exception\ApiErrorException;
+use yii\base\BaseObject;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "invoice".
@@ -156,4 +162,127 @@ class Invoice extends \yii\db\ActiveRecord
     {
         return $this->hasOne(PaymentIntent::class, ['invoice_id' => 'id']);
     }
+    
+    public function chargeInvoice()
+	{
+		/**
+		 * 1. Charge
+		 * 2. Save payment intent
+		 * 3. Update
+		 * 4. Receipt
+		 */
+		
+		$customer = Customer::findOne($this->customer_id);
+		/** @var PaymentMethod $paymentMethod */
+		$paymentMethod = PaymentMethod::find()->where([
+			'customer_id' => $customer->id,
+			'default' => PaymentMethod::PRIMARY_PAYMENT_METHOD_YES
+		])->one();
+		
+		try {
+			if ($paymentMethod) {
+				$chargeItem = \Stripe\PaymentIntent::create([
+					'amount' => $this->balance,
+					'currency' => 'usd',
+					'customer' => $customer->stripe_customer_id,
+					'description' => 'Invoice #' . $this->id,
+					'payment_method' => $paymentMethod->stripe_payment_method_id,
+					'confirm' => true,
+					'metadata' => [
+						'invoice_id' => $this->id,
+						'invoice_url' => Url::toRoute(['invoice/view', 'id' => $this->id], 'https'),
+					],
+				]);
+				$chargeItem['customer_id'] = $customer->id;
+				$chargeItem['payment_method_id'] = $paymentMethod->id;
+			} else {
+				$this->stderr('Payment method does not exist for invoice #' . $this->id . PHP_EOL);
+			}
+		} catch (ApiErrorException $e) {
+			$this->stderr(string: "There was an error processing invoice #{$this->id}: {$e->getMessage()}" . PHP_EOL . 'See Log for more details.' . PHP_EOL);
+			\Yii::error($e->getError()->toJSON());
+			
+			\Yii::$app->queue->push(new SendEmailJob([
+				'view' => 'failed-payment',
+				'params' => [
+					'customerName' => $this->customer->name,
+					'invoiceNumber' => $this->id,
+					'errorMessage' => $e->getMessage(),
+				],
+				'to' => $this->customer->getBillingEmail(),
+				'bcc' => \Yii::$app->params['adminEmail'],
+				'from' => \Yii::$app->params['senderEmail'],
+				'subject' => 'Error for Invoice #' . $this->id,
+			]));
+		}
+		
+		/**
+		 * Save Stripe ID after charging the customer
+		 */
+		$paymentIntent = new \frontend\models\PaymentIntent([
+			'invoice_id' => $invoice_id,
+			'stripe_payment_intent_id' => $charge->id,
+			'amount' => $charge->amount,
+			'status' => $charge->status,
+			'customer_id' => $charge['customer_id'],
+			'payment_method_id' => $charge['payment_method_id'],
+		]);
+		$paymentIntent->save();
+		
+		/**
+		 * 1. Get invoice
+		 * 2. Update balance maybe?
+		 * 3. Update status maybe?
+		 * 4. update()
+		 */
+		$invoice = Invoice::findOne($invoice_id);
+		
+		// check stripe's status
+		if ($charge->status == 'succeeded') {
+			// update invoice.balance to the remaining amount minus stripe's charges
+			$invoice->setAttribute('balance', ($invoice->amount - $charge->amount));
+			$invoice->setAttribute('status', Invoice::STATUS_PAID);
+			$invoice->setAttribute('stripe_charge_id', $charge->id);
+			if ($invoice->update() == false) {
+				foreach ($invoice->getErrorSummary(true) as $error) {
+					echo 'actionCharge() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
+				}
+			} else {
+				try {
+					
+					// Generate Receipt PDF
+					$pdf = new ReceiptPDF();
+					$pdf->generate($invoice);
+					
+					// Send
+					\Yii::$app->queue->push(new SendEmailJob([
+						'view' => 'new_payment',
+						'params' => [
+							'model' => $invoice,
+							'url' => Url::toRoute(['invoice/view', 'id' => $invoice->id], 'https'),
+						],
+						'to' => $invoice->customer->getBillingEmail(),
+						'bcc' => \Yii::$app->params['adminEmail'],
+						'from' => \Yii::$app->params['senderEmail'],
+						'subject' => 'ShipWise Receipt for Invoice #' . $invoice->id,
+						'attachments' => [[
+							'content' => $pdf->Output('S'),
+							'options' => ['fileName' => "Receipt_{$invoice->id}.pdf", 'contentType' => 'application/pdf'],
+						]],
+					]));
+					
+				} catch (\Exception $ex) {
+					var_dump($ex->getMessage());
+					die('exception hit');
+				}
+			}
+		}
+		
+		if ($charge->status == 'succeeded' || $charge->status == 'processing') {
+			$this->stdout("Charge successful for invoice #" . $invoice_id . PHP_EOL);
+		} else {
+			$this->stdout("Charge is NOT successful for invoice #" . $invoice_id . " - " . $charge->status . PHP_EOL);
+		}
+		
+	}
 }

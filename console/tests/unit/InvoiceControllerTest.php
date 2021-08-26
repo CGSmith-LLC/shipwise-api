@@ -4,7 +4,17 @@
 namespace console\tests\unit;
 
 
-class InvoiceControllerTest extends \Codeception\Test\Unit
-{
+use Codeception\Test\Unit;
+use console\tests\UnitTester;
 
+class InvoiceControllerTest extends Unit
+{
+	/* @var UnitTester $tester */
+	protected $tester;
+	
+	public function testCharge()
+	{
+	
+	}
+	
 }
