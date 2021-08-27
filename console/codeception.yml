@@ -13,3 +13,4 @@ modules:
     config:
         Yii2:
             configFile: 'config/test-local.php'
+            part: init
