@@ -12,6 +12,7 @@ use frontend\models\{forms\BulkEditForm,
 	BulkAction,
 	OrderImport,
 	search\OrderSearch,
+	User,
 	UserCustomer};
 use yii\web\{BadRequestHttpException, ForbiddenHttpException, NotFoundHttpException, Response};
 use yii\data\ActiveDataProvider;
@@ -287,14 +288,7 @@ class OrderController extends \frontend\controllers\Controller
      */
     protected function findModel($id)
     {
-    	$userCustomers = UserCustomer::findAll(['user_id' => \Yii::$app->user->id]);
-    	
-    	$customerIDs = [];
-    	foreach ($userCustomers as $userCustomer) {
-			$customerIDs[] = $userCustomer->customer_id;
-		}
-    	
-        if (($model = Order::find()->byId($id)->forCustomers($customerIDs)->one()) !== null) {
+        if (($model = Order::find()->byId($id)->forCustomers($this->customer_ids)->one()) !== null) {
         	return $model;
         }
 
