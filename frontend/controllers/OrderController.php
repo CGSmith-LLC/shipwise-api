@@ -307,7 +307,10 @@ class OrderController extends \frontend\controllers\Controller
 	 */
 	protected function findModel($id)
 	{
-		if (($model = Order::find()->byId($id)->forCustomers($this->customer_ids)->one()) !== null)
+		$query = Order::find()->byId($id);
+		$query = \Yii::$app->user->identity->isAdmin ? $query : $query->forCustomers($this->customer_ids);
+		
+		if (($model = $query->one()) !== null)
 		{
 			return $model;
 		}
