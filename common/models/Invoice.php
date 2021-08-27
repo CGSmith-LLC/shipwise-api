@@ -235,39 +235,38 @@ class Invoice extends \yii\db\ActiveRecord
 		 * 3. Update status maybe?
 		 * 4. update()
 		 */
-		$invoice = Invoice::findOne($this->id);
 		
 		// check stripe's status
 		if ($chargeItem->status == 'succeeded') {
 			// update invoice.balance to the remaining amount minus stripe's charges
-			$invoice->setAttribute('balance', ($invoice->amount - $chargeItem->amount));
-			$invoice->setAttribute('status', Invoice::STATUS_PAID);
-			$invoice->setAttribute('stripe_charge_id', $chargeItem->id);
-			if ($invoice->update() == false) {
-				foreach ($invoice->getErrorSummary(true) as $error) {
-					echo 'actionCharge() Invoice #' . $invoice->id . ' ' . $error . PHP_EOL;
+			$this->setAttribute('balance', ($this->amount - $chargeItem->amount));
+			$this->setAttribute('status', Invoice::STATUS_PAID);
+			$this->setAttribute('stripe_charge_id', $chargeItem->id);
+			if ($this->update() == false) {
+				foreach ($this->getErrorSummary(true) as $error) {
+					echo 'actionCharge() Invoice #' . $this->id . ' ' . $error . PHP_EOL;
 				}
 			} else {
 				try {
 					
 					// Generate Receipt PDF
 					$pdf = new ReceiptPDF();
-					$pdf->generate($invoice);
+					$pdf->generate($this);
 					
 					// Send
 					\Yii::$app->queue->push(new SendEmailJob([
 						'view' => 'new_payment',
 						'params' => [
-							'model' => $invoice,
-							'url' => Url::toRoute(['invoice/view', 'id' => $invoice->id], 'https'),
+							'model' => $this,
+							'url' => Url::toRoute(['invoice/view', 'id' => $this->id], 'https'),
 						],
-						'to' => $invoice->customer->getBillingEmail(),
+						'to' => $this->customer->getBillingEmail(),
 						'bcc' => \Yii::$app->params['adminEmail'],
 						'from' => \Yii::$app->params['senderEmail'],
-						'subject' => 'ShipWise Receipt for Invoice #' . $invoice->id,
+						'subject' => 'ShipWise Receipt for Invoice #' . $this->id,
 						'attachments' => [[
 							'content' => $pdf->Output('S'),
-							'options' => ['fileName' => "Receipt_{$invoice->id}.pdf", 'contentType' => 'application/pdf'],
+							'options' => ['fileName' => "Receipt_{$this->id}.pdf", 'contentType' => 'application/pdf'],
 						]],
 					]));
 					
