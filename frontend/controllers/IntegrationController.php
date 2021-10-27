@@ -25,7 +25,7 @@ class IntegrationController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -61,6 +61,26 @@ class IntegrationController extends Controller
         ]);
     }
 
+    public function actionMeta($id)
+    {
+
+        if ($model = $this->findModel($id)) {
+            $formName = 'frontend\models\forms\integrations\\' . $model->ecommerce . 'Form';
+            $form = new $formName;
+
+            if ($form->load(Yii::$app->request->post())) {
+                $form->save();
+
+                return $this->redirect(['meta', 'id' => $model->id]);
+            }
+
+            return $this->render('meta', [
+                'model' => $model,
+                'metaModel' => $form,
+            ]);
+        }
+    }
+
     /**
      * Creates a new Integration model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -68,13 +88,13 @@ class IntegrationController extends Controller
      */
     public function actionCreate()
     {
-        $model = new IntegrationForm();
+        $model = new Integration();
+        $model->status = Integration::PENDING; // when creating a new integration it starts as pending until we have meta data
 
         if ($model->load(Yii::$app->request->post())) {
-            if (!$model->save()) {
-                Yii::debug($model);
-            }
-            return $this->redirect(['view', 'id' => $model->integration->id]);
+            $model->save();
+
+            return $this->redirect(['meta', 'id' => $model->id]);
         }
 
         return $this->render('create', [
@@ -92,7 +112,8 @@ class IntegrationController extends Controller
      *
      * @return array key value of [class] => Public Name
      */
-    protected function getPlatforms(): array {
+    protected function getPlatforms(): array
+    {
         $return = [];
 
         $namespace = 'frontend\models\forms\integrations';
@@ -101,12 +122,9 @@ class IntegrationController extends Controller
         $phpFiles = new \RegexIterator($allFiles, '/\.php$/');
         /** @var \SplFileInfo $file */
         foreach ($phpFiles as $file) {
-            Yii::debug($file);
-            $reflection = new \ReflectionClass($namespace . '\\'. substr($file->getFilename(), 0,(strlen($file->getFilename()) - 4)));
-            Yii::debug($reflection);
+            $reflection = new \ReflectionClass($namespace . '\\' . substr($file->getFilename(), 0, (strlen($file->getFilename()) - 4)));
             $name = $reflection->getProperty('dropDownName')->getValue();
-            Yii::debug($name);
-            $return[substr($file->getFilename(), 0,(strlen($file->getFilename()) - 8))] = $name;
+            $return[substr($file->getFilename(), 0, (strlen($file->getFilename()) - 8))] = $name;
         }
 
         return $return;
@@ -129,6 +147,7 @@ class IntegrationController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'ecommercePlatforms' => $this->getPlatforms(),
             'customers' => Yii::$app->user->identity->isAdmin
                 ? \frontend\models\Customer::getList()
                 : Yii::$app->user->identity->getCustomerList(),
@@ -150,23 +169,19 @@ class IntegrationController extends Controller
         return $this->redirect(['index']);
     }
 
-    public function actionWoo($id){
-        return $this->render('_wooForm', [
-            'model' => $this->findModel($id)
-        ]);
-    }
-
-    public function actionFormBuilder($form){
-
+    public function actionNextForm($form)
+    {
         $request = Yii::$app->request;
-        $platform = new $form;
+        $class = 'frontend\models\forms\integrations\\' . $form . 'Form';
+        $platform = new $class;
         if (!$request->isAjax || !($platform)) {
             throw new BadRequestHttpException('Bad request.');
         }
 
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        return $platform->getMeta();
+
+        return $platform->meta;
     }
 
     /**
