@@ -174,6 +174,7 @@ class OrderSearch extends Order
             ->andFilterWhere(['like', 'origin', $this->origin])
             ->andFilterWhere(['like', Address::tableName() . '.name', $this->address]);
 
+        $this->customer_reference = preg_replace("/[^a-zA-Z0-9]/", "", $this->customer_reference);
         if (!empty($this->customer_reference)) {
             $query->andWhere("MATCH(customer_reference) AGAINST ('*$this->customer_reference*' IN BOOLEAN MODE)");
         }
