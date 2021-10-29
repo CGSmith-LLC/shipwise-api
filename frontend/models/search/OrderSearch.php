@@ -175,8 +175,9 @@ class OrderSearch extends Order
             ->andFilterWhere(['like', Address::tableName() . '.name', $this->address]);
 
         $this->customer_reference = preg_replace("/[^a-zA-Z0-9]/", "", $this->customer_reference);
+        $customerReference = "*$this->customer_reference*";
         if (!empty($this->customer_reference)) {
-            $query->andWhere("MATCH(customer_reference) AGAINST ('*$this->customer_reference*' IN BOOLEAN MODE)");
+            $query->andWhere("MATCH(customer_reference) AGAINST (:customer_reference IN BOOLEAN MODE)", [':customer_reference' => $customerReference]);
         }
         if (!empty($this->created_date)) {
             $date = new \DateTime($this->created_date);
