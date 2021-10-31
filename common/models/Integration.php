@@ -18,15 +18,22 @@ use yii\db\Expression;
  * @property string $ecommerce
  * @property string $fulfillment
  * @property int $status
+ * @property string $status_message
+ * @property string $last_success_run;
+ * @property string $created_date;
+ * @property string $updated_date;
  */
 class Integration extends ActiveRecord
 {
+    /**
+     * Add new status to generateActionList() method below
+     */
     const DISABLED = 0; // Disabled for billing
-    const PENDING = 1;
-    const VERIFYING = 2;
-    const INACTIVE = 3;
-    const ERROR = 4;
-    const ACTIVE = 5;
+    const PENDING = 1; // Have not connected yet but will attempt
+    const VERIFYING = 2; // currently verifying connection
+    const INACTIVE = 3; // customer disabled
+    const ERROR = 4; // could not connect
+    const ACTIVE = 5; // successfully connected and querying orders
 
     /** @inheritDoc */
     public static function tableName(): string
@@ -55,6 +62,8 @@ class Integration extends ActiveRecord
         return [
             [['name', 'customer_id', 'ecommerce', 'status'], 'required'],
             [['name', 'ecommerce', 'fulfillment'], 'string', 'max' => 64],
+            [['status_message'], 'string', 'max' => 100],
+            [['last_success_run'], 'safe'],
             [['customer_id', 'status'], 'integer'],
         ];
     }
@@ -79,6 +88,17 @@ class Integration extends ActiveRecord
         return $this->hasOne(\frontend\models\Customer::class, ['id' => 'customer_id']);
     }
 
+    /**
+     * Relation to meta datums
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMeta()
+    {
+        return $this->hasMany(IntegrationMeta::class, ['integration_id' => 'id']);
+    }
+
+
     public function getAdapter($json, $customer_id): BaseECommerceAdapter
     {
         $adaptername = '\\common\\adapters\\ecommerce\\' . ucfirst($this->ecommerce) . 'Adapter';
@@ -94,7 +114,7 @@ class Integration extends ActiveRecord
 
         /** @var BaseEcommerceService $service */
         $service = new $serviceName();
-        $service->applyMeta(metadata: IntegrationMeta::find()->where(['integration_id' => $this->id])->all());
+        $service->applyMeta($this->getMeta()->all());
 
         return $service;
     }
@@ -130,5 +150,22 @@ class Integration extends ActiveRecord
         }
 
         return $status;
+    }
+
+    /**
+     * Generate an action list - typically used by an administrator or customer service to change status
+     *
+     * @return array[]
+     */
+    public function generateActionList()
+    {
+        return [
+            ['label' => 'Pending', 'url' => ['integration/status', 'id' => $this->id, 'status' => self::PENDING]],
+            ['label' => 'Disabled', 'url' => ['integration/status', 'id' => $this->id, 'status' => self::DISABLED]],
+            ['label' => 'Verifying', 'url' => ['integration/status', 'id' => $this->id, 'status' => self::VERIFYING]],
+            ['label' => 'Inactive', 'url' => ['integration/status', 'id' => $this->id, 'status' => self::INACTIVE]],
+            ['label' => 'Error', 'url' => ['integration/status', 'id' => $this->id, 'status' => self::ERROR]],
+            ['label' => 'Active', 'url' => ['integration/status', 'id' => $this->id, 'status' => self::ACTIVE]],
+        ];
     }
 }

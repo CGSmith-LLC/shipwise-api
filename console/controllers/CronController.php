@@ -4,6 +4,7 @@ namespace console\controllers;
 
 use common\models\BulkAction;
 use common\models\FulfillmentMeta;
+use console\jobs\integrations\ValidateJob;
 use console\jobs\orders\ParseOrderJob;
 use console\jobs\orders\SendTo3PLJob;
 use yii\console\{Controller, ExitCode};
@@ -50,37 +51,31 @@ class CronController extends Controller
      */
     public function actionFrequent()
     {
-        // ...
         /**
          * 1. Loop through customers and customer meta data to find ecommerce site
          * 2. query ecommerce site for new orders
          * 3. save the orders and create 'ParseOrders' job.
          */
 
-        //if (date('i') % 10 === 0) {
         /**
          *  foreach customer:
          *      foreach integration:
          *          - Get integration metadata
          *          - call parseOrder
          */
-
-        /** @var Integration $integration */
-        foreach (Integration::find()->all() as $integration) {
-
-            $orders = $integration->getService()->getOrders();
-
-            foreach ($orders as $order) {
-                \Yii::$app->queue->push(new ParseOrderJob([
-                    "order" => $order,
-                    "integration_name" => $integration->name,
-                    "customer_id" => $integration->customer_id,
-                ]));
-            }
-        }
-        //}
+        $this->runIntegrations(Integration::PENDING);
 
         return ExitCode::OK;
+    }
+
+    public function runIntegrations($status)
+    {
+        /** @var Integration $integration */
+        foreach (Integration::find()->where(['status' => $status])->with('meta')->all() as $integration) {
+            \Yii::$app->queue->push(new ValidateJob([
+                'integration' => $integration
+            ]));
+        }
     }
 
     public function actionTest()
@@ -140,7 +135,7 @@ class CronController extends Controller
      */
     public function actionHalfhourly()
     {
-        //
+        $this->runIntegrations(Integration::ERROR);
 
         return ExitCode::OK;
     }

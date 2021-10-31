@@ -4,10 +4,7 @@
 namespace console\jobs\orders;
 
 
-use common\components\CustomerSettings;
-use common\components\FulfillmentService;
 use common\models\Order;
-use common\models\Status;
 use yii\console\Exception;
 use yii\queue\RetryableJobInterface;
 use \yii\base\BaseObject;

@@ -34,7 +34,25 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->getStatusLabel();
                 }
             ],
-            ['class' => 'yii\grid\ActionColumn'],
+            'status_message',
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view} {update} {delete} {change-status}',
+                'buttons' => [
+                    'change-status' => function ($url, $model, $key) {
+                        if (Yii::$app->user->identity->getIsAdmin()) {
+                            return \yii\bootstrap\ButtonDropdown::widget([
+                                'label' => 'Change Status',
+                                'options' => ['class' => 'btn-primary btn-sm'],
+                                'dropdown' => [
+                                    'items' => $model->generateActionList(),
+                                ],
+                            ]);
+                        }
+                        return '';// return nothing if not admin
+                    },
+                ]
+            ],
         ],
     ]); ?>
 </div>

@@ -13,17 +13,18 @@ class WooCommerceService extends BaseEcommerceService
      * @var Client $client
      */
     public Client $client;
-    public string $auth;
+    public array $auth;
 
     /**
      * Meta data stored in IntegrationMeta
      */
-    public const META_URL = 'url';
-    public const META_API_KEY = 'api_key';
-    public const META_API_SECRET = 'api_secret';
+    public $url;
+    public $apiKey;
+    public $apiPassword;
+    public $orderStatus;
 
-    public const API_VERISON = "2021-04";
-    public const BASE_WOOCOMMERCE_URL = 'admin/api/' . self::API_VERISON . '/';
+    public const API_VERSION = "2021-04";
+    public const BASE_WOOCOMMERCE_URL = 'admin/api/' . self::API_VERSION . '/';
 
     /**
      * Ingest an array of the meta data for the service and apply to internal objects where needed
@@ -34,25 +35,45 @@ class WooCommerceService extends BaseEcommerceService
 
     public function applyMeta(array $metadata)
     {
-        $auth = [];
         /**
          * @var IntegrationMeta $meta
          */
         foreach ($metadata as $meta) {
-            switch ($meta->key) {
-                case self::META_URL:
-                    $this->client = new Client(['baseUrl' => $meta->decryptedValue()]);
-                    break;
-                case self::META_API_KEY:
-                    $auth[0] = $meta->decryptedValue();
-                    break;
-                case self::META_API_SECRET:
-                    $auth[1] = $meta->decryptedValue();
-                    break;
-            }
+            $key = $meta->key;
+            $this->$key = $meta->decryptedValue();
         }
-        // add semicolon to end for BASIC auth
-        $this->auth = base64_encode(implode(array: $auth, separator: ':'));
+
+        $this->prepareRequest();
+    }
+
+    public function prepareRequest()
+    {
+        $this->client = new Client(['baseUrl' => $this->url]);
+        $this->auth = ['Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->apiPassword)];
+    }
+
+    /**
+     * Test the integration or throw an exception on why it is not working
+     *
+     * @return bool
+     * @throws Exception
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function testConnection()
+    {
+        $response = $this->client->createRequest()
+            ->setUrl('/wp-json/wc/v3')
+            ->setMethod('GET')
+            ->setHeaders($this->auth)
+            ->send();
+
+        if ($response->getStatusCode() == 200) {
+            return true;
+        } else {
+            $content = Json::decode($response->getContent());
+            throw new Exception($content['message'], $response->getStatusCode());
+        }
     }
 
     public function getOrders(): array
@@ -101,8 +122,8 @@ class WooCommerceService extends BaseEcommerceService
                 $nextPageLink = end(array: $nextPageLink);
                 $nextPageLink = substr(
                     string: substr(
-                        string: $nextPageLink, offset: 1, length: strlen($nextPageLink)
-                    ), offset: 0, length: strpos($nextPageLink, '>;') - 1
+                    string: $nextPageLink, offset: 1, length: strlen($nextPageLink)
+                ), offset: 0, length: strpos($nextPageLink, '>;') - 1
                 );
 
                 $pagesLeft = true;

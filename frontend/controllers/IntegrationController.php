@@ -2,11 +2,13 @@
 
 namespace frontend\controllers;
 
+use common\models\IntegrationMeta;
 use frontend\models\forms\IntegrationForm;
 use frontend\models\forms\integrations\WooCommerceForm;
 use Yii;
 use common\models\Integration;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -24,6 +26,18 @@ class IntegrationController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'ruleConfig' => [
+                    'class' => \dektrium\user\filters\AccessRule::class,
+                ],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['admin'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -31,6 +45,20 @@ class IntegrationController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionStatus($id, $status)
+    {
+        $model = $this->findModel($id);
+        $model->status = $status;
+        if ($model->update()) {
+            Yii::$app->getSession()->addFlash('success', 'Status changed to '. $model->getStatusLabel(false) .' on ' . $model->name . ' integration');
+        }else {
+            Yii::$app->getSession()->addFlash('error', 'Status modification failure');
+
+        }
+
+        return $this->redirect(['index']);
     }
 
     /**
@@ -63,20 +91,34 @@ class IntegrationController extends Controller
 
     public function actionMeta($id)
     {
-
         if ($model = $this->findModel($id)) {
             $formName = 'frontend\models\forms\integrations\\' . $model->ecommerce . 'Form';
-            $form = new $formName;
+            /** @var WooCommerceForm $metaModel */
+            $metaModel = new $formName;
 
-            if ($form->load(Yii::$app->request->post())) {
-                $form->save();
+            if ($metaModel->load(Yii::$app->request->post())) {
+                // delete old meta data first
+                // @todo perform an update on the fields
+                $existingMetas = IntegrationMeta::find()->where(['integration_id' => $model->id])->all();
+                foreach ($existingMetas as $existingMeta) {
+                    $existingMeta->delete();
+                }
+
+                foreach ($metaModel->getAttributes() as $name => $value) {
+                    IntegrationMeta::addMeta($name, $value, $model->id);
+                }
+
+                Yii::$app->getSession()->setFlash('success', 'Integration details saved successfully');
 
                 return $this->redirect(['meta', 'id' => $model->id]);
+            } else {
+                // assume we have attributes to set
+                $metaModel->setAttributes(IntegrationMeta::getMeta($model->id));
             }
 
             return $this->render('meta', [
                 'model' => $model,
-                'metaModel' => $form,
+                'metaModel' => $metaModel,
             ]);
         }
     }
