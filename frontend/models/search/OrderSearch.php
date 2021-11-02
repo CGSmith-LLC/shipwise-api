@@ -168,13 +168,15 @@ class OrderSearch extends Order
         ]);
 
         $query->andFilterWhere(['like', 'order_reference', $this->order_reference])
-            ->andFilterWhere(['like', 'customer_reference', $this->customer_reference])
             ->andFilterWhere(['like', 'tracking', $this->tracking])
-            ->andFilterWhere(['like', 'notes', $this->notes])
+            ->andFilterWhere(['like', 'orders.notes', $this->notes])
             ->andFilterWhere(['like', 'uuid', $this->uuid])
             ->andFilterWhere(['like', 'origin', $this->origin])
             ->andFilterWhere(['like', Address::tableName() . '.name', $this->address]);
 
+        if (!empty($this->customer_reference)) {
+            $query->andWhere("MATCH(customer_reference) AGAINST (:customer_reference IN BOOLEAN MODE)", [':customer_reference' => '*' . $this->customer_reference . '*']);
+        }
         if (!empty($this->created_date)) {
             $date = new \DateTime($this->created_date);
             $query->andFilterWhere(['like', Order::tableName() . '.created_date', $date->format('Y-m-d')]);
