@@ -107,6 +107,7 @@ AppAsset::register($this);
                     ['label' => 'One-Time Charges', 'url' => ['/one-time-charge']],
                     ['label' => 'Invoices', 'url' => ['/invoice']],
                     ['label' => 'Integrations', 'url' => ['/integration']],
+                    ['label' => 'Behaviors', 'url' => ['/behavior']],
                 ],
             ];
         }
