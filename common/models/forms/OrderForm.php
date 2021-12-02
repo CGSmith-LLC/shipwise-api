@@ -1,10 +1,9 @@
 <?php
 
-namespace frontend\models\forms;
+namespace common\models\forms;
 
 use Yii;
-use yii\base\Model;
-use frontend\models\{Order, Address, Item};
+use common\models\{Order, Address, Item};
 
 /**
  * Class OrderForm
@@ -16,7 +15,7 @@ use frontend\models\{Order, Address, Item};
  * @property Address $address
  * @property Item[]  $items
  *
- * @package frontend\models\forms
+ * @package common\models\forms
  */
 class OrderForm extends BaseForm
 {

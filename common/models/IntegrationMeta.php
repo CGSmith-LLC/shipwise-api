@@ -31,6 +31,7 @@ class IntegrationMeta extends base\BaseIntegrationMeta
     public static function getMeta($integration_id)
     {
         $metaDatums = IntegrationMeta::find()->where(['integration_id' => $integration_id])->all();
+        $returnMetaData = []; // init array
 
         foreach ($metaDatums as $metaDatum) {
             $returnMetaData[$metaDatum->getAttribute('key')] = \Yii::$app->getSecurity()->decryptByKey(base64_decode($metaDatum->getAttribute('value')), \Yii::$app->params['encryptionKey']);

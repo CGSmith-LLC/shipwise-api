@@ -8,7 +8,7 @@ use frontend\assets\DatePickerAsset;
 use frontend\models\Item;
 
 /* @var $this yii\web\View */
-/* @var $model frontend\models\forms\OrderForm */
+/* @var $model common\models\forms\OrderForm */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $customers array List of customers */
 /* @var $statuses array List of order statuses */

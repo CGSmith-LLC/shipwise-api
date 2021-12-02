@@ -2,19 +2,100 @@
 
 namespace common\adapters\ecommerce;
 
+use common\behaviors\AddSku;
+use common\events\OrderEvent;
+use common\models\Address;
+use common\models\forms\OrderForm;
+use common\models\Order;
 use common\models\shipping\Service;
 use common\models\Sku;
 use common\models\State;
-use yii\helpers\Json;
-use function GuzzleHttp\Promise\all;
+use common\models\Status;
+use yii\base\Component;
+use yii\console\Exception;
 
-class WooCommerceAdapter extends BaseECommerceAdapter
+class WooCommerceAdapter extends Component
 {
-    public function __construct(string $orderJSON, int $customer_id)
-    {
-        $json = Json::decode(json: $orderJSON, asArray: true);
+    const EVENT_BEFORE_PARSE = 'beforeParse';
+    const EVENT_AFTER_PARSE = 'afterParse';
 
-        parent::__construct(json: $json, customer_id: $customer_id);
+    /**
+     * @param object $unparsedOrder
+     * @return Order
+     * @throws Exception
+     */
+    public function parseOrder(object $unparsedOrder): Order
+    {
+        // find behaviors asociated with this
+        $this->attachBehavior('addSkuBehavior', [
+            'class' => AddSku::class,
+            'unparsedOrder' => $unparsedOrder
+        ]);
+
+
+        $model = new OrderForm();
+        $model->order = new Order();
+        $model->address = new Address();
+
+        $model->order->status_id = Status::OPEN;
+        $model->order->origin = 'WooCommerce';
+        $model->order->address_id = 0; // to avoid validation, as we validate address model separately*/
+        $this->trigger(self::EVENT_BEFORE_PARSE);
+        /**
+         *    $shipwiseOrder = new Order();
+        $shipwiseOrder->setReferenceNumber($row->number);
+        $shipwiseOrder->setUuid((string)$row->id);
+        $shipwiseOrder->setStatus(Order::STATUS_OPEN);
+        $reflect = new \ReflectionClass($this);
+        if ($reflect->getParentClass() !== false) {
+        $shipwiseOrder->setOrigin($reflect->getParentClass()->getShortName());
+        } else {
+        $shipwiseOrder->setOrigin($reflect->getShortName());
+        }
+        $shipwiseOrder->setNotes(substr($row->customer_note, 0, 139)); // greeting
+        $shipwiseOrder->setShipToName($shipFirstname . ' ' . $shipLastname);
+        $shipwiseOrder->setShipToAddress1((!empty($row->shipping->address_1) ? $row->shipping->address_1 : $row->billing->address_1));
+        $shipwiseOrder->setShipToAddress2((!empty($row->shipping->address_2) ? $row->shipping->address_2 : $row->billing->address_2));
+        $shipwiseOrder->setShipToCompany((!empty($row->shipping->company) ? $row->shipping->company : $row->billing->company));
+        $shipwiseOrder->setShipToCity((!empty($row->shipping->city) ? $row->shipping->city : $row->billing->city));
+        $shipwiseOrder->setShipToState((!empty($row->shipping->state) ? $row->shipping->state : $row->billing->state));
+        $shipwiseOrder->setShipToZip((!empty($row->shipping->postcode) ? $row->shipping->postcode : $row->billing->postcode));
+        $shipwiseOrder->setShipToPhone((!empty($row->shipping->phone) ? $row->shipping->phone : $row->billing->phone));
+        $shipwiseOrder->setShipCarrier(FedEx::ID);
+        $shipwiseOrder->setShipService(FedEx::SHIPWISE_FEDEX_GROUND);
+        // We initialize the variable
+        $order = array();
+        foreach ($row->line_items as $item) {
+        if (!in_array($item->sku, $this->excludedProducts) && !empty($item->sku)) {
+        $orderItem = new OrderedItem();
+        $orderItem->setName($item->name);
+        $orderItem->setQuantity($item->quantity);
+        $orderItem->setSku($item->sku);
+        $order['items'][] = $orderItem;
+        }
+        }
+        if (isset($order['items']) && count($order['items'])) {
+        $shipwiseOrder->setOrderedItems($order['items']);
+        $result = $shipwiseOrder;
+        }
+
+         */
+       /* $model->setAttributes([
+
+            'shipToZip' => $unparsedOrder->shipping->postcode,
+            'shipToPhone' => $unparsedOrder->shipping->phone,
+            'shipCarrier',
+            'shipService',
+        ]);
+        \Yii::debug($model);
+        die;*/
+
+        $event = new OrderEvent();
+        $event->setOrder($unparsedOrder);
+        $this->trigger(self::EVENT_AFTER_PARSE, $event);
+        echo $unparsedOrder->number;
+
+        return $model;
     }
 
     protected function buildGeneral(array $json)

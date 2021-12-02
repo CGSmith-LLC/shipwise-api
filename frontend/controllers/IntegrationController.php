@@ -3,10 +3,12 @@
 namespace frontend\controllers;
 
 use common\models\IntegrationMeta;
+use console\jobs\integrations\ValidateJob;
 use frontend\models\forms\IntegrationForm;
 use frontend\models\forms\integrations\WooCommerceForm;
 use Yii;
 use common\models\Integration;
+use yii\base\BaseObject;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\BadRequestHttpException;
@@ -51,11 +53,15 @@ class IntegrationController extends Controller
     {
         $model = $this->findModel($id);
         $model->status = $status;
-        if ($model->update()) {
-            Yii::$app->getSession()->addFlash('success', 'Status changed to '. $model->getStatusLabel(false) .' on ' . $model->name . ' integration');
-        }else {
+        if ($updated = $model->update()) {
+            Yii::$app->getSession()->addFlash('success', 'Status changed to ' . $model->getStatusLabel(false) . ' on ' . $model->name . ' integration');
+        } else {
             Yii::$app->getSession()->addFlash('error', 'Status modification failure');
+        }
 
+        // If status is pending then we need to enqueue the check
+        if ($updated && $model->status == Integration::PENDING) {
+            \Yii::$app->queue->push(new ValidateJob(['integration_id' => $model->id]));
         }
 
         return $this->redirect(['index']);
@@ -109,6 +115,8 @@ class IntegrationController extends Controller
                 }
 
                 Yii::$app->getSession()->setFlash('success', 'Integration details saved successfully');
+
+                \Yii::$app->queue->push(new ValidateJob(['integration_id' => $model->id]));
 
                 return $this->redirect(['meta', 'id' => $model->id]);
             } else {

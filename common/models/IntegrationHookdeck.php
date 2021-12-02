@@ -95,7 +95,7 @@ class IntegrationHookdeck extends \yii\db\ActiveRecord
     {
         $connectionResponse = $this->client->createRequest()
             ->setUrl('/connections')
-            ->setMethod('POST')
+            ->setMethod('PUT')
             ->setData([
                 'name' => 'integration-' . $this->integration_id,
                 'source' => [
@@ -106,7 +106,7 @@ class IntegrationHookdeck extends \yii\db\ActiveRecord
                 ]
             ])
             ->send();
-        // @todo save response approriately
+
         $sourceData = $connectionResponse->getData();
         $this->source_id = $sourceData['source']['id'];
         $this->source_name = $sourceData['source']['name'];
@@ -117,6 +117,11 @@ class IntegrationHookdeck extends \yii\db\ActiveRecord
         $this->validate();
 
         return parent::beforeSave($insert);
+    }
+
+    public function getIntegration()
+    {
+        return $this->hasOne(Integration::class, ['id' => 'integration_id']);
     }
 
     /**

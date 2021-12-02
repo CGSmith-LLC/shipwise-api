@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model frontend\models\forms\OrderForm */
+/* @var $model common\models\forms\OrderForm */
 /* @var $customers array List of customers */
 /* @var $statuses array List of order statuses */
 /* @var $carriers array List of carriers */

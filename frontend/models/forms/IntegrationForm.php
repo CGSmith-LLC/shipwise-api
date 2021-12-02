@@ -10,7 +10,7 @@ use common\models\IntegrationMeta;
  * @property Integration $integration
  * @property IntegrationMeta $metaData
  */
-class IntegrationForm extends BaseForm
+class IntegrationForm extends \common\models\forms\BaseForm
 {
 
 

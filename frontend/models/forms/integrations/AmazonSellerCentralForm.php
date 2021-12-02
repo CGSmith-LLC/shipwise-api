@@ -2,7 +2,7 @@
 
 namespace frontend\models\forms\integrations;
 
-use frontend\models\forms\BaseForm;
+use common\models\forms\BaseForm;
 use frontend\models\forms\BaseIntegrationsForm;
 
 class AmazonSellerCentralForm extends BaseIntegrationsForm

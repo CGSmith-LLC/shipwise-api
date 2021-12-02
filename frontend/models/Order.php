@@ -3,9 +3,7 @@
 namespace frontend\models;
 
 use common\models\Order as BaseOrder;
-use DateTime;
 use yii\helpers\ArrayHelper;
-use Yii;
 
 /**
  * Class Order

@@ -1,9 +1,7 @@
 <?php
 
-namespace frontend\models\forms;
+namespace common\models\forms;
 
-use common\models\Integration;
-use common\models\IntegrationMeta;
 use yii\base\Model;
 
 class BaseForm extends Model

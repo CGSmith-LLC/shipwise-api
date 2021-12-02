@@ -3,14 +3,8 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
-use api\modules\v1\models\core\ApiConsumerEx;
-use api\modules\v1\models\forms\OrderForm;
-use api\modules\v1\models\mappers\ShopifyMapper;
-use common\models\ApiConsumer;
-use common\models\CustomerMeta;
-use common\models\Order;
-use common\models\Status;
-use shopify\controllers\BaseController;
+use common\models\IntegrationHookdeck;
+use console\jobs\orders\ParseOrderJob;
 use Yii;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
@@ -39,45 +33,28 @@ class WebhookController extends ControllerEx
     {
         $headers = Yii::$app->request->headers;
 
-        $domain = $headers->get('x-shopify-shop-domain');
-        $type = $headers->get('x-shopify-topic');
-
-        /** @var CustomerMeta $customerMeta */
-        $customerMeta = Yii::$app->customerSettings->getObjectByValue('shopify_store_url', $domain);
-        $shopifyData = Yii::$app->request->bodyParams;
-
-        $this->apiConsumer = ApiConsumer::find()->where(['customer_id' => $customerMeta->customer_id])->one();
-        if (!$this->apiConsumer) {
-            $this->apiConsumer = new ApiConsumer(['customer_id' => $customerMeta->customer_id]);
-        }
-        if ($type == 'orders/create') {
-            // @todo not the best way to do this and we need to verify that this is the correct shopify user
-            if (!empty(Order::find()->where(['uuid' => $shopifyData['id']])->all())) {
-                return $this->errorMessage(400, "An order with this id already exists");
+        /**
+         * 1. Validate the hookdeck source. If there is no source we throw a 404
+         * 2. Check source against DB to see if hookdeck exists
+         * 3. @todo validate the hookdeck HMAC and webhook HMAC
+         * 4. @todo log unparsed order into DB for future parsing
+         * 5. @todo throw 500 if queue cannot be pushed too
+         */
+        if ($sourceName = $headers->get('X-Hookdeck-Source-Name', false)) {
+            /** @var IntegrationHookdeck $integrationHookdeck */
+            if ($integrationHookdeck = IntegrationHookdeck::find()->where(['source_name' => $sourceName])->one()) {
+                $id = \Yii::$app->queue->push(new ParseOrderJob([
+                    'unparsedOrder' => Yii::$app->request->bodyParams,
+                    'integration_id' => $integrationHookdeck->integration_id,
+                ]));
+                return $this->success('Queued ' . $id);
+            }else {
+                return $this->errorMessage(404, 'Unknown source name');
             }
-            $orderForm = new ShopifyMapper();
-            $orderForm->setScenario(ShopifyMapper::SCENARIO_DEFAULT);
-            $orderForm->setAttributes($orderForm->parse($shopifyData));
-            return $this->orderCreate($orderForm);
-        } elseif ($type == 'orders/delete') {
-            $toDelete = Order::find()->where(['uuid' => $shopifyData['id'], 'status_id' => Status::OPEN])->one();
-            Yii::debug($toDelete);
-            return $toDelete->delete();
-        } elseif ($type == 'orders/cancelled') {
-            $toCancel = Order::find()->where(['uuid' => $shopifyData['id'], 'status_id' => Status::OPEN])->one();
-            $toCancel->status_id = Status::CANCELLED;
-            return $toCancel->save();
-        } elseif ($type == 'orders/updated') {
-            $orderForm = new ShopifyMapper();
-            $orderForm->setScenario(ShopifyMapper::SCENARIO_UPDATE);
-            $orderForm->setAttributes($orderForm->parse($shopifyData));
-            $toUpdate = Order::find()->where(['uuid' => $shopifyData['id'], 'status_id' => Status::OPEN])->one();
-            $id = $toUpdate->id;
-            return $this->orderUpdate($orderForm, $id);
+        } else {
+            return $this->errorMessage(404, 'Missing source name');
         }
     }
-
-
 
     public function behaviors()
     {

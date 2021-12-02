@@ -2,10 +2,14 @@
 
 namespace common\services\ecommerce;
 
+use common\models\IntegrationHookdeck;
 use common\models\IntegrationMeta;
+use common\models\IntegrationWebhook;
 use yii\console\Exception;
 use yii\helpers\Json;
 use yii\httpclient\Client;
+use yii\httpclient\Request;
+use yii\httpclient\RequestEvent;
 
 class WooCommerceService extends BaseEcommerceService
 {
@@ -22,17 +26,19 @@ class WooCommerceService extends BaseEcommerceService
     public $apiKey;
     public $apiPassword;
     public $orderStatus;
+    protected bool $canCreateWebhooks = true;
 
-    public const API_VERSION = "2021-04";
-    public const BASE_WOOCOMMERCE_URL = 'admin/api/' . self::API_VERSION . '/';
+
+    public const API_BASE = '/wp-json/wc/v3';
+    public const API_ORDERS = 'orders';
+    // @see https://woocommerce.github.io/woocommerce-rest-api-docs/#batch-update-webhooks
+    public const API_WEBHOOKS = 'webhooks/batch';
 
     /**
      * Ingest an array of the meta data for the service and apply to internal objects where needed
      *
      * @param array $metadata
-     * @todo Change function name to buildComponents???
      */
-
     public function applyMeta(array $metadata)
     {
         /**
@@ -48,8 +54,73 @@ class WooCommerceService extends BaseEcommerceService
 
     public function prepareRequest()
     {
-        $this->client = new Client(['baseUrl' => $this->url]);
-        $this->auth = ['Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->apiPassword)];
+        $this->client = new Client([
+            'baseUrl' => $this->url,
+            'requestConfig' => [
+                'format' => Client::FORMAT_JSON,
+            ],
+            'responseConfig' => [
+                'format' => Client::FORMAT_JSON
+            ],
+            'parsers' => [
+                // configure options of the JsonParser, parse JSON as objects
+                Client::FORMAT_JSON => [
+                    'class' => 'yii\httpclient\JsonParser',
+                    'asArray' => true,
+                ]
+            ],
+        ]);
+
+        // Setup event for auth before each send
+        $this->client->on(Request::EVENT_BEFORE_SEND, function (RequestEvent $event) {
+            $event->request->addHeaders(['Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->apiPassword)]);
+        });
+    }
+
+    public function createWebhooks()
+    {
+        // Generate hookdeck integration
+        $this->createHookdeck();
+
+        // Generate ecommerce webhooks
+        $response = $this->client->createRequest()
+            ->setUrl(self::API_BASE . '/' . self::API_WEBHOOKS)
+            ->setMethod('POST')
+            ->setData([
+                'create' => [
+                    [
+                        'name' => 'Order Created -> Shipwise',
+                        'topic' => 'order.created',
+                        'delivery_url' => $this->hookdeck->source_url,
+                        'secret' => $this->hookdeck->source_name // secret for HMAC verification
+                    ], [
+                        'name' => 'Order Updated -> Shipwise',
+                        'topic' => 'order.updated',
+                        'delivery_url' => $this->hookdeck->source_url,
+                        'secret' => $this->hookdeck->source_name
+                    ], [
+                        'name' => 'Order Deleted -> Shipwise',
+                        'topic' => 'order.deleted',
+                        'delivery_url' => $this->hookdeck->source_url,
+                        'secret' => $this->hookdeck->source_name
+                    ],
+                ]
+            ])
+            ->send();
+
+        $webhookData = $response->getData();
+        foreach ($webhookData['create'] as $webhookDatum) {
+            $webhook = new IntegrationWebhook();
+            $webhook->setAttributes([
+                'integration_id' => $this->integration->id,
+                'integration_hookdeck_id' => $this->hookdeck->id,
+                'source_uuid' => $webhookDatum['id'],
+                'name' => $webhookDatum['name'],
+                'topic' => $webhookDatum['topic'],
+            ]);
+            $webhook->save();
+        }
+
     }
 
     /**
@@ -63,9 +134,8 @@ class WooCommerceService extends BaseEcommerceService
     public function testConnection()
     {
         $response = $this->client->createRequest()
-            ->setUrl('/wp-json/wc/v3')
+            ->setUrl(self::API_BASE)
             ->setMethod('GET')
-            ->setHeaders($this->auth)
             ->send();
 
         if ($response->getStatusCode() == 200) {
@@ -76,75 +146,29 @@ class WooCommerceService extends BaseEcommerceService
         }
     }
 
-    public function getOrders(): array
+    /**
+     *
+     * @see https://woocommerce.github.io/woocommerce-rest-api-docs/#list-all-orders
+     * @throws Exception
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function getOrders()
     {
-        $startDate = new \DateTime('-12 minutes', new \DateTimeZone('America/Chicago'));
-        $orderarray = [];
-        $page = $this->client->createRequest()
-            ->setMethod(method: 'GET')
-            ->setUrl(url: self::BASE_WOOCOMMERCE_URL . 'orders.json')
-            ->setData([
-                'created_at_min' => $startDate->format(format: DATE_ISO8601),
-                'status' => 'open',
-                'fulfillment_status' => null,
-                'limit' => 250,
-            ])->setHeaders(['Authorization' => "Basic {$this->auth}"])
+        if (is_null($this->last_success_run)) {
+            $parameters = ['after' => $this->last_success_run]; //2017-03-22T16:28:02
+        }
+        $parameters = [
+            'status' => $this->orderStatus, // default any
+            'per_page' => $this->perPage, // default 10
+            'page' => $this->page, // default 1
+        ];
+
+        return $this->client->createRequest()
+            ->setUrl(self::API_BASE . '/' . self::API_ORDERS)
+            ->setMethod('GET')
+            ->setData($parameters)
             ->send();
-        $pages = 1;
-
-        do {
-            $pagesLeft = false;
-
-            //  Add page to $orderarray
-            $orders = $page->getContent();
-            $headers = $page->getHeaders();
-
-            try {
-                $orders = Json::decode($orders, asArray: true);
-            } catch (\yii\base\InvalidArgumentException $e) {
-                $orders = ['error' => "Error on decode: $e"];
-            }
-
-            $orders = end(array: $orders);
-
-            if (!is_array($orders)) {
-                throw new Exception(message: '$orders is not an array. Orders reads: ' . $orders);
-            }
-
-            foreach ($orders as $order) {
-                $order = Json::encode($order);
-                $orderarray[] = $order;
-            }
-
-            if (isset($headers['link'])) {
-                $pageLinks = explode(string: $headers['link'], separator: ', ');
-                $nextPageLink = preg_grep(pattern: "/rel=\"next\"$/", array: $pageLinks);
-                $nextPageLink = end(array: $nextPageLink);
-                $nextPageLink = substr(
-                    string: substr(
-                    string: $nextPageLink, offset: 1, length: strlen($nextPageLink)
-                ), offset: 0, length: strpos($nextPageLink, '>;') - 1
-                );
-
-                $pagesLeft = true;
-                $pages++;
-
-                $page = $this->client->createRequest()
-                    ->setMethod(method: 'GET')
-                    ->setUrl($nextPageLink)
-                    ->setHeaders(['Authorization' => "Basic {$this->auth}"])
-                    ->send();
-            }
-        } while ($pagesLeft);
-
-        /**
-         * 1. Get all unfulfilled Shopify orders from the last 12 minutes (just to be safe)
-         * 2. Extract all individual order object-arrays from array
-         */
-
-        echo "\t$pages page(s) of orders. " . (count($orderarray)) . " order(s) found" . PHP_EOL;
-
-        return $orderarray;
-
     }
+
 }

@@ -99,10 +99,10 @@ class Integration extends ActiveRecord
     }
 
 
-    public function getAdapter($json, $customer_id): BaseECommerceAdapter
+    public function getAdapter()
     {
-        $adaptername = '\\common\\adapters\\ecommerce\\' . ucfirst($this->ecommerce) . 'Adapter';
-        return new $adaptername(json: $json, customer_id: $customer_id);
+        $adaptername = '\\common\\adapters\\ecommerce\\' . $this->ecommerce . 'Adapter';
+        return new $adaptername();
     }
 
     /**
@@ -114,6 +114,7 @@ class Integration extends ActiveRecord
 
         /** @var BaseEcommerceService $service */
         $service = new $serviceName();
+        $service->integration = $this;
         $service->applyMeta($this->getMeta()->all());
 
         return $service;

@@ -4,8 +4,7 @@ namespace console\controllers;
 
 use common\models\BulkAction;
 use common\models\FulfillmentMeta;
-use console\jobs\integrations\ValidateJob;
-use console\jobs\orders\ParseOrderJob;
+use console\jobs\orders\FetchJob;
 use console\jobs\orders\SendTo3PLJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
@@ -63,7 +62,7 @@ class CronController extends Controller
          *          - Get integration metadata
          *          - call parseOrder
          */
-        $this->runIntegrations(Integration::PENDING);
+        $this->runIntegrations(Integration::ACTIVE);
 
         return ExitCode::OK;
     }
@@ -72,7 +71,7 @@ class CronController extends Controller
     {
         /** @var Integration $integration */
         foreach (Integration::find()->where(['status' => $status])->with('meta')->all() as $integration) {
-            \Yii::$app->queue->push(new ValidateJob([
+            \Yii::$app->queue->push(new FetchJob([
                 'integration' => $integration
             ]));
         }
