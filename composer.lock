@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dfdf90662a412ac1ad9ce57a7944d19f",
+    "content-hash": "15c7c864ffeb935be87b8b8e107682d4",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -4488,6 +4488,68 @@
                 "wiki": "http://www.yiiframework.com/wiki/"
             },
             "time": "2018-09-23T22:00:47+00:00"
+        },
+        {
+            "name": "zhuravljov/yii2-queue-monitor",
+            "version": "0.3.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zhuravljov/yii2-queue-monitor.git",
+                "reference": "fa5246ba653164848fbd27b86a83e1adb8145c2e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zhuravljov/yii2-queue-monitor/zipball/fa5246ba653164848fbd27b86a83e1adb8145c2e",
+                "reference": "fa5246ba653164848fbd27b86a83e1adb8145c2e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "php": ">=5.5.0",
+                "yiisoft/yii2": "~2.0.14",
+                "yiisoft/yii2-bootstrap": "~2.0.0",
+                "yiisoft/yii2-queue": ">=2.2.0"
+            },
+            "require-dev": {
+                "yiisoft/yii2-debug": "~2.0.0",
+                "zhuravljov/yii2-pagination": "~1.0"
+            },
+            "suggest": {
+                "zhuravljov/yii2-pagination": "Makes pagination more responsive"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "zhuravljov\\yii\\queue\\monitor\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Zhuravlev",
+                    "email": "zhuravljov@gmail.com"
+                }
+            ],
+            "description": "Yii2 Queue Analytics Module",
+            "keywords": [
+                "analytics",
+                "module",
+                "queue",
+                "yii"
+            ],
+            "support": {
+                "issues": "https://github.com/zhuravljov/yii2-queue-monitor/issues",
+                "source": "https://github.com/zhuravljov/yii2-queue-monitor"
+            },
+            "time": "2020-08-04T21:28:39+00:00"
         },
         {
             "name": "zircote/swagger-php",

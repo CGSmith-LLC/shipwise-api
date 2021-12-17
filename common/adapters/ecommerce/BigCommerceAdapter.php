@@ -3,6 +3,8 @@
 namespace common\adapters\ecommerce;
 
 use common\events\OrderEvent;
+use common\exceptions\OrderExistsException;
+use common\exceptions\WebhookExistsException;
 use common\models\Address;
 use common\models\forms\OrderForm;
 use common\models\Order;
@@ -26,24 +28,30 @@ class BigCommerceAdapter extends Component
         $model->address = new Address();
 
         $this->trigger(self::EVENT_BEFORE_PARSE);
+        // check if order exists
+        if (Order::find()
+            ->where(['customer_reference' => (string) $unparsedOrder['id']])
+            ->andWhere(['customer_id' => 7])
+            ->one()) {
+            throw new OrderExistsException($unparsedOrder['id']);
+        }
 
         // set order created date
         $createDate = isset($unparsedOrder['date_created']) ? new \DateTime($unparsedOrder['date_created']) : new \DateTime();
 
-        $model->setOrder([
+        $model->order->setAttributes([
             'customer_id' => 7, // TODO
-            'customer_reference' =>  $unparsedOrder['id'],
+            'customer_reference' => (string) $unparsedOrder['id'],
             'status_id' => Status::OPEN,
             'uuid' => $unparsedOrder['id'],
-            'created_date' => $createDate,
+            'created_date' => $createDate->format('Y-m-d'),
             'origin' => 'BigCommerce',
             'address_id' => 0, // avoid validation issues
         ]);
 
 
-        $model->setAddress([
-            'name' => $unparsedOrder['shipping_addresses'][0]['first_name'] .
-                      ' ' . $unparsedOrder['shipping_addresses'][0]['last_name'],
+        $model->address->setAttributes([
+            'name' => $unparsedOrder['shipping_addresses'][0]['first_name'] . ' ' . $unparsedOrder['shipping_addresses'][0]['last_name'],
             'company' => $unparsedOrder['shipping_addresses'][0]['company'],
             'address1' => $unparsedOrder['shipping_addresses'][0]['street_1'],
             'address2' => $unparsedOrder['shipping_addresses'][0]['street_2'],
@@ -51,7 +59,7 @@ class BigCommerceAdapter extends Component
             'state' => $unparsedOrder['shipping_addresses'][0]['state'],
             'country' => $unparsedOrder['shipping_addresses'][0]['country_iso2'],
             'zip' => $unparsedOrder['shipping_addresses'][0]['zip'],
-            'phone' => $unparsedOrder['shipping_addresses'][0]['phone'],
+            'phone' => (!empty($unparsedOrder['shipping_addresses'][0]['phone'])) ? $unparsedOrder['shipping_addresses'][0]['phone'] : '555-555-5555',
         ]);
 
         foreach ($unparsedOrder['products'] as $unparsedProduct) {
@@ -62,6 +70,7 @@ class BigCommerceAdapter extends Component
             ];
         }
         $model->setItems($items);
+        $model->validate();
 
         // @todo convert from a bigcommerce mapping
         //$order->setShipCarrier(FedEx::ID);

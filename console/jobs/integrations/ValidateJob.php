@@ -2,6 +2,7 @@
 
 namespace console\jobs\integrations;
 
+use common\exceptions\WebhookExistsException;
 use common\models\Integration;
 use yii\base\BaseObject;
 use yii\console\Exception;
@@ -33,6 +34,11 @@ class ValidateJob extends BaseObject implements JobInterface
             }
             $this->integration->status = Integration::ACTIVE;
             $this->integration->status_message = "Integration connected.";
+            $this->integration->last_success_run = new Expression('NOW()');
+            $this->integration->save();
+        } catch (WebhookExistsException $exception) {
+            $this->integration->status = Integration::ACTIVE;
+            $this->integration->status_message = 'Integration exists already.';
             $this->integration->last_success_run = new Expression('NOW()');
             $this->integration->save();
         } catch (Exception $exception) {

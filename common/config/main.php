@@ -14,6 +14,17 @@ return [
     'bootstrap' => [
         'queue', // The component registers its own console commands
     ],
+    'container' => [
+        'singletons' => [
+            \zhuravljov\yii\queue\monitor\Env::class => [
+                'cache' => 'cache',
+                'db' => 'db',
+                'pushTableName'   => '{{%queue_push}}',
+                'execTableName'   => '{{%queue_exec}}',
+                'workerTableName' => '{{%queue_worker}}',
+            ],
+        ],
+    ],
     'components' => [
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -43,7 +54,9 @@ return [
             'channel' => 'default', // Queue channel key
             'mutex' => 'yii\mutex\MysqlMutex', // Mutex used to sync queries
             'as log' => 'yii\queue\LogBehavior',
-            'as deadLetterBehavior' => \common\behaviors\DeadLetterQueue::class,
+            //'as deadLetterBehavior' => \common\behaviors\DeadLetterQueue::class,
+            'as jobMonitor' => \zhuravljov\yii\queue\monitor\JobMonitor::class,
+            'as workerMonitor' => \zhuravljov\yii\queue\monitor\WorkerMonitor::class,
             'ttr' => 5 * 60, // Max time for anything job handling
             'attempts' => 3, // Max number of attempts
         ],

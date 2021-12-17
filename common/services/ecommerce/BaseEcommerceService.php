@@ -36,4 +36,9 @@ abstract class BaseEcommerceService extends \yii\base\BaseObject
         $this->hookdeck->save(false);
     }
 
+    public function getFullOrderDataIfNecessary($unparsedOrder)
+    {
+        return $unparsedOrder;
+    }
+
 }

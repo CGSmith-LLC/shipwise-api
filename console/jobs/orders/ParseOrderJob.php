@@ -4,6 +4,7 @@
 namespace console\jobs\orders;
 
 
+use common\exceptions\IgnoredWebhookException;
 use common\models\Integration;
 use yii\db\Exception;
 use \yii\base\BaseObject;
@@ -13,7 +14,7 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
 {
 
     /**
-     * @var object $unparsedOrder
+     * @var $unparsedOrder
      */
     public $unparsedOrder;
 
@@ -34,11 +35,16 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
     public function execute($queue)
     {
         $this->integration = Integration::find()->where(['id' => $this->integration_id])->with('meta')->one();
+        $this->unparsedOrder = $this->integration->getService()->getFullOrderDataIfNecessary($this->unparsedOrder);
         $adapter = $this->integration->getAdapter();
         try {
             $order = $adapter->parseOrder($this->unparsedOrder);
-            // $order->save();
+            $order->save();
+        } catch (IgnoredWebhookException $exception) {
+            // this guy is just ignored and should finish out happy :)
+            return;
         } catch (\Exception $exception) {
+            echo $exception->getMessage();
             throw $exception;
         }
     }

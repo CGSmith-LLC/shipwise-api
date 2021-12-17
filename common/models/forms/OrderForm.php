@@ -4,6 +4,7 @@ namespace common\models\forms;
 
 use Yii;
 use common\models\{Order, Address, Item};
+use yii\base\ErrorException;
 
 /**
  * Class OrderForm
@@ -11,9 +12,9 @@ use common\models\{Order, Address, Item};
  * This model is behind Order interface
  * it handles Order model, its `hasone` Address relation, and `hasmany` Item relation.
  *
- * @property Order   $order
+ * @property Order $order
  * @property Address $address
- * @property Item[]  $items
+ * @property Item[] $items
  *
  * @package common\models\forms
  */
@@ -53,20 +54,27 @@ class OrderForm extends BaseForm
         Yii::debug($this->order);
         if (!$this->order->save()) {
             $transaction->rollBack();
-
-            return false;
+            $message = '';
+            foreach ($this->order->getErrorSummary(true) as $error) {
+                $message .= $error . PHP_EOL;
+            }
+            throw new ErrorException('Order failed to save for the following reasons: ' . $message);
         }
 
 
         if ($this->address->save()) {
             $this->order->address_id = $this->address->id;
             if (!$this->order->save()) {
-
                 $transaction->rollBack();
             }
         } else {
+            $message = '';
+            foreach ($this->address->getErrorSummary(true) as $error) {
+                $message .= $error . PHP_EOL;
+            }
             $transaction->rollBack();
 
+            throw new ErrorException('Order failed to save for the following reasons: ' . $message);
             return false;
         }
 
@@ -203,13 +211,14 @@ class OrderForm extends BaseForm
             }
         }
     }
+
     /**
      * @return array
      */
     protected function getAllModels()
     {
         $models = [
-            'Order'   => $this->order,
+            'Order' => $this->order,
             'Address' => $this->address,
         ];
         foreach ($this->items as $id => $item) {

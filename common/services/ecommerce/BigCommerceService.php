@@ -2,6 +2,7 @@
 
 namespace common\services\ecommerce;
 
+use common\exceptions\IgnoredWebhookException;
 use common\exceptions\WebhookExistsException;
 use common\models\IntegrationMeta;
 use common\models\IntegrationWebhook;
@@ -75,6 +76,7 @@ class BigCommerceService extends BaseEcommerceService
         // Setup event for auth before each send
         $this->client->on(Request::EVENT_BEFORE_SEND, function (RequestEvent $event) {
             $event->request->addHeaders(['X-Auth-Token' => $this->accessToken]);
+            $event->request->addHeaders(['Accept' => 'application/json']);
         });
     }
 
@@ -124,7 +126,7 @@ class BigCommerceService extends BaseEcommerceService
     {
         // if status ID matches then proceed
         // scope should be store/order/statusUpdated - status 11 (unfulfilled)
-        if ($unparsedOrder['scope'] === 'store/order/updated' &&
+        if ($unparsedOrder['scope'] === 'store/order/statusUpdated' &&
             isset($unparsedOrder['data']['status']) &&
             $unparsedOrder['data']['status']['new_status_id'] == $this->statusId) {
             $orderURI = $this->storeHash . '/' . self::API_ORDERS . '/' . $unparsedOrder['data']['id'];
@@ -151,6 +153,8 @@ class BigCommerceService extends BaseEcommerceService
             $unparsedOrder['products'] = $response->getData();
 
             return $unparsedOrder;
+        } else {
+            throw new IgnoredWebhookException('This webhook is not monitored');
         }
     }
 }
