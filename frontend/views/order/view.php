@@ -18,21 +18,27 @@ YiiAsset::register($this);
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-        <?= Html::a('Print Packing Slip', ['packing-slip', 'id' => $model->id],
-            ['class' => 'btn btn-default', 'target' => '_blank']) ?>
+    <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+    <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        'class' => 'btn btn-danger',
+        'data' => [
+            'confirm' => 'Are you sure you want to delete this item?',
+            'method' => 'post',
+        ],
+    ]) ?>
 
-        <?= Html::a('Print Shipping Label', ['shipping-label', 'id' => $model->id],
-            ['class' => 'btn btn-default', 'target' => '_blank']) ?>
-    </p>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+            Action <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><?= Html::a('Clone Order', ['clone', 'id' => $model->id]) ?></li>
+            <li><?= Html::a('Print Packing Slip', ['packing-slip', 'id' => $model->id], ['target' => '_blank']) ?></li>
+            <li><?= Html::a('Print Shipping Label', ['shipping-label', 'id' => $model->id], ['target' => '_blank']) ?></li>
+        </ul>
+    </div>
+
 
     <div class="row">
         <div class="col-md-5">

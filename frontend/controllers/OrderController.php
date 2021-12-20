@@ -6,7 +6,14 @@ use common\pdf\OrderPackingSlip;
 use frontend\models\Customer;
 use Yii;
 use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
-use frontend\models\{forms\BulkEditForm, Order, forms\OrderForm, BulkAction, OrderImport, search\OrderSearch};
+use frontend\models\{Address,
+    forms\BulkEditForm,
+    Item,
+    Order,
+    forms\OrderForm,
+    BulkAction,
+    OrderImport,
+    search\OrderSearch};
 use yii\web\{BadRequestHttpException, NotFoundHttpException, Response};
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
@@ -237,6 +244,47 @@ class OrderController extends \frontend\controllers\Controller
                 'states' => State::getList('id', 'name', $model->address->country),
             ]
         );
+    }
+
+    /**
+     * Clone an existing Order model.
+     * If clone is successful, the browser will be redirected to the 'view' page.
+     *
+     * @param integer $id
+     *
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     */
+    public function actionClone($id)
+    {
+        /** @var OrderForm */
+        $orderToClone = Order::find()->where(['id' => $id])->one();
+        $addressToClone = Address::find()->where(['id' => $orderToClone->address_id])->one();
+        $itemsToClone = Item::find()->where(['order_id' => $id])->all();
+        $model = new OrderForm();
+        $model->order = new Order();
+        $model->setOrder($orderToClone->attributes);
+        $model->setAddress($addressToClone->attributes);
+
+        $model->order->status_id = Status::OPEN;
+        $model->order->setAttribute('customer_reference', $model->order->getNextCustomerReferenceNumber());
+
+        /** @var Item $item */
+        foreach ($itemsToClone as $item) {
+            $items[] = [
+                    'quantity' => $item->quantity,
+                    'sku' => $item->sku,
+                    'order_id' => $item->order_id,
+                    'name' => $item->name,
+            ];
+        }
+        $model->setItems($items);
+        $model->save();
+
+        Yii::$app->getSession()->setFlash('success', 'Order cloned.');
+
+        return $this->redirect(['view', 'id' => $model->order->id]);
     }
 
     /**

@@ -67,6 +67,26 @@ class Order extends BaseOrder
     }
 
     /**
+     * Return an order reference after checking if it exists.
+     *
+     * @return string
+     */
+    public function getNextCustomerReferenceNumber()
+    {
+        $i = 1;
+        $orderNumberToCheck = $this->customer_reference . '-' . $i;
+        while (Order::find()
+            ->where(['customer_reference' => $orderNumberToCheck])
+            ->andWhere(['customer_id' => $this->customer_id])
+            ->exists()) {
+            $i++;
+            $orderNumberToCheck = $this->customer_reference . '-' . $i;
+        }
+
+        return $orderNumberToCheck;
+    }
+
+    /**
      * Get Ship To Address
      *
      * @return \yii\db\ActiveQuery
