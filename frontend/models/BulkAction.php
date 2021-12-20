@@ -29,6 +29,7 @@ class BulkAction extends BaseBulkAction
     const EXECUTION_TYPE_ASYNC = 2;
 
     const ACTION_CHANGE_STATUS = 'changeStatus';
+    const ACTION_UPDATE_CARRIER = 'updateCarrier';
     const ACTION_PACKING_SLIPS = 'packingSlips';
     const ACTION_SHIPPING_LABELS = 'shippingLabels';
     const ACTION_SHIPPING_LABELS_PACKING_SLIPS = 'shippingLabelsPackingSlips';
@@ -42,6 +43,7 @@ class BulkAction extends BaseBulkAction
      */
     public static $actionList = [
         self::ACTION_CHANGE_STATUS,
+        self::ACTION_UPDATE_CARRIER,
         self::ACTION_PACKING_SLIPS,
         self::ACTION_SHIPPING_LABELS,
         self::ACTION_SHIPPING_LABELS_PACKING_SLIPS,
@@ -304,6 +306,35 @@ class BulkAction extends BaseBulkAction
             $transaction->commit();
             $this->_success = true;
             $this->_message = ($nbUpdated > 0) ? "$nbUpdated orders successfully updated." : "";
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            $this->addError('action', 'Execution failed. ' . $e->getMessage());
+            return false;
+        }
+
+        return self::EXECUTION_TYPE_SYNC;
+    }
+
+    /**
+     * Change Carrier and Service of the order(s).
+     *
+     * This function executes all orders synchronously and returns a result.
+     *
+     * @param null $params
+     * @return bool|int
+     */
+    public function updateCarrier($params = null): bool|int
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $updated = Order::updateAll([
+                'carrier_id' => $this->options['carrier_id'] ?: null,
+                'service_id' => $this->options['service_id'] ?: null,
+            ], ['in', 'id', $this->orderIDs]);
+            $transaction->commit();
+            $this->_success = true;
+            $this->_message = "$updated orders successfully updated.";
 
         } catch (\Exception $e) {
             $transaction->rollBack();

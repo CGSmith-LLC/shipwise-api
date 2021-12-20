@@ -613,4 +613,16 @@ class OrderController extends \frontend\controllers\Controller
 
         return $exporter->export()->send('template-import-orders.csv');
     }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionCarrierModal()
+    {
+        if(!Yii::$app->request->isAjax) {
+            throw new NotFoundHttpException('Page not found.');
+        }
+
+        return $this->renderAjax('carrier-modal');
+    }
 }
