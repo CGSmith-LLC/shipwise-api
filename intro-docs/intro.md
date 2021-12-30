@@ -1,13 +1,13 @@
-#Introduction to Shipwise
+# Introduction to Shipwise
 This is meant to provide an overview of how Shipwise is used from a customer perspective. This will contain the inner
 workings of how Shipwise works and **MUST NOT BE SHARED WITH EXTERNAL SOURCES**.
 
-##Problems Shipwise Solves
+## Problems Shipwise Solves
 * Connects ecommerce systems to one management platform
 * Connect to 3rd party logistics (3PL) companies (shipping companies)
 * Downloads tracking info from 3PLs and sends back upstream to ecommerce system
 
-##How does a small client use Shipwise?
+## How does a small client use Shipwise?
 
 A customer like The Elegant Farmer uses Shipwise to print shipping labels. They have a WooCommerce store that is 
 connected in Shipwise. Each morning they print UPS labels and packing slips so they can ship the orders out. 
@@ -15,7 +15,7 @@ When the orders are printed the ecommerce system will receive the tracking numbe
 
 Shipwise is used by them as a management platform.
 
-##How does a customer that uses a 3PL work?
+## How does a customer that uses a 3PL work?
 Shipwise will be contacted by a 3PL to connect with a customer's ecommerce site to start importing orders. We use the 
 appropriate API to download orders and normalize the data. When the data is normalized the 3PL applies business logic 
 to each order. They call this cartonization. Cartonization just tells what box and other packaging material is necessary
@@ -28,7 +28,7 @@ fulfillment side of things.
 Shipwise acts as the integration platform for Coldco Logistics and is the conduit between orders being placed and order 
 fulfillment.
 
-##How does a client use Shipwise?
+## How does a client use Shipwise?
 A client will create an account on Shipwise. After creating an account they will:
 
 * Connect to an ecommerce store(WooCommerce, Shopify, Amazon... etc)
@@ -40,7 +40,7 @@ Business logic and rules (aka Behaviors) will be added to Shipwise which will al
 only use Shipwise to login to see if there are issues with any orders being imported into the 3PL's system 
 (shown as WMS Error status in orders).
 
-##How does a 3PL use Shipwise?
+## How does a 3PL use Shipwise?
 A 3PL will provide us with a customer contact and connection that we need to configure. In the future the process will
 look like this:
 
@@ -59,7 +59,7 @@ project. This is all vanilla PHP. These behaviors can do a few business rules:
 * Route order to specific 3PL warehouse depending on state
 * Add special SKUs within certain dates (Valentine Day Special Pizza for example)
 
-#Miscellaneous Questions
+# Miscellaneous Questions
 
 > Why do I need another ecommerce service for tracking numbers?
 
