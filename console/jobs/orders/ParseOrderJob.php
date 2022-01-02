@@ -35,14 +35,14 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
     public function execute($queue)
     {
         $this->integration = Integration::find()->where(['id' => $this->integration_id])->with('meta')->one();
-        $this->unparsedOrder = $this->integration->getService()->getFullOrderDataIfNecessary($this->unparsedOrder);
-        $adapter = $this->integration->getAdapter();
         try {
+            $this->unparsedOrder = $this->integration->getService()->getFullOrderDataIfNecessary($this->unparsedOrder);
+            $adapter = $this->integration->getAdapter();
             $order = $adapter->parseOrder($this->unparsedOrder);
             $order->save();
         } catch (IgnoredWebhookException $exception) {
             // this guy is just ignored and should finish out happy :)
-            return;
+            return true;
         } catch (\Exception $exception) {
             echo $exception->getMessage();
             throw $exception;

@@ -108,6 +108,7 @@ AppAsset::register($this);
                     ['label' => 'Invoices', 'url' => ['/invoice']],
                     ['label' => 'Integrations', 'url' => ['/integration']],
                     ['label' => 'Behaviors', 'url' => ['/behavior']],
+                    ['label' => 'Jobs', 'url' => ['/monitor/jobs']],
                 ],
             ];
         }
