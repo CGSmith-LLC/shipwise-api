@@ -73,11 +73,15 @@ class State extends BaseState
             return false;
         }
 
-        if (($state = self::find()->where(['country' => $country, 'abbreviation' => $abbr])->one()) !== null) {
-            return $state;
-        }
+        // Match data in DB
+        $country = strtoupper($country);
+        $abbr = strtoupper($abbr);
 
-        if (($state = self::find()->where(['country' => $country, 'name' => $name])->one()) !== null) {
+        if (($state = self::find()
+                ->where(['country' => $country])
+                ->andFilterWhere(['abbreviation' => $abbr])
+                ->andFilterWhere(['name' => $name])
+                ->one()) !== null) {
             return $state;
         }
 

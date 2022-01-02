@@ -5,6 +5,7 @@ namespace console\jobs\orders;
 
 
 use common\exceptions\IgnoredWebhookException;
+use common\exceptions\OrderExistsException;
 use common\models\Integration;
 use yii\db\Exception;
 use \yii\base\BaseObject;
@@ -42,6 +43,9 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
             $order->save();
         } catch (IgnoredWebhookException $exception) {
             // this guy is just ignored and should finish out happy :)
+            return true;
+        } catch (OrderExistsException $exception) {
+            echo $exception->getMessage();
             return true;
         } catch (\Exception $exception) {
             echo $exception->getMessage();
