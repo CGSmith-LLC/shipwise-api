@@ -2,7 +2,6 @@
 
 namespace common\adapters\ecommerce;
 
-use common\events\OrderEvent;
 use common\exceptions\OrderExistsException;
 use common\models\Address;
 use common\models\forms\OrderForm;
@@ -79,10 +78,6 @@ class BigCommerceAdapter extends Component
         // @todo convert from a bigcommerce mapping
         //$order->setShipCarrier(FedEx::ID);
         //$order->setShipService(FedEx::SHIPWISE_GROUND_HOME);
-
-        $event = new OrderEvent();
-        $event->setOrder($unparsedOrder);
-        $this->trigger(self::EVENT_AFTER_PARSE, $event);
 
         return $model;
     }
