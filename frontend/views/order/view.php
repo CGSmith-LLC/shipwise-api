@@ -32,9 +32,6 @@ YiiAsset::register($this);
 
         <?= Html::a('Print Shipping Label', ['shipping-label', 'id' => $model->id],
             ['class' => 'btn btn-default', 'target' => '_blank']) ?>
-        <?= Html::a('Send to Fulfillment', ['send-fulfillment', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Get Tracking', ['get-tracking', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
-
     </p>
 
     <div class="row">
