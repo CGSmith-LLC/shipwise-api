@@ -6,6 +6,7 @@ use common\exceptions\IgnoredWebhookException;
 use common\exceptions\WebhookExistsException;
 use common\models\IntegrationMeta;
 use common\models\IntegrationWebhook;
+use console\jobs\orders\CreateOrderJob;
 use yii\httpclient\Client;
 use yii\httpclient\Request;
 use yii\httpclient\RequestEvent;
@@ -152,7 +153,10 @@ class BigCommerceService extends BaseEcommerceService
                 ->send();
             $unparsedOrder['products'] = $response->getData();
 
-            return $unparsedOrder;
+            return \Yii::$app->queue->push(new CreateOrderJob([
+                'unparsedOrder' => $unparsedOrder,
+                'integration_id' => $this->integration->id,
+            ]));
         } else {
             throw new IgnoredWebhookException('This webhook is not monitored');
         }

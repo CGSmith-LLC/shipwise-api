@@ -17,6 +17,8 @@ class BigCommerceAdapter extends Component
     const EVENT_BEFORE_PARSE = 'beforeParse';
     const EVENT_AFTER_PARSE = 'afterParse';
 
+    public int $customer_id;
+
     /**
      * @param object $unparsedOrder
      * @throws Exception
@@ -28,10 +30,11 @@ class BigCommerceAdapter extends Component
         $model->address = new Address();
 
         $this->trigger(self::EVENT_BEFORE_PARSE);
+
         // check if order exists
         if (Order::find()
             ->where(['customer_reference' => (string) $unparsedOrder['id']])
-            ->andWhere(['customer_id' => 7])
+            ->andWhere(['customer_id' => $this->customer_id])
             ->one()) {
             throw new OrderExistsException($unparsedOrder['id']);
         }
@@ -40,7 +43,7 @@ class BigCommerceAdapter extends Component
         $createDate = isset($unparsedOrder['date_created']) ? new \DateTime($unparsedOrder['date_created']) : new \DateTime();
 
         $model->order->setAttributes([
-            'customer_id' => 7, // TODO
+            'customer_id' => $this->customer_id,
             'customer_reference' => (string) $unparsedOrder['id'],
             'status_id' => Status::OPEN,
             'uuid' => (string) $unparsedOrder['id'],

@@ -1,21 +1,15 @@
 <?php
 
-
 namespace console\jobs\orders;
 
-
-use common\exceptions\IgnoredWebhookException;
 use common\exceptions\OrderExistsException;
 use common\models\Integration;
-use yii\db\Exception;
-use \yii\base\BaseObject;
-use \yii\queue\RetryableJobInterface;
 
-class ParseOrderJob extends BaseObject implements RetryableJobInterface
+class CreateOrderJob extends \yii\base\BaseObject implements \yii\queue\RetryableJobInterface
 {
 
     /**
-     * @var $unparsedOrder
+     * @var array $unparsedOrder
      */
     public $unparsedOrder;
 
@@ -31,26 +25,34 @@ class ParseOrderJob extends BaseObject implements RetryableJobInterface
 
     /**
      * @inheritDoc
-     * @throws Exception
+     * @throws \Exception
      */
     public function execute($queue)
     {
         $this->integration = Integration::find()->where(['id' => $this->integration_id])->with('meta')->one();
         try {
-            $createorder = $this->integration->getService()->getFullOrderDataIfNecessary($this->unparsedOrder);
-        } catch (IgnoredWebhookException $exception) {
-            // this guy is just ignored and should finish out happy :)
+            $adapter = $this->integration->getAdapter();
+            $adapter->customer_id = $this->integration->customer_id;
+            $order = $adapter->parseOrder($this->unparsedOrder);
+            $order->save();
+        } catch (OrderExistsException $e) {
             return true;
-        } catch (\Exception $exception) {
-            throw $exception;
+        } catch (\Exception $e) {
+            throw $e;
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function canRetry($attempt, $error)
     {
-        return ($attempt < 5); // TODO: Return to stopping attempts
+        return ($attempt < 5);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getTtr()
     {
         return 5;// 5 * 60; // TODO: Return to 15 minutes for production; different time better?
