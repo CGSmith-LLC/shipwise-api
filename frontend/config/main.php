@@ -12,7 +12,7 @@ return [
     'id' => 'app-frontend',
     'name' => $appName,
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'monitor'],
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [
@@ -68,6 +68,9 @@ return [
     ],
     'params' => $params,
     'modules' => [
+        'monitor' => [
+            'class' => \zhuravljov\yii\queue\monitor\Module::class,
+        ],
         'user' => [
             'class' => 'dektrium\user\Module',
             'mailer' => [

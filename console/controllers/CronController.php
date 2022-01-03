@@ -3,7 +3,12 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
+use common\models\FulfillmentMeta;
+use console\jobs\orders\FetchJob;
+use console\jobs\orders\SendTo3PLJob;
 use yii\console\{Controller, ExitCode};
+use common\models\Integration;
+use yii\db\Exception;
 
 // To create/edit crontab file: crontab -e
 // To list: crontab -l
@@ -41,15 +46,72 @@ class CronController extends Controller
     /**
      * Action Frequent
      * Called every five minutes
-     *
      * @return int exit code
      */
     public function actionFrequent()
     {
-        // ...
+        /**
+         * 1. Loop through customers and customer meta data to find ecommerce site
+         * 2. query ecommerce site for new orders
+         * 3. save the orders and create 'ParseOrders' job.
+         */
+
+        /**
+         *  foreach customer:
+         *      foreach integration:
+         *          - Get integration metadata
+         *          - call parseOrder
+         */
+        $this->runIntegrations(Integration::ACTIVE);
 
         return ExitCode::OK;
     }
+
+    public function runIntegrations($status)
+    {
+        /** @var Integration $integration */
+        foreach (Integration::find()->where(['status' => $status])->with('meta')->all() as $integration) {
+            \Yii::$app->queue->push(new FetchJob([
+                'integration' => $integration
+            ]));
+        }
+    }
+
+    public function actionTest()
+    {
+
+        /*
+        $newInt = new Fulfillment([
+            'name' => "Coldco",
+        ]);
+
+        $newInt->save();//*/
+
+        //FulfillmentMeta::addMeta('access_token', '', 1);
+        //IntegrationMeta::addMeta('api_key', '4d3f8cfe2fe56cffd14beca0ca583cd2',2);
+        //IntegrationMeta::addMeta('api_secret', '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',2);
+
+        return ExitCode::OK;
+    }
+
+    public function actionCreateFulfillmentMeta($key, $val, $fulfillment_id)
+	{
+		try {
+			FulfillmentMeta::addMeta(key: $key, value: $val, id: $fulfillment_id);
+		} catch (Exception $e) {
+			echo $e->getMessage();
+		}
+	}
+
+	public function actionCreateSendTo3PLJob($order, $fulfillment)
+	{
+		try {
+			\Yii::$app->queue->push(new SendTo3PLJob(['order_id' => $order, 'fulfillment_name' => $fulfillment]));
+		} catch (Exception $e) {
+			echo $e->getMessage();
+		}
+	}
+
 
     /**
      * Action Quarter
@@ -72,7 +134,7 @@ class CronController extends Controller
      */
     public function actionHalfhourly()
     {
-        //
+        $this->runIntegrations(Integration::ERROR);
 
         return ExitCode::OK;
     }

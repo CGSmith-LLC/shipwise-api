@@ -6,7 +6,7 @@
  *
  * @var yii\web\View $this
  * @var yii\widgets\ActiveForm $form The form
- * @var frontend\models\forms\OrderForm $model The order form model
+ * @var common\models\forms\OrderForm $model The order form model
  * @var frontend\models\Item $item The item
  * @var int $key Item key
  * @var int $counter Item counter

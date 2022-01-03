@@ -3,14 +3,14 @@
 namespace frontend\controllers;
 
 use common\pdf\OrderPackingSlip;
+use common\models\forms\OrderForm;
+use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\Customer;
 use Yii;
-use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\{Address,
     forms\BulkEditForm,
     Item,
     Order,
-    forms\OrderForm,
     BulkAction,
     OrderImport,
     search\OrderSearch};

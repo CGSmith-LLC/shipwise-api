@@ -115,6 +115,9 @@ AppAsset::register($this);
                     ['label' => 'Subscriptions', 'url' => ['/subscription']],
                     ['label' => 'One-Time Charges', 'url' => ['/one-time-charge']],
                     ['label' => 'Invoices', 'url' => ['/invoice']],
+                    ['label' => 'Integrations', 'url' => ['/integration']],
+                    ['label' => 'Behaviors', 'url' => ['/behavior']],
+                    ['label' => 'Jobs', 'url' => ['/monitor/jobs']],
                 ],
             ];
         }

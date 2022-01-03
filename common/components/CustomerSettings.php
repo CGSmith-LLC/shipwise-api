@@ -59,7 +59,7 @@ class CustomerSettings extends Component
      * @param string   $key        Settings key
      * @param string|null $value Value of meta data
      *
-     * @return null|string
+     * @return CustomerMeta|null
      */
     public static function getObjectByValue($key, $value = null)
     {

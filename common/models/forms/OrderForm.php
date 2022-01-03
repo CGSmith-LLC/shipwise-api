@@ -1,10 +1,10 @@
 <?php
 
-namespace frontend\models\forms;
+namespace common\models\forms;
 
 use Yii;
-use yii\base\Model;
-use frontend\models\{Order, Address, Item};
+use common\models\{Order, Address, Item};
+use yii\base\ErrorException;
 
 /**
  * Class OrderForm
@@ -12,13 +12,13 @@ use frontend\models\{Order, Address, Item};
  * This model is behind Order interface
  * it handles Order model, its `hasone` Address relation, and `hasmany` Item relation.
  *
- * @property Order   $order
+ * @property Order $order
  * @property Address $address
- * @property Item[]  $items
+ * @property Item[] $items
  *
- * @package frontend\models\forms
+ * @package common\models\forms
  */
-class OrderForm extends Model
+class OrderForm extends BaseForm
 {
 
     /** @var Order */
@@ -38,15 +38,6 @@ class OrderForm extends Model
         ];
     }
 
-    /** {@inheritdoc} */
-    public function afterValidate()
-    {
-        if (!Model::validateMultiple($this->getAllModels())) {
-            $this->addError(null); // add an empty error to prevent saving
-        }
-        parent::afterValidate();
-    }
-
     /**
      * Save models
      *
@@ -63,20 +54,27 @@ class OrderForm extends Model
         Yii::debug($this->order);
         if (!$this->order->save()) {
             $transaction->rollBack();
-
-            return false;
+            $message = '';
+            foreach ($this->order->getErrorSummary(true) as $error) {
+                $message .= $error . PHP_EOL;
+            }
+            throw new ErrorException('Order failed to save for the following reasons: ' . $message);
         }
 
 
         if ($this->address->save()) {
             $this->order->address_id = $this->address->id;
             if (!$this->order->save()) {
-
                 $transaction->rollBack();
             }
         } else {
+            $message = '';
+            foreach ($this->address->getErrorSummary(true) as $error) {
+                $message .= $error . PHP_EOL;
+            }
             $transaction->rollBack();
 
+            throw new ErrorException('Order failed to save for the following reasons: ' . $message);
             return false;
         }
 
@@ -215,32 +213,12 @@ class OrderForm extends Model
     }
 
     /**
-     * @param $form
-     *
-     * @return string
-     */
-    public function errorSummary($form)
-    {
-        $errorLists = [];
-        foreach ($this->getAllModels() as $id => $model) {
-            $errorList    = $form->errorSummary($model, [
-                'header' => '<p>Please fix the following errors for <b>' . $id . '</b></p>',
-                'class'  => 'alert alert-danger',
-            ]);
-            $errorList    = str_replace('<li></li>', '', $errorList); // remove the empty error
-            $errorLists[] = $errorList;
-        }
-
-        return implode('', $errorLists);
-    }
-
-    /**
      * @return array
      */
     protected function getAllModels()
     {
         $models = [
-            'Order'   => $this->order,
+            'Order' => $this->order,
             'Address' => $this->address,
         ];
         foreach ($this->items as $id => $item) {

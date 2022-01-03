@@ -170,3 +170,21 @@ You must set this in the policy at `/etc/ImageMagic-6/policy.xml` or it will err
 
 note: disregard if you use Docker, as it's already in [/frontend/Dockerfile](frontend/Dockerfile)
 
+### Troubleshooting Console Jobs
+
+Run `php yii queue/run` from the frontend docker container to execute the job. You can check in the `queue` table to see
+what jobs are available to run. From the order page you can queue up the jobs.
+
+Put this in the main-local.php in the console to troubleshoot queries and console commands.
+```php
+ [
+    'class' => 'yii\log\FileTarget',
+    'logFile' => '@runtime/logs/profile.log',
+    'logVars' => [],
+    'levels' => ['profile'],
+    'categories' => ['yii\db\Command::query'],
+    'prefix' => function ($message) {
+        return '';
+    }
+]
+```

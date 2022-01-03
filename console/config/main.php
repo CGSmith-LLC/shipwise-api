@@ -17,9 +17,19 @@ return [
         '@dektrium' => '@vendor/dektrium',
     ],
     'controllerMap' => [
+        'monitor' => [
+            'class' => \zhuravljov\yii\queue\monitor\console\GcController::class,
+        ],
         'fixture' => [
             'class' => 'yii\console\controllers\FixtureController',
             'namespace' => 'common\fixtures',
+        ],
+        'migrate' => [
+            'class' => \yii\console\controllers\MigrateController::class,
+            'migrationNamespaces' => [
+                //...
+                'zhuravljov\yii\queue\monitor\migrations',
+            ],
         ],
     ],
     'components' => [
@@ -29,11 +39,21 @@ return [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'logFile' => '@runtime/logs/http-request.log',
+                    'categories' => ['yii\httpclient\*'],
+                ],
             ],
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'scriptUrl' => 'https://app.getshipwise.com'
+        ],
+        'user' => [
+            'class' => 'yii\web\User',
+            'identityClass' => 'app\models\User',
+            //'enableAutoLogin' => true,
         ],
     ],
     'params' => $params,
