@@ -70,7 +70,7 @@ class CronController extends Controller
     public function runIntegrations($status)
     {
         /** @var Integration $integration */
-        foreach (Integration::find()->where(['status' => $status])->with('meta')->all() as $integration) {
+        foreach (Integration::find()->where(['status' => $status])->andWhere(['webhooks_enabled' => 0])->with('meta')->all() as $integration) {
             \Yii::$app->queue->push(new FetchJob([
                 'integration' => $integration
             ]));
