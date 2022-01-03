@@ -5,16 +5,12 @@ namespace frontend\controllers;
 use common\pdf\OrderPackingSlip;
 use common\models\forms\OrderForm;
 use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
-use console\jobs\orders\DownloadTrackingJob;
-use console\jobs\orders\SendTo3PLJob;
 use frontend\models\Customer;
 use Yii;
-use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\{Address,
     forms\BulkEditForm,
     Item,
     Order,
-    forms\OrderForm,
     BulkAction,
     OrderImport,
     search\OrderSearch};
@@ -248,20 +244,6 @@ class OrderController extends \frontend\controllers\Controller
                 'states' => State::getList('id', 'name', $model->address->country),
             ]
         );
-    }
-
-    public function actionSendFulfillment($id)
-    {
-        $job = Yii::$app->queue->push(new SendTo3PLJob(['orderId' => $id]));
-        Yii::$app->session->setFlash('success', 'Order sent to fulfillment');
-        $this->redirect('/order/view/'. $id);
-    }
-
-    public function actionGetTracking($id)
-    {
-        $job = Yii::$app->queue->push(new DownloadTrackingJob(['orderId' => $id]));
-        Yii::$app->session->setFlash('success', 'Order sent to fulfillment');
-        $this->redirect('/order/view/'. $id);
     }
 
     /**
