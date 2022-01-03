@@ -55,6 +55,6 @@ class CreateOrderJob extends \yii\base\BaseObject implements \yii\queue\Retryabl
      */
     public function getTtr()
     {
-        return 5;// 5 * 60; // TODO: Return to 15 minutes for production; different time better?
+        return 5 * 60;
     }
 }

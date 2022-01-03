@@ -3,7 +3,6 @@
 
 namespace common\models;
 
-use common\adapters\ecommerce\BaseECommerceAdapter;
 use common\services\ecommerce\BaseEcommerceService;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;

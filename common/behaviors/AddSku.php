@@ -85,7 +85,7 @@ class AddSku extends \yii\base\Behavior
     public function events()
     {
         return [
-            WooCommerceAdapter::EVENT_AFTER_PARSE => 'afterParse',
+            //WooCommerceAdapter::EVENT_AFTER_PARSE => 'afterParse',
         ];
     }
 
