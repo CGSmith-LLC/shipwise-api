@@ -9,7 +9,15 @@ use console\jobs\orders\DownloadTrackingJob;
 use console\jobs\orders\SendTo3PLJob;
 use frontend\models\Customer;
 use Yii;
-use frontend\models\{forms\BulkEditForm, Order, BulkAction, OrderImport, search\OrderSearch};
+use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
+use frontend\models\{Address,
+    forms\BulkEditForm,
+    Item,
+    Order,
+    forms\OrderForm,
+    BulkAction,
+    OrderImport,
+    search\OrderSearch};
 use yii\web\{BadRequestHttpException, NotFoundHttpException, Response};
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
@@ -254,6 +262,47 @@ class OrderController extends \frontend\controllers\Controller
         $job = Yii::$app->queue->push(new DownloadTrackingJob(['orderId' => $id]));
         Yii::$app->session->setFlash('success', 'Order sent to fulfillment');
         $this->redirect('/order/view/'. $id);
+    }
+
+    /**
+     * Clone an existing Order model.
+     * If clone is successful, the browser will be redirected to the 'view' page.
+     *
+     * @param integer $id
+     *
+     * @return mixed
+     * @throws \Throwable
+     * @throws \yii\db\Exception
+     */
+    public function actionClone($id)
+    {
+        /** @var OrderForm */
+        $orderToClone = Order::find()->where(['id' => $id])->one();
+        $addressToClone = Address::find()->where(['id' => $orderToClone->address_id])->one();
+        $itemsToClone = Item::find()->where(['order_id' => $id])->all();
+        $model = new OrderForm();
+        $model->order = new Order();
+        $model->setOrder($orderToClone->attributes);
+        $model->setAddress($addressToClone->attributes);
+
+        $model->order->status_id = Status::OPEN;
+        $model->order->setAttribute('customer_reference', $model->order->getNextCustomerReferenceNumber());
+
+        /** @var Item $item */
+        foreach ($itemsToClone as $item) {
+            $items[] = [
+                    'quantity' => $item->quantity,
+                    'sku' => $item->sku,
+                    'order_id' => $item->order_id,
+                    'name' => $item->name,
+            ];
+        }
+        $model->setItems($items);
+        $model->save();
+
+        Yii::$app->getSession()->setFlash('success', 'Order cloned.');
+
+        return $this->redirect(['view', 'id' => $model->order->id]);
     }
 
     /**
@@ -629,5 +678,17 @@ class OrderController extends \frontend\controllers\Controller
         );
 
         return $exporter->export()->send('template-import-orders.csv');
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionCarrierModal()
+    {
+        if(!Yii::$app->request->isAjax) {
+            throw new NotFoundHttpException('Page not found.');
+        }
+
+        return $this->renderAjax('carrier-modal');
     }
 }

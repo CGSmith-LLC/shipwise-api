@@ -67,6 +67,9 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                     ] +
                     [
                         'Print:' => BulkAction::getPrintActionsList(),
+                    ] +
+                    [
+                        'Change Carrier/Service:' => [BulkAction::ACTION_UPDATE_CARRIER => 'Change Carrier/Service'],
                     ]
                     + ['Change status to:' => $changeStatus],
                     [
@@ -301,6 +304,10 @@ ob_start(); // output buffer the javascript to register later ?>
                 $('<label />', {'for': 'bulkaction-batch_id', text: ' Batch Name'}).appendTo(container);
             }
 
+            if (action === '<?=BulkAction::ACTION_UPDATE_CARRIER;?>') {
+                $('<div>').load('/order/carrier-modal').appendTo(container);
+            }
+
             btnConfirm.off().on('click', function () {
                 btnConfirm.attr('disabled', true);
 
@@ -316,6 +323,8 @@ ob_start(); // output buffer the javascript to register later ?>
                                 "print_as_pdf": $('#bulkaction-print_as_pdf').is(':checked') ? 1 : 0,
                                 "batch_name": $('#bulkaction-batch_name').val() ? $('#bulkaction-batch_name').val() : '',
                                 "batch_id": $('#bulkaction-batch_id').val() ? $('#bulkaction-batch_id').val() : '',
+                                "carrier_id": $('#carrier_id').val(),
+                                "service_id": $('#service_id').val(),
                             }
                         }
                     }
