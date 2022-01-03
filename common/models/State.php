@@ -77,11 +77,11 @@ class State extends BaseState
         $country = strtoupper($country);
         $abbr = strtoupper($abbr);
 
-        if (($state = self::find()
-                ->where(['country' => $country])
-                ->andFilterWhere(['abbreviation' => $abbr])
-                ->andFilterWhere(['name' => $name])
-                ->one()) !== null) {
+        if (($state = self::find()->where(['country' => $country, 'abbreviation' => $abbr])->one()) !== null) {
+            return $state;
+        }
+
+        if (($state = self::find()->where(['country' => $country, 'name' => $name])->one()) !== null) {
             return $state;
         }
 
