@@ -29,7 +29,6 @@ class BaseForm extends Model
                 'header' => '<p>Please fix the following errors for <b>' . $id . '</b></p>',
                 'class' => 'alert alert-danger',
             ]);
-            \Yii::debug($errorList);
             $errorList = str_replace('<li></li>', '', $errorList); // remove the empty error
             $errorLists[] = $errorList;
         }

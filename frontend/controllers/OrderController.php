@@ -221,8 +221,6 @@ class OrderController extends \frontend\controllers\Controller
 
         $model->order = $this->findModel($id);
         $model->setAttributes(Yii::$app->request->post());
-        Yii::debug($model->order);
-
 
         if (Yii::$app->request->post() && $model->validate() && $model->save()) {
             Yii::$app->getSession()->setFlash('success', 'Order has been updated.');

@@ -75,7 +75,6 @@ class OrderForm extends BaseForm
             $transaction->rollBack();
 
             throw new ErrorException('Order failed to save for the following reasons: ' . $message);
-            return false;
         }
 
         if (!$this->saveItems()) {
@@ -204,6 +203,7 @@ class OrderForm extends BaseForm
             if (is_array($item)) {
                 $this->_items[$key] = $this->getItem($key);
                 $this->_items[$key]->setAttributes($item);
+                $this->_items[$key]->order_id = 0; // so order id doesn't complain
             } else {
                 if ($item instanceof Item) {
                     $this->_items[$item->id] = $item;
