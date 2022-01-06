@@ -19,6 +19,41 @@ class BigCommerceAdapter extends Component
     public int $customer_id;
 
     /**
+     * These statuses should update downstream (3pl) to cancel an order if needed
+     *
+     * See BigCommerceService::updateDownstream()
+     */
+    const STATUS_INCOMPLETE = 0;
+    const STATUS_PENDING = 1;
+    const STATUS_CANCELLED = 5;
+    const STATUS_DECLINED = 6;
+    const STATUS_AWAITING_PAYMENT = 7;
+    const STATUS_MANUAL_VERIFICATION_REQUIRED = 12;
+    const STATUS_DISPUTED = 13;
+
+    /**
+     * These statuses are not monitored but Shipwise will trigger a notification
+     *
+     * See BigCommerceService::notifyCustomer()
+     */
+    const STATUS_REFUNDED = 4;
+    const STATUS_PARTIALLY_SHIPPED = 3;
+    const STATUS_PARTIALLY_REFUNDED = 14;
+
+    /**
+     * These statuses are not monitored and Shipwise won't do anything about them
+     */
+    const STATUS_SHIPPED = 2;
+    const STATUS_AWAITING_PICKUP = 8;
+    const STATUS_AWAITING_SHIPMENT = 9;
+    const STATUS_COMPLETED = 10;
+
+    /**
+     * This status is usually used (configurable) by Shipwise to send downstream (3pl)
+     */
+    const STATUS_AWAITING_FULFILLMENT = 11;
+
+    /**
      * @param object $unparsedOrder
      * @throws Exception
      */
@@ -29,14 +64,6 @@ class BigCommerceAdapter extends Component
         $model->address = new Address();
 
         $this->trigger(self::EVENT_BEFORE_PARSE);
-
-        // check if order exists
-        if (Order::find()
-            ->where(['customer_reference' => (string) $unparsedOrder['id']])
-            ->andWhere(['customer_id' => $this->customer_id])
-            ->one()) {
-            throw new OrderExistsException($unparsedOrder['id']);
-        }
 
         // set order created date
         $createDate = isset($unparsedOrder['date_created']) ? new \DateTime($unparsedOrder['date_created']) : new \DateTime();
