@@ -1,4 +1,7 @@
-# Ship Wise
+# Shipwise
+
+Want to learn more about Shipwise? Read that [in the intro](docs/intro.md) - you will be able to get into the customers
+head.
 
 ## Multi-Tier Project
 
@@ -37,6 +40,8 @@ crontab -l
 ```
 
 ### Job Workers
+
+Read more about [jobs](docs/jobs/jobs.md).
 
 **Yii2 Queue** is an extension for running tasks asynchronously via queues.
 
