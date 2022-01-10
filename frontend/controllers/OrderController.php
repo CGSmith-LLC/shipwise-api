@@ -14,7 +14,7 @@ use frontend\models\{Address,
     BulkAction,
     OrderImport,
     search\OrderSearch};
-use yii\web\{BadRequestHttpException, NotFoundHttpException, Response};
+use yii\web\{BadRequestHttpException, Cookie, NotFoundHttpException, Response};
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\helpers\ArrayHelper;
@@ -201,6 +201,26 @@ class OrderController extends \frontend\controllers\Controller
                 'states' => State::getList('id', 'name', $model->address->country),
             ]
         );
+    }
+
+    public function actionSimpleView()
+    {
+        $cookies = Yii::$app->request->cookies;
+        $simple = $cookies->getValue('simple', 0);
+
+        // Response
+        $cookies = Yii::$app->response->cookies;
+
+        if (!$simple) {
+            $cookies->add(new Cookie([
+                'name' => 'simple',
+                'value' => 1
+            ]));
+        }else {
+            $cookies->remove('simple');
+        }
+
+        return $this->redirect(Yii::$app->request->referrer);
     }
 
     /**
