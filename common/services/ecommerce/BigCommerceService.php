@@ -12,6 +12,7 @@ use common\models\Order;
 use common\models\Status;
 use console\jobs\NotifierJob;
 use console\jobs\orders\CreateOrderJob;
+use console\jobs\orders\UpdateOrderJob;
 use yii\httpclient\Client;
 use yii\httpclient\Request;
 use yii\httpclient\RequestEvent;

@@ -8,5 +8,6 @@ use common\models\forms\BaseForm;
 
 class BaseIntegrationsForm extends BaseForm
 {
+    public string $integration = 'ecommerce';
 
 }

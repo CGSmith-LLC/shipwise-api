@@ -51,7 +51,6 @@ class OrderForm extends BaseForm
     public function save()
     {
         $transaction = Yii::$app->db->beginTransaction();
-        Yii::debug($this->order);
         if (!$this->order->save()) {
             $transaction->rollBack();
             $message = '';

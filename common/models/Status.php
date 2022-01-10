@@ -14,12 +14,16 @@ class Status extends BaseStatus
 {
 
     /* Please keep synchronized with db values! */
+    const DELETED = 0; // Not in the database but used to trigger events
     const SHIPPED = 1;
+    const PRIME = 2;
+    const ON_HOLD = 6;
     const CANCELLED = 7;
     const PENDING = 8;
     const OPEN    = 9;
     const WMS_ERROR = 10;
     const COMPLETED = 11;
+    const PRIME_NO_RATE = 12;
 
     /**
      * Get array of Status ids

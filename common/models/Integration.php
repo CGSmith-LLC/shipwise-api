@@ -14,8 +14,8 @@ use yii\db\Expression;
  * @property string $id
  * @property string $name
  * @property int $customer_id
- * @property string $ecommerce
- * @property string $fulfillment
+ * @property string $platform
+ * @property string $type
  * @property int $status
  * @property string $status_message
  * @property string $last_success_run;
@@ -60,7 +60,7 @@ class Integration extends ActiveRecord
     {
         return [
             [['name', 'customer_id', 'ecommerce', 'status'], 'required'],
-            [['name', 'ecommerce', 'fulfillment'], 'string', 'max' => 64],
+            [['name', 'platform', 'type'], 'string', 'max' => 64],
             [['status_message'], 'string', 'max' => 100],
             [['last_success_run'], 'safe'],
             [['customer_id', 'status'], 'integer'],
@@ -72,8 +72,8 @@ class Integration extends ActiveRecord
     {
         return [
             'name' => 'Name',
-            'customer_id' => 'Customer ID',
-            'ecommerce' => 'Ecommerce Platform',
+            'customer_id' => 'Customer',
+            'platform' => 'Integration Platform',
         ];
     }
 
@@ -100,7 +100,7 @@ class Integration extends ActiveRecord
 
     public function getAdapter()
     {
-        $adaptername = '\\common\\adapters\\ecommerce\\' . $this->ecommerce . 'Adapter';
+        $adaptername = '\\common\\adapters\\ecommerce\\' . $this->platform . 'Adapter';
         return new $adaptername();
     }
 
@@ -109,7 +109,7 @@ class Integration extends ActiveRecord
      */
     public function getService(): BaseEcommerceService
     {
-        $serviceName = '\\common\\services\\ecommerce\\' . ucfirst($this->ecommerce) . 'Service';
+        $serviceName = '\\common\\services\\ecommerce\\' . ucfirst($this->platform) . 'Service';
 
         /** @var BaseEcommerceService $service */
         $service = new $serviceName();

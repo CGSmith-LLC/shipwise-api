@@ -2,6 +2,10 @@
 
 namespace common\models\base;
 
+use common\models\Integration;
+use common\models\Status;
+use console\jobs\orders\UpdateOrderJob;
+
 /**
  * This is the model class for table "orders".
  *
@@ -42,6 +46,56 @@ class BaseOrder extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'orders';
+    }
+
+    public function init()
+    {
+        parent::init();
+
+        // Configure events to call Stripe
+        $this->on(self::EVENT_BEFORE_DELETE, [$this, 'orderDelete']);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'orderUpdateCheck']);
+    }
+
+    public function orderDelete($event)
+    {
+        if ($integration = Integration::find()
+            ->where(['customer_id' => $event->sender->customer_id])
+            ->andWhere(['ecommerce' => $event->sender->origin])
+            ->one()) {
+            \Yii::$app->queue->push(new CancelOrderJob([
+                'status' => Status::DELETED,
+                'customer_reference' => $event->sender->customer_reference,
+                'order_reference' => $event->sender->order_reference,
+                'integration_id' => $integration->id,
+            ]));
+
+            // check if order has fulfillment_center_id
+        }
+    }
+
+    public function orderEventCheck($event)
+    {
+        if ($integration = Integration::find()
+            ->where(['customer_id' => $event->sender->customer_id])
+            ->andWhere(['ecommerce' => $event->sender->origin])
+            ->one()) {
+            $dirtyAttributes = $event->sender->getDirtyAttributes();
+
+
+            \Yii::$app->queue->push(new CancelOrderJob([
+                'status' => $event->sender->status_id,
+                'customer_reference' => $event->sender->customer_reference,
+                'order_reference' => $event->sender->order_reference,
+                'integration_id' => $integration->id,
+            ]));
+
+            // If order status moves to cancelled or on-hold
+            // Status::CANCELLED || Status::ON_HOLD - cancel upstream
+
+            // If order is updated - try to update upstream
+            //if (isset($dirtyAttributes['status_id']) && )
+        }
     }
 
     /**
