@@ -23,7 +23,6 @@ class IntegrationMeta extends base\BaseIntegrationMeta
             $transaction->commit();
         } else {
             $transaction->rollBack();
-            var_dump($newMeta->getErrorSummary(showAllErrors: true));
             throw new Exception(message: 'New metadatum could not be saved.');
         }
     }

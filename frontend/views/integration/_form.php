@@ -24,12 +24,11 @@ use yii\widgets\ActiveForm;
         die;
     }
     ?>
-    <?php ?>
 
     <?= $form->field($model, 'customer_id')->dropDownList($customers, ['prompt' => 'Please Select']) ?>
 
     <?= $form->field($model, 'name')->input('text'); ?>
-    <?= $form->field($model, 'ecommerce')->dropdownList($ecommercePlatforms, ['disabled' => !$model->isNewRecord, 'prompt'   => ' -- Unknown --',]) ?>
+    <?= $form->field($model, 'platform')->dropdownList($ecommercePlatforms, ['disabled' => !$model->isNewRecord, 'prompt'   => ' -- Unknown --',]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Next &rarr;', ['class' => 'btn btn-lg btn-success']) ?>

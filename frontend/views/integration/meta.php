@@ -23,7 +23,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         foreach ($metaModel->attributes() as $metaField) {
             Yii::debug($metaField);
-            echo $form->field($metaModel, $metaField)->input('text');
+            if ($metaField != 'type') {
+                echo $form->field($metaModel, $metaField)->input('text');
+            }
         }
         ?>
 

@@ -8,7 +8,7 @@ use frontend\models\forms\BaseIntegrationsForm;
 class AmericoldForm extends BaseIntegrationsForm
 {
     public static string $dropDownName = 'Americold';
-    public string $integration = 'fulfillment';
+    public string $type = 'fulfillment';
 
     public $customerId;
 

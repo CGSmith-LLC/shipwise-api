@@ -33,6 +33,8 @@ class Integration extends ActiveRecord
     const INACTIVE = 3; // customer disabled
     const ERROR = 4; // could not connect
     const ACTIVE = 5; // successfully connected and querying orders
+    const TYPE_ECOMMERCE = 'ecommerce';
+    const TYPE_FULFILLMENT = 'fulfillment';
 
     /** @inheritDoc */
     public static function tableName(): string
@@ -59,7 +61,7 @@ class Integration extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'customer_id', 'ecommerce', 'status'], 'required'],
+            [['name', 'customer_id', 'platform', 'status', 'type'], 'required'],
             [['name', 'platform', 'type'], 'string', 'max' => 64],
             [['status_message'], 'string', 'max' => 100],
             [['last_success_run'], 'safe'],

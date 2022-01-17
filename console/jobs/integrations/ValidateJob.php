@@ -19,7 +19,12 @@ class ValidateJob extends BaseObject implements JobInterface
 
     public function execute($queue)
     {
+        // Bail out if the integration is fulfillment
         $this->integration = Integration::find()->where(['id' => $this->integration_id])->with('meta')->one();
+        if ($this->integration->type == Integration::TYPE_FULFILLMENT) {
+            return;
+        }
+
         // try to connect to the integration and update status to active if possible to connect
         // get adapter for integration
         $service = $this->integration->getService();

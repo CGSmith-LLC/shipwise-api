@@ -98,7 +98,7 @@ class IntegrationController extends Controller
     public function actionMeta($id)
     {
         if ($model = $this->findModel($id)) {
-            $formName = 'frontend\models\forms\integrations\\' . $model->ecommerce . 'Form';
+            $formName = 'frontend\models\forms\integrations\\' . $model->platform . 'Form';
             /** @var WooCommerceForm $metaModel */
             $metaModel = new $formName;
 
@@ -142,6 +142,10 @@ class IntegrationController extends Controller
         $model->status = Integration::PENDING; // when creating a new integration it starts as pending until we have meta data
 
         if ($model->load(Yii::$app->request->post())) {
+            // Set platform type to the form's type
+            $class = 'frontend\models\forms\integrations\\' . $model->platform . 'Form';
+            $platform = new $class;
+            $model->type = $platform->type;
             $model->save();
 
             return $this->redirect(['meta', 'id' => $model->id]);
