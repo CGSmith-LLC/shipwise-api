@@ -4,6 +4,7 @@ namespace console\jobs\orders;
 
 use common\exceptions\OrderExistsException;
 use common\models\Integration;
+use console\jobs\NotifierJob;
 
 class CreateOrderJob extends \yii\base\BaseObject implements \yii\queue\RetryableJobInterface
 {
@@ -47,7 +48,15 @@ class CreateOrderJob extends \yii\base\BaseObject implements \yii\queue\Retryabl
      */
     public function canRetry($attempt, $error)
     {
-        return ($attempt < 5);
+        if ($attempt < 5) {
+            return true;
+        }else {
+            return \Yii::$app->queue->push(new NotifierJob([
+                'message' => 'Order failed to create! Our team has been notified of the issue.',
+                'customer_id' => $this->integration->customer_id,
+                'reason_general' => 'an order',
+            ]));
+        }
     }
 
     /**
