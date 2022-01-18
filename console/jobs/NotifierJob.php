@@ -3,12 +3,9 @@
 namespace console\jobs;
 
 use common\models\Customer;
-use common\models\Integration;
 use common\models\Order;
 use frontend\models\User;
-use http\Url;
 use Yii;
-use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\queue\RetryableJobInterface;
 
