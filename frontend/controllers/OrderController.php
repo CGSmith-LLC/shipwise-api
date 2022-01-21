@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\pdf\OrderPackingSlip;
 use common\models\forms\OrderForm;
 use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
+use common\services\ecommerce\AmericoldService;
 use frontend\models\Customer;
 use Yii;
 use frontend\models\{Address,

@@ -7,7 +7,7 @@ namespace common\services\ecommerce;
 use common\models\Integration;
 use common\models\IntegrationHookdeck;
 
-abstract class BaseEcommerceService extends \yii\base\BaseObject
+abstract class EcommerceService extends BaseService
 {
     public string|null $last_success_run = null;
     public int $page = 1;

@@ -13,10 +13,11 @@ return [
     'digitalOceanKey'               => 'key',
     'digitalOceanSecret'            => 'secret',
     'defaultSpace'                  => 'dev-getshipwise',
-    'coldco' => [
-        'baseUrl' => 'https://secure-wms.com',
-        'clientId' => 'lolno',
-        'secret' => 'lulz',
+    'americold' => [
+        'clientid' => 'lol',
+        'clientsecret' => 'no',
+        'threeplkey' => 'lulz',
+        'user_login' => 'ShipWise',
     ],
     /**
      * Shopify App Parameters and App Credentials

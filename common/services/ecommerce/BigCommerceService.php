@@ -9,15 +9,14 @@ use common\exceptions\WebhookExistsException;
 use common\models\IntegrationMeta;
 use common\models\IntegrationWebhook;
 use common\models\Order;
-use common\models\Status;
 use console\jobs\NotifierJob;
+use console\jobs\orders\CancelOrderJob;
 use console\jobs\orders\CreateOrderJob;
-use console\jobs\orders\UpdateOrderJob;
 use yii\httpclient\Client;
 use yii\httpclient\Request;
 use yii\httpclient\RequestEvent;
 
-class BigCommerceService extends BaseEcommerceService
+class BigCommerceService extends EcommerceService
 {
     /**
      * @var Client $client
@@ -173,8 +172,7 @@ class BigCommerceService extends BaseEcommerceService
                 'integration_id' => $this->integration->id,
             ]));
         } elseif ($this->isCancelOrderStatus($status)) {
-            return \Yii::$app->queue->push(new UpdateOrderJob([
-                'status' => Status::CANCELLED,
+            return \Yii::$app->queue->push(new CancelOrderJob([
                 'customer_reference' => $unparsedOrder['data']['id'],
                 'integration_id' => $this->integration->id,
             ]));

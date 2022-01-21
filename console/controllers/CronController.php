@@ -4,6 +4,8 @@ namespace console\controllers;
 
 use common\models\BulkAction;
 use common\models\FulfillmentMeta;
+use common\models\Order;
+use common\services\ecommerce\AmericoldService;
 use console\jobs\orders\FetchJob;
 use console\jobs\orders\SendTo3PLJob;
 use yii\console\{Controller, ExitCode};
@@ -39,6 +41,18 @@ class CronController extends Controller
      */
     public function actionIndex()
     {
+        $americold = new AmericoldService();
+        $order = Order::findOne(164728);
+        $integrations = Integration::find()
+        ->andWhere(['type' => Integration::TYPE_FULFILLMENT])
+        ->with('meta')
+        ->all();
+        foreach ($integrations as $integration) {
+            /** @var AmericoldService $service */
+            $service = $integration->getService();
+            $americoldOrder = $service->cancelOrder($order);
+            var_dump($americoldOrder);
+        }
         $this->stdout('Yes, service cron is running');
         return ExitCode::OK;
     }

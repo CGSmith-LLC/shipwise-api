@@ -11,7 +11,7 @@ use yii\httpclient\Client;
 use yii\httpclient\Request;
 use yii\httpclient\RequestEvent;
 
-class WooCommerceService extends BaseEcommerceService
+class WooCommerceService extends EcommerceService
 {
     /**
      * @var Client $client

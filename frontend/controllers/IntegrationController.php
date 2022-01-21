@@ -111,7 +111,9 @@ class IntegrationController extends Controller
                 }
 
                 foreach ($metaModel->getAttributes() as $name => $value) {
-                    IntegrationMeta::addMeta($name, $value, $model->id);
+                    if ($name !== 'type') {
+                        IntegrationMeta::addMeta($name, $value, $model->id);
+                    }
                 }
 
                 Yii::$app->getSession()->setFlash('success', 'Integration details saved successfully');

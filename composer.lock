@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "15c7c864ffeb935be87b8b8e107682d4",
+    "content-hash": "80182e1c6932bad77cb7e0bf4a466984",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1366,6 +1366,68 @@
                 "source": "https://github.com/jmespath/jmespath.php/tree/2.6.1"
             },
             "time": "2021-06-14T00:11:39+00:00"
+        },
+        {
+            "name": "mycademy/yii2-file-storage",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MyCademy/yii2-file-storage.git",
+                "reference": "44642513aa61a8c7f810666bd4ca97e20e512c5b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/MyCademy/yii2-file-storage/zipball/44642513aa61a8c7f810666bd4ca97e20e512c5b",
+                "reference": "44642513aa61a8c7f810666bd4ca97e20e512c5b",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "~2.0.13"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "mycademy\\yii2filestorage\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Paul Klimov",
+                    "email": "klimov.paul@gmail.com"
+                },
+                {
+                    "name": "MyCademy"
+                }
+            ],
+            "description": "File storage abstraction layer for Yii2",
+            "keywords": [
+                "GridFS",
+                "abstraction",
+                "amazon",
+                "file",
+                "mongodb",
+                "s3",
+                "sftp",
+                "ssh",
+                "storage",
+                "yii2"
+            ],
+            "support": {
+                "forum": "http://www.yiiframework.com/forum/",
+                "issues": "https://github.com/MyCademy/yii2-file-storage/issues",
+                "source": "https://github.com/MyCademy/yii2-file-storage",
+                "wiki": "https://github.com/MyCademy/yii2-file-storage/wiki"
+            },
+            "time": "2021-12-05T22:41:09+00:00"
         },
         {
             "name": "notamedia/yii2-sentry",

@@ -10,7 +10,7 @@ use yii\console\Exception;
 use yii\helpers\Json;
 use yii\httpclient\Client;
 
-class ShopifyService extends BaseEcommerceService
+class ShopifyService extends EcommerceService
 {
     /**
      * @var Client $client

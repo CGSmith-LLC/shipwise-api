@@ -19,7 +19,8 @@
         "bilberrry/yii2-digitalocean-spaces": "^0.1.2",
       "ext-json": "*",
         "yiisoft/yii2-httpclient": "*",
-        "zhuravljov/yii2-queue-monitor": "^0.3.4"
+        "zhuravljov/yii2-queue-monitor": "^0.3.4",
+        "mycademy/yii2-file-storage": "^1.3"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

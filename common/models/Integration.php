@@ -3,7 +3,8 @@
 
 namespace common\models;
 
-use common\services\ecommerce\BaseEcommerceService;
+use common\services\ecommerce\BaseService;
+use common\services\ecommerce\EcommerceService;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -80,6 +81,22 @@ class Integration extends ActiveRecord
     }
 
     /**
+     * Delete all relations as well
+     */
+    public function beforeDelete()
+    {
+        if (!parent::beforeDelete()) {
+            return false;
+        }
+
+        /** @var IntegrationMeta $meta */
+        foreach ($this->meta as $meta) {
+            $meta->delete();
+        }
+        return true;
+    }
+
+    /**
      * Relation for customer
      *
      * @return \yii\db\ActiveQuery
@@ -107,13 +124,13 @@ class Integration extends ActiveRecord
     }
 
     /**
-     * @return BaseEcommerceService
+     * @return BaseService
      */
-    public function getService(): BaseEcommerceService
+    public function getService(): BaseService
     {
         $serviceName = '\\common\\services\\ecommerce\\' . ucfirst($this->platform) . 'Service';
 
-        /** @var BaseEcommerceService $service */
+        /** @var BaseService $service */
         $service = new $serviceName();
         $service->integration = $this;
         $service->applyMeta($this->getMeta()->all());
