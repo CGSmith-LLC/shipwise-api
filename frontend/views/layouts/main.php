@@ -110,6 +110,7 @@ AppAsset::register($this);
                 'items' => [
                     ['label' => 'Countries', 'url' => ['/country']],
                     ['label' => 'States/Provinces', 'url' => ['/state']],
+                    ['label' => 'Status', 'url' => ['/status']],
                     ['label' => 'Customers', 'url' => ['/customer']],
                     ['label' => 'Users', 'url' => ['/user/admin/']],
                     ['label' => 'Subscriptions', 'url' => ['/subscription']],
