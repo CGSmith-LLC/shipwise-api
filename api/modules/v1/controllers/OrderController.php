@@ -685,7 +685,6 @@ class OrderController extends PaginatedControllerEx
      *                in = "query",
      *                type = "integer",
      *                required = true,
-     *                enum = {1,7,8,9,10,11},
      *                description = "Status value that need to be considered for filter
     1 - Shipped
     7 - Cancelled
