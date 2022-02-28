@@ -31,7 +31,8 @@ class OrderImport extends Model
         'item_sku',           // = items.sku
         'item_quantity',      // = items.quantity
         'item_name',          // = items.name
-        'shipto_company',        // = address.company
+        'origin',             // = order.origin
+        'shipto_company',     // = address.company
         'shipto_name',        // = address.name
         'shipto_address',     // = address.address1
         'shipto_address2',    // = address.address2
@@ -61,6 +62,7 @@ class OrderImport extends Model
                 'item_sku'            => 'FF55',
                 'item_quantity'       => '2',
                 'item_name'           => 'test',
+                'origin'              => 'Shipwise',
                 'shipto_company'      => 'Acme Corp',
                 'shipto_name'         => 'Andrew DiFeo',
                 'shipto_address'      => '176 N Wells St',
@@ -80,6 +82,7 @@ class OrderImport extends Model
                 'item_sku'            => 'FF57',
                 'item_quantity'       => '1',
                 'item_name'           => 'test',
+                'origin'              => 'Shipwise',
                 'shipto_company'      => 'Acme Corp',
                 'shipto_name'         => 'Andrew DiFeo',
                 'shipto_address'      => '176 N Wells St',
@@ -262,7 +265,7 @@ class OrderImport extends Model
                     // Order
                     $order                      = new Order();
                     $order->customer_id         = $this->customer;
-                    $order->origin              = Yii::$app->name . ' CSV import';
+                    $order->origin              = !empty(trim($data['origin'])) ? trim($data['origin']) : Yii::$app->name . ' CSV import';
                     $order->customer_reference  = $orderNo;
                     $order->address_id          = $address->id;
                     $order->status_id           = Status::OPEN;
