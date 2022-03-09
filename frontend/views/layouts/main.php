@@ -64,7 +64,7 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => Html::img('@web/images/logo.jpg', ['alt' => Yii::$app->name]),
+        'brandLabel' => Html::img('@web/images/logo-with-text.png', ['alt' => Yii::$app->name, 'style' => 'height: 32px']),
         'brandOptions' => ['class' => 'shipwise-brand'],
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
@@ -87,10 +87,6 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Login', 'url' => ['/user/login']];
 
     } else {
-
-        $menuItems = [
-            ['label' => 'Home', 'url' => ['/']],
-        ];
         $menuItems[] = [
             'label' => 'Orders',
             'url' => ['/order'],
@@ -124,9 +120,11 @@ AppAsset::register($this);
         }
 
         $menuItems[] = [
-            'label' => 'Account', 'url' => ['/user/settings/account'],
+            'label' => '<img src="https://www.gravatar.com/avatar/' . md5(Yii::$app->user->identity->email) . '?s=24&d=mp" style="border-radius:50%"> ' .  Yii::$app->user->identity->username,
+            'url' => ['/user/settings/account'],
+            'encode' => false,
             'items' => [
-                ['label' => 'Account', 'url' => ['/user/settings/account']],
+                ['label' => 'Account', 'url' => ['/user/settings/profile']],
 
                 ['label' => 'Items', 'url' => ['/sku']],
 
@@ -138,17 +136,18 @@ AppAsset::register($this);
                 [
                     'label' => Yii::t('app', 'API'),
                     'url' => '/api-consumer',
-                ]
+                ],
+                [
+                    'label'=>'<li style="margin-top: -6px;">'
+                        . Html::beginForm(['/user/logout'], 'post')
+                        . Html::submitButton('Logout', ['class' => 'logout', 'style' => 'padding: 3px 20px;'])
+                        . Html::endForm()
+                        . '</li>',
+                    'encode' => false,
+                    'url' => '/user/logout',
+                ],
 
             ]];
-        $menuItems[] = '<li>'
-            . Html::beginForm(['/user/logout'], 'post')
-            . Html::submitButton('<img src="https://www.gravatar.com/avatar/' . md5(Yii::$app->user->identity->email) . '?s=24&d=mp" style="border-radius:50%">' .
-                ' Logout (' . Yii::$app->user->identity->username . ')',
-                ['class' => 'logout']
-            )
-            . Html::endForm()
-            . '</li>';
 
     }
     echo Nav::widget([

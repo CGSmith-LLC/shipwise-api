@@ -129,7 +129,6 @@ $simple = $cookies->getValue('simple');
         <div class="col-md-12">
             <h2>Items (<?= count($model->items) ?? null ?>)</h2>
             <?php
-            $dataproviderHistory = new \yii\data\ActiveDataProvider(['query' => \common\models\OrderHistory::find()->where(['order_id' => $model->id])]);
 
             $dataProvider = new \yii\data\ActiveDataProvider(['query' => \frontend\models\Item::find()->where(['order_id' => $model->id]),]);
             $count = Yii::$app->db->createCommand('
@@ -158,28 +157,36 @@ $simple = $cookies->getValue('simple');
                     'name',],]); ?>
             <?php
             if (!$simple) {
-            ?>
-            <h2>Packages</h2>
-            <?php
-            echo \yii\grid\GridView::widget(['dataProvider' => $dataProviderPackages,
-                'columns' => ['tracking',
-                    'quantity',
-                    'sku',
-                    'lot_number',],]);
+                ?>
+                <h2>Packages</h2>
+                <?php
+                echo \yii\grid\GridView::widget(['dataProvider' => $dataProviderPackages,
+                    'columns' => ['tracking',
+                        'quantity',
+                        'sku',
+                        'lot_number',],]);
 
-            ?>
-            <h2>Order History</h2>
-            <?php
-            echo \yii\grid\GridView::widget(['dataProvider' => $dataproviderHistory,
-                'columns' => ['created_date:datetime',
-                    ['attribute' => 'comment',
-                        'value' => function ($model) {
-                            return nl2br($model->comment);
-                        },
-                        'format' => 'raw',]],]);
+                ?>
+                <h2>Order History</h2>
+                <?php
 
-            ?>
-            <?php
+                $dataproviderHistory = new \yii\data\ActiveDataProvider([
+                    'query' => \common\models\OrderHistory::find()
+                        ->where(['order_id' => $model->id])
+                        ->orderBy(['created_date' => SORT_DESC])
+                ]);
+                echo \yii\grid\GridView::widget(['dataProvider' => $dataproviderHistory,
+                    'columns' => [
+                        'created_date:datetime',
+                        [
+                            'attribute' => 'comment',
+                            'value' => function ($model) {
+                                return '<p style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;width: 900px;">'.nl2br($model->comment).'</p>';
+                            },
+                            'format' => 'raw',
+                        ],
+                    ],
+                ]);
             }
             ?>
         </div>
