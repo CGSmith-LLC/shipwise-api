@@ -32,6 +32,8 @@ namespace common\models\base;
  * @property string $ship_from_country_code
  * @property string $ship_from_phone
  * @property string $ship_from_email
+ * @property int $transit
+ * @property string $packagingNotes
  */
 class BaseOrder extends \yii\db\ActiveRecord
 {
@@ -51,11 +53,11 @@ class BaseOrder extends \yii\db\ActiveRecord
     {
         return [
             [['customer_id', 'customer_reference', 'address_id'], 'required'],
-            [['customer_id', 'status_id', 'address_id', 'carrier_id', 'service_id'], 'integer'],
-            [['created_date', 'updated_date', 'requested_ship_date', 'carrier_id', 'service_id'], 'safe'],
+            [['customer_id', 'status_id', 'address_id', 'carrier_id', 'service_id', 'transit'], 'integer'],
+            [['created_date', 'updated_date', 'requested_ship_date', 'carrier_id', 'service_id', 'transit'], 'safe'],
             [['order_reference', 'tracking'], 'string', 'max' => 45],
             [['customer_reference', 'origin', 'uuid'], 'string', 'max' => 64],
-            [['notes'], 'string', 'max' => 6000],
+            [['notes', 'packagingNotes'], 'string', 'max' => 6000],
             [['po_number'], 'string', 'max' => 64],
             [['label_data'], 'string'],
             [['label_type'], 'string', 'max' => 6],

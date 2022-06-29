@@ -55,6 +55,8 @@ class OrderEx extends Order
      *     @SWG\Property( property = "notes", type = "string", description = "Notes specific to an order" ),
      *     @SWG\Property( property = "origin", type = "string", description = "Origination of order. Such as
     SquareSpace or Zoho" ),
+     *     @SWG\Property( property = "transit", type = "integer", description = "Days in transit if available" ),
+     *     @SWG\Property( property = "packagingNotes", type = "string", description = "Description of packaging for warehouse" ),
      * )
      */
 
@@ -89,7 +91,9 @@ class OrderEx extends Order
             'uuid'              => 'uuid',
             'notes'             => 'notes',
             'origin'            => 'origin',
-            'packages'          => 'packages'
+            'packages'          => 'packages',
+            'transit'           => 'transit',
+            'packagingNotes'    => 'packagingNotes',
         ];
     }
 
