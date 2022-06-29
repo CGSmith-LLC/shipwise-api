@@ -87,7 +87,13 @@ $simple = $cookies->getValue('simple');
                     ],
                     'created_date:datetime',
                     [
-                        'attribute' => 'updated_date:datetime',
+                        'attribute' => 'updated_date',
+                        'format' => 'datetime',
+                        'visible' => !$simple,
+                    ],
+                    'transit',
+                    [
+                        'attribute' => 'packagingNotes',
                         'visible' => !$simple,
                     ],
                 ],

@@ -90,6 +90,8 @@ class ControllerEx extends Controller
             $order->notes = $orderForm->notes;
             $order->status_id = isset($orderForm->status) ? $orderForm->status : null;
             $order->address_id = $address->id;
+            $order->transit = $orderForm->transit;
+            $order->packagingNotes = $orderForm->packagingNotes;
 
             // Validate the order model itself
             if (!$order->validate()) {
@@ -188,6 +190,7 @@ class ControllerEx extends Controller
                 $item->alias_quantity = $formItem->alias_quantity;
                 $item->name = $formItem->name;
                 $item->notes = $formItem->notes;
+                $item->type = $formItem->type;
                 $item->save();
             }
 
@@ -339,6 +342,7 @@ class ControllerEx extends Controller
                 $item->alias_quantity = $formItem->alias_quantity;
                 $item->name = $formItem->name;
                 $item->notes = $formItem->notes;
+                $item->type = $formItem->type;
                 $item->save();
             }
 
@@ -350,6 +354,8 @@ class ControllerEx extends Controller
             $order->po_number = $orderForm->poNumber;
             $order->customer_reference = $orderForm->customerReference;
             $order->status_id = $orderForm->status;
+            $order->transit = $orderForm->transit;
+            $order->packagingNotes = $orderForm->packagingNotes;
 
             // Validate the order model itself
             if (!$order->validate()) {
