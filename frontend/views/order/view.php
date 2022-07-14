@@ -160,7 +160,7 @@ $simple = $cookies->getValue('simple');
             echo \yii\grid\GridView::widget(['dataProvider' => $dataProvider,
                 'columns' => ['quantity',
                     'sku',
-                    'name',],]); ?>
+                    'name','type'],]); ?>
             <?php
             if (!$simple) {
                 ?>
