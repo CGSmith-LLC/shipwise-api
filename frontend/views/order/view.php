@@ -87,7 +87,13 @@ $simple = $cookies->getValue('simple');
                     ],
                     'created_date:datetime',
                     [
-                        'attribute' => 'updated_date:datetime',
+                        'attribute' => 'updated_date',
+                        'format' => 'datetime',
+                        'visible' => !$simple,
+                    ],
+                    'transit',
+                    [
+                        'attribute' => 'packagingNotes',
                         'visible' => !$simple,
                     ],
                 ],
@@ -154,7 +160,7 @@ $simple = $cookies->getValue('simple');
             echo \yii\grid\GridView::widget(['dataProvider' => $dataProvider,
                 'columns' => ['quantity',
                     'sku',
-                    'name',],]); ?>
+                    'name','type'],]); ?>
             <?php
             if (!$simple) {
                 ?>

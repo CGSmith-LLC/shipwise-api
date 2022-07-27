@@ -141,6 +141,10 @@ class OrderForm extends Model
     public $status;
     /** @var ItemForm[] */
     public $items;
+    /** @var integer */
+    public $transit;
+    /** @var string  */
+    public $packagingNotes;
 
 
     /**
@@ -154,9 +158,10 @@ class OrderForm extends Model
                 'required',
                 'message' => '{attribute} is required.',
             ],
-            [['poNumber', 'uuid', 'origin', 'customerReference'], 'string', 'length' => [1, 64]],
+            [['poNumber', 'uuid', 'origin', 'customerReference', 'packagingNotes'], 'string', 'length' => [1, 64]],
             ['orderReference', 'string', 'length' => [1, 45]],
             ['notes', 'string', 'length' => [1, 6000]],
+            ['transit', 'integer'],
             ['requestedShipDate', 'date', 'format' => 'php:Y-m-d'],
             ['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
             ['status', 'integer', 'on' => self::SCENARIO_UPDATE],

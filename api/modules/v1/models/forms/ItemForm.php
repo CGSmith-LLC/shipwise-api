@@ -39,6 +39,13 @@ use yii\base\Model;
  *            minLength = 1,
  *            maxLength = 512
  *        ),
+ *     @SWG\Property(
+ *            property = "type",
+ *            type = "string",
+ *            description = "Type of item (packaging, dry ice)",
+ *            minLength = 1,
+ *            maxLength = 64
+ *        ),
  * )
  */
 
@@ -64,6 +71,8 @@ class ItemForm extends Model
     public $alias_sku;
     /** @var string */
     public $notes;
+    /** @var string */
+    public $type;
 
     /**
      * {@inheritdoc}
@@ -74,7 +83,7 @@ class ItemForm extends Model
             [['quantity', 'sku'], 'required', 'message' => '{attribute} is required.'],
             [['quantity', 'alias_quantity'], 'integer'],
             ['quantity', 'compare', 'compareValue' => 0, 'operator' => '>'],
-            [['sku', 'alias_sku', 'uuid'], 'string', 'length' => [1, 64]],
+            [['sku', 'alias_sku', 'uuid', 'type'], 'string', 'length' => [1, 64]],
             [['notes'], 'string', 'length' => [1, 512]],
             ['name', 'string', 'length' => [1, 128]],
         ];
