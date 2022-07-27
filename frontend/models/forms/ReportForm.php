@@ -21,11 +21,13 @@ class ReportForm extends Model
     public $start_date;
     public $end_date;
     public $customer;
+    public $items = true;
 
     public function rules()
     {
         return [
             [['start_date', 'end_date', 'customer'], 'required'],
+            [['items'], 'boolean'],
             [
                 'customer',
                 'in',

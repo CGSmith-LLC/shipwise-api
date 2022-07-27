@@ -42,6 +42,11 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
     public string $end_date;
 
     /**
+     * @var bool $items if true then include items in report
+     */
+    public bool $items;
+
+    /**
      * @inheritDoc
      */
     public function execute($queue)
@@ -99,36 +104,65 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
         // csv body
         foreach ($ordersQuery->batch(500) as $orders) {
             foreach ($orders as $order) {
-
-                /**
-                 * @var Package $package
-                 */
-                $packageId = [];
-                foreach ($order->packages as $package) {
-                    foreach ($package->items as $packageItems) {
-                        $packageId[] = $packageItems->id;
-                    }
-                }
-
-                foreach ($order->items as $item) {
+                if ($this->items) {
                     /**
-                     * Find lot number
+                     * @var Package $package
                      */
-                    $lotNumbers = PackageItem::find()
-                        ->with('lotInfo')
-                        ->where(['in', 'id', $packageId])
-                        ->andWhere(['sku' => $item->sku])
-                        ->all();
-                    $lotNumber = ArrayHelper::getColumn($lotNumbers, function ($packageItem) {
-                        $lotNumbers = [];
-                        /** @var PackageItem $packageItem */
-                        foreach ($packageItem->lotInfo as $lot) {
-                            $lotNumbers[] = $lot->lot_number;
+                    $packageId = [];
+                    foreach ($order->packages as $package) {
+                        foreach ($package->items as $packageItems) {
+                            $packageId[] = $packageItems->id;
                         }
-                        return implode(' ', $lotNumbers);
-                    });
-                    $lotNumber = implode(' ', $lotNumber);
+                    }
 
+                    foreach ($order->items as $item) {
+                        /**
+                         * Find lot number
+                         */
+                        $lotNumbers = PackageItem::find()
+                            ->with('lotInfo')
+                            ->where(['in', 'id', $packageId])
+                            ->andWhere(['sku' => $item->sku])
+                            ->all();
+                        $lotNumber = ArrayHelper::getColumn($lotNumbers, function ($packageItem) {
+                            $lotNumbers = [];
+                            /** @var PackageItem $packageItem */
+                            foreach ($packageItem->lotInfo as $lot) {
+                                $lotNumbers[] = $lot->lot_number;
+                            }
+                            return implode(' ', $lotNumbers);
+                        });
+                        $lotNumber = implode(' ', $lotNumber);
+
+                        // Output csv
+                        fputcsv(
+                            $fp,
+                            [
+                                $order->customer_reference,
+                                $order->created_date,
+                                $order->id,
+                                $order->order_reference,
+                                $order->status->name,
+                                $order->address->name ?? null,
+                                $order->address->city ?? null,
+                                $order->address->state->name ?? null,
+                                $order->address->zip ?? null,
+                                $order->address->notes ?? null,
+                                $order->notes,
+                                $order->tracking,
+                                $order->carrier->name ?? null,
+                                $order->service->name ?? null,
+                                $order->requested_ship_date,
+                                $order->po_number,
+                                $order->origin,
+                                $item->quantity,
+                                $item->sku,
+                                $item->name,
+                                $lotNumber,
+                            ]
+                        );
+                    }
+                } else {
                     // Output csv
                     fputcsv(
                         $fp,
@@ -150,10 +184,10 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
                             $order->requested_ship_date,
                             $order->po_number,
                             $order->origin,
-                            $item->quantity,
-                            $item->sku,
-                            $item->name,
-                            $lotNumber,
+                            '',
+                            '',
+                            '',
+                            '',
                         ]
                     );
                 }
@@ -181,12 +215,12 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
         $formatter = Yii::$app->getFormatter();
         $startDate = $formatter->asDate($this->start_date, 'php:F j, Y');
         $endDate = $formatter->asDate($this->end_date, 'php:F j, Y');
-        $mailer->compose(['html' => 'report'],[
-                'url' => $url,
-                'start_date' => $this->start_date,
-                'end_date' => $this->end_date,
-                'customerName' => Customer::findone(['id' => $this->customer])->name,
-            ])
+        $mailer->compose(['html' => 'report'], [
+            'url' => $url,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+            'customerName' => Customer::findone(['id' => $this->customer])->name,
+        ])
             ->setFrom(Yii::$app->params['senderEmail'])
             ->setTo($this->user_email)
             ->setSubject('Generated Report for ' . $startDate . ' to ' . $endDate)

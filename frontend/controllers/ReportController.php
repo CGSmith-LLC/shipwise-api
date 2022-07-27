@@ -54,6 +54,7 @@ class ReportController extends Controller
                 'user_email' => User::findone(['id' => Yii::$app->user->id])->email,
                 'start_date' => $model->start_date,
                 'end_date' => $model->end_date,
+                'items' => $model->items,
             ]));
 
             Yii::$app->getSession()->setFlash('success', 'The report is being generated. Please check your email in a few minutes.');

@@ -44,6 +44,7 @@ $this->title = Yii::$app->name;
                 'value' => (isset($model->end_date)) ? Yii::$app->formatter->asDate($model->end_date) : '',
             ]); ?>
             <?php echo $form->field($model, 'customer')->dropdownList($customers, ['prompt' => ' Please select']); ?>
+            <?php echo $form->field($model, 'items')->checkbox()->label('Include items in report?'); ?>
 
             <div class="form-group">
                 <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
