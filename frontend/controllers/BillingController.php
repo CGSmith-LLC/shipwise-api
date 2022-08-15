@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use Da\User\Filter\AccessRuleFilter;
 use common\models\Invoice;
 use Stripe\Stripe;
 use Yii;
@@ -27,7 +28,7 @@ class BillingController extends \frontend\controllers\Controller
             'access' => [
                 'class' => AccessControl::class,
                 'ruleConfig' => [
-                    'class' => \dektrium\user\filters\AccessRule::class,
+                    'class' => AccessRuleFilter::class,
                 ],
 
                 'rules' => [

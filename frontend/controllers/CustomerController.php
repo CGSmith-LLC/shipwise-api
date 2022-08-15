@@ -10,6 +10,7 @@ use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
+use Da\User\Filter\AccessRuleFilter;
 /**
  * CustomerController implements the CRUD actions for Customer model.
  */
@@ -25,7 +26,7 @@ class CustomerController extends Controller
             'access' => [
                 'class' => AccessControl::class,
                 'ruleConfig' => [
-                    'class' => \dektrium\user\filters\AccessRule::class,
+                    'class' => AccessRuleFilter::class,
                 ],
                 'rules' => [
                     [

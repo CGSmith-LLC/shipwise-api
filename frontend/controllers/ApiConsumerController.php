@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use Da\User\Filter\AccessRuleFilter;
 use frontend\models\Customer;
 use Yii;
 use common\models\ApiConsumer;
@@ -24,7 +25,7 @@ class ApiConsumerController extends Controller
             'access' => [
                 'class' => AccessControl::class,
                 'ruleConfig' => [
-                    'class' => \dektrium\user\filters\AccessRule::class,
+                    'class' => AccessRuleFilter::class,
                 ],
                 'rules' => [
                     [

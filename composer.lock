@@ -4,8 +4,161 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "15c7c864ffeb935be87b8b8e107682d4",
+    "content-hash": "a28ab017c86ec9ac0a7e6a9c74c23247",
     "packages": [
+        {
+            "name": "2amigos/yii2-selectize-widget",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/2amigos/yii2-selectize-widget.git",
+                "reference": "9762a34d1095f15b60f46b876dad245011755bfc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/2amigos/yii2-selectize-widget/zipball/9762a34d1095f15b60f46b876dad245011755bfc",
+                "reference": "9762a34d1095f15b60f46b876dad245011755bfc",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/selectize": "~0.12.0",
+                "yiisoft/yii2": "~2.0.0",
+                "yiisoft/yii2-bootstrap": "~2.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "dosamigos\\selectize\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "2amigOS! Consulting Group",
+                    "email": "hola@2amigos.us",
+                    "homepage": "http://2amigos.us",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The selectize.js widget for the Yii framework",
+            "homepage": "https://github.com/2amigos/yii2-selectize-widget",
+            "keywords": [
+                "2amigos",
+                "selectize",
+                "widget",
+                "yii",
+                "yii 2",
+                "yii2"
+            ],
+            "support": {
+                "issues": "https://github.com/2amigos/yii2-selectize-widget/issues",
+                "source": "https://github.com/2amigos/yii2-selectize-widget/tree/master"
+            },
+            "time": "2017-09-19T22:02:33+00:00"
+        },
+        {
+            "name": "2amigos/yii2-usuario",
+            "version": "1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/2amigos/yii2-usuario.git",
+                "reference": "e2b041a32a9cd248c7849ff6cfb12a2f60822b57"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/2amigos/yii2-usuario/zipball/e2b041a32a9cd248c7849ff6cfb12a2f60822b57",
+                "reference": "e2b041a32a9cd248c7849ff6cfb12a2f60822b57",
+                "shasum": ""
+            },
+            "require": {
+                "2amigos/yii2-selectize-widget": "^1.1",
+                "php": ">=5.5",
+                "yiisoft/yii2-authclient": "^2.1",
+                "yiisoft/yii2-bootstrap": "^2.0",
+                "yiisoft/yii2-httpclient": "^2.0",
+                "yiisoft/yii2-swiftmailer": "^2.0"
+            },
+            "conflict": {
+                "dektrium/yii2-rbac": "*",
+                "dektrium/yii2-user": "*"
+            },
+            "require-dev": {
+                "codeception/codeception": "*",
+                "codeception/module-asserts": "^1.1",
+                "codeception/module-db": "^1.0",
+                "codeception/module-filesystem": "^1.0",
+                "codeception/module-yii2": "^1.1",
+                "codeception/verify": "^0.3.3",
+                "friendsofphp/php-cs-fixer": "^2.3",
+                "phpmd/phpmd": "@stable",
+                "roave/security-advisories": "dev-master",
+                "squizlabs/php_codesniffer": "*"
+            },
+            "suggest": {
+                "2amigos/2fa-library": "Needed if you want to enable 2 Factor Authentication. Require version ^1.0",
+                "2amigos/qrcode-library": "Needed if you want to enable 2FA with QR Code generation. Require version ^1.1"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "bootstrap": "Da\\User\\Bootstrap"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Da\\User\\": "./src/User"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "2amigOS! Consulting Group",
+                    "email": "hola@2amigos.us",
+                    "homepage": "http://2amigos.us",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Antonio Ramirez Cobos",
+                    "email": "hola@2amigos.us",
+                    "homepage": "http://2amigos.us",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Highly customizable and extensible user management, authentication, and authorization Yii2 extension",
+            "keywords": [
+                "2amigos",
+                "User management",
+                "access",
+                "acl",
+                "backend",
+                "rbac",
+                "user",
+                "yii",
+                "yii 2",
+                "yii framework",
+                "yii2",
+                "yii2 user",
+                "yii2-user"
+            ],
+            "support": {
+                "forum": "https://gitter.im/2amigos/yii2-usuario",
+                "issues": "https://github.com/2amigos/yii2-usuario/issues?state=open",
+                "source": "https://github.com/2amigos/yii2-usuario"
+            },
+            "time": "2020-04-05T11:59:36+00:00"
+        },
         {
             "name": "aws/aws-crt-php",
             "version": "v1.0.2",
@@ -252,6 +405,24 @@
             ]
         },
         {
+            "name": "bower-asset/microplugin",
+            "version": "v0.0.3",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:brianreavis/microplugin.js.git",
+                "reference": "d8671e6cc769938648f8735610534427cdeeaf67"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brianreavis/microplugin.js/zipball/d8671e6cc769938648f8735610534427cdeeaf67",
+                "reference": "d8671e6cc769938648f8735610534427cdeeaf67"
+            },
+            "type": "bower-asset",
+            "license": [
+                "Apache License, Version 2.0"
+            ]
+        },
+        {
             "name": "bower-asset/punycode",
             "version": "v1.3.2",
             "source": {
@@ -265,6 +436,47 @@
                 "reference": "38c8d3131a82567bfef18da09f7f4db68c84f8a3"
             },
             "type": "bower-asset"
+        },
+        {
+            "name": "bower-asset/selectize",
+            "version": "0.12.6-patch1",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:selectize/selectize.js.git",
+                "reference": "b8df29c9d4733857a4df4ddbf40d72abfd7c3ae9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/selectize/selectize.js/zipball/b8df29c9d4733857a4df4ddbf40d72abfd7c3ae9",
+                "reference": "b8df29c9d4733857a4df4ddbf40d72abfd7c3ae9"
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.7.0",
+                "bower-asset/microplugin": "dev-0.0.x|0.0.x",
+                "bower-asset/sifter": "dev-0.5.x|0.5.x"
+            },
+            "type": "bower-asset",
+            "license": [
+                "Apache License, Version 2.0"
+            ]
+        },
+        {
+            "name": "bower-asset/sifter",
+            "version": "v0.5.4",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:brianreavis/sifter.js.git",
+                "reference": "2009705c24ba9bb0fbe71fa3c60b1dfa682538d2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brianreavis/sifter.js/zipball/2009705c24ba9bb0fbe71fa3c60b1dfa682538d2",
+                "reference": "2009705c24ba9bb0fbe71fa3c60b1dfa682538d2"
+            },
+            "type": "bower-asset",
+            "license": [
+                "Apache License, Version 2.0"
+            ]
         },
         {
             "name": "bower-asset/swagger-ui",
@@ -649,70 +861,6 @@
                 "source": "https://github.com/codemix/yii2-localeurls/tree/1.8.0"
             },
             "time": "2022-05-04T06:51:52+00:00"
-        },
-        {
-            "name": "dektrium/yii2-user",
-            "version": "0.9.14",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/dektrium/yii2-user.git",
-                "reference": "8f2daea532f7efefc3f808e50d74a91c0de71ff4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/dektrium/yii2-user/zipball/8f2daea532f7efefc3f808e50d74a91c0de71ff4",
-                "reference": "8f2daea532f7efefc3f808e50d74a91c0de71ff4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0",
-                "yiisoft/yii2": "^2.0.13",
-                "yiisoft/yii2-authclient": "^2.1.0",
-                "yiisoft/yii2-bootstrap": "^2.0.0",
-                "yiisoft/yii2-swiftmailer": "^2.0.0"
-            },
-            "require-dev": {
-                "codeception/specify": "^0.4.3",
-                "codeception/verify": "^0.3.1",
-                "yiisoft/yii2-codeception": "^2.0.0"
-            },
-            "type": "yii2-extension",
-            "extra": {
-                "bootstrap": "dektrium\\user\\Bootstrap",
-                "branch-alias": {
-                    "dev-master": "0.9.x-dev",
-                    "dev-develop": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "dektrium\\user\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Dmitry Erofeev",
-                    "email": "dmeroff@gmail.com",
-                    "homepage": "http://dmeroff.ru"
-                }
-            ],
-            "description": "Flexible user registration and authentication module for Yii2",
-            "keywords": [
-                "User management",
-                "dektrium",
-                "yii2",
-                "yii2-user"
-            ],
-            "support": {
-                "forum": "https://gitter.im/dektrium/yii2-user",
-                "issues": "https://github.com/dektrium/yii2-user/issues?state=open",
-                "source": "https://github.com/dektrium/yii2-user"
-            },
-            "time": "2018-04-03T12:24:41+00:00"
         },
         {
             "name": "doctrine/annotations",

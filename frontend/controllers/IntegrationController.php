@@ -16,6 +16,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
+use Da\User\Filter\AccessRuleFilter;
 
 /**
  * IntegrationController implements the CRUD actions for Integration model.
@@ -31,7 +32,7 @@ class IntegrationController extends Controller
             'access' => [
                 'class' => AccessControl::class,
                 'ruleConfig' => [
-                    'class' => \dektrium\user\filters\AccessRule::class,
+                    'class' => AccessRuleFilter::class,
                 ],
                 'rules' => [
                     [

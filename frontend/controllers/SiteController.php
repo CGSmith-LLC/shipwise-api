@@ -111,7 +111,7 @@ class SiteController extends \frontend\controllers\Controller
                 'orders' => 0,
             ];
         }
-
+        $response = [];
         foreach ($customers as $customer) {
             $response[$customer->id] = [
                 'name' => $this->trimName($customer->name),

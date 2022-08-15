@@ -56,7 +56,6 @@ cp /var/www/$3.old/yii /var/www/$3/yii || { echo 'mv failed for yii'; }
 #php /var/www/$3/init --env=$YII_ENV_INIT --overwrite=n || { echo 'mv failed for environment settings' ; exit 1; }
 
 # Update SQL
-php /var/www/$3/yii migrate --migrationPath=@dektrium/yii2-user/migrations --interactive=0 || { echo 'failed user update sql' ; exit 1; }
 php /var/www/$3/yii migrate --interactive=0 || { echo 'failed to update SQL' ; exit 1; }
 
 

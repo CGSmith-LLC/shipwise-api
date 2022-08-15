@@ -3,7 +3,7 @@
 
 /**
  * @var yii\web\View $this
- * @var dektrium\user\models\User $user
+ * @var frontend\models\User $user
  * @var frontend\models\search\CustomerSearch $searchModel
  * @var yii\data\ActiveDataProvider $dataProvider
  */
@@ -15,13 +15,13 @@ use yii\helpers\Html;
 $userId = $user->id;
 ?>
 
-<?php $this->beginContent('@dektrium/user/views/admin/update.php', ['user' => $user]) ?>
+<?php $this->beginContent('@Da/User/resources/views/admin/update.php', ['user' => $user]) ?>
 
 <?= Alert::widget([
     'options' => [
         'class' => 'alert-info alert-dismissible',
     ],
-    'body' => Yii::t('user', 'You can link multiple customers by using the list below'),
+    'body' => Yii::t('usuario', 'You can link multiple customers by using the list below'),
 ]) ?>
 
 <h3>Customers</h3>
@@ -35,24 +35,24 @@ $userId = $user->id;
         'city',
         //'created_date',
         [
-            'header' => Yii::t('user', 'Association'),
+            'header' => Yii::t('usuario', 'Association'),
             'value' => function ($model) use ($userId) {
                 if ($model->isLinkedToUser($userId)) {
-                    return Html::a(Yii::t('user', 'Unlink'),
+                    return Html::a(Yii::t('usuario', 'Unlink'),
                         ['link-customer', 'id' => $userId, 'cid' => $model->id],
                         [
                             'class' => 'btn btn-xs btn-danger btn-block',
                             'data-method' => 'post',
-                            'data-confirm' => Yii::t('user',
+                            'data-confirm' => Yii::t('usuario',
                                 'Are you sure you want to unlink user from this customer?'),
                         ]);
                 } else {
-                    return Html::a(Yii::t('user', 'Link'),
+                    return Html::a(Yii::t('usuario', 'Link'),
                         ['link-customer', 'id' => $userId, 'cid' => $model->id],
                         [
                             'class' => 'btn btn-xs btn-success btn-block',
                             'data-method' => 'post',
-                            //'data-confirm' => Yii::t('user', 'Are you sure you want to link user to this customer?'),
+                            //'data-confirm' => Yii::t('usuario', 'Are you sure you want to link user to this customer?'),
                         ]);
                 }
             },

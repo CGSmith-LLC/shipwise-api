@@ -9,14 +9,14 @@ use yii\widgets\ActiveForm;
 /**
  * @var yii\web\View $this
  * @var yii\widgets\ActiveForm $form
- * @var dektrium\user\models\SettingsForm $model
+ * @var Da\User\Form\SettingsForm $model
  */
 
-$this->title = Yii::t('user', 'Account settings');
+$this->title = Yii::t('usuario', 'Account settings');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<?= $this->render('/_alert', ['module' => Yii::$app->getModule('user')]) ?>
+<?= $this->render('/shared/_alert', ['module' => Yii::$app->getModule('user')]) ?>
 
 <div class="row">
     <div class="col-md-3">
@@ -49,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <div class="form-group">
                     <div class="col-lg-offset-3 col-lg-9">
-                        <?= Html::submitButton(Yii::t('user', 'Save'), ['class' => 'btn btn-block btn-success']) ?><br>
+                        <?= Html::submitButton(Yii::t('usuario', 'Save'), ['class' => 'btn btn-block btn-success']) ?><br>
                     </div>
                 </div>
 
@@ -57,21 +57,21 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
         </div>
 
-        <?php if ($model->module->enableAccountDelete): ?>
+        <?php if ($model->module->allowAccountDelete): ?>
             <div class="panel panel-danger">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><?= Yii::t('user', 'Delete account') ?></h3>
+                    <h3 class="panel-title"><?= Yii::t('usuario', 'Delete account') ?></h3>
                 </div>
                 <div class="panel-body">
                     <p>
-                        <?= Yii::t('user', 'Once you delete your account, there is no going back') ?>.
-                        <?= Yii::t('user', 'It will be deleted forever') ?>.
-                        <?= Yii::t('user', 'Please be certain') ?>.
+                        <?= Yii::t('usuario', 'Once you delete your account, there is no going back') ?>.
+                        <?= Yii::t('usuario', 'It will be deleted forever') ?>.
+                        <?= Yii::t('usuario', 'Please be certain') ?>.
                     </p>
-                    <?= Html::a(Yii::t('user', 'Delete account'), ['delete'], [
+                    <?= Html::a(Yii::t('usuario', 'Delete account'), ['delete'], [
                         'class' => 'btn btn-danger',
                         'data-method' => 'post',
-                        'data-confirm' => Yii::t('user', 'Are you sure? There is no going back'),
+                        'data-confirm' => Yii::t('usuario', 'Are you sure? There is no going back'),
                     ]) ?>
                 </div>
             </div>

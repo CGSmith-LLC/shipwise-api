@@ -131,7 +131,7 @@ class ReceiptPDF extends \FPDF
         $this->resetFont();
 
         $cellH = 5; // cell height
-        $txt   = Yii::t('user', 'Dear {user},', ['user' => $this->invoice->customer_name]);
+        $txt   = Yii::t('usuario', 'Dear {user},', ['user' => $this->invoice->customer_name]);
         $this->Cell(0, $cellH, $txt, 0, 2);
         $this->ln(7);
         $txt = Yii::t(

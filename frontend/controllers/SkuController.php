@@ -9,6 +9,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 use Yii;
+use Da\User\Filter\AccessRuleFilter;
 
 class SkuController extends Controller
 {
@@ -21,7 +22,7 @@ class SkuController extends Controller
             'access' => [
                 'class' => AccessControl::class,
                 'ruleConfig' => [
-                    'class' => \dektrium\user\filters\AccessRule::class,
+                    'class' => AccessRuleFilter::class,
                 ],
                 'rules' => [
                     [

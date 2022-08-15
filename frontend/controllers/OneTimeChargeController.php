@@ -8,6 +8,7 @@ use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use Da\User\Filter\AccessRuleFilter;
 
 /**
  * OneTimeChargeController implements the CRUD actions for OneTimeCharge model.
@@ -23,7 +24,7 @@ class OneTimeChargeController extends Controller
             'access' => [
                 'class' => AccessControl::class,
                 'ruleConfig' => [
-                    'class' => \dektrium\user\filters\AccessRule::class,
+                    'class' => AccessRuleFilter::class,
                 ],
                 'rules' => [
                     [

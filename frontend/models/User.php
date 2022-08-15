@@ -2,7 +2,8 @@
 
 namespace frontend\models;
 
-use dektrium\user\models\User as BaseUser;
+use Da\User\Model\User as BaseUser;
+use Da\User\Event\UserEvent;
 use Stripe\Customer;
 use Stripe\Exception\ApiErrorException;
 use yii\base\Event;
@@ -21,11 +22,11 @@ class User extends BaseUser
 
     public function init()
     {
-        $this->on(self::BEFORE_REGISTER, function () {
+        $this->on(UserEvent::EVENT_BEFORE_REGISTER, function () {
             $this->username = $this->email;
         });
 
-        $this->on(self::BEFORE_CREATE, function () {
+        $this->on(UserEvent::EVENT_BEFORE_CREATE, function () {
             $this->username = $this->email;
         });
 
@@ -96,7 +97,7 @@ class User extends BaseUser
         }
 
         $customer = \frontend\models\Customer::findOne($this->customer_id);
-        return $customer->direct;
+        return $customer ? $customer->direct : false;
     }
 
     /**

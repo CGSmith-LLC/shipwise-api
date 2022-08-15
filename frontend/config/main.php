@@ -61,7 +61,7 @@ return [
         'view' => [
             'theme' => [
                 'pathMap' => [
-                    '@dektrium/user/views' => '@frontend/views/user', // our overrides
+                    '@Da/User/resources/views' => '@frontend/views/user', // our overrides
                 ],
             ],
         ],
@@ -72,26 +72,26 @@ return [
             'class' => \zhuravljov\yii\queue\monitor\Module::class,
         ],
         'user' => [
-            'class' => 'dektrium\user\Module',
-            'mailer' => [
-                'sender' => [$params['senderEmail'] => $appName],
+            'class' => Da\User\Module::class,
+            'mailParams' => [
+                'fromEmail' => [$params['senderEmail'] => $appName],
             ],
             'enableFlashMessages' => false,
-            'admins' => $params['adminEmail'],
+            'administrators' => $params['adminEmail'],
             'controllerMap' => [
                 'admin' => 'frontend\controllers\user\AdminController',
                 'registration' => [
-                    'class' => '\dektrium\user\controllers\RegistrationController',
-                    'on ' . \dektrium\user\controllers\RegistrationController::EVENT_AFTER_REGISTER => [
+                    'class' => Da\User\Controller\RegistrationController::class,
+                    'on ' . Da\User\Event\FormEvent::EVENT_AFTER_REGISTER => [
                         'frontend\events\user\AfterRegisterEvent',
                         'notifyAdmin'
                     ]
                 ],
             ],
-            'modelMap' => [
+            'classMap' => [
                 'User' => 'frontend\models\User',
                 'RegistrationForm' => 'frontend\models\forms\RegistrationForm',
-            ],
+            ]
         ],
     ],
 ];
