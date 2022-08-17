@@ -322,3 +322,34 @@ a.desc:after {
 .m-auto {
     margin: auto;
 }
+
+#LoginForm .auth-clients {
+    margin-top: 15px;
+}
+
+.auth-clients {
+    display: flex;
+    justify-content: center;
+    margin: 1em 0 !important;
+    padding: 0;
+}
+
+.auth-clients li {
+    margin: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.btn-social.auth-link {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-social.auth-link .auth-icon {
+    float: left;
+    margin: 0 25px 0 -45px;
+}

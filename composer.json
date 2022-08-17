@@ -19,7 +19,11 @@
       "ext-json": "*",
         "yiisoft/yii2-httpclient": "*",
         "zhuravljov/yii2-queue-monitor": "^0.3.4",
-        "2amigos/yii2-usuario": "^1.5"
+        "2amigos/yii2-usuario": "^1.5",
+        "yiisoft/yii2-authclient": "^2.2",
+        "paragonie/random_compat": "2.*",
+        "2amigos/2fa-library": "^2.0",
+        "2amigos/qrcode-library": "^2.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

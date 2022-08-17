@@ -65,6 +65,16 @@ return [
                 ],
             ],
         ],
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'google' => [
+                    'class' => 'Da\User\AuthClient\Google',
+                    'clientId' => $params['google_client_id'],
+                    'clientSecret' => $params['google_client_secret'],
+                ],
+            ],
+        ]
     ],
     'params' => $params,
     'modules' => [
@@ -73,6 +83,7 @@ return [
         ],
         'user' => [
             'class' => Da\User\Module::class,
+            'enableTwoFactorAuthentication' => true,
             'mailParams' => [
                 'fromEmail' => [$params['senderEmail'] => $appName],
             ],
@@ -81,7 +92,7 @@ return [
             'controllerMap' => [
                 'admin' => 'frontend\controllers\user\AdminController',
                 'registration' => [
-                    'class' => Da\User\Controller\RegistrationController::class,
+                    'class' => frontend\controllers\user\RegistrationController::class,
                     'on ' . Da\User\Event\FormEvent::EVENT_AFTER_REGISTER => [
                         'frontend\events\user\AfterRegisterEvent',
                         'notifyAdmin'
