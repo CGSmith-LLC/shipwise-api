@@ -11,7 +11,7 @@ use common\models\SubscriptionItems;
 use common\models\PaymentMethod;
 use common\pdf\InvoicePDF;
 use common\pdf\ReceiptPDF;
-use dektrium\user\models\User;
+use Da\User\Model\User;
 use frontend\models\Customer;
 use Stripe\PaymentIntent;
 use yii\console\Controller;

@@ -2,7 +2,7 @@
 
 namespace frontend\models\forms;
 
-use dektrium\user\models\RegistrationForm as BaseRegistrationForm;
+use Da\User\Form\RegistrationForm as BaseRegistrationForm;
 
 class RegistrationForm extends BaseRegistrationForm
 {

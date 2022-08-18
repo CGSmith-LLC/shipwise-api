@@ -2,10 +2,9 @@
 
 namespace frontend\events\user;
 
-use dektrium\user\models\Profile;
 use frontend\models\User;
-use dektrium\user\events\FormEvent;
-use dektrium\user\models\RegistrationForm;
+use Da\User\Event\FormEvent;
+use Da\User\Form\RegistrationForm;
 use Yii;
 use yii\helpers\Url;
 

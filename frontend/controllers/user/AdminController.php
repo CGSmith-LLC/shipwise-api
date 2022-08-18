@@ -2,7 +2,7 @@
 
 namespace frontend\controllers\user;
 
-use dektrium\user\controllers\AdminController as BaseAdminController;
+use Da\User\Controller\AdminController as BaseAdminController;
 use frontend\models\Customer;
 use frontend\models\search\CustomerSearch;
 use Yii;
@@ -11,6 +11,7 @@ use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UserEvent;
+use frontend\models\User;
 
 /**
  * Class AdminController
@@ -86,10 +87,10 @@ class AdminController extends BaseAdminController
 
         if ($customer->isLinkedToUser($user->id)) {
             $user->unlink('customers', $customer, true);
-            Yii::$app->getSession()->setFlash('success', Yii::t('user', 'Customer has been unlinked.'));
+            Yii::$app->getSession()->setFlash('success', Yii::t('usuario', 'Customer has been unlinked.'));
         } else {
             $user->link('customers', $customer);
-            Yii::$app->getSession()->setFlash('success', Yii::t('user', 'Customer has been linked.'));
+            Yii::$app->getSession()->setFlash('success', Yii::t('usuario', 'Customer has been linked.'));
         }
 
         return $this->redirect(Url::previous('actions-redirect'));
@@ -112,5 +113,17 @@ class AdminController extends BaseAdminController
         }
 
         $user->link('customers', $customer);
+    }
+
+    public function actionResendPassword($id)
+    {
+        return $this->actionPasswordReset($id);
+    }
+
+    protected function findModel($id)
+    {
+        if (($model = User::findOne($id)) !== null) {
+            return $model;
+        }
     }
 }

@@ -3,7 +3,6 @@
 namespace frontend\controllers;
 
 use common\models\Customer;
-use dektrium\user\controllers\AdminController;
 use frontend\models\PaymentMethod;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -36,8 +35,10 @@ class Controller extends \yii\web\Controller
     {
         parent::init();
         // Only perform this check if a user is logged in
+        /** @var Da\User\Module $module */
+        $module = Yii::$app->getModule('user');
         if (!Yii::$app->user->isGuest) {
-            if (!Yii::$app->session->has(AdminController::ORIGINAL_USER_SESSION_KEY) &&
+            if (!Yii::$app->session->has($module->switchIdentitySessionKey) &&
                 !Yii::$app->user->identity->isAdmin &&
                 Yii::$app->user->identity->isDirectCustomer() &&
                 !Yii::$app->user->identity->hasPaymentMethod() &&

@@ -5,7 +5,7 @@ namespace frontend\controllers;
 use common\models\Invoice;
 use common\pdf\InvoicePDF;
 use common\pdf\ReceiptPDF;
-use dektrium\user\filters\AccessRule;
+use Da\User\Filter\AccessRuleFilter;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -25,7 +25,7 @@ class InvoiceController extends Controller
             'access' => [
                 'class'      => AccessControl::class,
                 'ruleConfig' => [
-                    'class' => AccessRule::class,
+                    'class' => AccessRuleFilter::class,
                 ],
                 'rules'      => [
                     [

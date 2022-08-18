@@ -8,7 +8,6 @@
         "light/yii2-swagger": "~2.0.0-alpha",
         "notamedia/yii2-sentry": "^1.3",
         "codemix/yii2-localeurls": "^1.7",
-        "dektrium/yii2-user": "^0.9.14",
         "yiisoft/yii2-queue": "^2.3",
         "setasign/fpdf": "^1.8",
         "cgsmith/yii2-stripe": "dev-master",
@@ -19,7 +18,12 @@
         "bilberrry/yii2-digitalocean-spaces": "^0.1.2",
       "ext-json": "*",
         "yiisoft/yii2-httpclient": "*",
-        "zhuravljov/yii2-queue-monitor": "^0.3.4"
+        "zhuravljov/yii2-queue-monitor": "^0.3.4",
+        "2amigos/yii2-usuario": "^1.5",
+        "yiisoft/yii2-authclient": "^2.2",
+        "paragonie/random_compat": "2.*",
+        "2amigos/2fa-library": "^2.0",
+        "2amigos/qrcode-library": "^2.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

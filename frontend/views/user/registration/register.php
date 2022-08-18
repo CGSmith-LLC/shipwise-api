@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file overrides the Dektrium project's view
+ * This file overrides the 2amigos/yii2-usuario project's view
  * - Removed username from the view
  */
 
@@ -10,11 +10,11 @@ use yii\widgets\ActiveForm;
 
 /**
  * @var yii\web\View $this
- * @var dektrium\user\models\User $model
- * @var dektrium\user\Module $module
+ * @var frontend\models\forms\RegistrationForm $model
+ * @var Da\User\Module $module
  */
 
-$this->title = Yii::t('user', 'Sign up');
+$this->title = Yii::t('usuario', 'Sign up');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="row">
@@ -32,17 +32,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?= $form->field($model, 'email') ?>
 
-                <?php if ($module->enableGeneratingPassword == false): ?>
+                <?php if ($module->generatePasswords == false): ?>
                     <?= $form->field($model, 'password')->passwordInput() ?>
                 <?php endif ?>
 
-                <?= Html::submitButton(Yii::t('user', 'Sign up'), ['class' => 'btn btn-success btn-block']) ?>
+                <?= Html::submitButton(Yii::t('usuario', 'Sign up'), ['class' => 'btn btn-success btn-block']) ?>
 
                 <?php ActiveForm::end(); ?>
             </div>
         </div>
         <p class="text-center">
-            <?= Html::a(Yii::t('user', 'Already registered? Sign in!'), ['/user/security/login']) ?>
+            <?= Html::a(Yii::t('usuario', 'Already registered? Sign in!'), ['/user/security/login']) ?>
         </p>
     </div>
 </div>

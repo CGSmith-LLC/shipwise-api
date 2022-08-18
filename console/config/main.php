@@ -14,7 +14,6 @@ return [
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
-        '@dektrium' => '@vendor/dektrium',
     ],
     'controllerMap' => [
         'monitor' => [
@@ -26,9 +25,14 @@ return [
         ],
         'migrate' => [
             'class' => \yii\console\controllers\MigrateController::class,
+            'migrationPath' => [
+                '@app/migrations',
+                '@yii/rbac/migrations', // Just in case you forgot to run it on console (see next note)
+            ],
             'migrationNamespaces' => [
                 //...
                 'zhuravljov\yii\queue\monitor\migrations',
+                'Da\User\Migration',
             ],
         ],
     ],
@@ -59,7 +63,7 @@ return [
     'params' => $params,
     'modules' => [
         'user' => [
-            'class' => 'dektrium\user\Module',
+            'class' => Da\User\Module::class,
         ],
     ],
 ];
