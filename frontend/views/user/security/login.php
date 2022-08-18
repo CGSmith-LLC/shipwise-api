@@ -9,7 +9,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use Da\User\Widget\ConnectWidget;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\authclient\widgets\AuthChoice;
@@ -25,7 +24,19 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <?= $this->render('/shared/_alert', ['module' => Yii::$app->getModule('user')]) ?>
+<style type="text/css">
+    .btn-social {
+        margin-top: 5px;
+    }
 
+    .auth-icon {
+        margin-left: 5px;
+    }
+
+    .auth-text {
+        margin-top: -26px;
+    }
+</style>
 <div class="row">
     <div class="col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
         <div class="panel panel-default">
@@ -76,12 +87,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 ) ?>
 
                 <?php $authAuthChoice = AuthChoice::begin(['baseAuthUrl' => ['/user/security/auth']]); ?>
-                <ul class="auth-clients">
-                    <?php foreach($authAuthChoice->getClients() as $client): ?>
-                        <li><?= $authAuthChoice->clientLink($client, '<span class="auth-icon ' . $client->getName() . '"></span> Sign in with ' . $client->getTitle(), ['class' => 'btn btn-block btn-social btn-' . $client->getName(),]) ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
+                <?php foreach ($authAuthChoice->getClients() as $client) { ?>
+                    <?= $authAuthChoice->clientLink($client, '<span class="auth-icon ' . $client->getName() . '"></span> <p class="auth-text">Sign in with ' . $client->getTitle() . '</p>', ['class' => 'btn-default btn btn-block btn-social btn-' . $client->getName(),]) ?>
+                <?php } ?>
                 <?php AuthChoice::end(); ?>
 
                 <?php ActiveForm::end(); ?>
