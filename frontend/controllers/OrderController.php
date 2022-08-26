@@ -52,6 +52,26 @@ class OrderController extends \frontend\controllers\Controller
         ];
     }
 
+    public function actionStatusUpdate($id, $status)
+    {
+        $response = Yii::$app->response;
+        $response->format = Response::FORMAT_JSON;
+        if ($order = Order::find()->forCustomers(Yii::$app->user->identity->getCustomerList())->byId($id)->one()) {
+            $status = Status::findOne($status);
+            $order->status_id = $status->id;
+            if ($order->save()) {
+                return [
+                    'message' => $order->status->getStatusLabel(),
+                    'code' => 200,
+                ];
+            }
+        }
+
+        return [
+            'code' => 400
+        ];
+    }
+
     public function actionBulkEdit()
     {
         $model = new BulkEditForm();
