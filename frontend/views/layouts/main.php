@@ -57,6 +57,8 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
 </head>
 <body>
 <?php $this->beginBody() ?>
@@ -177,6 +179,11 @@ AppAsset::register($this);
 </footer>
 
 <?php $this->endBody() ?>
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script>
+    // Setup notyf for use on any page
+    var notyf = new Notyf();
+</script>
 </body>
 </html>
 <?php $this->endPage() ?>
