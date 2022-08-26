@@ -157,7 +157,6 @@ class SiteController extends \frontend\controllers\Controller
                 'width'  => '',
                 'height' => '',
             ]);
-        }
     }
 
     private function lookupAvatarColor($avatar)
