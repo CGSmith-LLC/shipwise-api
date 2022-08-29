@@ -79,7 +79,18 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                         'title' => 'Apply bulk action to selected orders',
                     ]) ?>
             </div>
-            <div class="col-lg-9">
+
+            <div class="col-lg-3 col-md-2 col-sm-2 col-xs-3">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#columnModal">
+                    <?= Yii::t('app','Column Manager') ?>
+                </button>
+            </div>
+            <?= $this->render('partial/_column_modal', array(
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            )) ?>
+
+            <div class="col-lg-6">
                 <div class="pull-right">
                     <?= Html::a('<i class="glyphicon glyphicon-remove-sign"></i> Clear filters',
                         ['/order?' . urlencode('OrderSearch[clearfilters]') . '=1'],

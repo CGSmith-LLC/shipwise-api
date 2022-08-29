@@ -150,15 +150,6 @@ class SiteController extends \frontend\controllers\Controller
         return strtoupper($return);
     }
 
-    public function actionConway()
-    {
-        return $this->render('conway', [
-                'name'   => 'Conway',
-                'width'  => '',
-                'height' => '',
-            ]);
-    }
-
     private function lookupAvatarColor($avatar)
     {
         $colors = ['#00AA55', '#009FD4', '#B381B3', '#939393', '#E3BC00', '#D47500', '#DC2A2A'];

@@ -370,3 +370,24 @@ ul.auth-clients {
     text-align: center;
     font-size: 16px;
 }
+
+/*column model*/
+#columnModal .modal-header {
+    display: flex;
+}
+
+#columnModal .modal-header .modal-title {
+    width: 98%;
+}
+
+#columnModal .modal-footer {
+    border-top: unset;
+}
+
+@media (min-width: 768px) {
+    #columnModal .modal-dialog {
+        width: 65%;
+        max-width: 70%;
+        margin: 30px auto;
+    }
+}
