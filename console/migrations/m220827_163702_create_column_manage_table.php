@@ -15,7 +15,7 @@ class m220827_163702_create_column_manage_table extends Migration
         $this->createTable('{{%column_manage}}', [
             'id' => $this->primaryKey(),
             'user_id' => $this->integer(11)->notNull(),
-            'column_data' => $this->string(255)->notNull()->defaultValue(''),
+            'column_data' => $this->getDb()->getSchema()->createColumnSchemaBuilder('longtext')->null()->comment('JSON data'),
         ]);
     }
 

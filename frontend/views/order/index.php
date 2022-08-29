@@ -7,6 +7,7 @@ use yii\bootstrap\Modal;
 use yii\grid\GridView;
 use yii\web\View;
 use yii\widgets\Pjax;
+use frontend\models\ColumnManage;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\search\OrderSearch */
@@ -24,6 +25,8 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
 } else {
     $customerDropdownList = Customer::getList();
 }
+
+$customColumns = ColumnManage::getColumnManageOfUser();
 ?>
     <div class="order-index">
 
@@ -88,6 +91,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
             <?= $this->render('partial/_column_modal', array(
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
+                'customColumns' => $customColumns,
             )) ?>
 
             <div class="col-lg-6">
@@ -101,6 +105,66 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
             </div>
         </div>
 
+        <?php
+        $columns = array(
+            [
+                'class' => 'yii\grid\CheckboxColumn',
+            ],
+            [
+                'attribute' => 'customer.name',
+                // Visible if admin or has a count higher than 0 for associated users
+                'visible' => ((count($customerDropdownList) > 1) || Yii::$app->user->identity->getIsAdmin()),
+                'filter' => Html::activeDropDownList(
+                    $searchModel,
+                    'customer_id',
+                    $customerDropdownList,
+                    ['class' => 'form-control', 'prompt' => Yii::t('app', 'All Customers')]
+                ),
+            ],
+            'customer_reference',
+            'po_number',
+            [
+                'attribute' => 'carrier_id',
+                'options' => ['width' => '10%'],
+                'value' => 'carrier.name',
+                'filter' => Html::activeDropDownList(
+                    $searchModel,
+                    'carrier_id',
+                    $carriers,
+                    ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
+                ),
+            ],
+            'service.name',
+            [
+                'attribute' => 'address',
+                'value' => 'address.name',
+            ],
+            'tracking',
+            'created_date:datetime',
+            'requested_ship_date:datetime',
+            [
+                'attribute' => 'notes',
+                'value' => function ($model) {
+                    return yii\helpers\StringHelper::truncate($model->notes, 40);
+                }
+            ],
+            [
+                'attribute' => 'status_id',
+                'options' => ['width' => '10%'],
+                'value' => 'status.name',
+                'filter' => Html::activeDropDownList(
+                    $searchModel,
+                    'status_id',
+                    $statuses,
+                    ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
+                ),
+            ],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'options' => ['width' => '15%'],
+            ],
+        );
+        ?>
         <?= GridView::widget([
             'id' => 'orders-grid-view',
             'dataProvider' => $dataProvider,
@@ -110,64 +174,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                 'firstPageLabel' => Yii::t('app', 'First'),
                 'lastPageLabel' => Yii::t('app', 'Last'),
             ],
-            'columns' => [
-                [
-                    'class' => 'yii\grid\CheckboxColumn',
-                ],
-                [
-                    'attribute' => 'customer.name',
-                    // Visible if admin or has a count higher than 0 for associated users
-                    'visible' => ((count($customerDropdownList) > 1) || Yii::$app->user->identity->getIsAdmin()),
-                    'filter' => Html::activeDropDownList(
-                        $searchModel,
-                        'customer_id',
-                        $customerDropdownList,
-                        ['class' => 'form-control', 'prompt' => Yii::t('app', 'All Customers')]
-                    ),
-                ],
-                'customer_reference',
-                'po_number',
-                [
-                    'attribute' => 'carrier_id',
-                    'options' => ['width' => '10%'],
-                    'value' => 'carrier.name',
-                    'filter' => Html::activeDropDownList(
-                        $searchModel,
-                        'carrier_id',
-                        $carriers,
-                        ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
-                    ),
-                ],
-                'service.name',
-                [
-                    'attribute' => 'address',
-                    'value' => 'address.name',
-                ],
-                'tracking',
-                'created_date:datetime',
-                'requested_ship_date:datetime',
-                [
-                    'attribute' => 'notes',
-                    'value' => function ($model) {
-                        return yii\helpers\StringHelper::truncate($model->notes, 40);
-                    }
-                ],
-                [
-                    'attribute' => 'status_id',
-                    'options' => ['width' => '10%'],
-                    'value' => 'status.name',
-                    'filter' => Html::activeDropDownList(
-                        $searchModel,
-                        'status_id',
-                        $statuses,
-                        ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
-                    ),
-                ],
-                [
-                    'class' => 'yii\grid\ActionColumn',
-                    'options' => ['width' => '15%'],
-                ],
-            ],
+            'columns' => $columns,
         ]); ?>
         <?php Pjax::end(); ?>
     </div>
