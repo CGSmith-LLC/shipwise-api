@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\pdf\OrderPackingSlip;
 use common\models\forms\OrderForm;
 use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
+use console\jobs\orders\ParseOrderJob;
 use frontend\models\Customer;
 use Yii;
 use frontend\models\{Address,
@@ -89,10 +90,18 @@ class OrderController extends \frontend\controllers\Controller
                 /** @var Order $order */
                 $errors = $success = [];
                 foreach ($orders as $order) {
-                    if (!$order->changeStatus($status->id)) {
-                        $errors[] = $order->customer_reference;
-                    } else {
+                    if ($model->reopen_enable && !empty($model->open_date)) {
+                        \Yii::$app->queue->push(new ParseOrderJob([
+                             'unparsedOrder' => Yii::$app->request->bodyParams,
+                             'integration_id' => $integrationHookdeck->integration_id,
+                         ]));
                         $success[] = $order->customer_reference;
+                    }else {
+                        if (!$order->changeStatus($status->id)) {
+                            $errors[] = $order->customer_reference;
+                        } else {
+                            $success[] = $order->customer_reference;
+                        }
                     }
                 }
 
