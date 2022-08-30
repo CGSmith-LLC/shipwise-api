@@ -132,6 +132,8 @@ Start your Docker container with:
 
 `docker-compose up -d`
 
+If you are on Linux and Solr doesn't start you may need to run this: `sudo chown 8983:8983 solr-data/var/solr/`
+
 Example of importing a gzipped mysql dump:
 
 `zcat cgsmpoim_shipwise.sql.gz | mysql -h mysql -u root -p cgsmpoim_shipwise`
