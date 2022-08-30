@@ -84,19 +84,10 @@ $generateColumns = ColumnManage::generateColumns();
                     ]) ?>
             </div>
 
-            <div class="col-lg-3 col-md-2 col-sm-2 col-xs-3">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#columnModal">
-                    <?= Yii::t('app','Column Manager') ?>
-                </button>
-            </div>
-            <?= $this->render('partial/_column_modal', array(
-                'searchModel' => $searchModel,
-                'dataProvider' => $dataProvider,
-                'customColumns' => $customColumns,
-            )) ?>
-
-            <div class="col-lg-6">
+            <div class="col-lg-9">
                 <div class="pull-right">
+                    <?= Html::button('<i class="glyphicon glyphicon-list"></i> Column Manager',
+                        ['class' => 'btn btn-default btn-xs m-b-xs', 'data-toggle' => 'modal', 'data-target' => '#columnModal']) ?>
                     <?= Html::a('<i class="glyphicon glyphicon-remove-sign"></i> Clear filters',
                         ['/order?' . urlencode('OrderSearch[clearfilters]') . '=1'],
                         ['class' => 'btn btn-default btn-xs m-b-xs m-r-xs']) ?>
@@ -189,7 +180,11 @@ $generateColumns = ColumnManage::generateColumns();
         ]); ?>
         <?php Pjax::end(); ?>
     </div>
-
+<?= $this->render('partial/_column_modal', array(
+    'searchModel' => $searchModel,
+    'dataProvider' => $dataProvider,
+    'customColumns' => $customColumns,
+)) ?>
 <?php Modal::begin([
     'id' => 'modalBulk',
     'clientOptions' => ['backdrop' => 'static', 'keyboard' => false],

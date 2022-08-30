@@ -384,9 +384,9 @@ ul.auth-clients {
 }
 
 #columnModal .modal-footer {
-    border-top: unset;
     display: inline-block;
     width: 100%;
+    margin-top: 20px;
 }
 
 #columnModal .form-check-input, #columnModal .form-check-label {

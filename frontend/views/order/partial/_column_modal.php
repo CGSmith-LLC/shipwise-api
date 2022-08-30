@@ -15,7 +15,7 @@ foreach(json_decode($customColumns->column_data) as $column) {
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="columnModalLabel"><?= Yii::t('app', 'Manage columns') ?></h5>
+                <h2 class="modal-title" id="columnModalLabel"><?= Yii::t('app', 'Manage columns') ?></h2>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
