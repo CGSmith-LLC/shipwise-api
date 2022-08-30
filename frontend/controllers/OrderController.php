@@ -96,12 +96,20 @@ class OrderController extends \frontend\controllers\Controller
                     }
                 }
 
+                if ($model->reopen_enable && !empty($model->open_date)) {
+                    $scheduledVerbiage = 'scheduled for';
+                } else {
+                    $scheduledVerbiage = 'changed to';
+                }
                 if (count($errors) > 0) {
-                    Yii::$app->getSession()->setFlash('error', count($errors) . ' orders failed to changed: <br>' . implode(',', $errors));
+                    Yii::$app->getSession()->setFlash('error', count($errors) . ' orders failed to ' . $scheduledVerbiage . ': <br>' . implode(',', $errors));
                 }
 
                 if (count($success) > 0) {
-                    Yii::$app->getSession()->setFlash('success', count($success) . ' orders changed to <strong>' . $status->name . '</strong>');
+                    Yii::$app->getSession()->setFlash(
+                        'success',
+                        count($success) . ' orders ' . $scheduledVerbiage . ' <strong>' . $status->name . '</strong>'
+                    );
                 }
 
                 return $this->redirect('bulk-edit');
@@ -111,7 +119,13 @@ class OrderController extends \frontend\controllers\Controller
             $model->order_ids = implode(PHP_EOL, ArrayHelper::map($orders, 'id', 'customer_reference'));
             $model->confirmed = true;
 
-            Yii::$app->getSession()->setFlash('warning', 'You are about to change <em>all</em> of the orders below to a status of <strong>' . $status->name);
+            $warning = 'You are about to change <em>all</em> of the orders below to a status of <strong>' . $status->name . '</strong>';
+            if ($model->reopen_enable && !empty($model->open_date)) {
+                $warning .= '<br><br>The orders will change to <strong>Open</strong> on <strong>' . $model->open_date . '</strong>.';
+            } else {
+                $model->reopen_enable = false;
+            }
+            Yii::$app->getSession()->setFlash('warning', $warning);
 
             return $this->render(
                 'bulk-edit',
