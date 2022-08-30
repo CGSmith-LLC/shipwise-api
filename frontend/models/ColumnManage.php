@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use common\models\base\BaseColumnManage;
+use yii\helpers\{Html, Json, Url};
 use Yii;
 
 /**
@@ -12,10 +13,8 @@ use Yii;
  * @property int $user_id Reference to user table
  * @property string $column_data
  */
-class ColumnManage extends BaseColumnManage
-{
+class ColumnManage extends BaseColumnManage {
     /**
-     * @param $user_id
      * @return array|\yii\db\ActiveRecord|null
      */
     public static function getColumnManageOfUser() {
@@ -26,43 +25,14 @@ class ColumnManage extends BaseColumnManage
         }
 
         $columnData = ColumnManage::find()->where(['user_id' => $user_id])->one();
-        if(empty($columnData)) {
+        if (empty($columnData)) {
             $customColumns = new ColumnManage();
             $customColumns->user_id = $user_id;
-            $defaultColumns = array(
-                [
-                    'attribute' => 'customer_reference',
-                    'status' => 1,
-                ],
-                [
-                    'attribute' => 'po_number',
-                    'status' => 1,
-                ],
-                [
-                    'attribute' => 'address',
-                    'status' => 1,
-                ],
-                [
-                    'attribute' => 'tracking',
-                    'status' => 1,
-                ],
-                [
-                    'attribute' => 'requested_ship_date',
-                    'status' => 1,
-                ],
-                [
-                    'attribute' => 'notes',
-                    'status' => 1,
-                ],
-                [
-                    'attribute' => 'created_at',
-                    'status' => 1,
-                ],
-                [
-                    'attribute' => 'status_id',
-                    'status' => 1,
-                ],
-            );
+            $defaultColumns = array();
+            $columns = array('customer_reference', 'po_number', 'carrier_id', 'service_id', 'address', 'tracking', 'created_date', 'requested_ship_date', 'notes', 'status_id',);
+            foreach($columns as $column) {
+                $defaultColumns[] = ['attribute' => $column, 'status' => 1];
+            }
 
             $customColumns->column_data = json_encode($defaultColumns);
             $customColumns->save();
@@ -70,5 +40,18 @@ class ColumnManage extends BaseColumnManage
         } else {
             return $columnData;
         }
+    }
+
+    /**
+     * @return array|\yii\db\ActiveRecord|null
+     */
+    public static function generateColumns() {
+        $customColumns = self::getColumnManageOfUser();
+        foreach(json_decode($customColumns->column_data) as $column) {
+            if ($column->status == 1) {
+                $generateColumns[] = $column->attribute;
+            }
+        }
+        return $generateColumns;
     }
 }

@@ -378,10 +378,40 @@ ul.auth-clients {
 
 #columnModal .modal-header .modal-title {
     width: 98%;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
 }
 
 #columnModal .modal-footer {
     border-top: unset;
+    display: inline-block;
+    width: 100%;
+}
+
+#columnModal .form-check-input, #columnModal .form-check-label {
+    cursor: pointer;
+}
+
+#columnModal .form-check-input {
+    width: 18px;
+    height: 18px;
+    margin: 0 8px;
+}
+
+#columnModal .form-check-label {
+    margin-bottom: 0;
+}
+
+#columnModal .form-check {
+    margin: 6px 0;
+    position: relative;
+    display: flex;
+    align-content: center;
+}
+
+.order-index #orders-grid-view {
+    overflow: auto;
 }
 
 @media (min-width: 768px) {

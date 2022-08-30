@@ -43,8 +43,27 @@ foreach(json_decode($customColumns->column_data) as $column) {
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal"><?= Yii::t('app', 'Close') ?></button>
-                <button type="button" class="btn btn-primary"><?= Yii::t('app', 'Save changes') ?></button>
+                <button id="submit-change-columnModal" type="button" class="btn btn-primary"><?= Yii::t('app', 'Save changes') ?></button>
             </div>
         </div>
     </div>
 </div>
+<?php $this->registerJs( <<<JS
+    $(document).ready(function() {
+        $('#submit-change-columnModal').on('click', function (e) {
+            var data = {};
+            $('#columnModal input[type=checkbox]').each(function() {
+                data[$(this).attr('name')] = $(this).is(':checked') ? 1 : 0;
+            });
+            $.ajax({
+                url: '/column-manage/update',
+                type: 'POST',
+                data: data,
+                success: function(data) {
+                    location.reload();
+                }
+            });
+        });
+    });
+JS
+); ?>

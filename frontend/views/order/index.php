@@ -27,6 +27,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
 }
 
 $customColumns = ColumnManage::getColumnManageOfUser();
+$generateColumns = ColumnManage::generateColumns();
 ?>
     <div class="order-index">
 
@@ -121,49 +122,59 @@ $customColumns = ColumnManage::getColumnManageOfUser();
                     ['class' => 'form-control', 'prompt' => Yii::t('app', 'All Customers')]
                 ),
             ],
-            'customer_reference',
-            'po_number',
-            [
-                'attribute' => 'carrier_id',
-                'options' => ['width' => '10%'],
-                'value' => 'carrier.name',
-                'filter' => Html::activeDropDownList(
-                    $searchModel,
-                    'carrier_id',
-                    $carriers,
-                    ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
-                ),
-            ],
-            'service.name',
-            [
-                'attribute' => 'address',
-                'value' => 'address.name',
-            ],
-            'tracking',
-            'created_date:datetime',
-            'requested_ship_date:datetime',
-            [
-                'attribute' => 'notes',
-                'value' => function ($model) {
-                    return yii\helpers\StringHelper::truncate($model->notes, 40);
-                }
-            ],
-            [
-                'attribute' => 'status_id',
-                'options' => ['width' => '10%'],
-                'value' => 'status.name',
-                'filter' => Html::activeDropDownList(
-                    $searchModel,
-                    'status_id',
-                    $statuses,
-                    ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
-                ),
-            ],
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'options' => ['width' => '15%'],
-            ],
         );
+
+        foreach($generateColumns as $value) {
+            if ($value == 'carrier_id') {
+                $userColumns[] = [
+                    'attribute' => 'carrier_id',
+                    'options' => ['width' => '10%'],
+                    'value' => 'carrier.name',
+                    'filter' => Html::activeDropDownList(
+                        $searchModel,
+                        'carrier_id',
+                        $carriers,
+                        ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
+                    ),
+                ];
+            } elseif ($value == 'address') {
+                $userColumns[] = [
+                    'attribute' => 'address',
+                    'value' => 'address.name',
+                ];
+            } elseif ($value == 'notes') {
+                $userColumns[] = [
+                    'attribute' => 'notes',
+                    'value' => function ($model) {
+                        return yii\helpers\StringHelper::truncate($model->notes, 40);
+                    }
+                ];
+            } elseif ($value == 'status_id') {
+                $userColumns[] = [
+                    'attribute' => 'status_id',
+                    'options' => ['width' => '10%'],
+                    'value' => 'status.name',
+                    'filter' => Html::activeDropDownList(
+                        $searchModel,
+                        'status_id',
+                        $statuses,
+                        ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
+                    ),
+                ];
+            } elseif (in_array($value, ['created_date', 'requested_ship_date', 'updated_date'])) {
+                $userColumns[] = $value . ':datetime';
+            } elseif ($value == 'service_id') {
+                $userColumns[] = 'service.name';
+            } else {
+                $userColumns[] = $value;
+            }
+        }
+        $userColumns[] = [
+            'class' => 'yii\grid\ActionColumn',
+            'options' => ['width' => '15%'],
+        ];
+
+        $columns = array_merge($columns, $userColumns);
         ?>
         <?= GridView::widget([
             'id' => 'orders-grid-view',
