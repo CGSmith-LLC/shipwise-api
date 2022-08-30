@@ -23,7 +23,8 @@
         "yiisoft/yii2-authclient": "^2.2",
         "paragonie/random_compat": "2.*",
         "2amigos/2fa-library": "^2.0",
-        "2amigos/qrcode-library": "^2.0"
+        "2amigos/qrcode-library": "^2.0",
+        "solarium/solarium": "^6.2"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

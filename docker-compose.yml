@@ -55,3 +55,13 @@ services:
       PMA_ARBITRARY: 1
     depends_on:
       - mysql
+
+  solr:
+    image: solr:9
+    ports:
+      - "30005:8983"
+    command:
+      - solr-precreate
+      - shipwise
+    volumes:
+      - ./solr-data/var/solr:/var/solr

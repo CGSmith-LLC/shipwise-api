@@ -144,8 +144,13 @@ Example of importing a gzipped mysql dump:
 1. Install composer and run `composer install` on the root directory
 1. Run `php init` for development
 
-Frontend: localhost:30000 API: localhost:30001 MySQL: localhost:30002 PhpMyAdmin: localhost:30003 Shopify: localhost:
-30004
+
+* Frontend: localhost:30000
+* API: localhost:30001
+* MySQL: localhost:30002
+* PhpMyAdmin: localhost:30003
+* Shopify: localhost:30004
+* Solr: localhost:30005
 
 ### Running queue jobs locally
 
@@ -169,6 +174,29 @@ You must set this in the policy at `/etc/ImageMagic-6/policy.xml` or it will err
 `apt-get update && apt-get install ghostscript`
 
 note: disregard if you use Docker, as it's already in [/frontend/Dockerfile](frontend/Dockerfile)
+
+### Solr
+
+Solr is configured in `docker-compose.yml` using the [official docker image](https://solr.apache.org/guide/solr/latest/deployment-guide/solr-in-docker.html).
+It is configured to automatically create a core called `shipwise` on startup if it doesn't exist.
+In development, the solr core is stored in `./solr-data/var/solr/data/shipwise`
+
+Solr can be installed manually by [downloading the binary release](https://solr.apache.org/downloads.html)
+and running `bin/solr` to start it. Create a core by running `bin/solr create -c shipwise`
+In this case, the core will be stored in `server/solr/shipwise`
+
+#### Field definitions
+We are currently using solr's dynamic field types to add fields without needing to specify a schema.
+Field names end with an indicator, such as `_i` for integer or `_t` for text.
+
+#### Loading data
+A script can be run to load items into an empty solr core:
+
+    ./yii solr/create-index
+
+#### Solr admin
+
+A web interface for querying solr can be found at http://localhost:30005/solr/#/shipwise/query
 
 ### Troubleshooting Console Jobs
 
