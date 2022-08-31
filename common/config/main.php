@@ -26,6 +26,19 @@ return [
         ],
     ],
     'components' => [
+        'solr' => [
+            'class' => 'common\components\SolrService',
+            'options' => [
+                'endpoint' => [
+                    'localhost' => [
+                        'host' => 'solr',
+                        'port' => '8983',
+                        'path' => '/',
+                        'collection' => 'shipwise'
+                    ]
+                ]
+            ]
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
