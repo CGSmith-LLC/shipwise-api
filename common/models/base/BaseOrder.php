@@ -2,6 +2,8 @@
 
 namespace common\models\base;
 
+use console\jobs\solr\CreateDocumentsJob;
+
 /**
  * This is the model class for table "orders".
  *
@@ -37,6 +39,21 @@ namespace common\models\base;
  */
 class BaseOrder extends \yii\db\ActiveRecord
 {
+    public function init()
+    {
+        parent::init();
+
+        // Configure events to call Solr
+        $this->on(self::EVENT_AFTER_INSERT, [$this, 'createOrUpdateSolrDocument']);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'createOrUpdateSolrDocument']);
+    }
+
+
+    public function createOrUpdateSolrDocument($event)
+    {
+        \Yii::$app->queue->push(new CreateDocumentsJob(['orderIds' => [$event->sender->id]]));
+    }
+
 
     /**
      * {@inheritdoc}
