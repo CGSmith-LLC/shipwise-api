@@ -22,6 +22,26 @@ class SolrService extends \yii\base\Component
         parent::init();
     }
 
+    public function search($query, $customerIds, $offset, $rows)
+    {
+        $select = $this->client->createSelect();
+
+        if (empty($query)) {
+            $select->setQuery('*:*');
+        } else {
+            $select->setQuery('_text_:' . $query);
+        }
+        if (!empty($customerIds)) {
+            $customerIdsOr = implode(' OR ', $customerIds);
+            $select->createFilterQuery('customer_ids')->setQuery('customer_id_i:('. $customerIdsOr .')');
+        }
+        $select->setStart($offset)->setRows($rows);
+        $select->addSort('created_date_dt', $select::SORT_DESC);
+
+        $resultset = $this->client->select($select);
+        return $resultset;
+    }
+
     public function createDocument(array $orders)
     {
         $update = $this->client->createUpdate();
@@ -31,6 +51,7 @@ class SolrService extends \yii\base\Component
             $doc = $update->createDocument();
             $doc->id = $order->id;
             $doc->customer_id_i = $order->customer_id;
+            $doc->created_date_dt = $order->created_date;
             if ($order->status) {
                 $doc->status_id_i = $order->status_id;
                 $doc->status_id_t = $order->status->name;

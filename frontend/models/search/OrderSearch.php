@@ -4,6 +4,7 @@ namespace frontend\models\search;
 
 use common\models\Address;
 use common\models\Status;
+use frontend\models\forms\SolrSearchForm;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -85,6 +86,48 @@ class OrderSearch extends Order
     {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
+    }
+
+    public function searchSolr($query, $params) {
+        $solr = \Yii::$app->solr;
+
+        $ids = [];
+
+        // If user is not admin, then show orders that ONLY belong to current user
+        $customerIds = [];
+        if (!Yii::$app->user->identity->isAdmin) {
+            $customerIds = Yii::$app->user->identity->customerIds;
+        }
+        $resultset = $solr->search($query, $customerIds, 0, 10);
+
+        foreach ($resultset as $document) {
+            $ids[] = $document->id;
+        }
+
+        $order_query = Order::find();
+        $order_query->andFilterWhere([
+            Order::tableName() . '.id' => $ids
+            ]);
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $order_query,
+            'sort' => [
+                'defaultOrder' => ['created_date' => SORT_DESC, 'id' => SORT_DESC],
+            ],
+        ]);
+
+        // TODO: for pager, convince the dataProvider that it has more results
+        //  so that we can show a pager. Also, read start/rows from page and pass to solr
+        $numresults = $resultset->getNumFound();
+        $dataProvider->pagination->totalCount = $numresults;
+
+        return $dataProvider;
+
+        // If any kind of error from solr, revert to database search
+        // TODO: As we've hidden the filters from the order page (no filterModel),
+        //   we need to decide if we want to keep the db search using the existing
+        //   functionality, or add the omnibox search to that too
+        //return $this->search($params);
     }
 
     /**

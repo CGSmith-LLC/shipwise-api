@@ -9,6 +9,7 @@ use frontend\models\Customer;
 use Yii;
 use frontend\models\{Address,
     forms\BulkEditForm,
+    forms\SolrSearchForm,
     Item,
     Order,
     BulkAction,
@@ -148,6 +149,31 @@ class OrderController extends \frontend\controllers\Controller
         return $this->render(
             'index',
             [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'statuses' => Status::getList(),
+                'carriers' => Carrier::getList(),
+                'services' => Service::getList(),
+            ]
+        );
+    }
+
+    public function actionSolr()
+    {
+        $model = new SolrSearchForm();
+        if ($model->load(Yii::$app->request->queryParams) && $model->validate()) {
+
+        } else {
+            // TODO: what is the response if this is an invalid form?
+        }
+        $searchModel = new OrderSearch();
+        //var_dump($model->query);
+        $dataProvider = $searchModel->searchSolr($model->query, Yii::$app->request->queryParams);
+
+        return $this->render(
+            'solr',
+            [
+                'model' => $model,
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
                 'statuses' => Status::getList(),
