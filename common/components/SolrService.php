@@ -31,8 +31,10 @@ class SolrService extends \yii\base\Component
             $doc = $update->createDocument();
             $doc->id = $order->id;
             $doc->customer_id_i = $order->customer_id;
-            $doc->status_id_i = $order->status_id;
-            $doc->status_id_t = $order->status->name;
+            if ($order->status) {
+                $doc->status_id_i = $order->status_id;
+                $doc->status_id_t = $order->status->name;
+            }
             if ($order->address) {
                 $doc->customer_name_t = $order->address->name;
                 $doc->customer_company_t = $order->address->company;
