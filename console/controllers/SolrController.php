@@ -16,10 +16,10 @@ class SolrController extends Controller
     public function actionCreateIndex()
     {
         $query = Order::find()->select(['id']);
-        // 100 seems to be a sweet spot for getting the data pushed to the job
-        foreach ($query->batch(100) as $orders) {
+        foreach ($query->batch(2000) as $orders) {
+            $orderIds = array_map(function($order) {return $order->id;}, $orders);
             \Yii::$app->queue->push(new CreateDocumentsJob([
-              'orderIds' => $orders,
+              'orderIds' => $orderIds,
           ]));
         }
     }
