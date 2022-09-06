@@ -14,7 +14,11 @@ class CreateDocumentsJob extends \yii\base\BaseObject implements \yii\queue\Retr
     {
         /** @var SolrService $solr */
         $solr = \Yii::$app->solr;
-        $orders = Order::find()->where(['id' => $this->orderIds])->all();
+        $orders = Order::find()->where(['id' => $this->orderIds])
+            ->with('address')
+            ->with('address.state')
+            ->with('status')
+            ->all();
         $solr->createDocument($orders);
     }
 
