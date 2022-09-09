@@ -29,7 +29,7 @@ class ScheduledOrder extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['order_id', 'status_id', 'scheduled_date'], 'required'],
+            [['order_id', 'status_id', 'customer_id', 'scheduled_date'], 'required'],
             [['order_id', 'status_id'], 'integer'],
         ];
     }
@@ -51,6 +51,16 @@ class ScheduledOrder extends \yii\db\ActiveRecord
      */
     public function getStatus()
     {
-        return $this->hasOne(Status::class, ['id' => 'order_id']);
+        return $this->hasOne(Status::class, ['id' => 'status_id']);
+    }
+
+    /**
+     * Relation for status
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCustomer()
+    {
+        return $this->hasOne(Customer::class, ['id' => 'customer_id']);
     }
 }

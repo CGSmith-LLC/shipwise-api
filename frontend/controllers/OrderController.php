@@ -13,7 +13,8 @@ use frontend\models\{Address,
     Order,
     BulkAction,
     OrderImport,
-    search\OrderSearch};
+    search\OrderSearch,
+    search\ScheduledOrderSearch};
 use yii\web\{BadRequestHttpException, Cookie, NotFoundHttpException, Response};
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
@@ -91,6 +92,7 @@ class OrderController extends \frontend\controllers\Controller
                 foreach ($orders as $order) {
                     if ($model->reopen_enable && !empty($model->open_date)) {
                         $scheduledOrder = new ScheduledOrder([
+                            'customer_id' => $order->customer_id,
                             'order_id' => $order->id,
                             'status_id' => Status::OPEN,
                             'scheduled_date' => $model->open_date,
@@ -156,6 +158,19 @@ class OrderController extends \frontend\controllers\Controller
                 'confirmed' => false,
                 'customers' => Yii::$app->user->identity->isAdmin ? Customer::getList() : Yii::$app->user->identity->getCustomerList(),
                 'statuses' => Status::getList(),
+            ]
+        );
+    }
+
+    public function actionScheduled()
+    {
+        $searchModel = new ScheduledOrderSearch();
+        $dataProvider = $searchModel->search([]);
+
+        return $this->render(
+            'scheduled',
+            [
+                'dataProvider' => $dataProvider,
             ]
         );
     }

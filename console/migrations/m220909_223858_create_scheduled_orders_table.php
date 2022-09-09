@@ -16,6 +16,7 @@ class m220909_223858_create_scheduled_orders_table extends Migration
             'id' => $this->primaryKey(),
             'order_id' => $this->integer()->notNull(),
             'status_id' => $this->integer()->notNull(),
+            'customer_id' => $this->integer()->notNull(),
             'scheduled_date' =>  $this->dateTime()->notNull(),
         ]);
     }
