@@ -34,8 +34,6 @@ $generateColumns = ColumnManage::generateColumns();
         <?php Pjax::begin([
             'id' => 'pjax-orders',
             'timeout' => 2000,
-            //'enablePushState'    => false,
-            //'enableReplaceState' => false,
         ]) ?>
         <h1><?= Html::encode($this->title) ?></h1>
 

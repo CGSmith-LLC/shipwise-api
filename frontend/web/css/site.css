@@ -410,10 +410,6 @@ ul.auth-clients {
     align-content: center;
 }
 
-.order-index #orders-grid-view {
-    overflow: auto;
-}
-
 @media (min-width: 768px) {
     #columnModal .modal-dialog {
         width: 65%;

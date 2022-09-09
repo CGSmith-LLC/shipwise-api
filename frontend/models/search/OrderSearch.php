@@ -139,6 +139,7 @@ class OrderSearch extends Order
         $dataProvider->sort->attributes['address'] = [
             'asc' => [Address::tableName() . '.name' => SORT_ASC],
             'desc' => [Address::tableName() . '.name' => SORT_DESC],
+            'label' => 'Ship To Name',
         ];
 
         $this->load($params);

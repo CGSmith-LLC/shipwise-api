@@ -23,10 +23,13 @@ foreach(json_decode($customColumns->column_data) as $column) {
             <div class="modal-body">
                 <?php
                 $columns = $dataProvider->sort->attributes;
+                $ignoreColumns = ['customer_id', 'address_id', 'label_data', 'label_type', 'facility_id','ship_from_name','ship_from_address1','ship_from_address2',
+                    'ship_from_city', 'ship_from_zip', 'ship_from_country_code', 'ship_from_email', 'ship_from_phone'];
+                Yii::debug($columns);
                 foreach($columns as $key => $value) {
                     $checked = '';
                     $inputValue = '';
-                    if (isset($value['label'])) {
+                    if (isset($value['label']) && !in_array($key, $ignoreColumns)) {
                         if (in_array($key, $userColumn)) {
                             $checked = 'checked';
                             $inputValue = 1;

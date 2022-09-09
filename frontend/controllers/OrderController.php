@@ -124,7 +124,7 @@ class OrderController extends \frontend\controllers\Controller
     {
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+        Yii::debug($dataProvider);
         return $this->render(
             'index',
             [
