@@ -14,9 +14,11 @@ class DatePickerAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/plugins/datapicker/datepicker3.css',
+        '//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
     ];
     public $js = [
         'js/plugins/datapicker/bootstrap-datepicker.js',
+        '//cdn.jsdelivr.net/npm/flatpickr',
     ];
     public $depends = [
         // depends on jQuery

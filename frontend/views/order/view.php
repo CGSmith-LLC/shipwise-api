@@ -15,11 +15,37 @@ $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 $cookies = Yii::$app->request->cookies;
 $simple = $cookies->getValue('simple');
+
+$statusUrl = \yii\helpers\Url::to(['order/status-update']);
+$js = <<<JS
+
+$(".status-links").on('click', function () {
+    $.ajax({
+        url: "{$statusUrl}",
+        data: {
+            id: $(this).attr("data-id"),
+            status: $(this).attr("data-status")
+        },
+        type: "get",
+        success: function(data){
+            notyf.success('Order status successfully updated!');
+            $("#order-status").html(data.message);
+            
+        },
+        error: function () {
+            notyf.error('We encountered an error saving the status.');
+        }
+    });
+});
+JS;
+
+$this->registerJs($js);
 ?>
+
 <div class="order-view">
 
     <h1 style="display: inline"><?= Html::encode($this->title) ?></h1>
-    <p style="display: inline;"><?= $model->status->getStatusLabel(); ?> </p>
+    <div style="display: inline;" id="order-status"><?= $model->status->getStatusLabel(); ?></div>
     <h4 style="margin-top: -0.5rem; color: #575555;"><?= $model->customer->name; ?> </h4>
 
     <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -30,6 +56,17 @@ $simple = $cookies->getValue('simple');
             'method' => 'post',
         ],
     ]) ?>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+            Status <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <?php foreach (\common\models\Status::getList() as $status_id => $name) { ?>
+                <li><?= Html::a($name, null, ['class' => 'status-links', 'data-status' => $status_id, 'data-id' => $model->id]) ?></li>
+            <?php } ?>
+        </ul>
+    </div>
 
     <div class="btn-group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"

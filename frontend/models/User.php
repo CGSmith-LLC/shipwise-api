@@ -5,8 +5,6 @@ namespace frontend\models;
 use Da\User\Model\User as BaseUser;
 use Da\User\Event\UserEvent;
 use Stripe\Customer;
-use Stripe\Exception\ApiErrorException;
-use yii\base\Event;
 use yii\helpers\ArrayHelper;
 
 /**

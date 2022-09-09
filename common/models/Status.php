@@ -15,6 +15,7 @@ class Status extends BaseStatus
 
     /* Please keep synchronized with db values! */
     const SHIPPED = 1;
+    const ON_HOLD = 6;
     const CANCELLED = 7;
     const PENDING = 8;
     const OPEN = 9;
