@@ -86,7 +86,9 @@ class CronController extends Controller
         foreach (ScheduledOrder::find()->where(['<=', 'scheduled_date', $date->format('Y-m-d')])->all() as $scheduledOrder) {
             $order = Order::findOne($scheduledOrder->order_id);
             $order->status_id = $scheduledOrder->status_id;
-            $order->save();
+            if ($order->save()) {
+                $scheduledOrder->delete();
+            }
         }
     }
 
