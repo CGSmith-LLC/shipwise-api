@@ -4,8 +4,7 @@ namespace frontend\controllers;
 
 use common\pdf\OrderPackingSlip;
 use common\models\forms\OrderForm;
-use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
-use console\jobs\orders\ParseOrderJob;
+use common\models\{base\BaseBatch, Country, ScheduledOrder, State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\Customer;
 use Yii;
 use frontend\models\{Address,
@@ -91,10 +90,13 @@ class OrderController extends \frontend\controllers\Controller
                 $errors = $success = [];
                 foreach ($orders as $order) {
                     if ($model->reopen_enable && !empty($model->open_date)) {
-                        \Yii::$app->queue->push(new ParseOrderJob([
-                             'unparsedOrder' => Yii::$app->request->bodyParams,
-                             'integration_id' => $integrationHookdeck->integration_id,
-                         ]));
+                        $scheduledOrder = new ScheduledOrder([
+                            'order_id' => $order->id,
+                            'status_id' => Status::OPEN,
+                            'scheduled_date' => $model->open_date,
+                         ]);
+                        $scheduledOrder->save();
+
                         $success[] = $order->customer_reference;
                     }else {
                         if (!$order->changeStatus($status->id)) {
