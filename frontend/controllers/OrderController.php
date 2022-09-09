@@ -323,12 +323,13 @@ class OrderController extends \frontend\controllers\Controller
         $orderToClone = Order::find()->where(['id' => $id])->one();
         $addressToClone = Address::find()->where(['id' => $orderToClone->address_id])->one();
         $itemsToClone = Item::find()->where(['order_id' => $id])->all();
+        $userStatusPreference = Yii::$app->user->identity->profile->clone_order_preference;
         $model = new OrderForm();
         $model->order = new Order();
         $model->setOrder($orderToClone->attributes);
         $model->setAddress($addressToClone->attributes);
 
-        $model->order->status_id = Status::OPEN;
+        $model->order->status_id = $userStatusPreference;
         $model->order->setAttribute('customer_reference', $model->order->getNextCustomerReferenceNumber());
 
         /** @var Item $item */

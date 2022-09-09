@@ -102,6 +102,7 @@ return [
             'classMap' => [
                 'User' => 'frontend\models\User',
                 'RegistrationForm' => 'frontend\models\forms\RegistrationForm',
+                'Profile' => 'frontend\models\Profile',
             ]
         ],
     ],
