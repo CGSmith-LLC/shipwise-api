@@ -4,6 +4,8 @@ namespace console\controllers;
 
 use common\models\BulkAction;
 use common\models\FulfillmentMeta;
+use common\models\Order;
+use common\models\ScheduledOrder;
 use console\jobs\orders\FetchJob;
 use console\jobs\orders\SendTo3PLJob;
 use yii\console\{Controller, ExitCode};
@@ -63,6 +65,7 @@ class CronController extends Controller
          *          - call parseOrder
          */
         $this->runIntegrations(Integration::ACTIVE);
+        $this->runScheduledOrders();
 
         return ExitCode::OK;
     }
@@ -74,6 +77,18 @@ class CronController extends Controller
             \Yii::$app->queue->push(new FetchJob([
                 'integration' => $integration
             ]));
+        }
+    }
+
+    public function runScheduledOrders()
+    {
+        $date = new \DateTime();
+        foreach (ScheduledOrder::find()->where(['<=', 'scheduled_date', $date->format('Y-m-d')])->all() as $scheduledOrder) {
+            $order = Order::findOne($scheduledOrder->order_id);
+            $order->status_id = $scheduledOrder->status_id;
+            if ($order->save()) {
+                $scheduledOrder->delete();
+            }
         }
     }
 

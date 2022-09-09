@@ -4,7 +4,7 @@ namespace frontend\controllers;
 
 use common\pdf\OrderPackingSlip;
 use common\models\forms\OrderForm;
-use common\models\{base\BaseBatch, Country, State, Status, shipping\Carrier, shipping\Service};
+use common\models\{base\BaseBatch, Country, ScheduledOrder, State, Status, shipping\Carrier, shipping\Service};
 use frontend\models\Customer;
 use Yii;
 use frontend\models\{Address,
@@ -13,7 +13,8 @@ use frontend\models\{Address,
     Order,
     BulkAction,
     OrderImport,
-    search\OrderSearch};
+    search\OrderSearch,
+    search\ScheduledOrderSearch};
 use yii\web\{BadRequestHttpException, Cookie, NotFoundHttpException, Response};
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
@@ -89,19 +90,39 @@ class OrderController extends \frontend\controllers\Controller
                 /** @var Order $order */
                 $errors = $success = [];
                 foreach ($orders as $order) {
-                    if (!$order->changeStatus($status->id)) {
-                        $errors[] = $order->customer_reference;
-                    } else {
+                    if ($model->reopen_enable && !empty($model->open_date)) {
+                        $scheduledOrder = new ScheduledOrder([
+                            'customer_id' => $order->customer_id,
+                            'order_id' => $order->id,
+                            'status_id' => Status::OPEN,
+                            'scheduled_date' => $model->open_date,
+                         ]);
+                        $scheduledOrder->save();
+
                         $success[] = $order->customer_reference;
+                    }else {
+                        if (!$order->changeStatus($status->id)) {
+                            $errors[] = $order->customer_reference;
+                        } else {
+                            $success[] = $order->customer_reference;
+                        }
                     }
                 }
 
+                if ($model->reopen_enable && !empty($model->open_date)) {
+                    $scheduledVerbiage = 'scheduled for';
+                } else {
+                    $scheduledVerbiage = 'changed to';
+                }
                 if (count($errors) > 0) {
-                    Yii::$app->getSession()->setFlash('error', count($errors) . ' orders failed to changed: <br>' . implode(',', $errors));
+                    Yii::$app->getSession()->setFlash('error', count($errors) . ' orders failed to ' . $scheduledVerbiage . ': <br>' . implode(',', $errors));
                 }
 
                 if (count($success) > 0) {
-                    Yii::$app->getSession()->setFlash('success', count($success) . ' orders changed to <strong>' . $status->name . '</strong>');
+                    Yii::$app->getSession()->setFlash(
+                        'success',
+                        count($success) . ' orders ' . $scheduledVerbiage . ' <strong>' . $status->name . '</strong>'
+                    );
                 }
 
                 return $this->redirect('bulk-edit');
@@ -111,7 +132,13 @@ class OrderController extends \frontend\controllers\Controller
             $model->order_ids = implode(PHP_EOL, ArrayHelper::map($orders, 'id', 'customer_reference'));
             $model->confirmed = true;
 
-            Yii::$app->getSession()->setFlash('warning', 'You are about to change <em>all</em> of the orders below to a status of <strong>' . $status->name);
+            $warning = 'You are about to change <em>all</em> of the orders below to a status of <strong>' . $status->name . '</strong>';
+            if ($model->reopen_enable && !empty($model->open_date)) {
+                $warning .= '<br><br>The orders will change to <strong>Open</strong> on <strong>' . $model->open_date . '</strong>.';
+            } else {
+                $model->reopen_enable = false;
+            }
+            Yii::$app->getSession()->setFlash('warning', $warning);
 
             return $this->render(
                 'bulk-edit',
@@ -131,6 +158,19 @@ class OrderController extends \frontend\controllers\Controller
                 'confirmed' => false,
                 'customers' => Yii::$app->user->identity->isAdmin ? Customer::getList() : Yii::$app->user->identity->getCustomerList(),
                 'statuses' => Status::getList(),
+            ]
+        );
+    }
+
+    public function actionScheduled()
+    {
+        $searchModel = new ScheduledOrderSearch();
+        $dataProvider = $searchModel->search([]);
+
+        return $this->render(
+            'scheduled',
+            [
+                'dataProvider' => $dataProvider,
             ]
         );
     }
@@ -300,12 +340,13 @@ class OrderController extends \frontend\controllers\Controller
         $orderToClone = Order::find()->where(['id' => $id])->one();
         $addressToClone = Address::find()->where(['id' => $orderToClone->address_id])->one();
         $itemsToClone = Item::find()->where(['order_id' => $id])->all();
+        $userStatusPreference = Yii::$app->user->identity->profile->clone_order_preference;
         $model = new OrderForm();
         $model->order = new Order();
         $model->setOrder($orderToClone->attributes);
         $model->setAddress($addressToClone->attributes);
 
-        $model->order->status_id = Status::OPEN;
+        $model->order->status_id = $userStatusPreference;
         $model->order->setAttribute('customer_reference', $model->order->getNextCustomerReferenceNumber());
 
         /** @var Item $item */
