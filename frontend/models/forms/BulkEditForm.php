@@ -26,6 +26,9 @@ class BulkEditForm extends Model
     /** @var string A delineated list of order reference numbers */
     public $order_ids;
 
+    public $open_date;
+    public $reopen_enable = false;
+
     public $confirmed = false;
 
 
@@ -34,7 +37,8 @@ class BulkEditForm extends Model
     {
         return [
             [['customer', 'action', 'order_ids'], 'required'],
-            [['confirmed'], 'boolean'],
+            [['confirmed', 'reopen_enable'], 'boolean'],
+            [['open_date'], 'string'],
         ];
     }
 
