@@ -56,6 +56,7 @@ return [
 
     "POST $version/inventory" => "$version/inventory/create",
     "POST $version/webhook" => "$version/webhook",
+    "POST $version/webhook/urban-smokehouse" => "$version/webhook/urban-smokehouse",
     "GET $version/inventory" => "$version/inventory",
     "DELETE $version/inventory/purge" => "$version/inventory/purge",
 
