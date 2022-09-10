@@ -3,11 +3,13 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
+use common\adapters\ecommerce\DudaAdapter;
 use common\models\IntegrationHookdeck;
 use console\jobs\orders\ParseOrderJob;
 use Yii;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\UnauthorizedHttpException;
 
 /**
  * Class WebhookController
@@ -23,6 +25,7 @@ class WebhookController extends ControllerEx
     {
         return [
             'index' => ['GET', 'POST'],
+            'urban-smokehouse' => ['POST'],
         ];
     }
 
@@ -53,6 +56,20 @@ class WebhookController extends ControllerEx
             }
         } else {
             return $this->errorMessage(404, 'Missing source name');
+        }
+    }
+
+    public function actionUrbanSmokehouse()
+    {
+        $headers = Yii::$app->request->headers;
+
+        if ($headers->get('authorization') === 'Basic c2hpcHdpc2U6bmVlc3ZpZ3M=') {
+            $duda = new DudaAdapter();
+            $duda->customer_id = 76; // urban smokehouse
+            $order = $duda->parseOrder(Yii::$app->request->getRawBody());
+            $order->save();
+        } else {
+            throw new  UnauthorizedHttpException();
         }
     }
 
