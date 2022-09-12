@@ -63,5 +63,7 @@ services:
     command:
       - solr-precreate
       - shipwise
+      - /coreconfigs/shipwise
     volumes:
       - ./solr-data/var/solr:/var/solr
+      - ./config/solr:/coreconfigs
