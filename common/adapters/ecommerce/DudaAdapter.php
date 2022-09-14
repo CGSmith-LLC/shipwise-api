@@ -2,6 +2,7 @@
 
 namespace common\adapters\ecommerce;
 
+use common\exceptions\IgnoredWebhookException;
 use common\exceptions\OrderExistsException;
 use common\models\Address;
 use common\models\forms\OrderForm;
@@ -9,7 +10,6 @@ use common\models\Order;
 use common\models\Sku;
 use common\models\State;
 use common\models\Status;
-use http\Exception\BadConversionException;
 use yii\base\Component;
 use yii\console\Exception;
 use yii\helpers\ArrayHelper;
@@ -35,7 +35,7 @@ class DudaAdapter extends Component
         $this->trigger(self::EVENT_BEFORE_PARSE);
 
         if ($unparsedOrder['paymentStatus'] !== 'PAID') {
-            throw new BadConversionException('Order must be marked paid');
+            throw new IgnoredWebhookException('Order must be marked paid', 200);
         }
 
         // check if order exists

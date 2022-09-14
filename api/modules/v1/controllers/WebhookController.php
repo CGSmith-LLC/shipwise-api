@@ -4,6 +4,7 @@ namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
 use common\adapters\ecommerce\DudaAdapter;
+use common\exceptions\IgnoredWebhookException;
 use common\models\IntegrationHookdeck;
 use console\jobs\orders\ParseOrderJob;
 use Yii;
@@ -66,8 +67,14 @@ class WebhookController extends ControllerEx
         if ($headers->get('authorization') === 'Basic c2hpcHdpc2U6bmVlc3ZpZ3M=') {
             $duda = new DudaAdapter();
             $duda->customer_id = 76; // urban smokehouse
-            $order = $duda->parseOrder(Yii::$app->request->getRawBody());
-            $order->save();
+            try {
+                $order = $duda->parseOrder(Yii::$app->request->getRawBody());
+                $order->save();
+            } catch (IgnoredWebhookException $exception) {
+                return $this->errorMessage(200, $exception->getMessage());
+            } catch (\Exception $exception) {
+                return $this->errorMessage(500, $exception->getMessage());
+            }
         } else {
             throw new  UnauthorizedHttpException();
         }
