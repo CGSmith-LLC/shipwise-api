@@ -40,7 +40,7 @@ class DudaAdapter extends Component
 
         // check if order exists
         if (Order::find()
-            ->where(['customer_reference' => (string) $unparsedOrder['orderNumber']])
+            ->where(['customer_reference' => (string) $unparsedOrder['id']])
             ->andWhere(['customer_id' => $this->customer_id])
             ->one()) {
             throw new OrderExistsException($unparsedOrder['orderNumber']);
@@ -51,7 +51,7 @@ class DudaAdapter extends Component
 
         $model->order->setAttributes([
             'customer_id' => $this->customer_id,
-            'customer_reference' => (string) $unparsedOrder['orderNumber'],
+            'customer_reference' => (string) $unparsedOrder['id'],
             'status_id' => Status::OPEN,
             'uuid' => (string) $unparsedOrder['id'],
             'created_date' => $createDate->format('Y-m-d'),
