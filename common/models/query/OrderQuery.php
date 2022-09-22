@@ -119,6 +119,18 @@ class OrderQuery extends \yii\db\ActiveQuery
     }
 
     /**
+     * Query condition to get requested ship date
+     *
+     * @param $date
+     *
+     * @return OrderQuery
+     */
+    public function onOrBeforeArriveByDate($date)
+    {
+        return $this->andWhere(['<=', Order::tableName() . '.must_arrive_by_date', $date]);
+    }
+
+    /**
      * Query condition to get orders after an updated date
      *
      * @param $date \DateTime

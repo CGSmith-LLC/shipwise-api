@@ -128,6 +128,14 @@ $this->registerJs($js);
                         'format' => 'datetime',
                         'visible' => !$simple,
                     ],
+                    [
+                        'attribute' => 'requested_ship_date',
+                        'visible' => !$simple,
+                    ],
+                    [
+                        'attribute' => 'must_arrive_by_date',
+                        'visible' => !$simple,
+                    ],
                     'transit',
                     [
                         'attribute' => 'packagingNotes',

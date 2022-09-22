@@ -85,6 +85,13 @@ $item->loadDefaultValues();
                             'value' => (isset($model->order->requested_ship_date)) ? Yii::$app->formatter->asDate($model->order->requested_ship_date) : '',
                         ]) ?>
 
+                        <?= $form->field($model->order, 'must_arrive_by_date', [
+                            'inputTemplate' =>
+                                '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
+                        ])->textInput([
+                            'value' => (isset($model->order->must_arrive_by_date)) ? Yii::$app->formatter->asDate($model->order->must_arrive_by_date) : '',
+                        ]) ?>
+
                     </div>
                 </div>
             </div>
