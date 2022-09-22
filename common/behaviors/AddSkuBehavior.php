@@ -6,7 +6,7 @@ namespace common\behaviors;
 
 use common\adapters\ecommerce\WooCommerceAdapter;
 
-class AddSku extends \yii\base\Behavior
+class AddSkuBehavior extends \yii\base\Behavior
 {
 
     public $unparsedOrder;

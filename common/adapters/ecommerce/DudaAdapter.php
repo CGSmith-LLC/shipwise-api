@@ -3,6 +3,7 @@
 namespace common\adapters\ecommerce;
 
 use common\exceptions\IgnoredWebhookException;
+use common\exceptions\OrderCancelledException;
 use common\exceptions\OrderExistsException;
 use common\models\Address;
 use common\models\forms\OrderForm;
@@ -10,6 +11,8 @@ use common\models\Order;
 use common\models\Sku;
 use common\models\State;
 use common\models\Status;
+use common\models\UnparsedProductEvent;
+use console\jobs\orders\CancelOrderJob;
 use yii\base\Component;
 use yii\console\Exception;
 use yii\helpers\ArrayHelper;
@@ -17,6 +20,7 @@ use yii\helpers\ArrayHelper;
 class DudaAdapter extends Component
 {
     const EVENT_BEFORE_PARSE = 'beforeParse';
+    const EVENT_BEFORE_ITEM_PARSE = 'beforeItemParse';
     const EVENT_AFTER_PARSE = 'afterParse';
 
     public int $customer_id;
@@ -34,6 +38,13 @@ class DudaAdapter extends Component
 
         $this->trigger(self::EVENT_BEFORE_PARSE);
 
+        if ($unparsedOrder['paymentStatus'] === 'CANCELLED') {
+            \Yii::$app->queue->push(new CancelOrderJob([
+                'customer_reference' => $unparsedOrder['id'],
+                'customer_id' => $this->customer_id,
+            ]));
+            throw new OrderCancelledException();
+        }
         if ($unparsedOrder['paymentStatus'] !== 'PAID') {
             throw new IgnoredWebhookException('Order must be marked paid', 200);
         }
@@ -89,15 +100,18 @@ class DudaAdapter extends Component
                 ->andWhere(['excluded' => 0])
                 ->all(), 'id','sku');
 
-        \Yii::debug($excludedItems);
-
         foreach ($unparsedItems as $unparsedProduct) {
             if (!in_array($unparsedProduct['sku'], $excludedItems)) {
                 if (empty($includedItems) || in_array($unparsedProduct['sku'], $includedItems)) {
+                    $event = new UnparsedProductEvent();
+                    $event->unparsedItem = $unparsedProduct;
+                    \Yii::debug($event, 'beforeParse');
+                    $this->trigger(self::EVENT_BEFORE_ITEM_PARSE, $event);
+                    \Yii::debug($event, 'afterParse');
                     $items[] = [
-                        'quantity' => $unparsedProduct['quantity'],
-                        'sku' => $unparsedProduct['sku'],
-                        'name' => $unparsedProduct['name'],
+                        'quantity' => $event->unparsedItem['quantity'],
+                        'sku' => $event->unparsedItem['sku'],
+                        'name' => $event->unparsedItem['name'],
                     ];
                 }
             }
