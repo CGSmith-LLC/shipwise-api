@@ -19,6 +19,7 @@ namespace common\models\base;
  * @property string $uuid
  * @property string $origin
  * @property string $requested_ship_date
+ * @property string $must_arrive_by_date
  * @property int    $carrier_id
  * @property int    $service_id
  * @property string $label_data Shipping labels file encoded in base64
@@ -54,7 +55,7 @@ class BaseOrder extends \yii\db\ActiveRecord
         return [
             [['customer_id', 'customer_reference', 'address_id'], 'required'],
             [['customer_id', 'status_id', 'address_id', 'carrier_id', 'service_id', 'transit'], 'integer'],
-            [['created_date', 'updated_date', 'requested_ship_date', 'carrier_id', 'service_id', 'transit'], 'safe'],
+            [['created_date', 'updated_date', 'requested_ship_date', 'must_arrive_by_date', 'carrier_id', 'service_id', 'transit'], 'safe'],
             [['order_reference', 'tracking'], 'string', 'max' => 45],
             [['customer_reference', 'origin', 'uuid'], 'string', 'max' => 64],
             [['notes', 'packagingNotes'], 'string', 'max' => 6000],

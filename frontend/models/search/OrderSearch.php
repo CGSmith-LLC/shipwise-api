@@ -187,6 +187,11 @@ class OrderSearch extends Order
             $query->andFilterWhere(['like', 'requested_ship_date', $date->format('Y-m-d')]);
         }
 
+        if (!empty($this->must_arrive_by_date)) {
+            $date = new \DateTime($this->must_arrive_by_date);
+            $query->andFilterWhere(['like', 'must_arrive_by_date', $date->format('Y-m-d')]);
+        }
+
         return $dataProvider;
     }
 }

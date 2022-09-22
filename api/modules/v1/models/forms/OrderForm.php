@@ -40,6 +40,11 @@ use api\modules\v1\models\order\StatusEx;
  *            description = "When the order should ship and be fulfilled",
  *        ),
  *     @SWG\Property(
+ *            property = "mustArriveByDate",
+ *            type = "string",
+ *            description = "When the order needs to arrive at the customer",
+ *        ),
+ *     @SWG\Property(
  *            property = "shipTo",
  *            ref = "#/definitions/AddressForm"
  *        ),
@@ -129,6 +134,8 @@ class OrderForm extends Model
     public $customerReference;
     /** @var string */
     public $requestedShipDate;
+    /** @var string */
+    public $mustArriveByDate;
     /** @var AddressForm */
     public $shipTo;
     /** @var AddressForm */
@@ -162,7 +169,7 @@ class OrderForm extends Model
             ['orderReference', 'string', 'length' => [1, 45]],
             ['notes', 'string', 'length' => [1, 6000]],
             ['transit', 'integer'],
-            ['requestedShipDate', 'date', 'format' => 'php:Y-m-d'],
+            [['requestedShipDate', 'mustArriveByDate'], 'date', 'format' => 'php:Y-m-d'],
             ['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
             ['status', 'integer', 'on' => self::SCENARIO_UPDATE],
             [

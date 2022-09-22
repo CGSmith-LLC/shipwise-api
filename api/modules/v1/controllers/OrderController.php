@@ -722,6 +722,13 @@ class OrderController extends PaginatedControllerEx
      *                default = 0
      *            ),
      *     @SWG\Parameter(
+     *                name = "mustArriveByDate",
+     *                in = "query",
+     *                type = "string",
+     *                description = "Search for orders on must arrive by date",
+     *                default = 0
+     *            ),
+     *     @SWG\Parameter(
      *                name = "origin",
      *                in = "query",
      *                type = "string",
@@ -827,6 +834,7 @@ class OrderController extends PaginatedControllerEx
         $updatedDate       = null;
         $createdDate       = null;
         $requestedShipDate = null;
+        $mustArriveByDate = null;
         $origin            = null;
         if (null !== $this->request->get('updatedDate')) {
             $updatedDate = $this->request->get('updatedDate');
@@ -836,6 +844,9 @@ class OrderController extends PaginatedControllerEx
         }
         if (null !== $this->request->get('requestedShipDate')) {
             $requestedShipDate = $this->request->get('requestedShipDate');
+        }
+        if (null !== $this->request->get('mustArriveByDate')) {
+            $mustArriveByDate = $this->request->get('mustArriveByDate');
         }
         if (null !== $this->request->get('origin')) {
             $origin = $this->request->get('origin');
@@ -858,6 +869,10 @@ class OrderController extends PaginatedControllerEx
 
         if ($requestedShipDate !== null) {
             $query->onOrBeforeRequestedDate($requestedShipDate);
+        }
+
+        if ($mustArriveByDate !== null) {
+            $query->onOrBeforeArriveByDate($mustArriveByDate);
         }
 
         if ($origin !== null) {

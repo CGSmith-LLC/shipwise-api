@@ -135,6 +135,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                 'tracking',
                 'created_date:datetime',
                 'requested_ship_date:datetime',
+                'must_arrive_by_date:datetime',
                 [
                     'attribute' => 'notes',
                     'value' => function ($model) {

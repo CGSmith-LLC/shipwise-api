@@ -45,6 +45,7 @@ class OrderImport extends Model
         'shipto_notes',       // = address.shiptonotes
         'carrier_service',    // = orders.service_id
         'requested_ship_date',// = orders.requested_ship_date
+        'must_arrive_by_date',// = orders.must_arrive_by_date
     ];
 
     /**
@@ -76,6 +77,7 @@ class OrderImport extends Model
                 'shipto_notes'        => 'Custom note.',
                 'carrier_service'     => 'UPSGround',
                 'requested_ship_date' => $now->format('Y-m-d'),
+                'must_arrive_by_date' => $now->format('Y-m-d'),
             ],
             [
                 'order_no'            => '100006286-AMBIENT',
@@ -96,6 +98,7 @@ class OrderImport extends Model
                 'shipto_notes'        => 'Custom note.',
                 'carrier_service'     => 'UPSGround',
                 'requested_ship_date' => $now->format('Y-m-d'),
+                'must_arrive_by_date' => $now->format('Y-m-d'),
             ],
         ];
     }
@@ -270,6 +273,7 @@ class OrderImport extends Model
                     $order->address_id          = $address->id;
                     $order->status_id           = Status::OPEN;
                     $order->requested_ship_date = date("Y-m-d", strtotime(trim($data['requested_ship_date'])));
+                    $order->must_arrive_by_date = date("Y-m-d", strtotime(trim($data['must_arrive_by_date'])));
                     $order->service_id          = $services[$service];
                     $order->carrier_id          = Carrier::findByServiceCode($service)->id ?? null;
 
