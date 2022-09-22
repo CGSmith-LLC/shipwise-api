@@ -5,7 +5,9 @@ namespace api\modules\v1\controllers;
 use api\modules\v1\components\ControllerEx;
 use common\adapters\ecommerce\DudaAdapter;
 use common\exceptions\IgnoredWebhookException;
+use common\exceptions\OrderCancelledException;
 use common\models\IntegrationHookdeck;
+use common\models\UnparsedProductEvent;
 use console\jobs\orders\ParseOrderJob;
 use Yii;
 use yii\rest\Controller;
@@ -63,13 +65,40 @@ class WebhookController extends ControllerEx
     public function actionUrbanSmokehouse()
     {
         $headers = Yii::$app->request->headers;
-
+        $customer_id = 76;
         if ($headers->get('authorization') === 'Basic c2hpcHdpc2U6bmVlc3ZpZ3M=') {
             $duda = new DudaAdapter();
-            $duda->customer_id = 76; // urban smokehouse
+            /**
+             * @TODO Replacable by the behaviors with meta info - this is temporary
+             */
+            $duda->on(DudaAdapter::EVENT_BEFORE_ITEM_PARSE, function (UnparsedProductEvent $event) {
+                switch ($event->unparsedItem['selectedOptions'][0]['value']) {
+                    case '4 Half Slabs':
+                        $multiplier = 4;
+                        break;
+                    case '6 Half Slabs':
+                        $multiplier = 6;
+                        break;
+                    case '8 Half Slabs':
+                        $multiplier = 8;
+                        break;
+                    case '10 Half Slabs':
+                        $multiplier = 10;
+                        break;
+                    case '12 Half Slabs':
+                        $multiplier = 12;
+                        break;
+                    default:
+                        $multiplier = 1;
+                }
+                $event->unparsedItem['quantity'] = $event->unparsedItem['quantity'] * $multiplier;
+            });
+            $duda->customer_id = $customer_id; // urban smokehouse
             try {
                 $order = $duda->parseOrder(Yii::$app->request->getRawBody());
                 $order->save();
+            } catch (OrderCancelledException $exception) {
+                return $this->errorMessage(200, 'Order sent to cancel job successfully');
             } catch (IgnoredWebhookException $exception) {
                 return $this->errorMessage(200, $exception->getMessage());
             } catch (\Exception $exception) {

@@ -34,7 +34,7 @@ class Behavior extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['customer_id', 'integration_id', 'name', 'event', 'status', 'order'], 'required'],
+            [['customer_id', 'integration_id', 'behavior', 'name', 'event', 'status', 'order'], 'required'],
             [['customer_id', 'integration_id', 'status', 'order'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'event'], 'string', 'max' => 128],
@@ -51,6 +51,7 @@ class Behavior extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'customer_id' => Yii::t('app', 'Customer ID'),
             'integration_id' => Yii::t('app', 'Integration ID'),
+            'behavior' => Yii::t('app', 'Behavior'),
             'name' => Yii::t('app', 'Name'),
             'description' => Yii::t('app', 'Description'),
             'event' => Yii::t('app', 'Event'),
