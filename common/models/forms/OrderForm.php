@@ -51,7 +51,6 @@ class OrderForm extends BaseForm
     public function save()
     {
         $transaction = Yii::$app->db->beginTransaction();
-        Yii::debug($this->order);
         if (!$this->order->save()) {
             $transaction->rollBack();
             $message = '';
@@ -64,6 +63,7 @@ class OrderForm extends BaseForm
 
         if ($this->address->save()) {
             $this->order->address_id = $this->address->id;
+            $this->order->off(Order::EVENT_BEFORE_UPDATE, [$this, 'checkIfOpen']);
             if (!$this->order->save()) {
                 $transaction->rollBack();
             }

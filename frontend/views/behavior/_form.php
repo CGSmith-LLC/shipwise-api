@@ -17,7 +17,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'integration_id')->textInput() ?>
 
-    <?= $form->field($model, 'behavior')->dropDownList(Beh::getList()) ?>
+    <?= $form->field($model, 'behavior')->dropDownList(Behavior::getList()) ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 

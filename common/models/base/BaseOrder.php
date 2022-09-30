@@ -2,6 +2,9 @@
 
 namespace common\models\base;
 
+use common\models\Status;
+use console\jobs\orders\OpenOrderJob;
+
 /**
  * This is the model class for table "orders".
  *
@@ -38,6 +41,25 @@ namespace common\models\base;
  */
 class BaseOrder extends \yii\db\ActiveRecord
 {
+
+    public function init()
+    {
+        parent::init();
+
+        $this->on(self::EVENT_AFTER_INSERT, [$this, 'checkIfOpen']);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'checkIfOpen']);
+    }
+
+    public function checkIfOpen($event)
+    {
+        if ($event->sender->status_id === Status::OPEN) {
+            \Yii::$app->queue->push(new OpenOrderJob([
+                'order_id' => $event->sender->id,
+                'customer_id' => $event->sender->customer->id
+            ]));
+        }
+    }
+
 
     /**
      * {@inheritdoc}

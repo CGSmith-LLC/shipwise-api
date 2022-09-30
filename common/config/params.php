@@ -13,6 +13,9 @@ return [
     'digitalOceanKey'               => 'key',
     'digitalOceanSecret'            => 'secret',
     'defaultSpace'                  => 'dev-getshipwise',
+    'hookdeckDestinationName'       => 'shipwise-dev-dest',
+    'hookdeckApiKey'                => '5ezcwrgklynot4b1x14u0odjt63m3y1hn2ofa0ri88ksqs90ao',
+    'hookdeckSigningSecret'         => '1x9l9413g8goa7uj0pfw5136z3bzudcdu3bo9eok1hjeelbxgl',
     'coldco' => [
         'baseUrl' => 'https://secure-wms.com',
         'clientId' => 'lolno',
