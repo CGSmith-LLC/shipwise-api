@@ -99,7 +99,7 @@ class OrderSearch extends Order
             $customerIds = Yii::$app->user->identity->customerIds;
         }
         $resultset = $solr->search($query, $customerIds, 0, 10);
-
+        return $resultset;
         foreach ($resultset as $document) {
             $ids[] = $document->id;
         }
@@ -108,7 +108,9 @@ class OrderSearch extends Order
         $order_query->andFilterWhere([
             Order::tableName() . '.id' => $ids
             ]);
+        $order_query->orderBy(['created_date' => SORT_DESC]);
 
+        return $order_query->all();
         $dataProvider = new ActiveDataProvider([
             'query' => $order_query,
             'sort' => [

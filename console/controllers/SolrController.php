@@ -15,6 +15,7 @@ class SolrController extends Controller
      */
     public function actionCreateIndex()
     {
+        ini_set('memory_limit', '-1');
         $query = Order::find()->select(['id']);
         foreach ($query->batch(2000) as $orders) {
             $orderIds = array_map(function($order) {return $order->id;}, $orders);

@@ -200,15 +200,24 @@ class OrderController extends \frontend\controllers\Controller
 
     public function actionSolr()
     {
-        $model = new SolrSearchForm();
-        if ($model->load(Yii::$app->request->queryParams) && $model->validate()) {
+        $this->response->format = \yii\web\Response::FORMAT_JSON;
 
-        } else {
-            // TODO: what is the response if this is an invalid form?
-        }
+        $model = new SolrSearchForm();
+        Yii::debug(Yii::$app->request->queryParams);
+        $model->setAttributes(Yii::$app->request->queryParams);
+        
         $searchModel = new OrderSearch();
-        //var_dump($model->query);
-        $dataProvider = $searchModel->searchSolr($model->query, Yii::$app->request->queryParams);
+        $models = $searchModel->searchSolr($model->query, Yii::$app->request->queryParams);
+        return $this->asJson($models);
+
+        /** @var Order $orderModel */
+        foreach ($models as $orderModel) {
+            $json[] = [
+                'id' => $orderModel->id,
+                'name' => $orderModel->address->name,
+            ];
+        }
+
 
         return $this->render(
             'solr',

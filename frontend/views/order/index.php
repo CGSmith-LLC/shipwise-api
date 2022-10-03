@@ -24,9 +24,17 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
 } else {
     $customerDropdownList = Customer::getList();
 }
+$this->registerJsFile('@web/js/solr.js',[ 'depends' => [\yii\web\JqueryAsset::class]]);
 ?>
+<?= Html::csrfMetaTags() ?>
     <div class="order-index">
 
+    <div class="order-solr-index">
+
+        <h1><?= Html::encode($this->title) ?></h1>
+
+        Search
+        <input id="quick-search" type="text" />
         <?php Pjax::begin([
             'id' => 'pjax-orders',
             'timeout' => 2000,
