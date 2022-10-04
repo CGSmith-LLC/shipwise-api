@@ -133,7 +133,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'switch' => function ($url, $model) {
                     if (\Yii::$app->user->identity->isAdmin && $model->id != Yii::$app->user->id && Yii::$app->getModule('user')->enableSwitchIdentities) {
-                        return Html::a('<span class="glyphicon glyphicon-user"></span>', ['/user/admin/switch', 'id' => $model->id], [
+                        return Html::a('<span class="glyphicon glyphicon-user"></span>', ['/user/admin/switch-identity', 'id' => $model->id], [
                             'title' => Yii::t('usuario', 'Become this user'),
                             'data-confirm' => Yii::t('usuario', 'Are you sure you want to switch to this user for the rest of this Session?'),
                             'data-method' => 'POST',

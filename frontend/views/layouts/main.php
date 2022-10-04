@@ -80,7 +80,7 @@ AppAsset::register($this);
     if (Yii::$app->session->has($module->switchIdentitySessionKey)) {
         echo Html::a(
             '<span class="glyphicon glyphicon-user"></span> Back to original user',
-            ['/user/admin/switch'],
+            ['/user/admin/switch-identity'],
             ['class' => 'btn btn-primary pull-right', 'data-method' => 'POST', 'style' => 'margin:8px']);
     }
 
