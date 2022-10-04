@@ -106,9 +106,7 @@ class SkuController extends PaginatedControllerEx
                     'customer_id'  => $skuForm->customer_id,
                     'sku'          => $skuForm->sku,
                     'name'         => $skuForm->name,
-                    'substitute_1' => $skuForm->substitute_1,
-                    'substitute_2' => $skuForm->substitute_2,
-                    'substitute_3' => $skuForm->substitute_3,
+                    'excluded'     => $skuForm->excluded,
                 ]
             );
             if ($sku->save()) {

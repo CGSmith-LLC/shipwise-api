@@ -15,6 +15,7 @@ use common\models\query\SkuQuery;
  * @property string $substitute_2
  * @property string $substitute_3
  * @property boolean $excluded
+ * @property boolean $included
  */
 class Sku extends \yii\db\ActiveRecord
 {
@@ -34,8 +35,7 @@ class Sku extends \yii\db\ActiveRecord
         return [
             [['sku'], 'string', 'max' => 64],
             [['name', 'substitute_1', 'substitute_2', 'substitute_3'], 'string', 'max' => 64],
-            [['customer_id'], 'integer'],
-            [['excluded'], 'integer']
+            [['customer_id', 'excluded', 'included'], 'integer'],
         ];
     }
 
@@ -58,7 +58,8 @@ class Sku extends \yii\db\ActiveRecord
             'sku' => 'Sku',
             'name' => 'Item Name',
             'customer_id' => 'Customer',
-            'excluded' => 'Excluded'
+            'excluded' => 'Excluded',
+            'included' => 'Included',
         ];
     }
 

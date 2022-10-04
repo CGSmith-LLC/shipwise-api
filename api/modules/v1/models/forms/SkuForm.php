@@ -13,7 +13,7 @@ use yii\base\Model;
  *            type = "string",
  *            description = "SKU",
  *            minLength = 1,
- *            maxLength = 16
+ *            maxLength = 64
  *        ),
  *     @SWG\Property(
  *            property = "name",
@@ -22,22 +22,9 @@ use yii\base\Model;
  *            maxLength = 64
  *        ),
  *     @SWG\Property(
- *            property = "substitute_1",
- *            type = "string",
- *            description = "Substitution for SKU",
- *            maxLength = 64
- *        ),
- *     @SWG\Property(
- *            property = "substitute_2",
- *            type = "string",
- *            description = "Substitution for SKU",
- *            maxLength = 64
- *        ),
- *     @SWG\Property(
- *            property = "substitute_3",
- *            type = "string",
- *            description = "Substitution for SKU",
- *            maxLength = 64
+ *            property = "excluded",
+ *            type = "boolean",
+ *            description = "Whether or not this SKU is excluded from fulfillment"
  *        ),
  * )
  */
@@ -58,12 +45,8 @@ class SkuForm extends Model
     public $sku;
     /** @var string */
     public $name;
-    /** @var string */
-    public $substitute_1;
-    /** @var string */
-    public $substitute_2;
-    /** @var string */
-    public $substitute_3;
+    /** @var bool */
+    public $excluded;
 
     /**
      * {@inheritdoc}
@@ -72,7 +55,7 @@ class SkuForm extends Model
     {
         return [
             [['customer_id', 'sku'], 'required', 'message' => '{attribute} is required.'],
-            [['customer_id', 'id'], 'integer'],
+            [['customer_id', 'id', 'excluded'], 'integer'],
             [['sku'], 'string', 'max' => 16],
             [['name', 'substitute_1', 'substitute_2', 'substitute_3'], 'string', 'max' => 64],
         ];
