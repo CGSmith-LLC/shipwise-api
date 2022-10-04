@@ -49,7 +49,7 @@ class SkuController extends Controller
         $query = Sku::find();
 
         if (!Yii::$app->user->identity->isAdmin) {
-            $query->andOnCondition([Sku::tableName() . '.customer_id' => $this->customers]);
+            $query->forCustomers(Yii::$app->user->identity->getCustomerIds());
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -72,7 +72,7 @@ class SkuController extends Controller
         $query = Sku::find();
 
         if (!Yii::$app->user->identity->isAdmin) {
-            $query->forCustomers($this->customers);
+            $query->forCustomers(Yii::$app->user->identity->getCustomerIds());
         }
 
         if (($query
