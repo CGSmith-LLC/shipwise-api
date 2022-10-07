@@ -297,7 +297,7 @@ class OrderImport extends Model
                 $item->order_id = $processedOrders[$orderNo];
                 $item->sku      = trim($data['item_sku']);
                 $item->quantity = trim($data['item_quantity']);
-                $item->name     = trim($data['item_name']) ?? null;
+                $item->name     = utf8_decode(trim($data['item_name'])) ?? null;
                 // Validate and save Item object
                 if (!$item->save()) {
                     foreach ($item->getErrors() as $attr => $error) {
