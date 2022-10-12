@@ -81,7 +81,7 @@ $item->loadDefaultValues();
 
                 <?php
                 if ($model->isNewRecord) { ?>
-                    <div id="new-item-block">
+                    <div>
                         <?= $this->render('partial/_alias-row', [
                             'key' => '__id__',
                             'form' => $form,
@@ -120,7 +120,6 @@ $item->loadDefaultValues();
     <?php
     ActiveForm::end(); ?>
 
-    <?php if (!$model->isNewRecord) { ?>
     <div id="new-item-block" style="display: none;">
         <?= $this->render('partial/_alias-row', [
             'key' => '__id__',
@@ -130,5 +129,4 @@ $item->loadDefaultValues();
         ]);
         ?>
     </div>
-    <?php } ?>
 </div>
