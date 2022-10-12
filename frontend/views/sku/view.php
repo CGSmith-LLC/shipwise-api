@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model common\models\Sku */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'SKUs', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>

@@ -15,7 +15,7 @@
 use yii\helpers\Html;
 
 // custom template for item fields
-$fieldTemplate = '<div style="margin:0 10px"><label class="control-label">{label}</label>{input}{hint}{error}</div>';
+$fieldTemplate = '<div><label class="control-label">{label}</label>{input}{hint}{error}</div>';
 ?>
 
 <div class="col-md-3">

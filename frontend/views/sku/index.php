@@ -7,7 +7,7 @@ use common\models\Customer;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'SKUs';
+$this->title = 'Items';
 $this->params['breadcrumbs'][] = $this->title;
 if ((!Yii::$app->user->identity->getIsAdmin())) {
     $customerDropdownList = Yii::$app->user->identity->getCustomerList();
@@ -19,9 +19,10 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <?= Html::a('View Aliases', ['alias/index']);?>
     <p>
-        <?= Html::a('Create a SKU', ['create'], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Create an Alias', ['alias/create'], ['class' => 'btn btn-info']) ?>
+        <?= Html::a('Create SKU', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Alias', ['alias/create'], ['class' => 'btn btn-info']) ?>
     </p>
 
     <?= GridView::widget([

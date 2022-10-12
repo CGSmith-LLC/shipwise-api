@@ -1,7 +1,7 @@
 
 $("#btn-add-item").off('click').on("click", function() {
     $("#items").append(
-        '<div class="row item">'
+        '<div class="item">'
         + $('#new-item-block').html()
             .replace('Quantity', '')
             .replace('SKU', '')

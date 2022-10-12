@@ -13,8 +13,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+
+    <?= Html::a('View Items', ['sku/index']);?>
     <p>
-        <?= Html::a('Create Alias', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create SKU', ['sku/create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Alias', ['create'], ['class' => 'btn btn-info']) ?>
     </p>
 
     <?= GridView::widget([

@@ -13,7 +13,7 @@ ToggleAsset::register($this);
 
 ?>
 
-<p>SKUs can be included or excluded from Shipwise. You do not need to have any SKUs here for
+<p>Items/SKUs can be included or excluded from Shipwise. You do not need to have any SKUs here for
     Shipwise to work properly. If you have a SKU of <strong>GIFTCARD</strong> that you do not want to be sent to fulfillment
     or to be excluded from orders then you should create a SKU and select the <i>excluded</i> option. This is known as an
     <i>exclusion</i> list.<br/><br/>

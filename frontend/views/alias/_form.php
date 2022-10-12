@@ -31,12 +31,12 @@ $item->loadDefaultValues();
 
     <div class="row">
         <div class="col-md-12">
-            <div class="panel panel-primary">
+            <div class="panel panel-primary row">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Alias</h3>
+                    <p class="panel-title">Alias</p>
                 </div>
                 <div class="col-md-3">
-                    <?= $form->field($model, 'customer_id')->dropdownList($customers, ['prompt' => ' Please select']); ?>
+                    <?= $form->field($model, 'customer_id')->dropdownList($customers, ['prompt' => ' Please select'])->label('Customer'); ?>
                 </div>
                 <div class="col-md-3">
                     <?= $form->field($model, 'sku')->textInput(['maxlength' => true]) ?>
@@ -60,7 +60,7 @@ $item->loadDefaultValues();
 
     <div class="row">
             <div class="col-md-12">
-                <div class="panel panel-primary">
+                <div class="panel panel-primary row">
                     <div class="panel-heading">
                         <p class="panel-title">Child Items <?= Html::a(
                                 '<i class="glyphicon glyphicon-plus"></i> add another item',
@@ -74,7 +74,7 @@ $item->loadDefaultValues();
 
                     <?php
                     if ($model->isNewRecord) { ?>
-                        <div id="new-item-block" class="row">
+                        <div id="new-item-block">
                             <?= $this->render('partial/_alias-row', [
                                 'key' => '__id__',
                                 'form' => $form,
@@ -88,7 +88,7 @@ $item->loadDefaultValues();
                     } else {
                         // existing item fields
                         foreach ($model->items as $itemKey => $_item) { ?>
-                            <div class="row item item-<?= $itemKey ?>">
+                            <div class="item item-<?= $itemKey ?>">
                                 <?= $this->render('partial/_alias-row', [
                                     'key' => $_item->isNewRecord
                                         ? (strpos($itemKey, 'new') !== false ? $itemKey : 'new' . $itemKey)

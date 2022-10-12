@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $model common\models\Sku */
 /* @var $customers array of customers */
 
-$this->title = 'Create Sku';
-$this->params['breadcrumbs'][] = ['label' => 'Sku', 'url' => ['index']];
+$this->title = 'Create Item';
+$this->params['breadcrumbs'][] = ['label' => 'Item', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="sku-create">

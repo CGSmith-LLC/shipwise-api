@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\AliasParent */
 
-$this->title = 'Create Alias Parent';
+$this->title = 'Create Alias';
 $this->params['breadcrumbs'][] = ['label' => 'Aliases', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

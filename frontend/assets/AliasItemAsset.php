@@ -12,6 +12,11 @@ class AliasItemAsset extends AssetBundle
     public $js = [
         'js/plugins/aliasitem/create.js',
     ];
+
+    public $css = [
+        'css/plugins/aliasitem/create.css',
+    ];
+
     public $depends = [
         'yii\web\YiiAsset', // depends on jQuery
     ];
