@@ -121,7 +121,7 @@ $item->loadDefaultValues();
     ActiveForm::end(); ?>
 
     <?php if (!$model->isNewRecord) { ?>
-    <div id="new-item-block">
+    <div id="new-item-block" style="display: none;">
         <?= $this->render('partial/_alias-row', [
             'key' => '__id__',
             'form' => $form,

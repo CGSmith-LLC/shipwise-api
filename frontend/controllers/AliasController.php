@@ -118,7 +118,33 @@ class AliasController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $transaction = Yii::$app->db->beginTransaction();
+            $model->save();
+
+            /** @var AliasChildren $item */
+            foreach ($model->items as $item) {
+                $item->delete();
+            }
+
+            $aliasChildrenQty = Yii::$app->request->post('AliasChildrenQty');
+            $aliasChildrenSku = Yii::$app->request->post('AliasChildrenSku');
+            $aliasChildrenName = Yii::$app->request->post('AliasChildrenName');
+            for ($i = 0; $i < count($aliasChildrenSku); $i++) {
+                $aliasChild = new AliasChildren();
+                $aliasChild->attributes = [
+                    'alias_id' => $model->id, // Alias Parent ID
+                    'quantity' => $aliasChildrenQty[$i],
+                    'name' => $aliasChildrenName[$i],
+                    'sku' => $aliasChildrenSku[$i],
+                ];
+                if ($aliasChild->validate()) {
+                    $aliasChild->save();
+                } else {
+                    throw new HttpException('Child alias not valid');
+                }
+            }
+            $transaction->commit();
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
