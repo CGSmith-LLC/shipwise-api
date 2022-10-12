@@ -20,7 +20,8 @@ class BaseQuery extends \yii\db\ActiveQuery
 
         // Check that we are passing the table name through
         if (is_null($this->tableName)) {
-                throw new InvalidArgumentException('Table name is not passed to BaseQuery `Query(get_called_class(), [\'tableName\' => Model::tableName()])`');
+            $this->tableName == $modelClass::tableName();
+                //throw new InvalidArgumentException('Table name is not passed to BaseQuery `Query(get_called_class(), [\'tableName\' => Model::tableName()])`');
         }
     }
 

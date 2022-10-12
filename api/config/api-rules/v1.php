@@ -54,6 +54,9 @@ return [
         ],
     ],
 
+    // Aliases
+    "GET $version/aliases" => "$version/alias",
+
     "POST $version/inventory" => "$version/inventory/create",
     "POST $version/webhook" => "$version/webhook",
     "POST $version/webhook/urban-smokehouse" => "$version/webhook/urban-smokehouse",

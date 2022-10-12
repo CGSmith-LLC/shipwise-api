@@ -21,6 +21,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
 
     <p>
         <?= Html::a('Create a SKU', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create an Alias', ['alias/create'], ['class' => 'btn btn-info']) ?>
     </p>
 
     <?= GridView::widget([
