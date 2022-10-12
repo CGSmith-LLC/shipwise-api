@@ -14,5 +14,5 @@ $("#btn-add-item").off('click').on("click", function() {
 
 // remove item button
 $(document).on('click', '.btn-remove-item', function () {
-    $(this).closest('.row').remove();
+    $(this).closest('.item').remove();
 });

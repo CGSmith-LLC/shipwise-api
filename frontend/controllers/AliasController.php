@@ -38,8 +38,8 @@ class AliasController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => AliasParent::find(),
-        ]);
+                                                   'query' => AliasParent::find(),
+                                               ]);
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
@@ -86,7 +86,7 @@ class AliasController extends Controller
                     ];
                     if ($aliasChild->validate()) {
                         $aliasChild->save();
-                    }else {
+                    } else {
                         throw new HttpException('Child alias not valid');
                     }
                 }
@@ -154,6 +154,11 @@ class AliasController extends Controller
     protected function findModel($id)
     {
         if (($model = AliasParent::findOne($id)) !== null) {
+            if (!\Yii::$app->user->identity->isAdmin) {
+                if (!in_array($model->customer_id, Yii::$app->user->identity->customerIds)) {
+                    throw new NotFoundHttpException('The requested page does not exist.');
+                }
+            }
             return $model;
         }
 
