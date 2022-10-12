@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model common\models\AliasParent */
 
 $this->title = 'Update Alias Parent: ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Alias Parents', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Aliases', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>

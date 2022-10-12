@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $model common\models\AliasParent */
 
 $this->title = 'Create Alias Parent';
-$this->params['breadcrumbs'][] = ['label' => 'Alias Parents', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Aliases', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="alias-parent-create">

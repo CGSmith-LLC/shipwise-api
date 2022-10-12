@@ -6,7 +6,7 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Alias Parents';
+$this->title = 'Aliases';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="alias-parent-index">
@@ -14,20 +14,27 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Alias Parent', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Alias', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'customer_id',
-            'alias',
+            'customer.name',
+            'sku',
             'name',
-            'active',
-
+            [
+                'attribute' => 'Children',
+                'format' => 'raw',
+                'value' => function($data) {
+                    $raw = '';
+                    foreach ($data->items as $item) {
+                        $raw .= '<span class="label label-info">'.$item->quantity.' x '.$item->sku.'</span> ';
+                    }
+                    return $raw;
+                }
+            ],
+            'active:boolean',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

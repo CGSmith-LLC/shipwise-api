@@ -64,7 +64,7 @@ class AliasParent extends ActiveRecord
 
     public function getCustomer()
     {
-        return $this->hasOne(Customer::class, ['customer_id' => 'id']);
+        return $this->hasOne(Customer::class, ['id' => 'customer_id']);
     }
 
     /**

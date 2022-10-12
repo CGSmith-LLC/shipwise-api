@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model common\models\AliasParent */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Alias Parents', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Aliases', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
