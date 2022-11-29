@@ -63,11 +63,6 @@ class WebhookController extends ControllerEx
         }
     }
 
-    protected function getCsvPath(array $params)
-    {
-
-    }
-
     public function actionImport()
     {
         try {
