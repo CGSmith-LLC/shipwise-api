@@ -54,11 +54,18 @@ return [
         ],
     ],
 
+    // Carrier
+    [
+        "class" => 'yii\rest\UrlRule',
+        "controller" => ["$version/carrier"],
+    ],
+
     // Aliases
     "GET $version/aliases" => "$version/alias",
 
     "POST $version/inventory" => "$version/inventory/create",
     "POST $version/webhook" => "$version/webhook",
+    "POST $version/webhook/import" => "$version/webhook/import",
     "POST $version/webhook/urban-smokehouse" => "$version/webhook/urban-smokehouse",
     "GET $version/inventory" => "$version/inventory",
     "DELETE $version/inventory/purge" => "$version/inventory/purge",

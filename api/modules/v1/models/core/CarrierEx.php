@@ -13,17 +13,6 @@ class CarrierEx extends Carrier
 {
 
     /**
-     * Override parent to define only those carriers that are implemented in API.
-     * @see Carrier::$shipwiseCodes for all available.
-     *
-     * @var array
-     */
-    protected static $shipwiseCodes = [
-        self::FEDEX => 'FedEx',
-        self::UPS   => 'UPS',
-    ];
-
-    /**
      * @SWG\Definition(
      *     definition = "Carrier",
      *
@@ -36,5 +25,16 @@ class CarrierEx extends Carrier
     public function fields()
     {
         return ['id', 'name'];
+    }
+
+    public static function getListForCsvBox()
+    {
+        $carriers = self::getList();
+        $newArray = [];
+
+        foreach ($carriers as $id => $name) {
+            $newArray[] = ['value' => (string) $id, 'display_label' => $name, 'dependents' => ServiceEx::getListForCsvBox($id)];
+        }
+        return $newArray;
     }
 }

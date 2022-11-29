@@ -16,12 +16,17 @@ class PaginatedControllerEx extends ControllerEx
      */
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
+        return ArrayHelper::merge(parent::behaviors(), $this->addPagination());
+    }
+
+    public function addPagination()
+    {
+        return [
             'Pagination' => [
                 'class' => 'api\modules\v1\components\parameters\Pagination',
             ],
             'Search'     => 'api\modules\v1\components\parameters\Search',
             'Limit'      => 'api\modules\v1\components\parameters\Limit',
-        ]);
+        ];
     }
 }

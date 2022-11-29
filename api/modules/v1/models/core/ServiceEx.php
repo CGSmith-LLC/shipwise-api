@@ -30,6 +30,18 @@ class ServiceEx extends Service
         return ['id', 'name', 'carrier'];
     }
 
+
+    public static function getListForCsvBox($carrierId)
+    {
+        $services = self::getList(carrierId: $carrierId);
+        $newArray = [];
+
+        foreach ($services as $id => $name) {
+            $newArray[] = ['value' => (string) $id, 'display_label' => $name];
+        }
+        return $newArray;
+    }
+
     /**
      * @param int|string|null $carrier Carrier ID or shipwise_code. Optional.
      *
