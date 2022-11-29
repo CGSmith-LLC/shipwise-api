@@ -69,7 +69,7 @@ class CsvBox extends \yii\base\Model
         $this->customer_id = $this->custom_fields['customer_id'];
     }
 
-    public function import()
+    public function import(): bool
     {
         $countries = Country::getList(); // abbr => name
         $processedOrders = []; // order_no => order id (newly inserted pk)
@@ -195,6 +195,7 @@ class CsvBox extends \yii\base\Model
             }
 
             $transaction->commit();
+            return true;
         } catch (\Exception $e) {
             $transaction->rollBack();
             $this->addError('file', 'Import failed. ' . $e->getMessage());
