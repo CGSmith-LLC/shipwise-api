@@ -692,18 +692,24 @@ class OrderController extends \frontend\controllers\Controller
             ? Customer::getList()
             : Yii::$app->user->identity->getCustomerList();
 
-        $model = new OrderImport();
-        $model->load(Yii::$app->request->queryParams);
+        $model = new \common\models\OrderImport();
+
+        if (count($customers) === 1) {
+            $model->customer = array_key_first($customers);
+        }else {
+            $model->load(Yii::$app->request->queryParams);
+        }
 
         // check that selected customer belongs to user
         if ($model->customer && !isset($customers[$model->customer])) {
             throw new BadRequestHttpException('Invalid customer id.');
         }
 
-        if (Yii::$app->request->isPost && $model->import()) {
+        if (Yii::$app->request->get('success')) {
             Yii::$app->session->setFlash(
                 'success',
-                "Import successfully processed! <br />" . Html::a('See orders', ['/order'], ['target' => '_blank'])
+                "Import successfully processed! Orders will processed shortly! <br />" .
+                Html::a('See orders', ['/order'], ['target' => '_blank'])
             );
         }
 
@@ -714,6 +720,7 @@ class OrderController extends \frontend\controllers\Controller
                 'carriers' => Carrier::getShipwiseCodes(),
                 'services' => Service::getShipwiseCodes(),
                 'customers' => $customers,
+                'showSelectCustomer' => count($customers) > 1
             ]
         );
     }

@@ -62,4 +62,9 @@ return [
         'phone'   => '(262) 342-6638',
     ],
 
+    'hookdeckSigningSecret' => '1234',
+    'csvBoxS3Key' => '',
+    'csvBoxS3Secret' => '',
+    'csvBoxS3Region' => '',
+    'csvBoxS3Bucket' => '',
 ];
