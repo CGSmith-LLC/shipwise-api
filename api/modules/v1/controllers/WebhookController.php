@@ -3,15 +3,19 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\ControllerEx;
+use api\modules\v1\models\CsvBox;
 use common\adapters\ecommerce\DudaAdapter;
 use common\exceptions\IgnoredWebhookException;
 use common\exceptions\OrderCancelledException;
 use common\models\IntegrationHookdeck;
 use common\models\UnparsedProductEvent;
+use console\jobs\NotificationJob;
 use console\jobs\orders\ParseOrderJob;
+use frostealth\yii2\aws\s3\Service;
 use Yii;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
 use yii\web\UnauthorizedHttpException;
 
 /**
@@ -29,7 +33,69 @@ class WebhookController extends ControllerEx
         return [
             'index' => ['GET', 'POST'],
             'urban-smokehouse' => ['POST'],
+            'import' => ['POST'],
         ];
+    }
+
+    /**
+     * A way to validate the Hookdeck signature
+     *
+     * @param Request $request
+     * @return void
+     * @throws \Exception
+     */
+    public function isValid(Request $request): void
+    {
+        if ('' === $request->headers->get('x-hookdeck-signature')) {
+            throw new \Exception('Unauthorized', 403);
+        }
+
+        $hmacHeader = $request->headers->get('x-hookdeck-signature');
+        $hash = base64_encode(hash_hmac(
+            'sha256',
+            $request->getRawBody(),
+            Yii::$app->params['hookdeckSigningSecret'],
+            true
+        ));
+
+        if (!hash_equals($hmacHeader, $hash)) {
+            throw new \Exception('Unauthorized', 403);
+        }
+    }
+
+    public function actionImport()
+    {
+        try {
+            $csvBox = new CsvBox(Yii::$app->request->getBodyParams());
+            // setting file_path as attribute makes it easier in the model
+            $csvBox->file_path = Yii::$app->params['csvBoxS3Path'];
+            Yii::debug($csvBox->getS3FilePath());
+            $this->isValid(Yii::$app->request);
+
+            // get file
+            /** @var Service $s3 */
+            $s3 = Yii::$app->get('csvboxstorage');
+            $csvBox->file_stream = $s3->get($csvBox->getS3FilePath());
+
+            // if import failed send email to user
+            if (false == $csvBox->import()) {
+                $errors = "<li>" . implode("</li><li>", $csvBox->getErrorSummary(true)) . "</li>";
+                \Yii::$app->queue->push(new NotificationJob([
+                    'customer_id' => $csvBox->customer_id,
+                    'subject' => '⚠️ Problem importing order file ' . $csvBox->original_filename,
+                    'message' => 'This file failed to import for the following reasons: <ul>' . $errors . '</ul>',
+                    'url' =>  ['/order/import',],
+                    'urlText' => 'Reupload and Import File',
+                ]));
+                return $this->errorMessage('File could not be imported');
+                throw new \Exception('File could not be imported');
+            }
+
+            return $this->success('Imported successfully');
+        } catch (\Exception $e) {
+            return $this->errorMessage(500, $e->getMessage());
+        }
+
     }
 
     /**

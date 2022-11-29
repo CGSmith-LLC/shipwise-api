@@ -22,81 +22,69 @@ if ($model->customer) {
     $title .= ' (' . ($customers[$model->customer] ?? '') . ')';
 }
 ?>
+
     <div class="order-import">
-
-        <h1><?= Html::encode($title) ?></h1>
-
-        <div class="row">
+        <h1>Order Import</h1>
+        <?php
+        if ($model->customer) { ?>
+            <p>
+                <?php
+                    if ($showSelectCustomer) {
+                        echo Html::a('Select a new customer', ['order/import']);
+                    }
+                ?>
+            </p>
+            <div class="row">
             <div class="col-md-3">
-                <?= Html::beginForm(['import'], 'get', ['id' => 'form-customer']) ?>
-                <div class="form-group">
-                    <label><?= $model->getAttributeLabel('customer') ?></label>
-                    <?= Html::activeDropDownList(
-                        $model,
-                        'customer',
-                        $customers,
-                        [
-                            'prompt' => ' Please select',
-                            'class'  => 'form-control',
-                        ]
-                    ) ?>
-                </div>
-                <?= Html::endForm() ?>
-            </div>
-        </div>
+            <button class="btn btn-lg btn-success" data-csvbox disabled onclick="importer.openModal();"><i class="fa fa-upload"></i> Import</button>
+            <script type="text/javascript" src="https://js.csvbox.io/script.js"></script>
+            <script type="text/javascript">
+                function callback(result, data) {
+                    if (result) {
+                        window.location.href = "import?success=true";
+                    } else {
+                        alert("There was some problem uploading the sheet");
+                    }
+                }
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="panel panel-success">
-                    <div class="panel-body bg-success">
-                        <div class="jumbotron">
-                            <h2 style="margin-bottom: 50px">Step One</h2>
-                            <?= Html::beginForm(['download-csv-template'], 'post', ['id' => 'form-template']) ?>
-                            <p>
-                                <?= Html::submitButton(
-                                    '<i class="fa fa-download"></i> Get CSV template',
-                                    ['class' => 'btn btn-lg btn-success']
-                                ) ?>
-                            </p>
-                            <?= Html::endForm() ?>
-                        </div>
+                let importer = new CSVBoxImporter("VXHBUpdb9BGgeI78lCjkIr1Y3c11Vs", {}, callback);
+                importer.setUser({
+                    user_id: "<?= Yii::$app->user->identity->email?>",
+                    customer_id: "<?= $model->customer; ?>",
+                });
+            </script>
+            </div>
+            </div>
+        <?php } else { ?>
+            <p>Select a customer and then you be able to upload a CSV file. If you want you can download
+                <a href="https://app.csvbox.io/sample-csv-file/VXHBUpdb9BGgeI78lCjkIr1Y3c11Vs" target="_blank">our template file</a>.
+            </p>
+            <div class="row">
+                <div class="col-md-3">
+                    <?= Html::beginForm(['import'], 'get', ['id' => 'form-customer']) ?>
+                    <div class="form-group">
+                        <label>Select a customer</label>
+                        <?= Html::activeDropDownList(
+                            $model,
+                            'customer',
+                            $customers,
+                            [
+                                'prompt' => ' Please select',
+                                'class' => 'form-control',
+                            ]
+                        ) ?>
                     </div>
+                    <?= Html::endForm() ?>
                 </div>
             </div>
-            <div class="col-md-6">
-                <?php
-                $form = ActiveForm::begin(
-                    [
-                        'id'      => 'form-import',
-                        'options' => ['enctype' => 'multipart/form-data'],
-                    ]
-                ) ?>
-                <?= Html::errorSummary($model, ['class' => 'alert alert-danger', 'encode' => false]) ?>
-                <div class="panel panel-success">
-                    <div class="panel-body bg-success">
-                        <div class="jumbotron">
-                            <h2 class="top">Step Two</h2>
-                            <?= $form->field($model, 'customer')->hiddenInput()->label(false) ?>
-                            <?= $form->field($model, 'file')->fileInput(['class' => 'm-auto'])->label(false) ?>
-                            <p>
-                                <?= Html::submitButton(
-                                    '<i class="fa fa-upload"></i> Import',
-                                    ['class' => 'btn btn-lg btn-success']
-                                ) ?>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <?php
-                ActiveForm::end() ?>
-            </div>
-        </div>
+        <?php } ?>
 
-        <div class="row">
+        <div class="row" style="margin-top: 10px">
             <div class="col-md-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h3 class="panel-title">Reference data</h3>
+                        <p class="panel-subtitle">Use the data below to map your data properly for carrier or service selections</p>
                     </div>
                     <div class="panel-body text-muted">
                         <div class="row">
@@ -108,23 +96,7 @@ if ($model->customer) {
                                         echo "<code>$code</code><br />";
                                     }
                                 } ?>
-                                <hr class="visible-xs visible-sm" />
-                            </div>
-                            <div class="col-md-3">
-                                <p><strong>Datetime format</strong></p>
-                                YYYY-MM-DD<br />
-                                eg. <code><?= (new \DateTime('now'))->format('Y-m-d') ?></code>
-                                <hr class="visible-xs visible-sm" />
-                            </div>
-                            <div class="col-md-3">
-                                <p><strong>Country</strong></p>
-                                eg. <code>US</code> for USA, <code>CA</code> for Canada, etc.
-                                <hr class="visible-xs visible-sm" />
-                            </div>
-                            <div class="col-md-3">
-                                <p><strong>State / Province</strong></p>
-                                eg. <code>IL</code> for Illinois, <code>ON</code> for Ontario, etc.
-                                <hr class="visible-xs visible-sm" />
+                                <hr class="visible-xs visible-sm"/>
                             </div>
                         </div>
                     </div>

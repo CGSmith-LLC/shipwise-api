@@ -44,6 +44,16 @@ return [
             'defaultSpace' => $params['defaultSpace'],
             'defaultAcl' => 'public-read',
         ],
+        'csvboxstorage' => [
+            'class' => 'frostealth\yii2\aws\s3\Service',
+            'credentials' => [ // Aws\Credentials\CredentialsInterface|array|callable
+                'key' => $params['csvBoxS3Key'],
+                'secret' => $params['csvBoxS3Secret'],
+            ],
+            'region' => $params['csvBoxS3Region'],
+            'defaultBucket' => $params['csvBoxS3Bucket'],
+            'defaultAcl' => 'public-read',
+        ],
         'customerSettings' => [
             'class' => 'common\components\CustomerSettings',
         ],

@@ -23,16 +23,19 @@
         "yiisoft/yii2-authclient": "^2.2",
         "paragonie/random_compat": "2.*",
         "2amigos/2fa-library": "^2.0",
-        "2amigos/qrcode-library": "^2.0"
+        "2amigos/qrcode-library": "^2.0",
+        "frostealth/yii2-aws-s3": "~2.0",
+        "league/csv": "^9.8"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
         "yiisoft/yii2-gii": "~2.0.0",
-        "yiisoft/yii2-faker": "~2.0.0",
         "codeception/verify": "~0.3.1",
         "codeception/codeception": "^4.1",
         "codeception/module-phpbrowser": "^1.0.0",
-        "codeception/module-asserts": "^1.0.0"
+        "codeception/module-asserts": "^1.0.0",
+        "codeception/module-yii2": "^1.1",
+        "yiisoft/yii2-faker": "^2.0"
     },
     "config": {
         "process-timeout": 1800,

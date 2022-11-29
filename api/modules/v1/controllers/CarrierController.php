@@ -5,6 +5,8 @@ namespace api\modules\v1\controllers;
 use api\modules\v1\components\PaginatedControllerEx;
 use api\modules\v1\models\core\CarrierEx;
 use yii\data\ArrayDataProvider;
+use yii\filters\Cors;
+use yii\helpers\ArrayHelper;
 
 /**
  *
@@ -25,7 +27,18 @@ class CarrierController extends PaginatedControllerEx
     /** @inheritdoc */
     public function behaviors()
     {
-        return $this->addPagination();
+        $behaviors = parent::behaviors();
+        unset($behaviors['authenticator']);
+        $cors = [
+            [
+                'class' => Cors::class,
+                'cors' => [
+                    'Origin' => ['https://app.csvbox.io', 'https://app.getshipwise.com'],
+                    'Access-Control-Request-Method' => ['GET', 'HEAD', 'OPTIONS'],
+                ],
+            ],
+        ];
+        return ArrayHelper::merge($behaviors, $cors);
     }
 
     /**
