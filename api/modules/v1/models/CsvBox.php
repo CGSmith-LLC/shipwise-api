@@ -126,7 +126,7 @@ class CsvBox extends \yii\base\Model
                     $address->country = $country;
                     $address->state_id = $stateId;
                     $address->zip = trim($record['Zip']);
-                    $address->phone = trim($record['Phone']) ?? '5555555555';
+                    $address->phone = trim($record['Phone']) ?: '5555555555';
                     $address->email = trim($record['Email']) ?? null;
                     $address->notes = trim($record['Notes']) ?? null;
                     // Validate and save Address object
