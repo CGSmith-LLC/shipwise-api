@@ -6,6 +6,7 @@ use api\modules\v1\models\core\AddressEx;
 use common\models\base\BaseOrder;
 use common\models\query\OrderQuery;
 use common\models\shipping\{Carrier, Service, PackageType, Shipment, ShipmentPackage};
+use console\jobs\webhooks\OrderWebhook;
 use Yii;
 
 /**
@@ -25,6 +26,43 @@ use Yii;
  */
 class Order extends BaseOrder
 {
+
+    public function init()
+    {
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'createJobIfNeeded']);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, 'createJobIfNeeded']);
+        parent::init();
+    }
+
+    public function createJobIfNeeded($event)
+    {
+        // Only create a job if the status is changed
+        if (isset($event->changedAttributes['status_id']) && $event->changedAttributes['status_id'] !== $event->sender->status_id) {
+            // Only create a webhook that has a trigger set for the status
+            $webhooks = Webhook::find()
+                ->joinWith([
+                    'webhookTrigger' => function (\yii\db\ActiveQuery $query) use ($event) {
+                        $query->andWhere([WebhookTrigger::tableName() . '.status_id' => $event->sender->status_id]);
+                    }
+                ])
+                ->where([
+                    Webhook::tableName() . '.customer_id' => $event->sender->customer_id,
+                    Webhook::tableName() . '.active' => Webhook::STATUS_ACTIVE,
+                ])
+                ->all();
+            // loop through all webhooks to create a job
+            if ($webhooks) {
+                foreach ($webhooks as $webhook) {
+                    \Yii::$app->queue->push(
+                        new OrderWebhook([
+                            'webhook_id' => $webhook->id,
+                            'order_id' => $event->sender->id
+                        ])
+                    );
+                }
+            }
+        }
+    }
 
     /**
      * @inheritdoc

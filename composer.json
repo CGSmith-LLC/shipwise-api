@@ -16,7 +16,7 @@
         "yii2tech/csv-grid": "^1.0",
         "bp-sys/yii2-aws-s3": "~2.0",
         "bilberrry/yii2-digitalocean-spaces": "^0.1.2",
-      "ext-json": "*",
+        "ext-json": "*",
         "yiisoft/yii2-httpclient": "*",
         "zhuravljov/yii2-queue-monitor": "^0.3.4",
         "2amigos/yii2-usuario": "^1.5",
