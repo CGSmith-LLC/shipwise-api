@@ -2,6 +2,7 @@
 
 use common\models\Status;
 use common\models\Webhook;
+use common\models\WebhookTrigger;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -22,17 +23,16 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
 
     Yii::debug(
-        Webhook::find()
-            ->joinWith([
-                'webhookTrigger' => function (\yii\db\ActiveQuery $query) {
-                    $query->andWhere(['webhook_trigger.status_id' => Status::CANCELLED]);
-                }
-            ])
-            ->andWhere([
-                'webhook.customer_id' => 1,
-                'webhook.active' => Webhook::STATUS_ACTIVE,
-            ])
-            ->all()
+             Webhook::find()
+                ->joinWith([
+                    'webhookTrigger'
+                ])
+                ->where([
+                    Webhook::tableName() . '.customer_id' => 1,
+                    Webhook::tableName() . '.active' => Webhook::STATUS_ACTIVE,
+                    WebhookTrigger::tableName() . '.status_id' => 2,
+                ])
+                ->all()
     );
 
     ?>
