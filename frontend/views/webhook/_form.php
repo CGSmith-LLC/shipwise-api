@@ -16,6 +16,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'authentication_type')->textInput() ?>
 
+    <?=  Yii::$app->getSecurity()->generateRandomString();?>
+    <?= $form->field($model, 'signing_secret')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'user')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'user_id')->textInput(['maxlength' => true]) ?>
 

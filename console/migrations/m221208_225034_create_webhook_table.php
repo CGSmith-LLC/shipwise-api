@@ -20,6 +20,7 @@ class m221208_225034_create_webhook_table extends Migration
             'id' => $this->primaryKey(),
             'endpoint' => $this->string()->notNull(),
             'authentication_type' => $this->integer(),
+            'signing_secret' => $this->string()->notNull(),
             'user' => $this->string(),
             'pass' => $this->string(),
             'customer_id' => $this->integer()->notNull(),

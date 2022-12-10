@@ -29,17 +29,31 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
             'endpoint',
             'authentication_type',
             'user',
             'pass',
             'customer_id',
-            'when',
             'active',
-            'created_at',
-            'updated_at',
+            'created_at:datetime',
+            'updated_at:datetime',
         ],
     ]) ?>
+
+    <?php
+
+    $dataProvider = new \yii\data\ActiveDataProvider([
+        'query' => \common\models\WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(['id' => SORT_DESC]),
+    ]);
+
+    echo \yii\grid\GridView::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => [
+            'created_at:datetime',
+            'status_code',
+            'response',
+        ]
+    ]);
+    ?>
 
 </div>

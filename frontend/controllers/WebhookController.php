@@ -36,8 +36,9 @@ class WebhookController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Webhook::find(),
+            'query' => Webhook::find()->with(['webhookTrigger']),
         ]);
+
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,

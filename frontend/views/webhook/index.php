@@ -20,32 +20,20 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Webhook', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php
-
-    Yii::debug(
-             Webhook::find()
-                ->joinWith([
-                    'webhookTrigger'
-                ])
-                ->where([
-                    Webhook::tableName() . '.customer_id' => 1,
-                    Webhook::tableName() . '.active' => Webhook::STATUS_ACTIVE,
-                    WebhookTrigger::tableName() . '.status_id' => 2,
-                ])
-                ->all()
-    );
-
-    ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
             'endpoint',
             'authentication_type',
             'user',
             'pass',
+            [
+                'attribute' => 'lastEvent',
+                'value' => function ($model) {
+                    $log = \common\models\WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(['id' => SORT_DESC])->one();
+                    return $log->status_code;
+                }
+            ],
             //'customer_id',
             //'when',
             //'active',

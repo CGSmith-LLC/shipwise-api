@@ -18,7 +18,8 @@ class m221208_225254_create_webhook_log_table extends Migration
         $this->createTable('{{%webhook_log}}', [
             'id' => $this->primaryKey(),
             'webhook_id' => $this->integer()->notNull(),
-            'response' => $this->text()->notNull(),
+            'status_code' => $this->integer()->notNull(),
+            'response' => $this->text(),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
         ]);
