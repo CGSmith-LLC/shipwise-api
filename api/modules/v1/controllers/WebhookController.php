@@ -138,7 +138,11 @@ class WebhookController extends ControllerEx
              * @TODO Replacable by the behaviors with meta info - this is temporary
              */
             $duda->on(DudaAdapter::EVENT_BEFORE_ITEM_PARSE, function (UnparsedProductEvent $event) {
-                switch ($event->unparsedItem['selectedOptions'][0]['value']) {
+                $name = explode(' ', $event->unparsedItem['selectedOptions'][0]['value']);
+                switch ($name[0]) {
+                    case '2 Half Slabs':
+                        $multiplier = 2;
+                        break;
                     case '4 Half Slabs':
                         $multiplier = 4;
                         break;
