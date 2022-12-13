@@ -4,6 +4,9 @@ namespace common\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\bootstrap\Modal;
+use yii\helpers\Html;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "webhook_log".
@@ -71,5 +74,43 @@ class WebhookLog extends \yii\db\ActiveRecord
     public function getWebhook()
     {
         return $this->hasOne(Webhook::class, ['id' => 'webhook_id']);
+    }
+
+    public function getLabelFor($attribute) {
+        if ($attribute === 'status_code') {
+            $label = match (substr($this->$attribute, 0, 1)) {
+                '2' => 'success',
+                '3' => 'warning',
+                '4', '5' => 'danger',
+                default => 'info',
+            };
+            return '<span class="label label-'.$label.'">' . $this->$attribute . '</span>';
+        }
+
+        return '';
+    }
+
+    public function getModalForView()
+    {
+        // just display the response if it is short
+        if (strlen($this->response) < 25) {
+            return $this->response;
+        }
+
+        //$json = Json::decode($this->response); // not sure if i need to do this? only way to pretty print
+        $json = json_decode($this->response);
+        Modal::begin([
+            'id' => 'event-' . $this->id,
+            'header' => 'Event ' . $this->id . ' (' . $this->status_code . ') - ' . $this->webhook->endpoint,
+        ]);
+        echo '<pre>'.json_encode($json, JSON_PRETTY_PRINT).'</pre>';
+
+        Modal::end();
+
+        return Html::button('View Last Response', [
+            'data-toggle' => 'modal',
+            'data-target' => '#event-' . $this->id,
+            'class' => 'btn btn-sm btn-primary',
+        ]);
     }
 }

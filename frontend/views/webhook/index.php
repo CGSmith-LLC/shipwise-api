@@ -1,8 +1,7 @@
 <?php
 
-use common\models\Status;
-use common\models\Webhook;
-use common\models\WebhookTrigger;
+use common\models\WebhookLog;
+use yii\bootstrap\Modal;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -23,15 +22,32 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
-            'endpoint',
-            'authentication_type',
-            'user',
-            'pass',
+            'name',
             [
-                'attribute' => 'lastEvent',
+                'attribute' => 'endpoint',
+                'format' => 'raw',
                 'value' => function ($model) {
-                    $log = \common\models\WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(['id' => SORT_DESC])->one();
-                    return $log->status_code;
+                    return $model->endpoint . ' ' . $model->getLabelFor('authentication_type');
+                }
+            ],
+            [
+                'attribute' => 'recentStatusCode',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    $log = WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(
+                        ['id' => SORT_DESC]
+                    )->one();
+                    return $log->getLabelFor('status_code');
+                }
+            ],
+            [
+                'attribute' => 'recentResponse',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    $log = WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(
+                        ['id' => SORT_DESC]
+                    )->one();
+                   return $log->getModalForView();
                 }
             ],
             //'customer_id',

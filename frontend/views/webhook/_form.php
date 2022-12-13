@@ -12,6 +12,7 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
+    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'endpoint')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'authentication_type')->textInput() ?>

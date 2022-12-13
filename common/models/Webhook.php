@@ -10,6 +10,7 @@ use yii\behaviors\TimestampBehavior;
  * This is the model class for table "webhooks".
  *
  * @property int $id
+ * @property string $name
  * @property string $endpoint
  * @property int $authentication_type
  * @property string $signing_secret
@@ -31,6 +32,12 @@ class Webhook extends \yii\db\ActiveRecord
    const BASIC_AUTH = 1;
    const HEADER_AUTH = 2;
 
+   public array $authenticationOptions = [
+       self::NO_AUTH => 'None',
+       self::BASIC_AUTH => 'Basic Auth',
+       self::HEADER_AUTH => 'Header Auth',
+   ];
+
     /**
      * {@inheritdoc}
      */
@@ -45,9 +52,9 @@ class Webhook extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['endpoint', 'customer_id', 'user_id', 'when', 'active', 'signing_secret'], 'required'],
+            [['endpoint', 'name', 'customer_id', 'user_id', 'when', 'active', 'signing_secret'], 'required'],
             [['authentication_type', 'user_id', 'customer_id', 'active', 'created_at', 'updated_at'], 'integer'],
-            [['endpoint', 'user', 'pass', 'when', 'signing_secret'], 'string', 'max' => 255],
+            [['endpoint', 'name', 'user', 'pass', 'when', 'signing_secret'], 'string', 'max' => 255],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id']],
         ];
     }
@@ -59,6 +66,7 @@ class Webhook extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'name' => 'Name',
             'endpoint' => 'Endpoint',
             'authentication_type' => 'Authentication Type',
             'user' => 'User',
@@ -107,5 +115,23 @@ class Webhook extends \yii\db\ActiveRecord
     public function getWebhookLog()
     {
         return $this->hasMany(WebhookLog::class, ['webhook_id' => 'id']);
+    }
+
+    public function getLabelFor($attribute)
+    {
+        $template = '<span class="label label-info">%s</span>';
+        if ($attribute == 'authentication_type') {
+            return match ($this->$attribute) {
+                self::HEADER_AUTH, self::BASIC_AUTH => sprintf($template,  $this->authenticationOptions[$this->$attribute]),
+                default => '',
+            };
+        }
+
+        if (isset($this->$attribute)) {
+            return sprintf($template, $this->$attribute);
+        }
+
+        // return empty string if nothing to match
+        return '';
     }
 }

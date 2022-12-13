@@ -1,12 +1,14 @@
 <?php
 
+use common\models\WebhookLog;
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Webhook */
 
-$this->title = $model->id;
+$this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Webhooks', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -30,11 +32,21 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'endpoint',
-            'authentication_type',
+            [
+                'attribute' => 'authentication_type',
+                'value' => function ($model) {
+                    return $model->authenticationOptions[$model->authentication_type];
+                }
+            ],
             'user',
             'pass',
             'customer_id',
-            'active',
+            [
+                'attribute' => 'active',
+                'value' => function ($model) {
+                    return ($model->active) ? 'Enabled' : 'Disabled';
+                }
+            ],
             'created_at:datetime',
             'updated_at:datetime',
         ],
@@ -42,16 +54,28 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php
 
-    $dataProvider = new \yii\data\ActiveDataProvider([
-        'query' => \common\models\WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(['id' => SORT_DESC]),
+    $dataProvider = new ActiveDataProvider([
+        'query' => WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(['id' => SORT_DESC]),
     ]);
 
     echo \yii\grid\GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
             'created_at:datetime',
-            'status_code',
-            'response',
+            [
+                'attribute' => 'status_code',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    return $model->getLabelFor('status_code');
+                }
+            ],
+            [
+                'attribute' => 'response',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    return $model->getModalForView();
+                }
+            ],
         ]
     ]);
     ?>
