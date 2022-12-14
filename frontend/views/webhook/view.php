@@ -12,8 +12,7 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Webhooks', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
-$this->registerJs('
-$(".masked-button").on("click", function(event){
+$this->registerJs('$(".masked-button").on("click", function(event){
     masked = $(event.target).prev();
     if ($(this).text() == "Show") {
         masked.html(masked.data("content"));
@@ -22,8 +21,7 @@ $(".masked-button").on("click", function(event){
         masked.html(masked.data("mask"));
         $(this).text("Show"); 
     }
-});
-');
+});');
 ?>
 <div class="webhook-view">
 
@@ -59,22 +57,37 @@ $(".masked-button").on("click", function(event){
                 'attribute' => 'pass',
                 'format' => 'raw',
                 'value' => function ($model) {
-                    return Html::tag('div',
+                    return Html::tag(
+                        'div',
                         Html::tag('p', $model->getMasked('pass'), [
                             'class' => 'masked',
-                            'data-mask' => $model->getMasked('pass'),'data-content' => $model->pass
-                        ]) . Html::button('Show', ['class' => 'btn btn-sm masked-button']), ['style' => ['display' => 'flex']]);
+                            'data-mask' => $model->getMasked('pass'),
+                            'data-content' => $model->pass
+                        ]) . Html::button('Show', ['class' => 'btn btn-sm masked-button']),
+                        ['style' => ['display' => 'flex']]
+                    );
                 }
             ],
             [
                 'attribute' => 'signing_secret',
+                'label' => 'Signing Secret ' . Html::a('Regenerate Secret', ['regenerate', 'id' => $model->id], [
+                        'class' => 'btn btn-sm',
+                        'data' => [
+                            'confirm' => 'Are you sure you want to regenerate your signing secret?',
+                            'method' => 'post',
+                        ],
+                    ]),
                 'format' => 'raw',
                 'value' => function ($model) {
-                    return Html::tag('div',
+                    return Html::tag(
+                        'div',
                         Html::tag('p', $model->getMasked('signing_secret'), [
                             'class' => 'masked',
-                            'data-mask' => $model->getMasked('signing_secret'),'data-content' => $model->signing_secret
-                        ]) . Html::button('Show', ['class' => 'btn btn-sm masked-button']), ['style' => ['display' => 'flex']]);
+                            'data-mask' => $model->getMasked('signing_secret'),
+                            'data-content' => $model->signing_secret
+                        ]) . Html::button('Show', ['class' => 'btn btn-sm masked-button']),
+                        ['style' => ['display' => 'flex']]
+                    );
                 }
             ],
             [
