@@ -134,35 +134,6 @@ class WebhookController extends ControllerEx
         $customer_id = 76;
         if ($headers->get('authorization') === 'Basic c2hpcHdpc2U6bmVlc3ZpZ3M=') {
             $duda = new DudaAdapter();
-            /**
-             * @TODO Replacable by the behaviors with meta info - this is temporary
-             */
-            $duda->on(DudaAdapter::EVENT_BEFORE_ITEM_PARSE, function (UnparsedProductEvent $event) {
-                $name = explode(' ', $event->unparsedItem['selectedOptions'][0]['value']);
-                switch ($name[0]) {
-                    case '2 Half Slabs':
-                        $multiplier = 2;
-                        break;
-                    case '4 Half Slabs':
-                        $multiplier = 4;
-                        break;
-                    case '6 Half Slabs':
-                        $multiplier = 6;
-                        break;
-                    case '8 Half Slabs':
-                        $multiplier = 8;
-                        break;
-                    case '10 Half Slabs':
-                        $multiplier = 10;
-                        break;
-                    case '12 Half Slabs':
-                        $multiplier = 12;
-                        break;
-                    default:
-                        $multiplier = 1;
-                }
-                $event->unparsedItem['quantity'] = $event->unparsedItem['quantity'] * $multiplier;
-            });
             $duda->customer_id = $customer_id; // urban smokehouse
             try {
                 $order = $duda->parseOrder(Yii::$app->request->getRawBody());
@@ -175,7 +146,7 @@ class WebhookController extends ControllerEx
                 return $this->errorMessage(500, $exception->getMessage());
             }
         } else {
-            throw new  UnauthorizedHttpException();
+            throw new UnauthorizedHttpException();
         }
     }
 
