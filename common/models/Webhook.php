@@ -134,4 +134,9 @@ class Webhook extends \yii\db\ActiveRecord
         // return empty string if nothing to match
         return '';
     }
+
+    public function getMasked($attribute)
+    {
+        return substr($this->$attribute, 0, strlen($this->$attribute) / 5) . '*************** ';
+    }
 }

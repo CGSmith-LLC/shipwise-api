@@ -12,6 +12,18 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Webhooks', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+$this->registerJs('
+$(".masked-button").on("click", function(event){
+    masked = $(event.target).prev();
+    if ($(this).text() == "Show") {
+        masked.html(masked.data("content"));
+        $(this).text("Hide");
+    } else {
+        masked.html(masked.data("mask"));
+        $(this).text("Show"); 
+    }
+});
+');
 ?>
 <div class="webhook-view">
 
@@ -31,6 +43,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
+            [
+                'attribute' => 'customer',
+                'value' => $model->customer->name
+            ],
             'endpoint',
             [
                 'attribute' => 'authentication_type',
@@ -39,8 +55,24 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             'user',
-            'pass',
-            'customer_id',
+            [
+                'attribute' => 'pass',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    $button = Html::button('Show', ['class' => 'btn btn-sm masked-button']);
+                    $html = Html::tag('div', $model->getMasked('pass'), ['class' => 'masked',  'data-mask' => $model->getMasked('pass'),'data-content' => $model->pass]);
+                    return $html . $button;
+                }
+            ],
+            [
+                'attribute' => 'signing_secret',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    $button = Html::button('Show', ['class' => 'btn btn-sm masked-button']);
+                    $html = Html::tag('div', $model->getMasked('signing_secret'), ['class' => 'masked', 'data-mask' => $model->getMasked('signing_secret'), 'data-content' => $model->signing_secret]);
+                    return $html . $button;
+                }
+            ],
             [
                 'attribute' => 'active',
                 'value' => function ($model) {

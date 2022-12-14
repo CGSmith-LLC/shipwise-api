@@ -37,7 +37,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     $log = WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(
                         ['id' => SORT_DESC]
                     )->one();
-                    return $log->getLabelFor('status_code');
+                    if ($log) {
+                        return $log->getLabelFor('status_code');
+                    } else {
+                        return '';
+                    }
                 }
             ],
             [
@@ -47,7 +51,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     $log = WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(
                         ['id' => SORT_DESC]
                     )->one();
-                   return $log->getModalForView();
+                    if ($log) {
+                        return $log->getModalForView();
+                    } else {
+                        return '';
+                    }
                 }
             ],
             //'customer_id',
