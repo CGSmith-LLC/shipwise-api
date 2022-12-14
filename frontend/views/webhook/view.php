@@ -59,18 +59,22 @@ $(".masked-button").on("click", function(event){
                 'attribute' => 'pass',
                 'format' => 'raw',
                 'value' => function ($model) {
-                    $button = Html::button('Show', ['class' => 'btn btn-sm masked-button']);
-                    $html = Html::tag('div', $model->getMasked('pass'), ['class' => 'masked',  'data-mask' => $model->getMasked('pass'),'data-content' => $model->pass]);
-                    return $html . $button;
+                    return Html::tag('div',
+                        Html::tag('p', $model->getMasked('pass'), [
+                            'class' => 'masked',
+                            'data-mask' => $model->getMasked('pass'),'data-content' => $model->pass
+                        ]) . Html::button('Show', ['class' => 'btn btn-sm masked-button']), ['style' => ['display' => 'flex']]);
                 }
             ],
             [
                 'attribute' => 'signing_secret',
                 'format' => 'raw',
                 'value' => function ($model) {
-                    $button = Html::button('Show', ['class' => 'btn btn-sm masked-button']);
-                    $html = Html::tag('div', $model->getMasked('signing_secret'), ['class' => 'masked', 'data-mask' => $model->getMasked('signing_secret'), 'data-content' => $model->signing_secret]);
-                    return $html . $button;
+                    return Html::tag('div',
+                        Html::tag('p', $model->getMasked('signing_secret'), [
+                            'class' => 'masked',
+                            'data-mask' => $model->getMasked('signing_secret'),'data-content' => $model->signing_secret
+                        ]) . Html::button('Show', ['class' => 'btn btn-sm masked-button']), ['style' => ['display' => 'flex']]);
                 }
             ],
             [
