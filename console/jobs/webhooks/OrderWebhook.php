@@ -19,6 +19,7 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
     public $order_id;
     public Client $client;
     public $webhook;
+    public $testWebhook = false;
     public $order;
     public $headers = [];
 
@@ -28,7 +29,15 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
      */
     public function execute($queue)
     {
-        $this->webhook = Webhook::find()->where(['id' => $this->webhook_id, 'active' => Webhook::STATUS_ACTIVE])->one();
+        // All test webhook jobs to be sent even if they are inactive
+        if ($this->testWebhook) {
+            $this->webhook = Webhook::find()->where(['id' => $this->webhook_id])->one();
+        } else {
+            $this->webhook = Webhook::find()
+                ->where(['id' => $this->webhook_id, 'active' => Webhook::STATUS_ACTIVE])
+                ->one();
+        }
+
         $this->order = Order::findOne($this->order_id);
 
         if (!$this->webhook) {
@@ -62,7 +71,6 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
             $this->addAuth();
             $this->signRequest();
 
-
             $response = $this->client->createRequest()
                 ->setUrl($this->webhook->endpoint)
                 ->setMethod('POST')
@@ -88,7 +96,11 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
         }
     }
 
-
+    /**
+     * Sign request that is being made
+     *
+     * @return void
+     */
     public function signRequest()
     {
         $webhook = $this->webhook;
@@ -106,6 +118,11 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
         });
     }
 
+    /**
+     * Add authentication if chosen for basic auth or header auth
+     *
+     * @return void
+     */
     public function addAuth()
     {
         if ($this->webhook->authentication_type == Webhook::BASIC_AUTH) {
@@ -116,9 +133,12 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
         } elseif ($this->webhook->authentication_type == Webhook::HEADER_AUTH) {
             $headerName = $this->webhook->user;
             $headerValue = $this->webhook->pass;
-            $this->client->on(Request::EVENT_BEFORE_SEND, function (RequestEvent $event) use ($headerValue, $headerName) {
-                $event->request->addHeaders([$headerName => $headerValue]);
-            });
+            $this->client->on(
+                Request::EVENT_BEFORE_SEND,
+                function (RequestEvent $event) use ($headerValue, $headerName) {
+                    $event->request->addHeaders([$headerName => $headerValue]);
+                }
+            );
         }
     }
 

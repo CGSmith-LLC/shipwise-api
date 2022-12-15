@@ -25,7 +25,6 @@ class m221208_225034_create_webhook_table extends Migration
             'user' => $this->string(),
             'pass' => $this->string(),
             'customer_id' => $this->integer()->notNull(),
-            'when' => $this->string()->notNull(),
             'active' => $this->boolean()->notNull(),
             'user_id' => $this->integer()->notNull(),
             'created_at' => $this->integer()->notNull(),

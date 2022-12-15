@@ -2,10 +2,12 @@
 
 namespace frontend\controllers;
 
+use common\models\Order;
+use console\jobs\webhooks\OrderWebhook;
+use frontend\models\Customer;
 use Yii;
 use common\models\Webhook;
 use yii\data\ActiveDataProvider;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -21,9 +23,11 @@ class WebhookController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
+                    'regenerate' => ['POST'],
+                    'test' => ['POST'],
                 ],
             ],
         ];
@@ -73,6 +77,8 @@ class WebhookController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'customers' => Yii::$app->user->identity->isAdmin ?
+                Customer::getList() : Yii::$app->user->identity->getCustomerList(),
         ]);
     }
 
@@ -93,6 +99,8 @@ class WebhookController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'customers' => Yii::$app->user->identity->isAdmin ?
+                Customer::getList() : Yii::$app->user->identity->getCustomerList(),
         ]);
     }
 
@@ -108,6 +116,49 @@ class WebhookController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @param $id
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionRegenerate($id)
+    {
+        if ($this->findModel($id)->regenerateSigningSecret()) {
+            Yii::$app->getSession()->setFlash('success', 'Signing secret has been updated.');
+        } else {
+            Yii::$app->getSession()->setFlash('error', 'We had a problem updating the signing secret!');
+        }
+
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+        ]);
+    }
+
+    /**
+     * @param $id
+     */
+    public function actionTest($id)
+    {
+        try {
+            if ($model = $this->findModel($id)) {
+                $order = Order::find()->where(['customer_id' => $model->customer_id])->one();
+                \Yii::$app->queue->push(
+                    new OrderWebhook([
+                        'webhook_id' => $model->id,
+                        'order_id' => $order->id,
+                        'testWebhook' => true,
+                    ])
+                );
+                Yii::$app->getSession()->setFlash('success', 'Test sent to your endpoint - please check the logs');
+            }
+        } catch (\Exception $e) {
+            Yii::$app->getSession()->setFlash('error', 'We had a problem generating a test. You may not have an order to send as a test.');
+
+        }
+
+        return $this->redirect(['webhook/view', 'id' => $id]);
     }
 
     /**

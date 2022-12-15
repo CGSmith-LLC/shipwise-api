@@ -25,14 +25,22 @@ $this->registerJs('$(".masked-button").on("click", function(event){
 ?>
 <div class="webhook-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1 style="display: inline"><?= Html::encode($this->title) ?> </h1>
+    <div style="display: inline;"><?= $model->getLabelFor('active'); ?></div>
 
-    <p>
+    <p style="margin-top: 10px;">
         <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
+                'method' => 'post',
+            ],
+        ]) ?>
+        <?= Html::a('Test Endpoint', ['test', 'id' => $model->id], [
+            'class' => 'btn btn-default',
+            'data' => [
+                'confirm' => 'Are you sure you want to send a test to this endpoint?',
                 'method' => 'post',
             ],
         ]) ?>
