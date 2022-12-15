@@ -1,7 +1,6 @@
 <?php
 
 use common\models\WebhookLog;
-use yii\bootstrap\Modal;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -58,11 +57,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 }
             ],
-            //'customer_id',
-            //'when',
-            //'active',
-            //'created_at',
-            //'updated_at',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
