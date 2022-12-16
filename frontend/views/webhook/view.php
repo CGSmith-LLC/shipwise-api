@@ -60,6 +60,19 @@ $this->registerJs('$(".masked-button").on("click", function(event){
                     return $model->authenticationOptions[$model->authentication_type];
                 }
             ],
+            [
+                'attribute' => 'triggers',
+                'label' => 'Webhook Triggers',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    $triggersLabel = '';
+                    $statuses = \common\models\Status::find()->where(['in', 'id', $model->triggers])->all();
+                    foreach ($statuses as $status) {
+                        $triggersLabel .= '<span class="label label-info">'.$status->name.'</span> ';
+                    }
+                    return trim($triggersLabel);
+                }
+            ],
             'user',
             [
                 'attribute' => 'pass',

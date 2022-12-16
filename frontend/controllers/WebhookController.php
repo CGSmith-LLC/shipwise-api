@@ -93,7 +93,9 @@ class WebhookController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $model->save();
+            $model->createNewRelations();
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

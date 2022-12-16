@@ -1,11 +1,13 @@
 <?php
 
+use common\models\Status;
 use frontend\assets\ToggleAsset;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Webhook */
+/* @var $customers array */
 /* @var $form yii\widgets\ActiveForm */
 
 ToggleAsset::register($this);
@@ -20,6 +22,8 @@ ToggleAsset::register($this);
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'endpoint')->label('HTTPS Endpoint')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'triggers')->dropDownList(Status::getList(), ['multiple' => true]) ?>
 
     <?= $form->field($model, 'authentication_type')->dropDownList($model->authenticationOptions) ?>
 

@@ -5,43 +5,46 @@ namespace common\models;
 use Da\User\Model\User;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "webhooks".
  *
- * @property int $id
- * @property string $name
- * @property string $endpoint
- * @property int $authentication_type
- * @property string $signing_secret
- * @property string $user
- * @property string $pass
- * @property int $customer_id
- * @property int $active
- * @property int $created_at
- * @property int $updated_at
+ * @property int      $id
+ * @property string   $name
+ * @property string   $endpoint
+ * @property int      $authentication_type
+ * @property string   $signing_secret
+ * @property string   $user
+ * @property string   $pass
+ * @property int      $customer_id
+ * @property int      $active
+ * @property int      $created_at
+ * @property int      $updated_at
  *
  * @property Customer $customer
  */
 class Webhook extends \yii\db\ActiveRecord
 {
-   const STATUS_ACTIVE = 1;
-   const STATUS_INACTIVE = 0;
+    const STATUS_ACTIVE = 1;
+    const STATUS_INACTIVE = 0;
 
-   const NO_AUTH = 0;
-   const BASIC_AUTH = 1;
-   const HEADER_AUTH = 2;
+    const NO_AUTH = 0;
+    const BASIC_AUTH = 1;
+    const HEADER_AUTH = 2;
 
-   public array $authenticationOptions = [
-       self::NO_AUTH => 'None',
-       self::BASIC_AUTH => 'Basic Auth',
-       self::HEADER_AUTH => 'Header Auth',
-   ];
+    public array $authenticationOptions = [
+        self::NO_AUTH => 'None',
+        self::BASIC_AUTH => 'Basic Auth',
+        self::HEADER_AUTH => 'Header Auth',
+    ];
 
-   public array $activeOptions = [
-       self::STATUS_ACTIVE => 'Enabled',
-       self::STATUS_INACTIVE => 'Disabled',
-   ];
+    public array $activeOptions = [
+        self::STATUS_ACTIVE => 'Enabled',
+        self::STATUS_INACTIVE => 'Disabled',
+    ];
+
+    public $triggers;
 
     /**
      * {@inheritdoc}
@@ -57,11 +60,17 @@ class Webhook extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['endpoint', 'name', 'customer_id', 'user_id', 'active', 'signing_secret'], 'required'],
+            [['triggers', 'endpoint', 'name', 'customer_id', 'user_id', 'active', 'signing_secret'], 'required'],
             [['authentication_type', 'user_id', 'customer_id', 'active', 'created_at', 'updated_at'], 'integer'],
             [['name', 'user', 'pass', 'signing_secret'], 'string', 'max' => 255],
             [['endpoint'], 'url', 'validSchemes' => ['https']],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id']],
+            [
+                ['customer_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Customer::class,
+                'targetAttribute' => ['customer_id' => 'id']
+            ],
         ];
     }
 
@@ -109,6 +118,37 @@ class Webhook extends \yii\db\ActiveRecord
         ];
     }
 
+    public function afterFind()
+    {
+        $this->triggers = ArrayHelper::map($this->getWebhookTrigger()->all(), 'id', 'status_id');
+        parent::afterFind();
+    }
+
+    /**
+     * Creates new relations after deleting old ones
+     * @return void
+     */
+    public function createNewRelations()
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $triggers = WebhookTrigger::find()->where(['webhook_id' => $this->id])->all();
+            foreach ($triggers as $trigger) {
+                $trigger->delete();
+            }
+
+            foreach ($this->triggers as $newTriggerStatus) {
+                $trigger = new WebhookTrigger();
+                $trigger->webhook_id = $this->id;
+                $trigger->status_id = (int) $newTriggerStatus;
+                $trigger->save();
+            }
+            $transaction->commit();
+        } catch (\Exception $e) {
+            Yii::debug($e);
+            $transaction->rollBack();
+        }
+    }
 
     /**
      * @return \yii\db\ActiveQuery
@@ -143,7 +183,11 @@ class Webhook extends \yii\db\ActiveRecord
         $template = '<span class="label label-%s">%s</span>';
         if ($attribute == 'authentication_type') {
             return match ($this->$attribute) {
-                self::HEADER_AUTH, self::BASIC_AUTH => sprintf($template, $infoColor, $this->authenticationOptions[$this->$attribute]),
+                self::HEADER_AUTH, self::BASIC_AUTH => sprintf(
+                    $template,
+                    $infoColor,
+                    $this->authenticationOptions[$this->$attribute]
+                ),
                 default => '',
             };
         }

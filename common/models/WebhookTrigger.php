@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "webhook_trigger".
@@ -32,10 +33,20 @@ class WebhookTrigger extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['webhook_id', 'status_id', 'created_at', 'updated_at'], 'required'],
+            [['webhook_id', 'status_id'], 'required'],
             [['webhook_id', 'status_id', 'created_at', 'updated_at'], 'integer'],
-            [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::className(), 'targetAttribute' => ['status_id' => 'id']],
-            [['webhook_id'], 'exist', 'skipOnError' => true, 'targetClass' => Webhook::className(), 'targetAttribute' => ['webhook_id' => 'id']],
+            [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status_id' => 'id']],
+            [['webhook_id'], 'exist', 'skipOnError' => true, 'targetClass' => Webhook::class, 'targetAttribute' => ['webhook_id' => 'id']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
         ];
     }
 
@@ -58,7 +69,7 @@ class WebhookTrigger extends \yii\db\ActiveRecord
      */
     public function getStatus()
     {
-        return $this->hasOne(Status::className(), ['id' => 'status_id']);
+        return $this->hasOne(Status::class, ['id' => 'status_id']);
     }
 
     /**
@@ -66,6 +77,6 @@ class WebhookTrigger extends \yii\db\ActiveRecord
      */
     public function getWebhook()
     {
-        return $this->hasOne(Webhook::className(), ['id' => 'webhook_id']);
+        return $this->hasOne(Webhook::class, ['id' => 'webhook_id']);
     }
 }
