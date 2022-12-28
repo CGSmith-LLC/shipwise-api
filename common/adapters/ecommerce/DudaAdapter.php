@@ -83,12 +83,6 @@ class DudaAdapter extends Component
             'phone' => (!empty($unparsedOrder['shippingPerson']['phone'])) ? $unparsedOrder['shippingPerson']['phone'] : '555-555-5555',
         ]);
 
-        $unparsedItems = str_replace('"', '', $unparsedOrder['items']);
-        $unparsedItems = str_replace('\'', '"', $unparsedItems);
-        $patterns = ['/True/', '/False/', '/\\\\/',];
-        $replacements = ['true', 'false', '',];
-        $unparsedItems = json_decode(preg_replace($patterns, $replacements, $unparsedItems), true);
-
         $excludedItems = ArrayHelper::map(
             Sku::find()
                 ->where(['customer_id' => $this->customer_id])
@@ -100,7 +94,7 @@ class DudaAdapter extends Component
                 ->andWhere(['excluded' => 0])
                 ->all(), 'id','sku');
 
-        foreach ($unparsedItems as $unparsedProduct) {
+        foreach ($unparsedOrder['items'] as $unparsedProduct) {
             if (!in_array($unparsedProduct['sku'], $excludedItems)) {
                 if (empty($includedItems) || in_array($unparsedProduct['sku'], $includedItems)) {
                     $event = new UnparsedProductEvent();
