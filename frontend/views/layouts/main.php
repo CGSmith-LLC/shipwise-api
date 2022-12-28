@@ -143,6 +143,10 @@ AppAsset::register($this);
                     'url' => '/api-consumer',
                 ],
                 [
+                    'label' => Yii::t('app', 'Webhooks'),
+                    'url' => '/webhook',
+                ],
+                [
                     'label'=>'<li style="margin-top: -6px;">'
                         . Html::beginForm(['/user/logout'], 'post')
                         . Html::submitButton('Logout', ['class' => 'logout', 'style' => 'padding: 3px 20px;'])
