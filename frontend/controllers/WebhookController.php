@@ -30,6 +30,15 @@ class WebhookController extends Controller
                     'test' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => 'yii\filters\AccessControl',
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -40,7 +49,7 @@ class WebhookController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Webhook::find()->with(['webhookTrigger']),
+            'query' => Webhook::find()->forCustomers(Yii::$app->user->identity->customerIds)->with(['webhookTrigger']),
         ]);
 
 

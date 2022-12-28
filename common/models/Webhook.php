@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\models\query\WebhookQuery;
 use Da\User\Model\User;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -148,6 +149,15 @@ class Webhook extends \yii\db\ActiveRecord
             Yii::debug($e);
             $transaction->rollBack();
         }
+    }
+
+    /**
+     * @inheritdoc
+     * @return WebhookQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new WebhookQuery(get_called_class());
     }
 
     /**
