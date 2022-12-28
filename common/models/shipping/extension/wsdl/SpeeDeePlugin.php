@@ -16,7 +16,7 @@ class SpeeDeePlugin extends ShipmentPlugin
     private string $hostProd = '66.191.64.52';
     private string $hostDev = '';
     private string $ftpUser = '';
-    private string $frpPassword = '';
+    private string $ftpPassword = '';
 
 
     public function autoload($customerId = null)

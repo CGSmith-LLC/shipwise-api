@@ -11,7 +11,7 @@ use Yii;
  * @property int $order_id
  * @property int $customer_id
  * @property string $ship_from_shipper_number
- * @property string $ship_from_bane
+ * @property string $ship_from_name
  * @property string $ship_from_attention
  * @property string $ship_from_address_1
  * @property string $ship_from_address_2
@@ -74,7 +74,7 @@ class SpeedeeManifest extends \yii\db\ActiveRecord
             [['order_id', 'customer_id', 'ship_from_zip', 'weight', 'length', 'width', 'height', 'oversized', 'pickup_tag', 'aod', 'aod_option', 'cod', 'cod_value', 'declared_value', 'package_handling', 'apply_package_handling', 'unboxed'], 'integer'],
             [['ship_date'], 'safe'],
             [['ship_from_shipper_number', 'ship_to_shipper_number', 'bill_to_shipper_number'], 'string', 'max' => 6],
-            [['ship_from_bane', 'ship_from_attention', 'ship_from_address_1', 'ship_from_address_2', 'ship_from_city', 'ship_from_country', 'ship_from_email', 'ship_from_phone', 'ship_to_import_field', 'ship_to_name', 'ship_to_attention', 'ship_to_address_1', 'ship_to_address_2', 'ship_to_city', 'ship_to_country', 'ship_to_email', 'ship_to_phone', 'reference_1', 'reference_2', 'reference_3', 'reference_4', 'barcode'], 'string', 'max' => 255],
+            [['ship_from_name', 'ship_from_attention', 'ship_from_address_1', 'ship_from_address_2', 'ship_from_city', 'ship_from_country', 'ship_from_email', 'ship_from_phone', 'ship_to_import_field', 'ship_to_name', 'ship_to_attention', 'ship_to_address_1', 'ship_to_address_2', 'ship_to_city', 'ship_to_country', 'ship_to_email', 'ship_to_phone', 'reference_1', 'reference_2', 'reference_3', 'reference_4', 'barcode'], 'string', 'max' => 255],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id']],
             [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::class, 'targetAttribute' => ['order_id' => 'id']],
         ];
@@ -90,7 +90,7 @@ class SpeedeeManifest extends \yii\db\ActiveRecord
             'order_id' => 'Order ID',
             'customer_id' => 'Customer ID',
             'ship_from_shipper_number' => 'Ship From Shipper Number',
-            'ship_from_bane' => 'Ship From Bane',
+            'ship_from_name' => 'Ship From Name',
             'ship_from_attention' => 'Ship From Attention',
             'ship_from_address_1' => 'Ship From Address  1',
             'ship_from_address_2' => 'Ship From Address  2',
