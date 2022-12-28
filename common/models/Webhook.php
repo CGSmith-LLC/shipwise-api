@@ -72,7 +72,25 @@ class Webhook extends \yii\db\ActiveRecord
                 'targetClass' => Customer::class,
                 'targetAttribute' => ['customer_id' => 'id']
             ],
+            [['customer_id'], 'validateUserRelatesToCustomer'],
         ];
+    }
+
+    /**
+     * Ensure that the user saving the form has rights to save against the customer_id
+     * I added this so someone couldn't receive webhooks from another customer by brute force
+     *
+     * @param $attribute
+     * @param $params
+     * @param $validator
+     * @return void
+     */
+    public function validateUserRelatesToCustomer($attribute, $params, $validator)
+    {
+        if (!Yii::$app->user->identity->isAdmin &&
+            !in_array($this->$attribute, array_values(Yii::$app->user->identity->customerIds)) ) {
+            $this->addError($attribute, 'There was an error with associating with a customer');
+        }
     }
 
     /**
