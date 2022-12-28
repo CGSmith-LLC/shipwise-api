@@ -21,6 +21,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
+            [
+                'attribute' => 'customer.name',
+                'label' => 'Customer',
+                'visible' => Yii::$app->user->identity->isAdmin || count(Yii::$app->user->identity->customerIds) > 1,
+            ],
             'name',
             [
                 'attribute' => 'endpoint',
@@ -57,7 +62,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     }
                 }
             ],
-
+            [
+                'attribute' => 'active',
+                'value' => function ($model) { return $model->getLabelFor('active');},
+                'format' => 'raw',
+            ],
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
