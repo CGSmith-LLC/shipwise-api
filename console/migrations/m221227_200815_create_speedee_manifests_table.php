@@ -57,6 +57,10 @@ class m221227_200815_create_speedee_manifests_table extends Migration
             'ship_date' => $this->date(), // Date package was picked up by driver; default is to use processing date
             'bill_to_shipper_number' => $this->string(6), // currently same as ship_to number
             'unboxed' => $this->boolean()->defaultValue(false),
+
+            'manifest_filename' => $this->string()->null(),
+            'is_manifest_sent'  => $this->boolean()->defaultValue(false),
+            'checksum'          => $this->string()->null(),
         ]);
 
         $this->addForeignKey(

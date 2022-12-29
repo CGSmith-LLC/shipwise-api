@@ -51,6 +51,8 @@ use Yii;
  * @property string $ship_date
  * @property string $bill_to_shipper_number
  * @property int $unboxed
+ * @property string $manifest_filename
+ * @property boolean $is_manifest_sent
  *
  * @property Customer $customer
  * @property Order $order
@@ -130,6 +132,9 @@ class SpeedeeManifest extends \yii\db\ActiveRecord
             'ship_date' => 'Ship Date',
             'bill_to_shipper_number' => 'Bill To Shipper Number',
             'unboxed' => 'Unboxed',
+            'manifest_filename' => 'Manifest Filename',
+            'is_manifest_sent' => 'Manifest is Sent',
+            'checksum' => 'Checksum',
         ];
     }
 

@@ -78,7 +78,6 @@ return [
             'baseUrl' => $params['coldco']['baseUrl'],
             'clientId' => $params['coldco']['clientId'],
             'secret' => $params['coldco']['secret'],
-        ]
-
+        ],
     ],
 ];
