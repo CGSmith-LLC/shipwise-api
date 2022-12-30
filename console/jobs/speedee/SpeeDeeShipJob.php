@@ -10,15 +10,42 @@ use Carbon\Carbon;
 class SpeeDeeShipJob extends BaseObject implements RetryableJobInterface
 {
     public SpeedeeManifest $manifest;
-    public int $index;
+
+    /**
+     * Get the current index for the specific customer. If none exists, start it at 0000.
+     *
+     * @return string
+     */
+    private function getIndex(): string
+    {
+        return Yii::$app->cache->getOrSet('speedee_manifest_index_' . $this->manifest->ship_from_shipper_number, function () {
+            return '0000';
+        });
+    }
+
+    /**
+     * Advance the index to the next 4-digit combination.
+     *
+     * @return void
+     */
+    private function bumpIndex() : void
+    {
+        // Retrieve current string value, coerce to int (under threat of violence), advance.
+        $current = intval(Yii::$app->cache->get('speedee_manifest_index_' . $this->manifest->ship_from_shipper_number));
+        $current++;
+        // Set the 4-digit value.
+        Yii::$app->cache->set('speedee_manifest_index_' . $this->manifest->ship_from_shipper_number, sprintf('%04d', $current));
+    }
+
     public function execute($queue)
     {
         $temp = fopen('php://temp/maxmemory:1048576', 'w');
         fputcsv($temp, $this->manifest->toArray());
 
         $filename = $this->manifest->bill_to_shipper_number
+            . '.'
             . Carbon::now()->format('Ymd')
-            . $this->index;
+            . $this->getIndex();
 
         $checksum = sha1($temp);
 
@@ -68,7 +95,7 @@ class SpeeDeeShipJob extends BaseObject implements RetryableJobInterface
         $this->manifest->checksum = $checksum;
         $this->manifest->save();
 
-
+        $this->bumpIndex();
     }
 
     public function getTtr()

@@ -80,7 +80,7 @@ class SpeeDeePlugin extends ShipmentPlugin
         $manifest->ship_to_country          = $this->shipment->recipient_country;
         $manifest->ship_to_email            = $this->shipment->recipient_email;
         $manifest->ship_to_phone            = $this->shipment->recipient_phone;
-        $manifest->reference_1              = $this->shipment->order_id; // Additional Reference Field (Usually Invoice Number). 2, 3, 4 are also available for use.
+        $manifest->reference_1              = $this->shipment->customer_reference; // Additional Reference Field (Usually Invoice Number). 2, 3, 4 are also available for use.
         $manifest->weight                   = $this->shipment->getTotalWeight();
 
         $package = $this->shipment->getPackages()[0];
