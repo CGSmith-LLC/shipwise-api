@@ -2,6 +2,8 @@
 
 namespace frontend\models;
 
+use common\models\UserWarehouse;
+use common\models\Warehouse;
 use Da\User\Model\User as BaseUser;
 use Da\User\Event\UserEvent;
 use Stripe\Customer;
@@ -49,6 +51,12 @@ class User extends BaseUser
     {
         return $this->hasMany('frontend\models\Customer', ['id' => 'customer_id'])
             ->viaTable(UserCustomer::tableName(), ['user_id' => 'id']);
+    }
+
+    public function getWarehouses()
+    {
+        return $this->hasMany(Warehouse::class, ['id' => 'warehouse_id'])
+            ->viaTable(UserWarehouse::tableName(), ['user_id' => 'id']);
     }
 
     /**

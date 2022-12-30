@@ -4,7 +4,14 @@ namespace frontend\controllers;
 
 use common\pdf\OrderPackingSlip;
 use common\models\forms\OrderForm;
-use common\models\{base\BaseBatch, Country, ScheduledOrder, State, Status, shipping\Carrier, shipping\Service};
+use common\models\{base\BaseBatch,
+    Country,
+    ScheduledOrder,
+    State,
+    Status,
+    shipping\Carrier,
+    shipping\Service,
+    Warehouse};
 use frontend\models\Customer;
 use Yii;
 use frontend\models\{Address,
@@ -320,6 +327,7 @@ class OrderController extends \frontend\controllers\Controller
                 'services' => Service::getList('id', 'name', $model->order->carrier_id),
                 'countries' => Country::getList(),
                 'states' => State::getList('id', 'name', $model->address->country),
+                'warehouses' => Warehouse::getList(),
             ]
         );
     }

@@ -2,11 +2,14 @@
 
 namespace common\models\base;
 
+use common\models\Warehouse;
+
 /**
  * This is the model class for table "orders".
  *
  * @property int    $id
  * @property int    $customer_id
+ * @property int    $warehouse_id
  * @property string $order_reference
  * @property string $customer_reference
  * @property int    $status_id
@@ -54,7 +57,7 @@ class BaseOrder extends \yii\db\ActiveRecord
     {
         return [
             [['customer_id', 'customer_reference', 'address_id'], 'required'],
-            [['customer_id', 'status_id', 'address_id', 'carrier_id', 'service_id', 'transit'], 'integer'],
+            [['customer_id', 'warehouse_id', 'status_id', 'address_id', 'carrier_id', 'service_id', 'transit'], 'integer'],
             [['created_date', 'updated_date', 'requested_ship_date', 'must_arrive_by_date', 'carrier_id', 'service_id', 'transit'], 'safe'],
             [['order_reference', 'tracking'], 'string', 'max' => 45],
             [['customer_reference', 'origin', 'uuid'], 'string', 'max' => 64],
@@ -88,6 +91,7 @@ class BaseOrder extends \yii\db\ActiveRecord
         return [
             'id'                 => 'ID',
             'customer_id'        => 'Customer ID',
+            'warehouse_id'       => 'Warehouse ID',
             'order_reference'    => 'WMS Order #',
             'customer_reference' => 'Customer Order #',
             'status_id'          => 'Status ID',
@@ -102,5 +106,10 @@ class BaseOrder extends \yii\db\ActiveRecord
             'label_data'         => 'Label Data',
             'label_type'         => 'Label Type',
         ];
+    }
+
+    public function getWarehouse()
+    {
+        return $this->hasOne(Warehouse::class, ['id' => 'warehouse_id']);
     }
 }

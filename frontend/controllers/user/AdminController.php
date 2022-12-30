@@ -2,9 +2,11 @@
 
 namespace frontend\controllers\user;
 
+use common\models\Warehouse;
 use Da\User\Controller\AdminController as BaseAdminController;
 use frontend\models\Customer;
 use frontend\models\search\CustomerSearch;
+use frontend\models\search\WarehouseSearch;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -45,6 +47,58 @@ class AdminController extends BaseAdminController
             ],
         ]);
     }
+
+    /**
+     * Shows a list of all customers and allows admin to associate one or many customers to user.
+     *
+     * @param int $id User ID
+     *
+     * @return string
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionAssociateWarehouses($id)
+    {
+        Url::remember('', 'actions-redirect');
+        $user = $this->findModel($id);
+
+        $searchModel  = new WarehouseSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('_associate-warehouses', [
+            'user'         => $user,
+            'searchModel'  => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Link/Unlink the user to/from given customer.
+     *
+     * @param int $id  User ID
+     * @param int $wid Warehouse ID
+     *
+     * @todo pretty much the same as linkCustomer() just needs to refactor if needed
+     * @return Response
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionLinkWarehouse($id, $wid)
+    {
+        $user = $this->findModel((int)$id);
+        if (($warehouse = Warehouse::findOne((int)$wid)) === null) {
+            throw new NotFoundHttpException('Warehouse does not exist');
+        }
+
+        if ($warehouse->isLinkedToUser($user->id)) {
+            $user->unlink('warehouses', $warehouse, true);
+            Yii::$app->getSession()->setFlash('success', Yii::t('usuario', 'Warehouse has been unlinked.'));
+        } else {
+            $user->link('warehouses', $warehouse);
+            Yii::$app->getSession()->setFlash('success', Yii::t('usuario', 'Warehouse has been linked.'));
+        }
+
+        return $this->redirect(Url::previous('actions-redirect'));
+    }
+
 
     /**
      * Shows a list of all customers and allows admin to associate one or many customers to user.
