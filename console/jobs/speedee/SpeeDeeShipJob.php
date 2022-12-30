@@ -73,7 +73,7 @@ class SpeeDeeShipJob extends BaseObject implements RetryableJobInterface
         try {
             $filesystem->write('/' . $filename, $temp);
         } catch (\League\Flysystem\FilesystemException $e) {
-            // @TODO: handle exception
+            // whoopsie
         }
 
         fclose($temp);
@@ -85,9 +85,9 @@ class SpeeDeeShipJob extends BaseObject implements RetryableJobInterface
                 throw new Exception('Manifest ' . $filename . ' did not pass checksum.');
             }
         } catch (\League\Flysystem\FilesystemException $e) {
-            // @TODO: handle filesystem exception
+            // uh oh
         } catch (Exception $e) {
-            // @TODO: handle general exception
+            // oopsadoodle
         }
 
         $this->manifest->manifest_filename = $filename;
