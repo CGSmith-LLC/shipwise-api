@@ -37,29 +37,27 @@ class Order extends BaseOrder
     public function createJobIfNeeded($event)
     {
         // Only create a job if the status is changed
-        if (!isset($event->changedAttributes['status_id']) && $event->changedAttributes['status_id'] === $event->sender->status_id) {
-            return;
-        }
-
-        // Only create a webhook that has a trigger set for the status
-        $webhooks = Webhook::find()
-            ->joinWith('webhookTrigger')
-            ->where([
-                Webhook::tableName() . '.customer_id' => $event->sender->customer_id,
-                Webhook::tableName() . '.active' => Webhook::STATUS_ACTIVE,
-                WebhookTrigger::tableName() . '.status_id' => $event->sender->status_id,
-            ])
-            ->all();
-
-        // loop through all webhooks to create a job
-        if ($webhooks) {
-            foreach ($webhooks as $webhook) {
-                \Yii::$app->queue->push(
-                    new OrderWebhook([
-                        'webhook_id' => $webhook->id,
-                        'order_id' => $event->sender->id
-                    ])
-                );
+        // sender attribute needs to be cast as an int as it comes down as a string
+        if (isset($event->changedAttributes['status_id']) && $event->changedAttributes['status_id'] !== (int) $event->sender->status_id) {
+            // Only create a webhook that has a trigger set for the status
+            $webhooks = Webhook::find()
+                ->joinWith('webhookTrigger')
+                ->where([
+                    Webhook::tableName() . '.customer_id' => $event->sender->customer_id,
+                    Webhook::tableName() . '.active' => Webhook::STATUS_ACTIVE,
+                    WebhookTrigger::tableName() . '.status_id' => $event->sender->status_id,
+                ])
+                ->all();
+            // loop through all webhooks to create a job
+            if ($webhooks) {
+                foreach ($webhooks as $webhook) {
+                    \Yii::$app->queue->push(
+                        new OrderWebhook([
+                            'webhook_id' => $webhook->id,
+                            'order_id' => $event->sender->id
+                        ])
+                    );
+                }
             }
         }
     }
@@ -217,7 +215,7 @@ class Order extends BaseOrder
         $shipment->customer_id = $this->customer_id;
         $shipment->order_id = $this->id;
 
-        // Sender
+// Sender
         /** @var AddressEx $sender */
         $sender = $this->getFromAddress();
         $shipment->sender_contact = $sender->name;
@@ -232,7 +230,7 @@ class Order extends BaseOrder
         $shipment->sender_email = $sender->email;
         $shipment->sender_is_residential = false;
 
-        // Recipient
+// Recipient
         $shipment->recipient_contact = $this->address->name;
         $shipment->recipient_address1 = $this->address->address1;
         $shipment->recipient_address2 = $this->address->address2;
@@ -241,10 +239,10 @@ class Order extends BaseOrder
         $shipment->recipient_postal_code = $this->address->zip;
         $shipment->recipient_country = $this->address->country;
         $shipment->recipient_phone = $this->address->phone;
-        //$shipment->recipient_email = $this->address->; // @todo TBD
-        //$shipment->recipient_is_residential = $this->address->; // @todo TBD
+//$shipment->recipient_email = $this->address->; // @todo TBD
+//$shipment->recipient_is_residential = $this->address->; // @todo TBD
 
-        // Packaging
+// Packaging
         $shipment->package_type = PackageType::MY_PACKAGE;
         $shipment->weight_units = Shipment::WEIGHT_UNITS_LB;
         $shipment->dim_units = Shipment::DIM_UNITS_IN;
@@ -262,15 +260,15 @@ class Order extends BaseOrder
             $shipment->addPackage($_pkg);
         }
 
-        // Shipping carrier & service
+// Shipping carrier & service
         $shipment->service = $this->service;
         $shipment->carrier = $this->service->carrier;
 
-        // Shipment References
+// Shipment References
         $shipment->reference1 = $this->customer_reference;
         $shipment->reference2 = $this->order_reference;
 
-        // Retrieve existing label for this order, if exists
+// Retrieve existing label for this order, if exists
         if ($this->service->carrier->getReprintBehaviour() == Carrier::REPRINT_BEHAVIOUR_EXISTING) {
             if (!empty($this->tracking) && !empty($this->label_data) && !empty($this->label_type)) {
                 $shipment->setMasterTrackingNumber($this->tracking);
@@ -280,7 +278,7 @@ class Order extends BaseOrder
             }
         }
 
-        // Invoke carrier API call
+// Invoke carrier API call
         try {
             $shipment->ship();
         } catch (\Exception $e) {
@@ -288,7 +286,7 @@ class Order extends BaseOrder
             $shipment->addError('plugin', $e->getMessage());
         }
 
-        // Shipment errors. This includes carrier API errors if any.
+// Shipment errors. This includes carrier API errors if any.
         if ($shipment->hasErrors()) {
             $this->addErrors($shipment->getErrors());
             return false;
@@ -298,9 +296,9 @@ class Order extends BaseOrder
     }
 
     /* Get Order Packages
-     *
-     * @return \yii\db\ActiveQuery
-     */
+    *
+    * @return \yii\db\ActiveQuery
+    */
     public function getPackages()
     {
         return $this->hasMany('common\models\Package', ['order_id' => 'id']);

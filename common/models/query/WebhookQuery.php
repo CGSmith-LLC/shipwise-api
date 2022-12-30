@@ -19,7 +19,11 @@ class WebhookQuery extends BaseQuery
 
         // Admins can see all models - so admins skip this andWhere()
         // skip if running from CLI - typically a Job
-        if (\Yii::$app instanceof \yii\web\Application && !\Yii::$app->user->identity->isAdmin) {
+        // also skip if running from API
+        // @todo load user while making requests to run through ACL
+        if (\Yii::$app instanceof \yii\web\Application &&
+            \Yii::$app->id !== 'app-api' &&
+            !\Yii::$app->user->identity->isAdmin) {
             $this->andWhere(['in', 'customer_id', \Yii::$app->user->identity->customerIds]);
         }
     }
