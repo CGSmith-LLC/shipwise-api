@@ -15,6 +15,7 @@ class NotificationJob extends BaseObject implements RetryableJobInterface
      * @var int $customer_id
      */
     public int $customer_id;
+    public ?int $user_id = null;
 
     public string $message;
     public string $subject;
@@ -31,10 +32,18 @@ class NotificationJob extends BaseObject implements RetryableJobInterface
         $mailer->viewPath = '@frontend/views/mail';
         $mailer->getView()->theme = \Yii::$app->view->theme;
 
-        $emails = User::find()
-            ->where(['customer_id' => $this->customer_id])
-            ->andWhere(['blocked_at' => null])
-            ->all();
+        if (isset($this->user_id)) {
+            $emails = User::find()
+                ->where(['id' => $this->user_id])
+                ->andWhere(['blocked_at' => null])
+                ->all();
+        } else {
+            $emails = User::find()
+                ->where(['customer_id' => $this->customer_id])
+                ->andWhere(['blocked_at' => null])
+                ->all();
+        }
+
         $emails = ArrayHelper::map($emails, 'username', 'email');
 
         $mailer->compose(['html' => 'notification'], [

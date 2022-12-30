@@ -2,10 +2,10 @@
 
 namespace console\jobs\webhooks;
 
-use Codeception\Lib\Interfaces\Web;
 use common\models\Order;
 use common\models\Webhook;
 use common\models\WebhookLog;
+use console\jobs\NotificationJob;
 use yii\console\Exception;
 use yii\helpers\Json;
 use yii\httpclient\Client;
@@ -18,6 +18,7 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
     public $webhook_id;
     public $order_id;
     public Client $client;
+    /** @var Webhook $webhook */
     public $webhook;
     public $testWebhook = false;
     public $order;
@@ -88,11 +89,17 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
             $webhookLog->response = Json::encode($response->getData());
             $webhookLog->save();
         } catch (\Exception $e) {
+            if (isset($response)) {
+                $statusCode = $response->getStatusCode();
+            } else {
+                $statusCode = 500;
+            }
             $webhookLog = new WebhookLog();
             $webhookLog->webhook_id = $this->webhook->id;
-            $webhookLog->status_code = $response->getStatusCode();
+            $webhookLog->status_code = $statusCode;
             $webhookLog->response = $e->getMessage();
             $webhookLog->save();
+            throw $e;
         }
     }
 
@@ -145,11 +152,28 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
 
     public function getTtr()
     {
-        return 300; // seconds
+        return 3; // seconds
     }
 
     public function canRetry($attempt, $error)
     {
-        return ($attempt < 3);
+        if ($attempt < 3) {
+            return true;
+        } else {
+            // not sure why but i cannot modify $this->webhook->active = 0; so I have to do it this way
+            $webhook = Webhook::findOne($this->webhook_id);
+            // Disable the webhook and send a notification to the user
+            $webhook->active = Webhook::STATUS_INACTIVE;
+            $webhook->save(false);
+            \Yii::$app->queue->push(
+                new NotificationJob([
+                    'user_id' => $webhook->user_id,
+                    'subject' => '🚨 Your webhook is failing: ' . $this->webhook->name,
+                    'message' => 'This is possible if your endpoint isn\'t correct or is failing. <strong>We will disable it going forward.</strong>',
+                    'url' => ['/webhook',],
+                    'urlText' => 'See the failure message',
+                ])
+            );
+        }
     }
 }

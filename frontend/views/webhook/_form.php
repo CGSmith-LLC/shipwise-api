@@ -15,10 +15,18 @@ ToggleAsset::register($this);
 
 <div class="webhook-form">
 
-    <?php $form = ActiveForm::begin(); ?>
-
-    <?= $form->field($model, 'customer_id')->label('Customer Name')->dropDownList($customers, ['prompt' => 'Please Select']) ?>
-
+    <?php
+    $form = ActiveForm::begin();
+    // if only one customer associated then select that customer on a hidden input
+    // not sure if this logic should be in the controller
+    if (Yii::$app->user->identity->isAdmin || count(Yii::$app->user->identity->customerIds) > 1) {
+        echo $form->field($model, 'customer_id')
+            ->label('Customer Name')
+            ->dropDownList($customers, ['prompt' => 'Please Select']);
+    } else {
+        echo $form->field($model, 'customer_id')->label(false)->hiddenInput(['value' => array_key_first($customers)]);
+    }
+    ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'endpoint')->label('HTTPS Endpoint')->textInput(['maxlength' => true]) ?>

@@ -18,7 +18,8 @@ class WebhookQuery extends BaseQuery
         parent::__construct($modelClass, $config);
 
         // Admins can see all models - so admins skip this andWhere()
-        if (!\Yii::$app->user->identity->isAdmin) {
+        // skip if running from CLI - typically a Job
+        if (\Yii::$app instanceof \yii\web\Application && !\Yii::$app->user->identity->isAdmin) {
             $this->andWhere(['in', 'customer_id', \Yii::$app->user->identity->customerIds]);
         }
     }
