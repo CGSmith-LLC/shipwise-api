@@ -61,6 +61,8 @@ class m221227_200815_create_speedee_manifests_table extends Migration
             'manifest_filename' => $this->string()->null(),
             'is_manifest_sent'  => $this->boolean()->defaultValue(false),
             'checksum'          => $this->string()->null(),
+            'created_at'        => $this->bigInteger(),
+            'updated_at'        => $this->bigInteger(),
         ]);
 
         $this->addForeignKey(

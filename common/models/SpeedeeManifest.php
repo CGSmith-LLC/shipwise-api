@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "speedee_manifests".
@@ -53,6 +54,8 @@ use Yii;
  * @property int $unboxed
  * @property string $manifest_filename
  * @property boolean $is_manifest_sent
+ * @property int $created_at
+ * @property int $updated_at
  *
  * @property Customer $customer
  * @property Order $order
@@ -65,6 +68,13 @@ class SpeedeeManifest extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'speedee_manifests';
+    }
+
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
+        ];
     }
 
     /**
