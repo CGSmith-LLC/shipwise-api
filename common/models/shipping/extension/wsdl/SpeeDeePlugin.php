@@ -109,10 +109,11 @@ class SpeeDeePlugin extends ShipmentPlugin
 
     protected function shipmentExecute()
     {
-        Yii::$app->queue->push(new \SpeeDeeShipJob([
-            'manifest' => $this->currentManifest,
-            'index' => 0 // @TODO: solve the "how to generate this" dilemma
-        ]));
+        // Currently queing this up manually for bulk process
+//        Yii::$app->queue->push(new \SpeeDeeShipJob([
+//            'manifest' => $this->currentManifest,
+//        ]));
+        return $this;
     }
 
     protected function shipmentProcess()
