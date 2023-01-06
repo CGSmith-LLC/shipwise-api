@@ -39,7 +39,7 @@ class m221230_194520_create_warehouse_table extends Migration
             '{{%fk-orders-warehouse_id}}',
             '{{%orders}}',
             'warehouse_id',
-            '{{%orders}}',
+            '{{%warehouse}}',
             'id',
             'RESTRICT'
         );
