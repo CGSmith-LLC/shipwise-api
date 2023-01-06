@@ -112,7 +112,7 @@ AppAsset::register($this);
                     'items' => [
                             [
                                 'label' => 'SpeeDee',
-                                'url' => ['/report/manifest/speedee'],
+                                'url' => ['/report/manifest-speedee'],
                                 'visible' => true, // @TODO: come back once we've implemented a "has speedee" type check
                             ]
                     ]

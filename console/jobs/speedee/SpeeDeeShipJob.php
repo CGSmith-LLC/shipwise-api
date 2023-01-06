@@ -1,15 +1,20 @@
 <?php
 
+namespace console\jobs\speedee;
+
+use Yii;
 use yii\base\BaseObject;
 use yii\queue\RetryableJobInterface;
 use \common\models\SpeedeeManifest;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
+use League\Csv\Writer;
 use Carbon\Carbon;
 
 class SpeeDeeShipJob extends BaseObject implements RetryableJobInterface
 {
     public SpeedeeManifest $manifest;
+    public int $customer_id;
 
     /**
      * Get the current index for the specific customer. If none exists, start it at 0000.
@@ -39,13 +44,31 @@ class SpeeDeeShipJob extends BaseObject implements RetryableJobInterface
 
     public function execute($queue)
     {
-        $temp = fopen('php://temp/maxmemory:1048576', 'w');
-        fputcsv($temp, $this->manifest->toArray());
+        $manifests = SpeedeeManifest::find()
+            ->where(['customer_id' => $this->customer_id])
+            ->andWhere(['is_manifest_sent' => false])
+            ->asArray()
+            ->all();
 
+        $temp = fopen('php://temp/maxmemory:1048576', 'w');
         $filename = $this->manifest->bill_to_shipper_number
             . '.'
             . Carbon::now()->format('Ymd')
             . $this->getIndex();
+
+        $csv = Writer::createFromString();
+
+
+        foreach ($manifests as $manifest) {
+            $formattedManifest = [];
+            foreach ($manifest as $key => $value) {
+                $formattedManifest[] = $value;
+            }
+            $csv->insertOne($formattedManifest);
+            unset($formattedManifest);
+        }
+
+        file_put_contents($temp, $csv->toString());
 
         $checksum = sha1($temp);
 
@@ -82,18 +105,22 @@ class SpeeDeeShipJob extends BaseObject implements RetryableJobInterface
         try {
             $validate = sha1($filesystem->read('/' . $filename));
             if ($validate !== $checksum) {
-                throw new Exception('Manifest ' . $filename . ' did not pass checksum.');
+                throw new \Exception('Manifest ' . $filename . ' did not pass checksum.');
             }
         } catch (\League\Flysystem\FilesystemException $e) {
             // uh oh
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // oopsadoodle
         }
+
+        Yii::$app->db->beginTransaction();
 
         $this->manifest->manifest_filename = $filename;
         $this->manifest->is_manifest_sent = true;
         $this->manifest->checksum = $checksum;
         $this->manifest->save();
+
+        Yii::$app->db->endTransaction();
 
         $this->bumpIndex();
     }

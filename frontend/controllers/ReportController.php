@@ -2,9 +2,12 @@
 
 namespace frontend\controllers;
 
+use common\models\SpeedeeManifest;
 use console\jobs\CreateReportJob;
+use console\jobs\speedee\SpeeDeeShipJob;
 use frontend\models\Customer;
 use frontend\models\forms\ReportForm;
+use frontend\models\forms\SpeedeeManifestForm;
 use frontend\models\User;
 use Yii;
 
@@ -29,6 +32,25 @@ class ReportController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionManifestSpeedee()
+    {
+        $model = new SpeedeeManifestForm();
+
+        //Yii::$app->queue->push(new SpeeDeeShipJob(['customer_id' => 1]));
+        return $this->render('speedee-manifest', [
+//            'pendingOrders' => SpeedeeManifest::find()->where()
+            'model' => $model,
+            'customers' => Yii::$app->user->identity->isAdmin
+                ? Customer::getList()
+                : Yii::$app->user->identity->getCustomerList(),
+        ]);
+    }
+
+    public function actionSpeedeeFetch($customerId)
+    {
+
     }
 
     /**
