@@ -51,12 +51,14 @@ class WebhookController extends ControllerEx
         }
 
         $hmacHeader = $request->headers->get('x-hookdeck-signature');
-        $hash = base64_encode(hash_hmac(
-            'sha256',
-            $request->getRawBody(),
-            Yii::$app->params['hookdeckSigningSecret'],
-            true
-        ));
+        $hash = base64_encode(
+            hash_hmac(
+                'sha256',
+                $request->getRawBody(),
+                Yii::$app->params['hookdeckSigningSecret'],
+                true
+            )
+        );
 
         if (!hash_equals($hmacHeader, $hash)) {
             throw new \Exception('Unauthorized', 403);
@@ -78,24 +80,25 @@ class WebhookController extends ControllerEx
             $csvBox->file_stream = $s3->get($csvBox->getS3FilePath());
 
             // if import failed send email to user
-            if (false == $csvBox->import()) {
+            $csvBox->import();
+            if (!empty($csvBox->getErrorSummary(true))) {
                 $errors = "<li>" . implode("</li><li>", $csvBox->getErrorSummary(true)) . "</li>";
-                \Yii::$app->queue->push(new NotificationJob([
-                    'customer_id' => $csvBox->customer_id,
-                    'subject' => '⚠️ Problem importing order file ' . $csvBox->original_filename,
-                    'message' => 'This file failed to import for the following reasons: <ul>' . $errors . '</ul>',
-                    'url' =>  ['/order/import',],
-                    'urlText' => 'Reupload and Import File',
-                ]));
+                \Yii::$app->queue->push(
+                    new NotificationJob([
+                        'customer_id' => $csvBox->customer_id,
+                        'subject' => '⚠️ Problem importing order file ' . $csvBox->original_filename,
+                        'message' => 'This file failed to import for the following reasons: <ul>' . $errors . '</ul>',
+                        'url' => ['/order/import',],
+                        'urlText' => 'Reupload and Import File',
+                    ])
+                );
                 return $this->errorMessage('File could not be imported');
-                throw new \Exception('File could not be imported');
             }
 
             return $this->success('Imported successfully');
         } catch (\Exception $e) {
             return $this->errorMessage(500, $e->getMessage());
         }
-
     }
 
     /**
@@ -115,12 +118,14 @@ class WebhookController extends ControllerEx
         if ($sourceName = $headers->get('X-Hookdeck-Source-Name', false)) {
             /** @var IntegrationHookdeck $integrationHookdeck */
             if ($integrationHookdeck = IntegrationHookdeck::find()->where(['source_name' => $sourceName])->one()) {
-                $id = \Yii::$app->queue->push(new ParseOrderJob([
-                    'unparsedOrder' => Yii::$app->request->bodyParams,
-                    'integration_id' => $integrationHookdeck->integration_id,
-                ]));
+                $id = \Yii::$app->queue->push(
+                    new ParseOrderJob([
+                        'unparsedOrder' => Yii::$app->request->bodyParams,
+                        'integration_id' => $integrationHookdeck->integration_id,
+                    ])
+                );
                 return $this->success('Queued ' . $id);
-            }else {
+            } else {
                 return $this->errorMessage(404, 'Unknown source name');
             }
         } else {
