@@ -50,7 +50,9 @@ class ReportController extends Controller
 
     public function actionSpeedeeFetch($customerId)
     {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
+        return SpeedeeManifest::find()->where(['customer_id' => $customerId])->all();
     }
 
     /**

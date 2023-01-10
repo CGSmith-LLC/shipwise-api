@@ -17,7 +17,7 @@ class m221227_200815_create_speedee_manifests_table extends Migration
             'order_id' => $this->integer(),
             'customer_id' => $this->integer(),
             'ship_from_shipper_number' => $this->string(6),
-            'ship_from_bane' => $this->string(),
+            'ship_from_name' => $this->string(),
             'ship_from_attention' => $this->string()->null(),
             'ship_from_address_1' => $this->string(),
             'ship_from_address_2' => $this->string()->null(),

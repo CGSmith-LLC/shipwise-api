@@ -25,7 +25,15 @@ use yii\bootstrap\ActiveForm;
                 ?>
                 <?= Html::button('Generate and Send', ['class' => 'btn btn-primary']) ?>
             <?php ActiveForm::end() ?>
-            <table id="ordersTable">
+            <table id="ordersTable" class="table">
+                <thead>
+                    <tr>
+                        <th>Ship From</th>
+                        <th>Ship To</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
             </table>
         </div>
     </div>
