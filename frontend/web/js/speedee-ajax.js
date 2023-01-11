@@ -1,4 +1,3 @@
-//wip, obvs
 $('#speedeemanifestform-customer').change(function () {
     let rowHtml;
     $.get('/report/speedee-fetch?customerId=' + (this).value, function (data) {
