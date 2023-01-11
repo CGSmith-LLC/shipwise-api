@@ -79,7 +79,8 @@ class SpeeDeeShipJob extends BaseObject implements RetryableJobInterface
         $filename = $this->customer_number
             . '.'
             . Carbon::now()->format('Ymd')
-            . $this->getIndex();
+            . $this->getIndex()
+            . '.csv';
 
         // Format and write to a single CSV
         $csv = Writer::createFromString();
@@ -119,7 +120,8 @@ class SpeeDeeShipJob extends BaseObject implements RetryableJobInterface
             Yii::info('trying?');
             $filesystem->write($filename, $csv->toString());
         } catch (\League\Flysystem\FilesystemException $e) {
-            // whoopsie
+            Yii::error('no working ' . $e);
+            die();
         }
 
         // Validate remote file
@@ -129,9 +131,11 @@ class SpeeDeeShipJob extends BaseObject implements RetryableJobInterface
                 throw new \Exception('Manifest ' . $filename . ' did not pass checksum.');
             }
         } catch (\League\Flysystem\FilesystemException $e) {
-            // uh oh
+            Yii::error('no working ' . $e);
+            die();
         } catch (\Exception $e) {
-            // oopsadoodle
+            Yii::error('no working ' . $e);
+            die();
         }
 
         // Update the manifest entries in the application database
