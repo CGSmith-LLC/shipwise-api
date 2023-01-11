@@ -9,8 +9,8 @@ $('#speedeemanifestform-customer').change(function () {
             $.each(data, function (i, item) {
                 rowHtml += `
                     <tr>
+                        <td>${item.reference_1}</td>
                         <td>${item.ship_to_name}</td>
-                        <td>${item.ship_from_name}</td>
                     </tr>
                     `
             })

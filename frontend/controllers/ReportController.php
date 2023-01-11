@@ -38,9 +38,13 @@ class ReportController extends Controller
     {
         $model = new SpeedeeManifestForm();
 
-        //Yii::$app->queue->push(new SpeeDeeShipJob(['customer_id' => 1]));
+        if (Yii::$app->request->post()) {
+            $request = Yii::$app->request->post();
+            Yii::$app->queue->push(new SpeeDeeShipJob(['customer_id' => $request['SpeedeeManifestForm']['customer']]));
+            Yii::$app->session->setFlash('success', "Manifest queued for delivery.");
+        }
+
         return $this->render('speedee-manifest', [
-//            'pendingOrders' => SpeedeeManifest::find()->where()
             'model' => $model,
             'customers' => Yii::$app->user->identity->isAdmin
                 ? Customer::getList()
@@ -52,7 +56,7 @@ class ReportController extends Controller
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        return SpeedeeManifest::find()->where(['customer_id' => $customerId])->all();
+        return SpeedeeManifest::find()->where(['customer_id' => $customerId])->andWhere(['is_manifest_sent' => false])->all();
     }
 
     /**

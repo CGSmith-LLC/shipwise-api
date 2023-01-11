@@ -23,13 +23,13 @@ use yii\bootstrap\ActiveForm;
                             'prompt' => ' Select customer...',
                     ]);
                 ?>
-                <?= Html::button('Generate and Send', ['class' => 'btn btn-primary']) ?>
+                <?= Html::submitButton('Generate and Send', ['class' => 'btn btn-primary']) ?>
             <?php ActiveForm::end() ?>
             <table id="ordersTable" class="table">
                 <thead>
                     <tr>
-                        <th>Ship From</th>
-                        <th>Ship To</th>
+                        <th>Reference #</th>
+                        <th>Recipient</th>
                     </tr>
                 </thead>
                 <tbody>
