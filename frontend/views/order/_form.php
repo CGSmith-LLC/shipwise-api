@@ -62,8 +62,8 @@ $item->loadDefaultValues();
 
 
                         <?php
-                        // i think i only want this for admins right now... needs more thought
-                        if (Yii::$app->user->identity->getIsAdmin()) {
+                        if (Yii::$app->user->identity->getWarehouses() &&
+                                $warehouses = \common\models\Warehouse::getList()) {
                             echo $form->field($model->order, 'warehouse_id')
                                 ->dropdownList($warehouses, ['prompt' => ' Please select']);
                         }

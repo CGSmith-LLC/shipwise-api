@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\models\query\WarehouseQuery;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\ArrayHelper;
@@ -56,7 +57,6 @@ class Warehouse extends \yii\db\ActiveRecord
         ];
     }
 
-
     /**
      * Whether the customer is linked to given user
      *
@@ -69,6 +69,10 @@ class Warehouse extends \yii\db\ActiveRecord
         return $this->getUserWarehouse()->onCondition(['user_id' => (int)$userId])->exists();
     }
 
+    public static function find()
+    {
+        return new WarehouseQuery(get_called_class());
+    }
 
     /**
      * Returns list of customers as array [id=>name]

@@ -120,6 +120,7 @@ AppAsset::register($this);
                     ['label' => 'Integrations', 'url' => ['/integration']],
                     ['label' => 'Behaviors', 'url' => ['/behavior']],
                     ['label' => 'Jobs', 'url' => ['/monitor/jobs']],
+                    ['label' => 'Warehouses', 'url' => ['/warehouse']],
                 ],
             ];
         }

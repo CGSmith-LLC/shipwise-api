@@ -64,7 +64,7 @@ class OrderController extends \frontend\controllers\Controller
     {
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_JSON;
-        if ($order = Order::find()->forCustomers(Yii::$app->user->identity->getCustomerList())->byId($id)->one()) {
+        if ($order = Order::find()->byId($id)->one()) {
             $status = Status::findOne($status);
             $order->status_id = $status->id;
             if ($order->save()) {
@@ -152,7 +152,7 @@ class OrderController extends \frontend\controllers\Controller
                 [
                     'model' => $model,
                     'confirmed' => true,
-                    'customers' => Yii::$app->user->identity->isAdmin ? Customer::getList() : Yii::$app->user->identity->getCustomerList(),
+                    'customers' => Yii::$app->user->identity->getCustomerList(),
                     'statuses' => Status::getList(),
                 ]
             );

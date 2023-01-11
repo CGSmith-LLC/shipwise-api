@@ -139,7 +139,9 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                 [
                     'attribute' => 'notes',
                     'value' => function ($model) {
-                        return yii\helpers\StringHelper::truncate($model->notes, 40);
+                        if (!empty($model->notes)) {
+                            return yii\helpers\StringHelper::truncate($model->notes, 40);
+                        }
                     }
                 ],
                 [

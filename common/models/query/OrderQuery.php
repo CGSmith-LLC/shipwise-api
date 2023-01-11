@@ -4,6 +4,7 @@ namespace common\models\query;
 
 use common\models\base\BaseBatch;
 use common\models\Order;
+use common\traits\LimitBy;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -11,8 +12,28 @@ use yii\helpers\ArrayHelper;
  *
  * @see Order
  */
-class OrderQuery extends \yii\db\ActiveQuery
+class OrderQuery extends BaseQuery
 {
+    use LimitBy;
+
+    public function __construct($modelClass, $config = [])
+    {
+        parent::__construct($modelClass, $config);
+
+        if (\Yii::$app instanceof \yii\web\Application &&
+            \Yii::$app->id !== 'app-api' &&
+            !\Yii::$app->user->identity->isAdmin) {
+            // If a "warehouse" user limit orders only by the warehouse that is linked
+            if (\Yii::$app->user->identity->isWarehouseType()) {
+                $this->limitByWarehouse();
+            }
+
+            // If a "customer" user then limit the orders by the customers that they have access to
+            if (\Yii::$app->user->identity->isCustomerType()) {
+                $this->limitByCustomer();
+            }
+        }
+    }
 
     /**
      * @inheritdoc
@@ -30,37 +51,6 @@ class OrderQuery extends \yii\db\ActiveQuery
     public function one($db = null)
     {
         return parent::one($db);
-    }
-
-    /**
-     * Query condition to get orders for given customer id
-     *
-     * We assume that if $id passed is null then no condition to apply
-     *
-     * @param int $id Customer Id
-     *
-     * @return OrderQuery
-     */
-    public function forCustomer($id)
-    {
-        return is_numeric($id)
-            ? $this->andOnCondition([Order::tableName() . '.customer_id' => (int)$id])
-            : $this;
-    }
-
-    /**
-     * Query condition to get orders for multiple given customers
-     *
-     * @param array $ids Customer Ids
-     *
-     * @return OrderQuery
-     */
-    public function forCustomers($ids = [])
-    {
-        if (!empty($ids)) {
-            return $this->andOnCondition([Order::tableName() . '.customer_id' => $ids]);
-        }
-        return $this;
     }
 
     /**

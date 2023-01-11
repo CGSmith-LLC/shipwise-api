@@ -7,6 +7,7 @@ use common\models\Warehouse;
 use Da\User\Model\User as BaseUser;
 use Da\User\Event\UserEvent;
 use Stripe\Customer;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -16,9 +17,12 @@ use yii\helpers\ArrayHelper;
  *
  * @property Customer[] $customers
  * @property integer $customer_id
+ * @property integer $type
  */
 class User extends BaseUser
 {
+    public const TYPE_CUSTOMER = 0;
+    public const TYPE_WAREHOUSE = 1;
 
     public function init()
     {
@@ -36,7 +40,8 @@ class User extends BaseUser
     public function rules()
     {
         $rules = parent::rules();
-        $rules['fieldRequired'] = ['customer_id', 'required'];
+        $rules['customerIdRequired'] = ['customer_id', 'required'];
+        $rules['userTypeRequired'] = ['type', 'required'];
         unset($rules['usernameRequired']);
         return $rules;
     }
@@ -70,9 +75,26 @@ class User extends BaseUser
      */
     public function getCustomerList($keyField = 'id', $valueField = 'name')
     {
-        $data = $this->getCustomers()->orderBy([$valueField => SORT_ASC])->all();
+        if ($this->isWarehouseType()) {
+            $data = Order::find()
+                ->select('customer_id')
+                ->distinct()
+                ->where(['in', 'warehouse_id', $this->getWarehouseIds()])
+                ->all();
+            $data = \frontend\models\Customer::find()
+                ->where(['id' => ArrayHelper::getColumn($data, 'customer_id')])
+                ->orderBy([$valueField => SORT_ASC])
+                ->all();
+        } else {
+            $data = $this->getCustomers()->orderBy([$valueField => SORT_ASC])->all();
+        }
 
         return ArrayHelper::map($data, $keyField, $valueField);
+    }
+
+    public function getTypes()
+    {
+        return [self::TYPE_CUSTOMER => 'Customer', self::TYPE_WAREHOUSE => 'Warehouse'];
     }
 
     /**
@@ -106,6 +128,16 @@ class User extends BaseUser
         return $customer ? $customer->direct : false;
     }
 
+    public function isWarehouseType()
+    {
+        return ($this->type === self::TYPE_WAREHOUSE);
+    }
+
+    public function isCustomerType()
+    {
+        return ($this->type === self::TYPE_CUSTOMER);
+    }
+
     /**
      * Return the customer id
      *
@@ -130,5 +162,20 @@ class User extends BaseUser
                 ->asArray()
                 ->all(),
             'customer_id');
+    }
+
+    /**
+     * Get array of associated customers IDs
+     *
+     * @return array
+     */
+    public function getWarehouseIds()
+    {
+        return ArrayHelper::getColumn(
+            $this->hasMany(UserWarehouse::class, ['user_id' => 'id'])
+                ->select('warehouse_id')
+                ->asArray()
+                ->all(),
+            'warehouse_id');
     }
 }
