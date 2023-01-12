@@ -154,7 +154,7 @@ class WebhookController extends Controller
     {
         try {
             if ($model = $this->findModel($id)) {
-                $order = Order::find()->where(['customer_id' => $model->customer_id])->one();
+                $order = Order::find()->where(['customer_id' => $model->customer_id])->limit(1)->one();
                 \Yii::$app->queue->push(
                     new OrderWebhook([
                         'webhook_id' => $model->id,

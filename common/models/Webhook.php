@@ -236,13 +236,13 @@ class Webhook extends \yii\db\ActiveRecord
 
     public function getMasked($attribute)
     {
-        return substr($this->$attribute, 0, strlen($this->$attribute) / 5) . '*************** ';
+        return substr($this->$attribute, 0, (int) (strlen($this->$attribute) / 5)) . '*************** ';
     }
 
     public function regenerateSigningSecret()
     {
         $this->signing_secret = $this->generateSigningSecret();
-        return $this->save();
+        return $this->save(false);
     }
 
     public function generateSigningSecret()
