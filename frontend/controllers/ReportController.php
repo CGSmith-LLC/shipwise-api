@@ -37,27 +37,28 @@ class ReportController extends Controller
      * @return string|void
      * @throws \yii\base\InvalidConfigException
      */
-    public function actionIndex()
+    public function actionIndex($scenario = null)
     {
         $model = new ReportForm();
 
+        // select model scenario from GET or POST
+        $model->scenario = ReportForm::SCENARIO_BY_DATE;
+        $scenario = $this->request->post('scenario', $scenario);
+        if (in_array($scenario, [ReportForm::SCENARIO_BY_DATE, ReportForm::SCENARIO_BY_ORDER_NR])) {
+            $model->scenario = $scenario;
+        }
+
         // Generate Report
-        if (Yii::$app->request->post()) {
+        if ($this->request->post()) {
             $model->load(Yii::$app->request->post());
-            // Always set for beginning of day and end of day for query
-            $model->start_date = Yii::$app->formatter->asDate($model->start_date, 'php:Y-m-d 00:00:00');
-            $model->end_date   = Yii::$app->formatter->asDate($model->end_date, 'php:Y-m-d 23:59:59');
 
-            Yii::$app->queue->push(new CreateReportJob([
-                'customer' => $model->customer,
-                'user_id' => Yii::$app->user->id,
-                'user_email' => User::findone(['id' => Yii::$app->user->id])->email,
-                'start_date' => $model->start_date,
-                'end_date' => $model->end_date,
-                'items' => $model->items,
-            ]));
+            if ($model->validate()) {
 
-            Yii::$app->getSession()->setFlash('success', 'The report is being generated. Please check your email in a few minutes.');
+                $model->pushReportQueueJob();
+
+                Yii::$app->getSession()->setFlash('success', 'The report is being generated. Please check your email in a few minutes.');
+                return $this->redirect(['report/index', 'scenario' => $model->scenario]);
+            }
         }
 
 
@@ -65,9 +66,7 @@ class ReportController extends Controller
             'index',
             [
                 'model'     => $model,
-                'customers' => Yii::$app->user->identity->isAdmin
-                    ? Customer::getList()
-                    : Yii::$app->user->identity->getCustomerList(),
+                'customers' => $model->getCustomerList(),
             ]
         );
     }

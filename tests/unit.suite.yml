@@ -7,4 +7,9 @@ modules:
     enabled:
         - Asserts
         - \Helper\Unit
+        #- Db
+        # Yii2 module must be loaded after Db module to make sure fixtures are not overwritten by Db dump
+        - Yii2:
+            configFile: 'common/config/test-local.php'
+            transaction: false
     step_decorators: ~        

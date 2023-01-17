@@ -50,6 +50,11 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
     public bool $items;
 
     /**
+     * @var array if set, the report will be generated on order numbers instead of date range.
+     */
+    public array $order_nrs;
+
+    /**
      * @inheritDoc
      */
     public function execute($queue)
@@ -77,8 +82,6 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
     protected function processReport(): string
     {
         $ordersQuery = \frontend\models\Order::find()
-            ->where(['customer_id' => $this->customer])
-            ->andWhere(['between', 'created_date', $this->start_date, $this->end_date])
             ->with(
                 [
                     'items',
@@ -90,6 +93,14 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
                 ]
             )
             ->orderBy('created_date');
+
+        if (is_array($this->order_nrs)) {
+            $ordersQuery->where(['customer_reference' => $this->order_nrs]);
+        } else {
+            $ordersQuery->where(['customer_id' => $this->customer]);
+            $ordersQuery->andWhere(['between', 'created_date', $this->start_date, $this->end_date])
+        }
+
 
         $dir = Yii::getAlias('@console') . '/runtime/reports/';
         FileHelper::createDirectory($dir);

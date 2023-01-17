@@ -25,31 +25,29 @@ $this->title = Yii::$app->name;
 
     <div class="body-content">
         <h1>Reports</h1>
-        <p>Choose the date range below. We will generate a CSV file for you after clicking export.</p>
+
         <div class="report-form">
-            <?php $form = ActiveForm::begin(); ?>
 
-            <?= $form->field($model, 'start_date', [
-                'inputTemplate' =>
-                    '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
-                'inputOptions' => ['autocomplete' => 'off']
-            ])->textInput([
-                'value' => (isset($model->start_date)) ? Yii::$app->formatter->asDate($model->start_date) : '',
-            ]); ?>
-            <?= $form->field($model, 'end_date', [
-                'inputTemplate' =>
-                    '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
-                'inputOptions' => ['autocomplete' => 'off']
-            ])->textInput([
-                'value' => (isset($model->end_date)) ? Yii::$app->formatter->asDate($model->end_date) : '',
-            ]); ?>
-            <?php echo $form->field($model, 'customer')->dropdownList($customers, ['prompt' => ' Please select']); ?>
-            <?php echo $form->field($model, 'items')->checkbox()->label('Include items in report?'); ?>
+            <?= \yii\bootstrap\Tabs::widget([
+            'items' => [
+                [
+                    'label' => 'By Date',
+                    'content' => $this->render('_tabDate', [
+                        'model' => $model,
+                        'customers' => $customers,
+                    ]),
+                    'active' => $model->scenario === \frontend\models\forms\ReportForm::SCENARIO_BY_DATE,
+                ],
+                [
+                    'label' => 'By Order #',
+                    'content' => $this->render('_tabOrderNr', [
+                        'model' => $model,
+                    ]),
+                    'active' => $model->scenario === \frontend\models\forms\ReportForm::SCENARIO_BY_ORDER_NR,
+                ],
 
-            <div class="form-group">
-                <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
-            </div>
-            <?php ActiveForm::end(); ?>
+            ],
+        ])?>
         </div>
     </div>
 </div>
