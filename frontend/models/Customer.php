@@ -28,6 +28,7 @@ class Customer extends BaseCustomer
             ->viaTable(UserCustomer::tableName(), ['customer_id' => 'id']);
     }
 
+
     /**
      * Get UserCustomer
      *

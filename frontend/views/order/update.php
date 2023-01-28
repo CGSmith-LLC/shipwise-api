@@ -10,6 +10,7 @@ use yii\helpers\Html;
 /* @var $services array List of carrier services */
 /* @var $states array List of states */
 /* @var $countries array List of countries */
+/* @var $warehouses array List of warehouses */
 
 $this->title = 'Update Order: ' . $model->order->id;
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
@@ -21,13 +22,14 @@ $this->params['breadcrumbs'][] = 'Update';
     <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
-        'model'     => $model,
-        'customers' => $customers,
-        'statuses'  => $statuses,
-        'carriers'  => $carriers,
-        'services'  => $services,
-        'states'    => $states,
-        'countries' => $countries,
+        'model'      => $model,
+        'customers'  => $customers,
+        'statuses'   => $statuses,
+        'carriers'   => $carriers,
+        'services'   => $services,
+        'states'     => $states,
+        'countries'  => $countries,
+        'warehouses' => $warehouses,
     ]) ?>
 
 </div>

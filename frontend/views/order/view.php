@@ -111,6 +111,11 @@ $this->registerJs($js);
                         },
                     ],
                     [
+                        'attribute' => 'warehouse.name',
+                        'label' => 'Warehouse',
+                        'visible' => !$simple,
+                    ],
+                    [
                         'attribute' => 'origin',
                         'visible' => !$simple,
                     ],

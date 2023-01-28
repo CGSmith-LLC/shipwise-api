@@ -122,9 +122,9 @@ class OrderSearch extends Order
                 $query->byStatus($this->status_id);
             }
             // If user is not admin, then show orders that ONLY belong to current user
-            if (!Yii::$app->user->identity->isAdmin) {
-                $query->forCustomers(Yii::$app->user->identity->customerIds);
-            }
+            //if (!Yii::$app->user->identity->isAdmin) {
+            //    $query->forCustomers(Yii::$app->user->identity->customerIds);
+            //}
         }
 
 

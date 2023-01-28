@@ -60,6 +60,15 @@ $item->loadDefaultValues();
                         <?= $form->field($model->order, 'customer_id')
                                  ->dropdownList($customers, ['prompt' => ' Please select']) ?>
 
+
+                        <?php
+                        if (Yii::$app->user->identity->getWarehouses() &&
+                                $warehouses = \common\models\Warehouse::getList()) {
+                            echo $form->field($model->order, 'warehouse_id')
+                                ->dropdownList($warehouses, ['prompt' => ' Please select']);
+                        }
+                        ?>
+
                         <?= $form->field($model->order, 'tracking')->textInput(['maxlength' => true]) ?>
 
                         <?= $form->field($model->order, 'customer_reference')->textInput(['maxlength' => true]) ?>

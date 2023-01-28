@@ -52,6 +52,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'label' => Yii::t('usuario', 'Associate customers'),
                             'url' => ['/user/admin/associate-customers', 'id' => $user->id]
                         ],
+                        [
+                            'label' => Yii::t('usuario', 'Associate warehouses'),
+                            'url' => ['/user/admin/associate-warehouses', 'id' => $user->id]
+                        ],
                         '<hr>',
                         [
                             'label' => Yii::t('usuario', 'Confirm'),
