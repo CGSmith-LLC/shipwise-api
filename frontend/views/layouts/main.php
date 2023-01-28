@@ -102,7 +102,23 @@ AppAsset::register($this);
                 ['label' => 'Scheduling', 'url' => ['/order/scheduled']],
             ]
         ];
-        $menuItems[] = ['label' => 'Reports', 'url' => ['/report']];
+        $menuItems[] = [
+            'label' => 'Reports',
+            'url'   => ['/'],
+            'items' => [
+                ['label' => 'Orders', 'url' => ['/report']],
+                [
+                    'label' => 'Manifest', 'url' => ['/'],
+                    'items' => [
+                            [
+                                'label' => 'SpeeDee',
+                                'url' => ['/report/manifest-speedee'],
+                                'visible' => true, // @TODO: come back once we've implemented a "has speedee" type check
+                            ]
+                    ]
+                ]
+            ]
+        ];
 
         if (Yii::$app->user->identity->isAdmin) {
             $menuItems[] = [

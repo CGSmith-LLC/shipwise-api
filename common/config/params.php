@@ -67,4 +67,8 @@ return [
     'csvBoxS3Secret' => '',
     'csvBoxS3Region' => '',
     'csvBoxS3Bucket' => '',
+
+    'speedeeFtpHost' => '',
+    'speedeeFtpUser' => 123,
+    'speedeeFtpPass' => '',
 ];

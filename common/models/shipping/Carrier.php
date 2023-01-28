@@ -20,6 +20,7 @@ class Carrier extends BaseCarrier
     const DHL          = 4;
     const AMAZON_UPS   = 5;
     const AMAZON_FEDEX = 6;
+    const SPEEDEE      = 9;
     const AMAZON_USPS  = 11;
 
     /** @var array */
@@ -31,6 +32,7 @@ class Carrier extends BaseCarrier
         self::AMAZON_UPS   => 'AMAZON_UPS',
         self::AMAZON_FEDEX => 'AMAZON_FEDEX',
         self::AMAZON_USPS  => 'AMAZON_USPS',
+        self::SPEEDEE      => 'SPEEDEE',
     ];
 
     const REPRINT_BEHAVIOUR_CREATE_NEW = 1;
@@ -49,6 +51,7 @@ class Carrier extends BaseCarrier
         self::AMAZON_UPS,
         self::AMAZON_FEDEX,
         self::AMAZON_USPS,
+        self::SPEEDEE,
     ];
 
     /**
