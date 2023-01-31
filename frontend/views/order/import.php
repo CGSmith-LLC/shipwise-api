@@ -1,6 +1,4 @@
 <?php
-
-use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use yii\web\View;
 use yii\web\YiiAsset;
@@ -12,14 +10,14 @@ use yii\web\YiiAsset;
 /* @var $states array */
 /* @var $customers array */
 
-$title = 'Import orders';
+$this->title = 'Import orders';
 
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $title;
+$this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 
 if ($model->customer) {
-    $title .= ' (' . ($customers[$model->customer] ?? '') . ')';
+    $this->title .= ' (' . ($customers[$model->customer] ?? '') . ')';
 }
 ?>
 
@@ -27,6 +25,9 @@ if ($model->customer) {
         <h1>Order Import</h1>
         <?php
         if ($model->customer) { ?>
+            <p>
+                Selected customer: <strong><?= Html::encode($customers[$model->customer]) ?></strong>
+            </p>
             <p>
                 <?php
                     if ($showSelectCustomer) {
@@ -47,7 +48,7 @@ if ($model->customer) {
                     }
                 }
 
-                let importer = new CSVBoxImporter("VXHBUpdb9BGgeI78lCjkIr1Y3c11Vs", {}, callback);
+                let importer = new CSVBoxImporter("<?= Yii::$app->params['csvBoxImportKey'] ?>", {}, callback);
                 importer.setUser({
                     user_id: "<?= Yii::$app->user->identity->email?>",
                     customer_id: "<?= $model->customer; ?>",
@@ -57,7 +58,7 @@ if ($model->customer) {
             </div>
         <?php } else { ?>
             <p>Select a customer and then you be able to upload a CSV file. If you want you can download
-                <a href="https://app.csvbox.io/sample-csv-file/VXHBUpdb9BGgeI78lCjkIr1Y3c11Vs" target="_blank">our template file</a>.
+                <a href="https://app.csvbox.io/sample-csv-file/<?= Yii::$app->params['csvBoxImportKey'] ?>" target="_blank">our template file</a>.
             </p>
             <div class="row">
                 <div class="col-md-3">
