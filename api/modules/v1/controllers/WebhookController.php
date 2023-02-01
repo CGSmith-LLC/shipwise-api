@@ -67,7 +67,7 @@ class WebhookController extends ControllerEx
                 if ($csvBox->hasErrors()) {
                     $this->sendImportErrorsSummary($csvBox);
 
-                    return $this->errorMessage(500, 'File could not be imported' . serialize($csvBox->getErrors()));
+                    return $this->errorMessage(500, 'File could not be imported');
                 }
 
                 return $this->success('Imported successfully');
