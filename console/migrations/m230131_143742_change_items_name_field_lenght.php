@@ -22,19 +22,4 @@ class m230131_143742_change_items_name_field_lenght extends Migration
     {
         $this->alterColumn('{{%items}}', 'name', $this->string(128));
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m230131_143742_change_items_name_field_lenght cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }

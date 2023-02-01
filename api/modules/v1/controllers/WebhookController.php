@@ -42,10 +42,10 @@ class WebhookController extends ControllerEx
     /**
      * csvbox.io import action.
      *
-     * @return array
+     * @return array|string
      * @throws \Exception
      */
-    public function actionImport(): array
+    public function actionImport(): array|string
     {
         $data = Yii::$app->request->getBodyParams();
 
@@ -67,11 +67,13 @@ class WebhookController extends ControllerEx
                 if ($csvBox->hasErrors()) {
                     $this->sendImportErrorsSummary($csvBox);
 
-                    return $this->errorMessage(500, 'File could not be imported');
+                    return $this->errorMessage(500, 'File could not be imported' . serialize($csvBox->getErrors()));
                 }
 
                 return $this->success('Imported successfully');
             } else {
+                $this->sendImportErrorsSummary($csvBox);
+
                 return $this->errorMessage(500, 'Invalid data');
             }
         } catch (\Exception $e) {
