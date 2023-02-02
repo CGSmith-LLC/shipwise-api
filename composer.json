@@ -11,7 +11,6 @@
         "yiisoft/yii2-queue": "^2.3",
         "setasign/fpdf": "^1.8",
         "cgsmith/yii2-stripe": "dev-master",
-        "serzh/amazon-mws-merchant-fulfillment": "^1.0",
         "osiset/basic-shopify-api": "^9.1",
         "yii2tech/csv-grid": "^1.0",
         "bp-sys/yii2-aws-s3": "~2.0",
@@ -25,7 +24,8 @@
         "2amigos/2fa-library": "^2.0",
         "2amigos/qrcode-library": "^2.0",
         "frostealth/yii2-aws-s3": "~2.0",
-        "league/csv": "^9.8"
+        "league/csv": "^9.8",
+        "jlevers/selling-partner-api": "^5.5"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

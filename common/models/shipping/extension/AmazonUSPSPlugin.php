@@ -7,7 +7,7 @@ namespace common\models\shipping\extension;
  *
  * @package common\models\shipping\extension
  */
-class AmazonUSPSPlugin extends AmazonMWS
+class AmazonUSPSPlugin extends AmazonSPAPI
 {
 
     /**

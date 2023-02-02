@@ -3,6 +3,11 @@
 namespace common\models\shipping\extension;
 
 use common\models\Item;
+use SellingPartnerApi\Api\ShippingV2Api;
+use SellingPartnerApi\Configuration;
+use SellingPartnerApi\Endpoint;
+use SellingPartnerApi\Model\ShippingV1\CreateShipmentRequest;
+use SellingPartnerApi\Model\ShippingV2\DirectPurchaseRequest;
 use Yii;
 use common\models\shipping\{
     Shipment,
@@ -13,7 +18,7 @@ use common\models\shipping\{
 use yii\helpers\FileHelper;
 
 /**
- * Class AmazonMWS
+ * Class AmazonSPAPI
  *
  * Handles shipment creation using Amazon MWS Merchant Fulfillment
  *
@@ -22,26 +27,8 @@ use yii\helpers\FileHelper;
  *
  * @property int $maxRetries
  */
-class AmazonMWS extends ShipmentPlugin
+class AmazonSPAPI extends ShipmentPlugin
 {
-
-    /**
-     * Development API url
-     *
-     * @var string
-     */
-    private $urlDev = 'n/a';
-
-    /**
-     * Production API url
-     *
-     * This is for North America region
-     * @todo add other regions
-     *
-     * @var string
-     */
-    private $urlProd = 'https://mws.amazonservices.com/MerchantFulfillment/2015-06-01';
-
     /**
      * Marketplace ID
      *
@@ -66,9 +53,7 @@ class AmazonMWS extends ShipmentPlugin
      * @var string
      */
     private $sellerId;
-    private $mwsAuthToken;
-    private $awsAccessKeyId;
-    private $awsSecretKey;
+    private $refreshToken;
 
     /**
      * Multiple piece shipment flag
@@ -99,15 +84,24 @@ class AmazonMWS extends ShipmentPlugin
      */
     public $isTrackable = true;
 
+    protected Configuration $config;
+
     /** @inheritdoc */
     public function autoload($customerId = null)
     {
         $this->setAccountInfo(
             Yii::$app->customerSettings->get('amazon_mws_seller_id', $customerId),
-            Yii::$app->customerSettings->get('amazon_mws_auth_token', $customerId),
             Yii::$app->customerSettings->get('amazon_mws_aws_access_key_id', $customerId),
-            Yii::$app->customerSettings->get('amazon_mws_aws_secret_key', $customerId)
         );
+
+        $this->config = new Configuration([
+            "lwaClientId" => Yii::$app->params['amazon-lwaClient'],
+            "lwaClientSecret" => Yii::$app->params['amazon-lwaSecret'],
+            "lwaRefreshToken" => $this->refreshToken,
+            "awsAccessKeyId" => Yii::$app->params['amazon-accessKey'],
+            "awsSecretAccessKey" => Yii::$app->params['amazon-secretKey'],
+            "endpoint" => Endpoint::NA
+        ]);
     }
 
     /**
@@ -122,14 +116,10 @@ class AmazonMWS extends ShipmentPlugin
      */
     public function setAccountInfo(
         $sellerId,
-        $mwsAuthToken,
-        $awsAccessKeyId,
-        $awsSecretKey
+        $refreshToken
     ) {
         $this->sellerId       = $sellerId;
-        $this->mwsAuthToken   = $mwsAuthToken;
-        $this->awsAccessKeyId = $awsAccessKeyId;
-        $this->awsSecretKey   = $awsSecretKey;
+        $this->refreshToken   = $refreshToken;
 
         return $this;
     }
@@ -174,7 +164,12 @@ class AmazonMWS extends ShipmentPlugin
         /**
          * Build Amazon MWS `CreateShipmentRequest`
          */
-        $request = new \MWSMerchantFulfillmentService_Model_CreateShipmentRequest();
+        $instance = new ShippingV2Api($this->config);
+        $body = new DirectPurchaseRequest();
+        $locale = 'en-US';
+        $request = new CreateShipmentRequest();
+
+
         $request->setSellerId($this->sellerId);
         $request->setMWSAuthToken($this->mwsAuthToken);
         $request->setShippingServiceId($this->shipment->service->carrier_code ?? null);
