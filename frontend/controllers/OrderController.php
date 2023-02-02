@@ -4,7 +4,14 @@ namespace frontend\controllers;
 
 use common\pdf\OrderPackingSlip;
 use common\models\forms\OrderForm;
-use common\models\{base\BaseBatch, Country, ScheduledOrder, State, Status, shipping\Carrier, shipping\Service};
+use common\models\{base\BaseBatch,
+    Country,
+    OrderImport,
+    ScheduledOrder,
+    State,
+    Status,
+    shipping\Carrier,
+    shipping\Service};
 use frontend\models\Customer;
 use Yii;
 use frontend\models\{Address,
@@ -12,7 +19,6 @@ use frontend\models\{Address,
     Item,
     Order,
     BulkAction,
-    OrderImport,
     search\OrderSearch,
     search\ScheduledOrderSearch};
 use yii\web\{BadRequestHttpException,
@@ -710,7 +716,7 @@ class OrderController extends \frontend\controllers\Controller
             ? Customer::getList()
             : Yii::$app->user->identity->getCustomerList();
 
-        $model = new \common\models\OrderImport();
+        $model = new OrderImport();
 
         if (count($customers) === 1) {
             $model->customer = array_key_first($customers);

@@ -175,8 +175,18 @@ class OrderSearch extends Order
             ->andFilterWhere(['like', Address::tableName() . '.name', $this->address]);
 
         if (!empty($this->customer_reference)) {
-            $query->andWhere("MATCH(customer_reference) AGAINST (:customer_reference IN BOOLEAN MODE)", [':customer_reference' => '*' . $this->customer_reference . '*']);
+            $searchQuery = str_replace(
+                ['-', '*', '~', '+', '>', '<', '(', ')'],
+                ['&#8208;', '&#42;', '&#126;', '&#43;', '&#62;', '&#60;', '&#40;', '&#41;'],
+                $this->customer_reference
+            );
+
+            $query->andWhere(
+                "MATCH(customer_reference) AGAINST (:customer_reference IN BOOLEAN MODE)",
+                [':customer_reference' => '*' . $searchQuery . '*']
+            );
         }
+
         if (!empty($this->created_date)) {
             $date = new \DateTime($this->created_date);
             $query->andFilterWhere(['like', Order::tableName() . '.created_date', $date->format('Y-m-d')]);
