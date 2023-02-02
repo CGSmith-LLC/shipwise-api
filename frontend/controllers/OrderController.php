@@ -20,7 +20,8 @@ use frontend\models\{Address,
     Order,
     BulkAction,
     search\OrderSearch,
-    search\ScheduledOrderSearch};
+    search\ScheduledOrderSearch,
+    UserCustomer};
 use yii\web\{BadRequestHttpException,
     Cookie,
     NotFoundHttpException,
@@ -36,7 +37,7 @@ use yii2tech\csvgrid\CsvGrid;
 /**
  * OrderController implements the CRUD actions for Order model.
  */
-class OrderController extends \frontend\controllers\Controller
+class OrderController extends Controller
 {
 
     /**
@@ -63,23 +64,62 @@ class OrderController extends \frontend\controllers\Controller
         ];
     }
 
-    public function actionStatusUpdate($id, $status)
+    /**
+     * @throws BadRequestHttpException
+     */
+    public function beforeAction($action): bool
     {
-        $response = Yii::$app->response;
-        $response->format = Response::FORMAT_JSON;
-        if ($order = Order::find()->forCustomers(Yii::$app->user->identity->getCustomerList())->byId($id)->one()) {
-            $status = Status::findOne($status);
-            $order->status_id = $status->id;
-            if ($order->save()) {
-                return [
-                    'message' => $order->status->getStatusLabel(),
-                    'code' => 200,
-                ];
+        $ajaxActions = [
+            'status-update',
+            'carrier-services',
+            'country-states',
+        ];
+
+        if (in_array($action->id, $ajaxActions)) {
+            if (!Yii::$app->request->isAjax) {
+                throw new BadRequestHttpException('Bad request.');
             }
+
+            Yii::$app->response->format = Response::FORMAT_JSON;
+        }
+
+        return parent::beforeAction($action);
+    }
+
+    /**
+     * Changes order status.
+     *
+     * @param int $id
+     * @param int $status
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function actionStatusUpdate(int $id, int $status): array
+    {
+        $order = Order::find()
+            ->byId($id)
+            ->forCustomers($this->customer_ids)
+            ->one();
+        $status = Status::findOne($status);
+
+        if (!$order) {
+            throw new NotFoundHttpException('Order not found.');
+        }
+
+        if (!$status) {
+            throw new NotFoundHttpException('Status not found.');
+        }
+
+        if ($order->changeStatus($status->id)) {
+            return [
+                'message' => $order->status->getStatusLabel(),
+                'code' => 200,
+            ];
         }
 
         return [
-            'code' => 400
+            'code' => 400,
+            'message' => 'Bad request'
         ];
     }
 
@@ -449,12 +489,9 @@ class OrderController extends \frontend\controllers\Controller
      */
     public function actionCarrierServices($carrierId)
     {
-        $request = Yii::$app->request;
-        if (!$request->isAjax || !($carrierId)) {
+        if (!$carrierId) {
             throw new BadRequestHttpException('Bad request.');
         }
-
-        Yii::$app->response->format = Response::FORMAT_JSON;
 
         return Service::getList('id', 'name', $carrierId);
     }
@@ -469,12 +506,9 @@ class OrderController extends \frontend\controllers\Controller
      */
     public function actionCountryStates($country)
     {
-        $request = Yii::$app->request;
-        if (!$request->isAjax || !($country)) {
+        if (!$country) {
             throw new BadRequestHttpException('Bad request.');
         }
-
-        Yii::$app->response->format = Response::FORMAT_JSON;
 
         return State::getList('id', 'name', $country);
     }

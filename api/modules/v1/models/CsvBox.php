@@ -16,10 +16,14 @@ use League\Csv\Reader;
 use League\Csv\Statement;
 use yii\base\Exception;
 use yii\helpers\Json;
+use yii\base\Model;
 
-class CsvBox extends \yii\base\Model
+/**
+ * Class CsvBox
+ * @package api\modules\v1\models
+ */
+class CsvBox extends Model
 {
-
     public int $sheet_id;
     public string $sheet_name;
     public int $import_id;
@@ -42,27 +46,26 @@ class CsvBox extends \yii\base\Model
     /** @var array Orders uploaded or errored */
     public array $orders = [];
 
-
-    public function rules()
+    public function rules(): array
     {
         return [
-            [['sheet_id', 'import_id', 'row_count', 'row_success', 'row_fail'], 'required'],
+            [['sheet_id', 'import_id', 'row_count', 'row_success', 'row_fail', 'file_path'], 'required'],
             [['sheet_id', 'import_id', 'row_count', 'row_success'], 'integer'],
             [['sheet_name', 'import_status', 'raw_file', 'original_filename', 'file_path'], 'string'],
             [
                 ['custom_fields', 'column_mappings'],
                 function ($attribute, $params) {
-                    if (!is_array($params)) {
+                    if (!is_array($this->$attribute)) {
                         $this->addError($attribute, $attribute . ' is not an array');
                     }
                 }
             ],
             [['row_fail'], 'integer', 'min' => 0, 'max' => 0],
-            [['import_starttime', 'import_endtime'], 'time'],
+            [['import_starttime', 'import_endtime'], 'integer'],
         ];
     }
 
-    public function init()
+    public function init(): void
     {
         parent::init();
         $this->user_id = $this->custom_fields['user_id'];
@@ -76,6 +79,7 @@ class CsvBox extends \yii\base\Model
 
         // Begin DB transaction
         $transaction = \Yii::$app->db->beginTransaction();
+
         try {
             $modelValidated = true; // model validation flag
 
@@ -143,14 +147,18 @@ class CsvBox extends \yii\base\Model
                     // Order
                     $carrier = CarrierEx::find()->where(['name' => $record['Carrier']])->one();
                     $service = ServiceEx::find()->where(['name' => $record['Service']])->one();
+
+                    $requestedShipDate = date("Y-m-d", strtotime(trim($record['Requested Ship Date'])));
+                    $mustArriveByDate = ($record['Must Arrive By Date']) ? date("Y-m-d", strtotime(trim($record['Must Arrive By Date']))) : null;
+
                     $order = new Order();
                     $order->customer_id = $this->customer_id;
                     $order->origin = !empty(trim($record['Origin'])) ? trim($record['Origin']) : \Yii::$app->name . ' CSV import';
                     $order->customer_reference = $orderNo;
                     $order->address_id = $address->id;
                     $order->status_id = Status::OPEN;
-                    $order->requested_ship_date = date("Y-m-d", strtotime(trim($record['Requested Ship Date'])));
-                    $order->must_arrive_by_date = date("Y-m-d", strtotime(trim($record['Must Arrive By Date'])));
+                    $order->requested_ship_date = $requestedShipDate;
+                    $order->must_arrive_by_date = $mustArriveByDate;
                     $order->service_id = $service->id;
                     $order->carrier_id = $carrier->id;
 
@@ -204,11 +212,11 @@ class CsvBox extends \yii\base\Model
         }
     }
 
-    public function getS3FilePath()
+    public function getS3FilePath(): string
     {
         return
             $this->file_path .
-            DIRECTORY_SEPARATOR .
+            '/' .
             $this->import_id .
             '_' .
             $this->user_id .
