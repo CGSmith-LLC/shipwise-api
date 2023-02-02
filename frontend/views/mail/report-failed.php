@@ -10,6 +10,6 @@ use common\models\Customer;
     Hello,
 </p>
 <p>
-    Please regenerate your last report for <b><?= Html::encode($customer->name) ?></b>
-    since we had some issues executing it. Try to select a shorter interval.
+    We could not generate your last report for <b><?= Html::encode($customer->name) ?></b>.
+    Please retry and select a smaller date range.
 </p>
