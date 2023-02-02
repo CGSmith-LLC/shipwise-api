@@ -2,12 +2,12 @@
 
 namespace console\jobs;
 
+use Yii;
 use bilberrry\spaces\Service;
 use common\models\Item;
 use common\models\Order;
 use common\models\Package;
 use common\models\PackageItem;
-use Yii;
 use yii\helpers\ArrayHelper;
 use yii\base\BaseObject;
 use common\models\Customer;
@@ -16,6 +16,9 @@ use yii\queue\RetryableJobInterface;
 
 class CreateReportJob extends BaseObject implements RetryableJobInterface
 {
+    const MAX_ATTEMPTS = 3;
+    const TTR = 600; // in seconds
+
     /**
      * @var int $customer
      */
@@ -27,7 +30,7 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
     public int $user_id;
 
     /**
-     * @var string $user_email ;
+     * @var string $user_email
      */
     public string $user_email;
 
@@ -50,6 +53,28 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
      * @inheritDoc
      */
     public function execute($queue)
+    {
+        $reportPath = $this->processReport();
+        $url = $this->uploadToStorage($reportPath);
+        $this->sendReportEmail($url);
+    }
+
+    public function getTtr(): int
+    {
+        return self::TTR;
+    }
+
+    public function canRetry($attempt, $error): bool
+    {
+        return ($attempt < self::MAX_ATTEMPTS);
+    }
+
+    public function isFailed(int $currentAttempt): int
+    {
+        return $currentAttempt === self::MAX_ATTEMPTS;
+    }
+
+    protected function processReport(): string
     {
         $ordersQuery = \frontend\models\Order::find()
             ->where(['customer_id' => $this->customer])
@@ -201,16 +226,25 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
         // NEVER use 777 - except for here... Systemd runs as www-data but the runtime folder is root:root
         // since this uploads to storage... locally 777 is fine.
         chmod($dir . $filename, 0777);
-        //  Upload CSV to Digital Ocean
+
+        return $dir . $filename;
+    }
+
+    protected function uploadToStorage(string $reportPath): string
+    {
         /** @var Service $storage */
         $storage = Yii::$app->get('storage');
 
         $date = date('YmdHi');
 
-        $storage->upload('shipwise-report-' . $date . '.csv', $dir . $filename);
+        $storage->upload('shipwise-report-' . $date . '.csv', $reportPath);
         $url = $storage->getUrl('shipwise-report-' . $date . '.csv');
 
-        // Send Email
+        return $url;
+    }
+
+    protected function sendReportEmail(string $reportUrl): void
+    {
         $mailer = \Yii::$app->mailer;
         $mailer->viewPath = '@frontend/views/mail';
         $mailer->getView()->theme = \Yii::$app->view->theme;
@@ -219,7 +253,7 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
         $startDate = $formatter->asDate($this->start_date, 'php:F j, Y');
         $endDate = $formatter->asDate($this->end_date, 'php:F j, Y');
         $mailer->compose(['html' => 'report'], [
-            'url' => $url,
+            'url' => $reportUrl,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'customerName' => Customer::findone(['id' => $this->customer])->name,
@@ -230,13 +264,26 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
             ->send();
     }
 
-    public function getTtr()
+    public static function sendFailEmail(string $sendTo, int $customerId): void
     {
-        return 300; // seconds
-    }
+        $customer = Customer::findone(['id' => $customerId]);
 
-    public function canRetry($attempt, $error)
-    {
-        return ($attempt < 3);
+        if ($customer) {
+            Yii::$app->mailer->viewPath = '@frontend/views/mail';
+            Yii::$app->mailer->getView()->theme = Yii::$app->view->theme;
+
+            Yii::$app->mailer->compose(
+                [
+                    'html' => 'report-failed'
+                ],
+                [
+                    'customer' => $customer,
+                ]
+            )
+            ->setFrom(Yii::$app->params['senderEmail'])
+            ->setTo($sendTo)
+            ->setSubject('Please regenerate your last report')
+            ->send();
+        }
     }
 }
