@@ -67,4 +67,6 @@ return [
     'csvBoxS3Secret' => '',
     'csvBoxS3Region' => '',
     'csvBoxS3Bucket' => '',
+    'csvBoxS3Path' => '',
+    'csvBoxImportKey' => '',
 ];
