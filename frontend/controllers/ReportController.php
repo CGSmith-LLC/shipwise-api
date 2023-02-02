@@ -2,11 +2,11 @@
 
 namespace frontend\controllers;
 
+use Yii;
 use console\jobs\CreateReportJob;
 use frontend\models\Customer;
 use frontend\models\forms\ReportForm;
 use frontend\models\User;
-use Yii;
 
 /**
  * Class ReportController
