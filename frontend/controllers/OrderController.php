@@ -96,7 +96,10 @@ class OrderController extends Controller
      */
     public function actionStatusUpdate(int $id, int $status): array
     {
-        $order = Order::find()->byId($id)->one();
+        $order = Order::find()
+            ->byId($id)
+            ->forCustomers($this->customer_ids)
+            ->one();
         $status = Status::findOne($status);
 
         if (!$order) {
@@ -105,13 +108,6 @@ class OrderController extends Controller
 
         if (!$status) {
             throw new NotFoundHttpException('Status not found.');
-        }
-
-        if (!UserCustomer::find()->where([
-            'user_id' => Yii::$app->user->identity->id,
-            'customer_id' => $order->customer_id
-        ])->exists()) {
-            throw new NotFoundHttpException('Relation not found.');
         }
 
         if ($order->changeStatus($status->id)) {
