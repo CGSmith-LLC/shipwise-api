@@ -750,7 +750,7 @@ class OrderController extends Controller
             ? Customer::getList()
             : Yii::$app->user->identity->getCustomerList();
 
-        $model = new \common\models\OrderImport();
+        $model = new OrderImport();
 
         if (count($customers) === 1) {
             $model->customer = array_key_first($customers);
