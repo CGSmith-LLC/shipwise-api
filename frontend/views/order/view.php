@@ -3,8 +3,10 @@
 use common\models\Package;
 use common\models\PackageItemLotInfo;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
+use common\models\Status;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Order */
@@ -16,7 +18,9 @@ YiiAsset::register($this);
 $cookies = Yii::$app->request->cookies;
 $simple = $cookies->getValue('simple');
 
-$statusUrl = \yii\helpers\Url::to(['order/status-update']);
+$statusesList = Status::getList();
+$statusUrl = Url::to(['order/status-update']);
+
 $js = <<<JS
 
 $(".status-links").on('click', function () {
@@ -62,7 +66,7 @@ $this->registerJs($js);
             Status <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-            <?php foreach (\common\models\Status::getList() as $status_id => $name) { ?>
+            <?php foreach ($statusesList as $status_id => $name) { ?>
                 <li><?= Html::a($name, null, ['class' => 'status-links', 'data-status' => $status_id, 'data-id' => $model->id]) ?></li>
             <?php } ?>
         </ul>
