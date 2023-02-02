@@ -1,4 +1,5 @@
 <?php
+
 $params = array_merge(
     require __DIR__ . '/params.php',
     require __DIR__ . '/params-local.php'
@@ -69,6 +70,13 @@ return [
             'as workerMonitor' => \zhuravljov\yii\queue\monitor\WorkerMonitor::class,
             'ttr' => 5 * 60, // Max time for anything job handling
             'attempts' => 3, // Max number of attempts
+            'on afterError' => function (yii\queue\ExecEvent $event) {
+                if ($event->job instanceof \console\jobs\CreateReportJob) {
+                    if ($event->job->isFailed($event->attempt)) {
+                        \console\jobs\CreateReportJob::sendFailEmail($event->job->user_email, $event->job->customer);
+                    }
+                }
+            },
         ],
         'fulfillment' => function () {
             return new \common\components\FulfillmentService();
