@@ -12,24 +12,16 @@ use yii\widgets\Pjax;
 /* @var $searchModel frontend\models\search\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $statuses array List of order statuses */
+/* @var $customerDropdownList array */
 
 $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
-/**
- * - Get a dropdown list from the associated customers
- * - OR - get a dropdown list of all customers if admin
- */
-if ((!Yii::$app->user->identity->getIsAdmin())) {
-    $customerDropdownList = Yii::$app->user->identity->getCustomerList();
-} else {
-    $customerDropdownList = Customer::getList();
-}
 ?>
     <div class="order-index">
 
         <?php Pjax::begin([
             'id' => 'pjax-orders',
-            'timeout' => 2000,
+            'timeout' => 3000,
             //'enablePushState'    => false,
             //'enableReplaceState' => false,
         ]) ?>
@@ -241,7 +233,7 @@ ob_start(); // output buffer the javascript to register later ?>
                 setTimeout(function () {
                     btn.children().removeClass('fa-spin');
                     btn.contents().last().replaceWith(' Refresh');
-                }, 1000);
+                }, 500);
             }
         }
 

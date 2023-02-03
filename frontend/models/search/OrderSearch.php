@@ -2,12 +2,12 @@
 
 namespace frontend\models\search;
 
-use common\models\Address;
-use common\models\Status;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use frontend\models\Order;
+use common\models\Address;
+use common\models\Status;
 
 /**
  * OrderSearch represents the model behind the search form of `frontend\models\Order`.
@@ -96,7 +96,8 @@ class OrderSearch extends Order
      */
     public function search($params)
     {
-        $query = Order::find();
+        $query = Order::find()
+            ->with(['customer', 'carrier', 'service', 'status', 'address']);
 
         // Clear order search from a session if requested
         if (isset($params["clearfilters"])) {
@@ -126,7 +127,6 @@ class OrderSearch extends Order
                 $query->forCustomers(Yii::$app->user->identity->customerIds);
             }
         }
-
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

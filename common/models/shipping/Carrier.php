@@ -2,6 +2,7 @@
 
 namespace common\models\shipping;
 
+use common\traits\CacheableListTrait;
 use common\models\base\BaseCarrier;
 use yii\helpers\ArrayHelper;
 
@@ -12,6 +13,9 @@ use yii\helpers\ArrayHelper;
  */
 class Carrier extends BaseCarrier
 {
+    use CacheableListTrait;
+
+    protected const LIST_CACHE_KEY = 'carriers-list';
 
     /* Please keep synchronized with database IDs */
     const FEDEX        = 1;
@@ -51,6 +55,12 @@ class Carrier extends BaseCarrier
         self::AMAZON_USPS,
     ];
 
+    public function init(): void
+    {
+        $this->setClearCacheEvents();
+        parent::init();
+    }
+
     /**
      * Shipping label re-print behaviour.
      *
@@ -65,22 +75,6 @@ class Carrier extends BaseCarrier
             $this->id,
             self::$reprintExisting
         ) ? self::REPRINT_BEHAVIOUR_EXISTING : self::REPRINT_BEHAVIOUR_CREATE_NEW;
-    }
-
-
-    /**
-     * Returns list of carriers as array [id=>name]
-     *
-     * @param string $keyField   Field name to use as key
-     * @param string $valueField Field name to use as value
-     *
-     * @return array
-     */
-    public static function getList($keyField = 'id', $valueField = 'name')
-    {
-        $data = self::find()->orderBy([$valueField => SORT_ASC])->all();
-
-        return ArrayHelper::map($data, $keyField, $valueField);
     }
 
     /** @return array */
