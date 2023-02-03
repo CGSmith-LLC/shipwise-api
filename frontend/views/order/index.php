@@ -12,6 +12,8 @@ use yii\widgets\Pjax;
 /* @var $searchModel frontend\models\search\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $statuses array List of order statuses */
+/* @var $carriers array List of carriers */
+/* @var $services array List of services */
 /* @var $customerDropdownList array */
 
 $this->title = 'Orders';
@@ -21,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?php Pjax::begin([
             'id' => 'pjax-orders',
-            'timeout' => 3000,
+            'timeout' => 2000,
             //'enablePushState'    => false,
             //'enableReplaceState' => false,
         ]) ?>
@@ -119,7 +121,17 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
                     ),
                 ],
-                'service.name',
+                [
+                    'attribute' => 'service_id',
+                    'options' => ['width' => '10%'],
+                    'value' => 'service.name',
+                    'filter' => Html::activeDropDownList(
+                        $searchModel,
+                        'service_id',
+                        $services,
+                        ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
+                    ),
+                ],
                 [
                     'attribute' => 'address',
                     'value' => 'address.name',

@@ -16,6 +16,7 @@ class m230203_133507_update_orders_table_indexes extends Migration
         $this->execute("ALTER TABLE {{%orders}} ADD INDEX(`carrier_id`);");
         $this->execute("ALTER TABLE {{%orders}} ADD INDEX(`service_id`);");
         $this->execute("ALTER TABLE {{%orders}} ADD INDEX(`address_id`);");
+        $this->execute("ALTER TABLE {{%orders}} ADD INDEX(`tracking`);");
     }
 
     /**
@@ -27,5 +28,6 @@ class m230203_133507_update_orders_table_indexes extends Migration
         $this->execute("ALTER TABLE {{%orders}} DROP INDEX `carrier_id`;");
         $this->execute("ALTER TABLE {{%orders}} DROP INDEX `service_id`;");
         $this->execute("ALTER TABLE {{%orders}} DROP INDEX `address_id`;");
+        $this->execute("ALTER TABLE {{%orders}} DROP INDEX `tracking`;");
     }
 }

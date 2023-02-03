@@ -248,8 +248,7 @@ class OrderController extends Controller
                 'dataProvider' => $dataProvider,
                 'statuses' => Status::getList(),
                 'carriers' => Carrier::getList(),
-                'services' => Service::getList(),
-
+                'services' => Service::getList(carrierId: (int) $searchModel->carrier_id),
                 'customerDropdownList' => $customerDropdownList,
             ]
         );
