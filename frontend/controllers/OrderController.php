@@ -235,6 +235,12 @@ class OrderController extends Controller
         $searchModel = new OrderSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        if (!Yii::$app->user->identity->getIsAdmin()) {
+            $customerDropdownList = Yii::$app->user->identity->getCustomerList();
+        } else {
+            $customerDropdownList = Customer::getList();
+        }
+
         return $this->render(
             'index',
             [
@@ -242,7 +248,8 @@ class OrderController extends Controller
                 'dataProvider' => $dataProvider,
                 'statuses' => Status::getList(),
                 'carriers' => Carrier::getList(),
-                'services' => Service::getList(),
+                'services' => Service::getList(carrierId: (int) $searchModel->carrier_id),
+                'customerDropdownList' => $customerDropdownList,
             ]
         );
     }

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseStatus;
+use common\traits\CacheableListTrait;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -12,6 +13,9 @@ use yii\helpers\ArrayHelper;
  */
 class Status extends BaseStatus
 {
+    use CacheableListTrait;
+
+    protected const LIST_CACHE_KEY = 'statuses-list';
 
     /* Please keep synchronized with db values! */
     const SHIPPED = 1;
@@ -22,6 +26,12 @@ class Status extends BaseStatus
     const WMS_ERROR = 10;
     const COMPLETED = 11;
 
+    public function init(): void
+    {
+        $this->setClearCacheEvents();
+        parent::init();
+    }
+
     /**
      * Get array of Status ids
      *
@@ -30,21 +40,6 @@ class Status extends BaseStatus
     public static function getIdsAsArray()
     {
         return ArrayHelper::getColumn(self::find()->select('id')->asArray()->all(), 'id');
-    }
-
-    /**
-     * Returns list of statuses as array [id=>name]
-     *
-     * @param string $keyField Field name to use as key
-     * @param string $valueField Field name to use as value
-     *
-     * @return array
-     */
-    public static function getList($keyField = 'id', $valueField = 'name')
-    {
-        $data = self::find()->orderBy([$valueField => SORT_ASC])->all();
-
-        return ArrayHelper::map($data, $keyField, $valueField);
     }
 
     /**

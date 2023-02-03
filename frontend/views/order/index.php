@@ -12,18 +12,12 @@ use yii\widgets\Pjax;
 /* @var $searchModel frontend\models\search\OrderSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $statuses array List of order statuses */
+/* @var $carriers array List of carriers */
+/* @var $services array List of services */
+/* @var $customerDropdownList array */
 
 $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
-/**
- * - Get a dropdown list from the associated customers
- * - OR - get a dropdown list of all customers if admin
- */
-if ((!Yii::$app->user->identity->getIsAdmin())) {
-    $customerDropdownList = Yii::$app->user->identity->getCustomerList();
-} else {
-    $customerDropdownList = Customer::getList();
-}
 ?>
     <div class="order-index">
 
@@ -127,7 +121,17 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
                         ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
                     ),
                 ],
-                'service.name',
+                [
+                    'attribute' => 'service_id',
+                    'options' => ['width' => '10%'],
+                    'value' => 'service.name',
+                    'filter' => Html::activeDropDownList(
+                        $searchModel,
+                        'service_id',
+                        $services,
+                        ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
+                    ),
+                ],
                 [
                     'attribute' => 'address',
                     'value' => 'address.name',
@@ -241,7 +245,7 @@ ob_start(); // output buffer the javascript to register later ?>
                 setTimeout(function () {
                     btn.children().removeClass('fa-spin');
                     btn.contents().last().replaceWith(' Refresh');
-                }, 1000);
+                }, 500);
             }
         }
 
