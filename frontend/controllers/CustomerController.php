@@ -91,7 +91,7 @@ class CustomerController extends Controller
 
         return $this->render('create', [
             'model' => $model,
-            'states' => State::getList('id', 'name', 'US'),
+            'states' => State::getList(additionalField: State::DEFAULT_COUNTRY_ABBR),
         ]);
     }
 
@@ -115,7 +115,7 @@ class CustomerController extends Controller
 
         return $this->render('update', [
             'model' => $model,
-            'states' => State::getList('id', 'name', 'US'),
+            'states' => State::getList(additionalField: State::DEFAULT_COUNTRY_ABBR),
         ]);
     }
 

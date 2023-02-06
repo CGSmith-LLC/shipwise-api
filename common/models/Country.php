@@ -4,7 +4,8 @@ namespace common\models;
 
 use common\models\shipping\Carrier;
 use yii\helpers\ArrayHelper;
-
+use yii\db\ActiveRecord;
+use common\traits\CacheableListTrait;
 
 /**
  * This is the model class for table "country".
@@ -13,8 +14,11 @@ use yii\helpers\ArrayHelper;
  * @property string $name
  * @property string $abbreviation
  */
-class Country extends \yii\db\ActiveRecord
+class Country extends ActiveRecord
 {
+    use CacheableListTrait;
+
+    protected const LIST_CACHE_KEY = 'countries-list';
 
     private static $list = [
         'US' => 'United States',
@@ -343,21 +347,6 @@ class Country extends \yii\db\ActiveRecord
             }
         }
         return $code;
-    }
-
-    /**
-     * Returns list of Countries as array [abbreviation=>name]
-     *
-     * @param string $keyField   Field name to use as key
-     * @param string $valueField Field name to use as value
-     *
-     * @return array
-     */
-    public static function getList($keyField = 'abbreviation', $valueField = 'name')
-    {
-        $data = self::find()->orderBy([$valueField => SORT_ASC])->all();
-
-        return ArrayHelper::map($data, $keyField, $valueField);
     }
 
     /**

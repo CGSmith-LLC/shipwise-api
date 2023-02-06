@@ -3,9 +3,9 @@
 namespace common\models;
 
 use common\models\base\BaseState;
-use common\models\shipping\Service;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use common\traits\CacheableListTrait;
 
 /**
  * Class State
@@ -14,6 +14,10 @@ use yii\helpers\ArrayHelper;
  */
 class State extends BaseState
 {
+    use CacheableListTrait;
+
+    protected const LIST_CACHE_KEY = 'states-list';
+    public const DEFAULT_COUNTRY_ABBR = 'US';
 
     /**
      * Get Carrier
@@ -25,7 +29,6 @@ class State extends BaseState
         return $this->hasOne('common\models\Country', ['id' => 'abbreviation']);
     }
 
-
     /**
      * Get array of State ids
      *
@@ -36,26 +39,6 @@ class State extends BaseState
         $array = ArrayHelper::getColumn(self::find()->select('id')->asArray()->cache(86400)->all(), 'id');
         $array[] = 0;
         return $array;
-    }
-
-    /**
-     * Returns list of states as array [id=>name]
-     *
-     * @param string $keyField Field name to use as key
-     * @param string $valueField Field name to use as value
-     * @param string|array|null $country Country or array of Countries. Optional.
-     * @return array
-     */
-    public static function getList($keyField = 'id', $valueField = 'name', $country = null)
-    {
-        $query = self::find();
-        if ($country) {
-            $query->andWhere([State::tableName() . '.country' => $country]);
-            $query->andWhere(['IN', State::tableName() . '.country', $country]);
-        }
-        $query->orderBy([$keyField => SORT_ASC, $valueField => SORT_ASC]);
-
-        return ArrayHelper::map($query->all(), $keyField, $valueField);
     }
 
     /**
