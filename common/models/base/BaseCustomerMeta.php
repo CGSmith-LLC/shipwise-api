@@ -29,7 +29,7 @@ class BaseCustomerMeta extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'created_date'], 'safe'],
-            [['key', 'value'], 'string', 'max' => 128],
+            [['key', 'value'], 'string'],
         ];
     }
 
