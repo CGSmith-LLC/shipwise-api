@@ -18,6 +18,10 @@ return [
         'clientId' => 'lolno',
         'secret' => 'lulz',
     ],
+    'amazon-lwaClient' => '',
+    'amazon-lwaSecret' => '',
+    'amazon-accessKey' => '',
+    'amazon-secretKey' => '',
     /**
      * Shopify App Parameters and App Credentials
      */
