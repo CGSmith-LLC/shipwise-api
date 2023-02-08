@@ -47,45 +47,6 @@ class Service extends BaseService
     }
 
     /**
-     * Returns services array
-     *
-     * Optionally pass the carrier id to get services for specific carrier.
-     *
-     * @param string $keyField   Field name to use as key
-     * @param string $valueField Field name to use as value
-     * @param int|array|null $carrierId  Carrier ID or array of IDs. Optional.
-     *
-     * @return array
-     */
-    public static function getList(string $keyField = 'id', string $valueField = 'name', int|array $carrierId = null): array
-    {
-        if ($keyField == 'id' && $valueField == 'name' && $carrierId == null) { // We cache only default values to avoid multi-storing
-            $data = \Yii::$app->cache->get(self::LIST_CACHE_KEY);
-
-            if (!$data) {
-                $query = self::find();
-                $query->orderBy([$keyField => SORT_ASC, $valueField => SORT_ASC]);
-                $data = ArrayHelper::map($query->all(), $keyField, $valueField);
-
-                \Yii::$app->cache->set(self::LIST_CACHE_KEY, $data, 30 * 86400); // 30 days
-            }
-        } else {
-            $query = self::find();
-
-            if ($carrierId) {
-                $query->andWhere([Service::tableName() . '.carrier_id' => $carrierId]);
-                $query->andWhere(['IN', Service::tableName() . '.carrier_id', $carrierId]);
-            }
-
-            $query->orderBy([$keyField => SORT_ASC, $valueField => SORT_ASC]);
-
-            $data = ArrayHelper::map($query->all(), $keyField, $valueField);
-        }
-
-        return $data;
-    }
-
-    /**
      * @param int|null $carrierId Carrier ID or shipwise_code. Optional.
      *
      * @return array

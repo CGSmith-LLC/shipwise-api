@@ -248,7 +248,7 @@ class OrderController extends Controller
                 'dataProvider' => $dataProvider,
                 'statuses' => Status::getList(),
                 'carriers' => Carrier::getList(),
-                'services' => Service::getList(carrierId: (int) $searchModel->carrier_id),
+                'services' => Service::getList(additionalField: (int)$searchModel->carrier_id),
                 'customerDropdownList' => $customerDropdownList,
             ]
         );
@@ -313,9 +313,9 @@ class OrderController extends Controller
                     : Yii::$app->user->identity->getCustomerList(),
                 'statuses' => Status::getList(),
                 'carriers' => Carrier::getList(),
-                'services' => Service::getList('id', 'name', $model->order->carrier_id),
+                'services' => Service::getList(additionalField: $model->order->carrier_id),
                 'countries' => Country::getList(),
-                'states' => State::getList('id', 'name', $model->address->country),
+                'states' => State::getList(additionalField: $model->address->country),
             ]
         );
     }
@@ -374,9 +374,9 @@ class OrderController extends Controller
                     : Yii::$app->user->identity->getCustomerList(),
                 'statuses' => Status::getList(),
                 'carriers' => Carrier::getList(),
-                'services' => Service::getList('id', 'name', $model->order->carrier_id),
+                'services' => Service::getList(additionalField: $model->order->carrier_id),
                 'countries' => Country::getList(),
-                'states' => State::getList('id', 'name', $model->address->country),
+                'states' => State::getList(additionalField: $model->address->country),
             ]
         );
     }
@@ -500,7 +500,7 @@ class OrderController extends Controller
             throw new BadRequestHttpException('Bad request.');
         }
 
-        return Service::getList('id', 'name', $carrierId);
+        return Service::getList(additionalField: $carrierId);
     }
 
     /**
@@ -517,7 +517,7 @@ class OrderController extends Controller
             throw new BadRequestHttpException('Bad request.');
         }
 
-        return State::getList('id', 'name', $country);
+        return State::getList(additionalField: $country);
     }
 
     /**
