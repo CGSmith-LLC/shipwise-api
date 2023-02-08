@@ -7,9 +7,11 @@ use yii\helpers\Url;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 use common\models\Status;
+use yii\bootstrap\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Order */
+/* @var $reopenModel frontend\models\forms\ReopenOrderEditForm */
 
 $this->title = 'Order ' . $model->customer_reference;
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
@@ -21,20 +23,31 @@ $simple = $cookies->getValue('simple');
 $statusesList = Status::getList();
 $statusUrl = Url::to(['order/status-update']);
 
+\frontend\assets\ToggleAsset::register($this);
+$status = \common\models\Status::ON_HOLD;
+
 $js = <<<JS
 
 $(".status-links").on('click', function () {
-    $.ajax({
-        url: "{$statusUrl}",
-        data: {
+    var statusData =  {
             id: $(this).attr("data-id"),
             status: $(this).attr("data-status")
-        },
+    };
+    
+    $.ajax({
+        url: "{$statusUrl}",
+        data: statusData,
         type: "get",
         success: function(data){
             notyf.success('Order status successfully updated!');
             $("#order-status").html(data.message);
-            
+        
+            if (statusData.status == {$status}) {
+                $('#reopen-dialog').show();
+            } else {
+                $('#bulkeditform-reopen_enable').prop('checked', false).change()
+                $('#reopen-dialog').hide();
+            }
         },
         error: function () {
             notyf.error('We encountered an error saving the status.');
@@ -44,6 +57,34 @@ $(".status-links").on('click', function () {
 JS;
 
 $this->registerJs($js);
+
+$js = <<<JS
+
+$("#form-reopen-edit").on('change', function () {
+    $('#reopen-form-submit-btn').removeAttr('disabled').removeClass('disabled');
+});
+
+$("#reopenordereditform-reopen_enable").on('change', function() {
+    if ($(this).prop('checked')) {
+        $('#reopen-date').show();
+    }else {
+        $('#reopen-date').hide();
+    }
+})
+JS;
+
+$this->registerJs($js);
+
+\frontend\assets\DatePickerAsset::register($this);
+$this->registerJs('
+    // Datepicker
+    $(\'.date\').flatpickr({
+    enableTime: true,
+    dateFormat: "Y-m-d H:i",
+    altInput: true,
+    altFormat: "F j, Y H:i",    
+    minDate: "today",
+})');
 ?>
 
 <div class="order-view">
@@ -72,6 +113,11 @@ $this->registerJs($js);
         </ul>
     </div>
 
+    <?php
+    $confirmed = true;
+    ?>
+
+
     <div class="btn-group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
@@ -88,6 +134,47 @@ $this->registerJs($js);
                 <li><?= Html::a('<i class="glyphicon glyphicon-eye-open"></i> Advanced View', ['simple-view']); ?></li>
             <?php } ?>
         </ul>
+    </div>
+
+
+
+
+    <div class="row">
+        <div class="col-md-6">
+
+    <?php $form = ActiveForm::begin([
+        'id' => 'form-reopen-edit'
+    ]); ?>
+
+    <div id="reopen-dialog" style="<?= ($model->status_id == $status) ?  '': 'display: none'; ?>; padding-top: 0.5em">
+        <div class="panel panel-default">
+            <div class="panel-body">
+        <label>Do you want to automatically change the status to Open at a specific time?</label>
+        <?= $form->field($reopenModel, 'reopen_enable')->checkbox([
+            'readonly' => $confirmed,
+            'data-toggle' => 'toggle',
+            'data-on' => 'Yes',
+            'data-off' => 'No',
+            'label' => false,
+        ]); ?>
+
+        <div id="reopen-date" style="<?= (!$reopenModel->reopen_enable) ? 'display: none' : ''; ?>">
+            <?= $form->field($reopenModel, 'open_date', [
+                'inputOptions' => ['autocomplete' => 'off']
+            ])->textInput([
+                'readonly' => $confirmed,
+                'class' => 'date',
+                'value' => (isset($reopenModel->open_date)) ? $reopenModel->open_date : '',
+            ])->label('Date and time to automatically change orders to Open'); ?>
+        </div>
+        <?= Html::submitButton(($confirmed) ? 'Save Changes' : 'Review &rarr;', ['id'=>'reopen-form-submit-btn', 'class' => 'btn  btn-success disabled']); ?>
+    </div>
+
+
+    <?php ActiveForm::end(); ?>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">

@@ -16,6 +16,7 @@ use frontend\models\Customer;
 use Yii;
 use frontend\models\{Address,
     forms\BulkEditForm,
+    forms\ReopenOrderEditForm,
     Item,
     Order,
     BulkAction,
@@ -264,10 +265,47 @@ class OrderController extends Controller
      */
     public function actionView($id)
     {
+        $order = $this->findModel($id);
+
+        $scheduledOrder = ScheduledOrder::findOne([
+            'customer_id' => $order->customer_id,
+            'order_id' => $id,
+            'status_id' => Status::OPEN,
+        ]);
+        $reopenModel = new ReopenOrderEditForm();
+
+        $reopenModel->setAttributes(Yii::$app->request->post('ReopenOrderEditForm'));
+
+        // Validate model and save
+        if (Yii::$app->request->post() && $reopenModel->validate()) {
+
+            if($reopenModel->reopen_enable){
+                $scheduledOrder = new ScheduledOrder([
+                    'customer_id' => $order->customer_id,
+                    'order_id' => $order->id,
+                    'status_id' => Status::OPEN,
+                    'scheduled_date' => $reopenModel->open_date,
+                ]);
+                $scheduledOrder->save();
+            }else{
+                $scheduledOrder->delete();
+                $scheduledOrder = null;
+                Yii::debug($scheduledOrder);
+            }
+
+            return $this->redirect(Yii::$app->request->referrer);
+        }
+
+        if($scheduledOrder){
+            $reopenModel->open_date = $scheduledOrder->scheduled_date;
+            $reopenModel->reopen_enable = true;
+        }
+
         return $this->render(
             'view',
             [
                 'model' => $this->findModel($id),
+                'reopenModel' => $reopenModel
             ]
         );
     }
