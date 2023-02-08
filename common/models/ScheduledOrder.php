@@ -4,11 +4,6 @@ namespace common\models;
 
 class ScheduledOrder extends \yii\db\ActiveRecord
 {
-//    public int $order_id;
-//    public int $status_id;
-//    public int $customer_id;
-//    public ?string $scheduled_date = null;
-
     public function beforeSave($insert)
     {
         if ($insert) {
