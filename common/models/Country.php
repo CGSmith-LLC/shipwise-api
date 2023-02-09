@@ -271,6 +271,12 @@ class Country extends ActiveRecord
         'ZW' => 'Zimbabwe',
     ];
 
+    public function init(): void
+    {
+        $this->setClearCacheEvents();
+        parent::init();
+    }
+
     /**
      * {@inheritdoc}
      */
