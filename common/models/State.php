@@ -19,6 +19,12 @@ class State extends BaseState
     protected const LIST_CACHE_KEY = 'states-list';
     public const DEFAULT_COUNTRY_ABBR = 'US';
 
+    public function init(): void
+    {
+        $this->setClearCacheEvents();
+        parent::init();
+    }
+
     /**
      * Get Carrier
      *

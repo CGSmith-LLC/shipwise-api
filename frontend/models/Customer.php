@@ -18,6 +18,12 @@ class Customer extends BaseCustomer
 
     protected const LIST_CACHE_KEY = 'customers-list';
 
+    public function init(): void
+    {
+        $this->setClearCacheEvents();
+        parent::init();
+    }
+
     /**
      * Get linked users
      *
