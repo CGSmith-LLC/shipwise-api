@@ -28,7 +28,6 @@ class m230208_103100_add_sql_indexes extends Migration
         $this->execute("ALTER TABLE {{%behavior}} ADD INDEX(`integration_id`);");
         $this->execute("ALTER TABLE {{%behavior}} ADD INDEX(`status`);");
         $this->execute("ALTER TABLE {{%behavior}} ADD INDEX(`order`);");
-        $this->execute("ALTER TABLE {{%behavior}} ADD INDEX(`order`);");
         $this->execute("ALTER TABLE {{%behavior_meta}} ADD INDEX(`customer_id`);");
 
         $this->execute("ALTER TABLE {{%bulk_action}} ADD INDEX(`status`);");
