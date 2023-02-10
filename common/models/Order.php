@@ -223,7 +223,7 @@ class Order extends BaseOrder
         $shipment->sender_address1 = $sender->address1;
         $shipment->sender_address2 = $sender->address2;
         $shipment->sender_city = $sender->city;
-        $shipment->sender_state = $sender->state->abbreviation;
+        $shipment->sender_state = ($sender->state) ? ($sender->state->abbreviation) : null;
         $shipment->sender_postal_code = $sender->zip;
         $shipment->sender_country = $sender->country;
         $shipment->sender_phone = $sender->phone;
@@ -231,14 +231,14 @@ class Order extends BaseOrder
         $shipment->sender_is_residential = false;
 
 // Recipient
-        $shipment->recipient_contact = $this->address->name;
-        $shipment->recipient_address1 = $this->address->address1;
-        $shipment->recipient_address2 = $this->address->address2;
-        $shipment->recipient_city = $this->address->city;
-        $shipment->recipient_state = $this->address->state->abbreviation ?? '';
-        $shipment->recipient_postal_code = $this->address->zip;
-        $shipment->recipient_country = $this->address->country;
-        $shipment->recipient_phone = $this->address->phone;
+        $shipment->recipient_contact = ($this->address) ? $this->address->name : null;
+        $shipment->recipient_address1 = ($this->address) ? $this->address->address1 : null;
+        $shipment->recipient_address2 = ($this->address) ? $this->address->address2 : null;
+        $shipment->recipient_city = ($this->address) ? $this->address->city : null;
+        $shipment->recipient_state = ($this->address && $this->address->state) ? $this->address->state->abbreviation : null;
+        $shipment->recipient_postal_code = ($this->address) ? $this->address->zip : null;
+        $shipment->recipient_country = ($this->address) ? $this->address->country : null;
+        $shipment->recipient_phone = ($this->address) ? $this->address->phone : null;
 //$shipment->recipient_email = $this->address->; // @todo TBD
 //$shipment->recipient_is_residential = $this->address->; // @todo TBD
 

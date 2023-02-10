@@ -22,7 +22,6 @@ use common\models\shipping\{
     ShipmentPlugin,
     ShipmentException
 };
-use yii\helpers\FileHelper;
 
 /**
  * Class AmazonSellingPartner
@@ -36,20 +35,27 @@ use yii\helpers\FileHelper;
  */
 class AmazonSellingPartner extends ShipmentPlugin
 {
-    protected int $sellerId;
-    protected string $refreshToken;
+    protected ?int $customerId;
     protected ShippingV2Api $apiInstance;
     protected array $requestBody;
 
+    /**
+     * @throws ShipmentException
+     * @throws \Exception
+     */
     public function autoload($customerId = null): void
     {
-        $this->sellerId = Yii::$app->customerSettings->get('amazon_mws_seller_id', $customerId);
-        $this->refreshToken = Yii::$app->customerSettings->get('amazon_mws_aws_access_key_id', $customerId);
+        $this->customerId = $customerId;
+        $refreshToken = Yii::$app->customerSettings->get('amazon_spapi_refresh_token', $this->customerId);
+
+        if (!$refreshToken) {
+            throw new ShipmentException("No Amazon SPAPI refresh token provided for customer.");
+        }
 
         $config = new Configuration([
             "lwaClientId" => Yii::$app->params['amazon-lwaClient'],
             "lwaClientSecret" => Yii::$app->params['amazon-lwaSecret'],
-            "lwaRefreshToken" => $this->refreshToken,
+            "lwaRefreshToken" => $refreshToken,
             "awsAccessKeyId" => Yii::$app->params['amazon-accessKey'],
             "awsSecretAccessKey" => Yii::$app->params['amazon-secretKey'],
             "endpoint" => Endpoint::NA
@@ -79,7 +85,7 @@ class AmazonSellingPartner extends ShipmentPlugin
         /**
          * string | A unique value which the server uses to recognize subsequent retries of the same request.
          */
-        $xAmznIdempotencyKey = 'x_amzn_idempotency_key_example';
+        $xAmznIdempotencyKey = $this->customerId . '-' . $this->shipment->order_id;
 
         /**
          * string | The IETF Language Tag (i.e. en-US, fr-CA).
@@ -102,6 +108,10 @@ class AmazonSellingPartner extends ShipmentPlugin
         return $this;
     }
 
+    /**
+     * @throws \SellingPartnerApi\ApiException
+     * @throws ShipmentException
+     */
     protected function shipmentExecute(): static
     {
         try {
@@ -113,14 +123,22 @@ class AmazonSellingPartner extends ShipmentPlugin
 
             print_r($result);
         } catch (\Exception $e) {
-            echo 'Exception when calling ShippingV2Api->directPurchaseShipment: ', $e->getMessage(), PHP_EOL;
+            throw new ShipmentException('Exception when calling ShippingV2Api->directPurchaseShipment: ' . $e->getMessage());
         }
 
+        exit;
         return $this;
     }
 
     protected function getShipFrom(): Address
     {
+        /**
+         * TODO: For test purpose only
+         */
+        $this->shipment->sender_address1 = "Some sender address.";
+        $this->shipment->sender_phone = "0661111111";
+
+
         $shipFrom = new Address();
         $shipFrom->setName($this->shipment->sender_company ?? $this->shipment->sender_contact);
         $shipFrom->setAddressLine1($this->shipment->sender_address1);
@@ -179,7 +197,7 @@ class AmazonSellingPartner extends ShipmentPlugin
                             : $package->weight * 1000, 2)
                     ]),
                     'insured_value' => 'getInsuredValue',
-                    'package_client_reference_id' => $package->id,
+                    'package_client_reference_id' => $package->reference1,
                     'items' => $apiItems
                 ]);
             }

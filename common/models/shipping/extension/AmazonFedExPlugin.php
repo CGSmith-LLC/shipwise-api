@@ -7,7 +7,7 @@ namespace common\models\shipping\extension;
  *
  * @package common\models\shipping\extension
  */
-class AmazonFedExPlugin extends AmazonSPAPI
+class AmazonFedExPlugin extends AmazonSellingPartner
 {
 
     /**

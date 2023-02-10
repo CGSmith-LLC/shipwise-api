@@ -333,6 +333,13 @@ class Shipment extends BaseShipment
         $carrierCode = $this->carrier->name ?? null;
         $carrierCode = str_replace(" ", "", $carrierCode);
 
+        /**
+         * TODO: TBD
+         */
+        if (!stripos("Amazon", $carrierCode)) {
+            $carrierCode = "Amazon" . $carrierCode;
+        }
+
         $class = "\\common\\models\\shipping\\extension\\{$carrierCode}Plugin";
 
         if (!($carrierCode && class_exists($class))) {
