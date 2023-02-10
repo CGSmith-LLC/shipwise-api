@@ -132,13 +132,6 @@ class AmazonSellingPartner extends ShipmentPlugin
 
     protected function getShipFrom(): Address
     {
-        /**
-         * TODO: For test purpose only
-         */
-        $this->shipment->sender_address1 = "Some sender address.";
-        $this->shipment->sender_phone = "0661111111";
-
-
         $shipFrom = new Address();
         $shipFrom->setName($this->shipment->sender_company ?? $this->shipment->sender_contact);
         $shipFrom->setAddressLine1($this->shipment->sender_address1);
