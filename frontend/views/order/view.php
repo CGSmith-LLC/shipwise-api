@@ -1,11 +1,10 @@
 <?php
-
-use common\models\Package;
-use common\models\PackageItemLotInfo;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
+use yii\data\ActiveDataProvider;
+use yii\grid\GridView;
 use common\models\Status;
 
 /* @var $this yii\web\View */
@@ -44,6 +43,16 @@ $(".status-links").on('click', function () {
 JS;
 
 $this->registerJs($js);
+$this->registerCss("
+    pre {
+        border: none;
+        padding: 5px;
+        line-height: 1;
+        max-height: 300px;
+        background-color: ivory;
+        font-size: 12px; 
+    }
+");
 ?>
 
 <div class="order-view">
@@ -185,7 +194,7 @@ $this->registerJs($js);
             <h2>Items (<?= count($model->items) ?? null ?>)</h2>
             <?php
 
-            $dataProvider = new \yii\data\ActiveDataProvider(['query' => \frontend\models\Item::find()->where(['order_id' => $model->id]),]);
+            $dataProvider = new ActiveDataProvider(['query' => \frontend\models\Item::find()->where(['order_id' => $model->id]),]);
             $count = Yii::$app->db->createCommand('
                 SELECT COUNT(*) FROM package_items WHERE order_id=:order_id
             ', [':order_id' => $model->id])->queryScalar();
@@ -206,7 +215,7 @@ $this->registerJs($js);
 
             // get the user records in the current page
             $models = $dataProvider->getModels();
-            echo \yii\grid\GridView::widget(['dataProvider' => $dataProvider,
+            echo GridView::widget(['dataProvider' => $dataProvider,
                 'columns' => ['quantity',
                     'sku',
                     'name','type'],]); ?>
@@ -215,7 +224,7 @@ $this->registerJs($js);
                 ?>
                 <h2>Packages</h2>
                 <?php
-                echo \yii\grid\GridView::widget(['dataProvider' => $dataProviderPackages,
+                echo GridView::widget(['dataProvider' => $dataProviderPackages,
                     'columns' => ['tracking',
                         'quantity',
                         'sku',
@@ -225,18 +234,19 @@ $this->registerJs($js);
                 <h2>Order History</h2>
                 <?php
 
-                $dataproviderHistory = new \yii\data\ActiveDataProvider([
+                $dataproviderHistory = new ActiveDataProvider([
                     'query' => \common\models\OrderHistory::find()
                         ->where(['order_id' => $model->id])
                         ->orderBy(['created_date' => SORT_DESC])
                 ]);
-                echo \yii\grid\GridView::widget(['dataProvider' => $dataproviderHistory,
+                echo GridView::widget(['dataProvider' => $dataproviderHistory,
                     'columns' => [
+                        'username',
                         'created_date:datetime',
                         [
-                            'attribute' => 'comment',
+                            'attribute' => 'notes',
                             'value' => function ($model) {
-                                return '<p style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;width: 900px;">'.nl2br($model->comment).'</p>';
+                                return '<pre>' . nl2br($model->notes) . '</pre>';
                             },
                             'format' => 'raw',
                         ],

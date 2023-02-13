@@ -259,15 +259,18 @@ class OrderController extends Controller
      *
      * @param integer $id
      *
-     * @return mixed
+     * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView(int $id): string
     {
+        $model = $this->findModel($id);
+        $model->trigger(Order::EVENT_ORDER_VIEWED);
+
         return $this->render(
             'view',
             [
-                'model' => $this->findModel($id),
+                'model' => $model,
             ]
         );
     }
@@ -299,6 +302,7 @@ class OrderController extends Controller
 
         // Validate model and save
         if (Yii::$app->request->post() && $model->validate() && $model->save()) {
+            $model->order->trigger(Order::EVENT_ORDER_CREATED);
             Yii::$app->getSession()->setFlash('success', 'Order created.');
 
             return $this->redirect(['view', 'id' => $model->order->id]);

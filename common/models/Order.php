@@ -26,11 +26,29 @@ use Yii;
  */
 class Order extends BaseOrder
 {
+    public const EVENT_ORDER_CREATED = 'eventOrderCreated';
+    public const EVENT_ORDER_VIEWED = 'eventOrderViewed';
+    public const EVENT_ORDER_CHANGED = 'eventOrderChanged';
+    public const EVENT_ORDER_STATUS_CHANGED = 'eventOrderStatusChanged';
 
     public function init()
     {
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'createJobIfNeeded']);
         $this->on(self::EVENT_AFTER_INSERT, [$this, 'createJobIfNeeded']);
+
+        if (OrderHistory::isScenarioEnabled(OrderHistory::SCENARIO_ORDER_CREATED)) {
+            $this->on(self::EVENT_ORDER_CREATED, [$this, 'orderCreated']);
+        }
+        if (OrderHistory::isScenarioEnabled(OrderHistory::SCENARIO_ORDER_VIEWED)) {
+            $this->on(self::EVENT_ORDER_VIEWED, [$this, 'orderViewed']);
+        }
+        if (OrderHistory::isScenarioEnabled(OrderHistory::SCENARIO_ORDER_CHANGED)) {
+            $this->on(self::EVENT_ORDER_CHANGED, [$this, 'orderChanged']);
+        }
+        if (OrderHistory::isScenarioEnabled(OrderHistory::SCENARIO_ORDER_STATUS_CHANGED)) {
+            $this->on(self::EVENT_ORDER_STATUS_CHANGED, [$this, 'orderStatusChanged']);
+        }
+
         parent::init();
     }
 
@@ -329,5 +347,45 @@ class Order extends BaseOrder
                 $this->save(false);
             }
         }
+    }
+
+    protected function orderCreated(): bool
+    {
+        $orderHistory = new OrderHistory([
+            'scenario' => OrderHistory::SCENARIO_ORDER_CREATED,
+            'order' => $this,
+        ]);
+
+        return $orderHistory->save();
+    }
+
+    protected function orderViewed(): bool
+    {
+        $orderHistory = new OrderHistory([
+            'scenario' => OrderHistory::SCENARIO_ORDER_VIEWED,
+            'order' => $this,
+        ]);
+
+        return $orderHistory->save();
+    }
+
+    protected function orderChanged(): bool
+    {
+        $orderHistory = new OrderHistory([
+            'scenario' => OrderHistory::SCENARIO_ORDER_CHANGED,
+            'order' => $this,
+        ]);
+
+        return $orderHistory->save();
+    }
+
+    protected function orderStatusChanged(): bool
+    {
+        $orderHistory = new OrderHistory([
+            'scenario' => OrderHistory::SCENARIO_ORDER_STATUS_CHANGED,
+            'order' => $this,
+        ]);
+
+        return $orderHistory->save();
     }
 }
