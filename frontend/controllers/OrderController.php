@@ -276,7 +276,6 @@ class OrderController extends Controller
 
         $reopenModel->setAttributes(Yii::$app->request->post('ReopenOrderEditForm'));
 
-        // Validate model and save
         if (Yii::$app->request->post() && $reopenModel->validate()) {
 
             if($reopenModel->reopen_enable){
