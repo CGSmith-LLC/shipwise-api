@@ -90,7 +90,8 @@ $this->registerJs('
 <div class="order-view">
 
     <h1 style="display: inline"><?= Html::encode($this->title) ?></h1>
-    <div style="display: inline;" id="order-status"><?= $model->status->getStatusLabel(); ?></div>
+    <div style="display: inline;" id="order-status"><?= Html::encode($model->status->getStatusLabel()) ?></div>
+
     <h4 style="margin-top: -0.5rem; color: #575555;"><?= Html::encode($model->customer->name) ?> </h4>
 
 
