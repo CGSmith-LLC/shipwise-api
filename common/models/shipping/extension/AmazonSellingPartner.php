@@ -60,6 +60,8 @@ class AmazonSellingPartner extends ShipmentPlugin
             "awsSecretAccessKey" => Yii::$app->params['amazon-secretKey'],
             "endpoint" => Endpoint::NA
         ]);
+        $config->setDebug(true);
+        $config->setDebugFile('./debug.log');
 
         $this->apiInstance = new ShippingV2Api($config);
     }
@@ -72,7 +74,7 @@ class AmazonSellingPartner extends ShipmentPlugin
     protected function shipmentPrepare(): static
     {
         $data = [
-            // 'ship_to' => '',
+            'ship_to' => $this->getShipTo(),
             'ship_from' => $this->getShipFrom(),
             // 'return_to' => '',
             'packages' => $this->getPackages(),
@@ -146,6 +148,24 @@ class AmazonSellingPartner extends ShipmentPlugin
         $shipFrom->setPhoneNumber(preg_replace("/[^0-9]/", "", $this->shipment->sender_phone));
 
         return $shipFrom;
+    }
+
+    protected function getShipTo(): Address
+    {
+        $shipTo = new Address();
+        $shipTo->setName($this->shipment->recipient_company ?? $this->shipment->recipient_contact);
+        $shipTo->setAddressLine1($this->shipment->recipient_address1);
+        if (!empty($this->shipment->recipient_address2)) {
+            $shipTo->setAddressLine2($this->shipment->recipient_address2);
+        }
+        $shipTo->setEmail($this->shipment->recipient_email);
+        $shipTo->setCity($this->shipment->recipient_city);
+        $shipTo->setStateOrRegion($this->shipment->recipient_state);
+        $shipTo->setPostalCode($this->shipment->recipient_postal_code);
+        $shipTo->setCountryCode($this->shipment->recipient_country);
+        $shipTo->setPhoneNumber(preg_replace("/[^0-9]/", "", $this->shipment->recipient_phone));
+
+        return $shipTo;
     }
 
     protected function getPackages(): array

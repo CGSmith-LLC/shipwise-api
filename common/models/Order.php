@@ -247,6 +247,20 @@ class Order extends BaseOrder
         $shipment->weight_units = Shipment::WEIGHT_UNITS_LB;
         $shipment->dim_units = Shipment::DIM_UNITS_IN;
 
+        // not sure if this is needed here ^ cgs
+        if (count($this->packages) == 0) {
+            $pkg = new ShipmentPackage();
+            $pkg->quantity = 1; // @todo TBD
+            $pkg->weight = 1; // @todo TBD
+            $pkg->length = 1; // @todo TBD
+            $pkg->width = 1; // @todo TBD
+            $pkg->height = 1; // @todo TBD
+            $pkg->description = 'Package'; // @todo TBD
+            $pkg->reference1 = $this->customer_reference;
+            $pkg->reference2 = $this->order_reference;
+            $shipment->addPackage($pkg);
+        }
+
         foreach ($this->packages as $package) {
             $_pkg = new ShipmentPackage();
             $_pkg->quantity = 1; // @todo TBD
