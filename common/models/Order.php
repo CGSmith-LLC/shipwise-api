@@ -2,12 +2,13 @@
 
 namespace common\models;
 
+use Yii;
 use api\modules\v1\models\core\AddressEx;
 use common\models\base\BaseOrder;
+use common\models\events\{OrderAddressCreatedEvent, OrderCreatedEvent, OrderStatusChangedEvent, OrderViewedEvent};
 use common\models\query\OrderQuery;
 use common\models\shipping\{Carrier, Service, PackageType, Shipment, ShipmentPackage};
 use console\jobs\webhooks\OrderWebhook;
-use Yii;
 
 /**
  * Class Order
@@ -26,28 +27,57 @@ use Yii;
  */
 class Order extends BaseOrder
 {
-    public const EVENT_ORDER_CREATED = 'eventOrderCreated';
-    public const EVENT_ORDER_VIEWED = 'eventOrderViewed';
-    public const EVENT_ORDER_CHANGED = 'eventOrderChanged';
-    public const EVENT_ORDER_STATUS_CHANGED = 'eventOrderStatusChanged';
-
-    public function init()
+    public function init(): void
     {
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'createJobIfNeeded']);
         $this->on(self::EVENT_AFTER_INSERT, [$this, 'createJobIfNeeded']);
 
-        if (OrderHistory::isScenarioEnabled(OrderHistory::SCENARIO_ORDER_CREATED)) {
-            $this->on(self::EVENT_ORDER_CREATED, [$this, 'orderCreated']);
-        }
-        if (OrderHistory::isScenarioEnabled(OrderHistory::SCENARIO_ORDER_VIEWED)) {
-            $this->on(self::EVENT_ORDER_VIEWED, [$this, 'orderViewed']);
-        }
-        if (OrderHistory::isScenarioEnabled(OrderHistory::SCENARIO_ORDER_CHANGED)) {
-            $this->on(self::EVENT_ORDER_CHANGED, [$this, 'orderChanged']);
-        }
-        if (OrderHistory::isScenarioEnabled(OrderHistory::SCENARIO_ORDER_STATUS_CHANGED)) {
-            $this->on(self::EVENT_ORDER_STATUS_CHANGED, [$this, 'orderStatusChanged']);
-        }
+        $this->on(OrderViewedEvent::EVENT_ORDER_VIEWED, [
+            'common\models\events\OrderViewedEvent',
+            'orderViewed'
+        ]);
+        $this->on(OrderStatusChangedEvent::EVENT_ORDER_STATUS_CHANGED, [
+            'common\models\events\OrderStatusChangedEvent',
+            'orderStatusChanged'
+        ]);
+        $this->on(OrderCreatedEvent::EVENT_ORDER_CREATED, [
+            'common\models\events\OrderCreatedEvent',
+            'orderCreated'
+        ]);
+        $this->on(OrderAddressCreatedEvent::EVENT_ORDER_ADDRESS_CREATED, [
+            'common\models\events\OrderAddressCreatedEvent',
+            'orderAddressCreated'
+        ]);
+
+        $this->on(self::EVENT_BEFORE_UPDATE, function () {
+            if ($this->status_id != $this->getOldAttribute('status_id')) {
+                $this->trigger(
+                    OrderStatusChangedEvent::EVENT_ORDER_STATUS_CHANGED,
+                    new OrderStatusChangedEvent([
+                        'order' => $this,
+                        'oldStatusId' => (int)$this->getOldAttribute('status_id')
+                    ])
+                );
+            }
+
+            if ($this->address_id && $this->address_id != $this->getOldAttribute('address_id')) {
+                $this->trigger(
+                    OrderAddressCreatedEvent::EVENT_ORDER_ADDRESS_CREATED,
+                    new OrderAddressCreatedEvent([
+                        'order' => $this
+                    ])
+                );
+            }
+        });
+
+        $this->on(self::EVENT_AFTER_INSERT, function () {
+            $this->trigger(
+                OrderCreatedEvent::EVENT_ORDER_CREATED,
+                new OrderCreatedEvent([
+                    'order' => $this
+                ])
+            );
+        });
 
         parent::init();
     }
@@ -187,11 +217,12 @@ class Order extends BaseOrder
      */
     public function getHistory()
     {
-        return $this->hasMany('common\models\OrderHistory', ['order_id' => 'id']);
+        return $this
+            ->hasMany('common\models\OrderHistory', ['order_id' => 'id'])
+            ->orderBy(['id' => SORT_DESC]);
     }
 
     /**
-     * <<<<<<< HEAD
      * Get carrier
      *
      * @return \yii\db\ActiveQuery
@@ -347,45 +378,5 @@ class Order extends BaseOrder
                 $this->save(false);
             }
         }
-    }
-
-    protected function orderCreated(): bool
-    {
-        $orderHistory = new OrderHistory([
-            'scenario' => OrderHistory::SCENARIO_ORDER_CREATED,
-            'order' => $this,
-        ]);
-
-        return $orderHistory->save();
-    }
-
-    protected function orderViewed(): bool
-    {
-        $orderHistory = new OrderHistory([
-            'scenario' => OrderHistory::SCENARIO_ORDER_VIEWED,
-            'order' => $this,
-        ]);
-
-        return $orderHistory->save();
-    }
-
-    protected function orderChanged(): bool
-    {
-        $orderHistory = new OrderHistory([
-            'scenario' => OrderHistory::SCENARIO_ORDER_CHANGED,
-            'order' => $this,
-        ]);
-
-        return $orderHistory->save();
-    }
-
-    protected function orderStatusChanged(): bool
-    {
-        $orderHistory = new OrderHistory([
-            'scenario' => OrderHistory::SCENARIO_ORDER_STATUS_CHANGED,
-            'order' => $this,
-        ]);
-
-        return $orderHistory->save();
     }
 }

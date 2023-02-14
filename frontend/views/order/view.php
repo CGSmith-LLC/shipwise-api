@@ -9,6 +9,7 @@ use common\models\Status;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Order */
+/* @var $dataProviderHistory ActiveDataProvider */
 
 $this->title = 'Order ' . $model->customer_reference;
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
@@ -219,41 +220,41 @@ $this->registerCss("
                 'columns' => ['quantity',
                     'sku',
                     'name','type'],]); ?>
-            <?php
-            if (!$simple) {
-                ?>
+
+            <?php if (!$simple) { ?>
                 <h2>Packages</h2>
-                <?php
-                echo GridView::widget(['dataProvider' => $dataProviderPackages,
-                    'columns' => ['tracking',
-                        'quantity',
-                        'sku',
-                        'lot_number',],]);
 
+                <?=
+                    GridView::widget(['dataProvider' => $dataProviderPackages,
+                        'columns' => [
+                            'tracking',
+                            'quantity',
+                            'sku',
+                            'lot_number'
+                        ]])
                 ?>
-                <h2>Order History</h2>
-                <?php
 
-                $dataproviderHistory = new ActiveDataProvider([
-                    'query' => \common\models\OrderHistory::find()
-                        ->where(['order_id' => $model->id])
-                        ->orderBy(['created_date' => SORT_DESC])
-                ]);
-                echo GridView::widget(['dataProvider' => $dataproviderHistory,
-                    'columns' => [
-                        'username',
-                        'created_date:datetime',
-                        [
-                            'attribute' => 'notes',
-                            'value' => function ($model) {
-                                return '<pre>' . nl2br($model->notes) . '</pre>';
-                            },
-                            'format' => 'raw',
+                <h2>Order History</h2>
+
+                <?=
+                    GridView::widget(['dataProvider' => $dataProviderHistory,
+                        'columns' => [
+                            [
+                                'attribute' => 'user.username',
+                            ],
+                            'created_date:datetime',
+                            [
+                                'attribute' => 'notes',
+                                'value' => function ($model) {
+                                    return '<pre>' . nl2br($model->notes) . '</pre>';
+                                },
+                                'format' => 'raw',
+                                'enableSorting' => false,
+                            ],
                         ],
-                    ],
-                ]);
-            }
-            ?>
+                    ])
+                ?>
+            <?php } ?>
         </div>
 
     </div>

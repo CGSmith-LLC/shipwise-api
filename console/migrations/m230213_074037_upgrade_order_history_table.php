@@ -21,7 +21,6 @@ class m230213_074037_upgrade_order_history_table extends Migration
         $this->renameColumn("{{%order_history}}", "comment", "notes");
 
         $this->execute("ALTER TABLE {{%order_history}} ADD `user_id` INT NOT NULL AFTER `id`;");
-        $this->execute("ALTER TABLE {{%order_history}} ADD `username` VARCHAR(255) NOT NULL AFTER `user_id`;");
 
         $this->addForeignKey(
             '{{%fk-order_history-order_id}}',

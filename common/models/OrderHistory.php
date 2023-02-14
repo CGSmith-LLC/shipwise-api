@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 use common\models\base\BaseOrderHistory;
 use yii\helpers\Json;
@@ -17,14 +18,12 @@ class OrderHistory extends BaseOrderHistory
     public const SCENARIO_ORDER_VIEWED = 'scenarioOrderViewed';
     public const SCENARIO_ORDER_CHANGED = 'scenarioOrderChanged';
     public const SCENARIO_ORDER_STATUS_CHANGED = 'scenarioOrderStatusChanged';
+    public const SCENARIO_ORDER_ADDRESS_CREATED = 'scenarioOrderAddressCreated';
+    public const SCENARIO_ORDER_ITEM_ADDED = 'scenarioOrderItemAdded';
 
-    public Order $order;
-
-    /**
-     * Add values like self::SCENARIO_ORDER_VIEWED to the array
-     * if you want to disable specific scenarios
-     */
-    public static array $disabledScenarios = [self::SCENARIO_ORDER_VIEWED];
+    public ?Order $order = null;
+    public ?int $previousStatusId = null;
+    public ?Item $item = null;
 
     /**
      * Add attributes you want to skip when adding to the logs
@@ -40,6 +39,8 @@ class OrderHistory extends BaseOrderHistory
             self::SCENARIO_ORDER_VIEWED => [],
             self::SCENARIO_ORDER_CHANGED => [],
             self::SCENARIO_ORDER_STATUS_CHANGED => [],
+            self::SCENARIO_ORDER_ADDRESS_CREATED => [],
+            self::SCENARIO_ORDER_ITEM_ADDED => [],
         ];
     }
 
@@ -47,11 +48,6 @@ class OrderHistory extends BaseOrderHistory
     {
         $this->on(self::EVENT_BEFORE_INSERT, [$this, 'orderHistoryPopulate']);
         parent::init();
-    }
-
-    public static function isScenarioEnabled(string $scenario): bool
-    {
-        return !in_array($scenario, self::$disabledScenarios);
     }
 
     public function getOrder(): ActiveQuery
@@ -66,17 +62,17 @@ class OrderHistory extends BaseOrderHistory
 
     protected function orderHistoryPopulate(): void
     {
-        $this->order_id = $this->order->id;
+        $this->order_id = null;
+
+        if ($this->order) {
+            $this->order_id = $this->order->id;
+        } elseif ($this->item) {
+            $this->order_id = $this->item->order_id;
+        }
 
         if (!$this->user_id) {
             if (!Yii::$app->user->isGuest) {
                 $this->user_id = Yii::$app->user->id;
-            }
-        }
-
-        if (!$this->username) {
-            if (!Yii::$app->user->isGuest) {
-                $this->username = Yii::$app->user->identity->username;
             }
         }
 
@@ -85,39 +81,80 @@ class OrderHistory extends BaseOrderHistory
             self::SCENARIO_ORDER_VIEWED => $this->orderViewed(),
             self::SCENARIO_ORDER_CHANGED => $this->orderChanged(),
             self::SCENARIO_ORDER_STATUS_CHANGED => $this->orderStatusChanged(),
+            self::SCENARIO_ORDER_ADDRESS_CREATED => $this->orderAddressCreated(),
+            self::SCENARIO_ORDER_ITEM_ADDED => $this->orderItemAdded(),
             default => throw new \InvalidArgumentException(),
         };
     }
 
     protected function orderCreated(): void
     {
-        $orderAttributes = $this->getSanitisedAttributes($this->order->attributes);
-        $addressAttributes = $this->getSanitisedAttributes($this->order->address->attributes);
-        $orderItems = $this->order->items;
-
-        foreach ($orderItems as $key => $orderItem) {
-            $orderItems[$key] = $this->getSanitisedAttributes($orderItem->attributes);
+        if (!$this->order) {
+            throw new InvalidConfigException("Object Order id missed.");
         }
 
+        $orderAttributes = $this->getSanitisedAttributes($this->order->attributes);
         $this->notes = "Order #{$this->order->id} is created.";
-        $this->notes .= "\r\n\r\nOrder Attributes: " . Json::encode($orderAttributes, JSON_PRETTY_PRINT);
-        $this->notes .= "\r\n\r\nAddress Attributes: " . Json::encode($addressAttributes, JSON_PRETTY_PRINT);
-        $this->notes .= "\r\n\r\nItems: " . Json::encode($orderItems, JSON_PRETTY_PRINT);
+        $this->notes .= "\r\nOrder Attributes: " . Json::encode($orderAttributes, JSON_PRETTY_PRINT);
     }
 
     protected function orderViewed(): void
     {
+        if (!$this->order) {
+            throw new InvalidConfigException("Object Order id missed.");
+        }
+
         $this->notes = "Order #{$this->order->id} is viewed.";
     }
 
     protected function orderChanged(): void
     {
+        if (!$this->order) {
+            throw new InvalidConfigException("Object Order id missed.");
+        }
+
         $this->notes = "Order #{$this->order->id} is changed.";
     }
 
     protected function orderStatusChanged(): void
     {
-        $this->notes = "Order status #{$this->order->id} is changed. Previous status: . New status: .";
+        if (!$this->order) {
+            throw new InvalidConfigException("Object Order id missed.");
+        }
+
+        if (!$this->previousStatusId) {
+            throw new InvalidConfigException("Variable \$previousStatusId id missed.");
+        }
+
+        $prevStatusId = $this->previousStatusId;
+        $newStatusId = $this->order->status_id;
+        $statuses = Status::getList();
+
+        $this->notes = "Order #{$this->order->id} status is changed.";
+        $this->notes .= " Previous status: #{$prevStatusId} ({$statuses[$prevStatusId]}).";
+        $this->notes .= " New status: #{$newStatusId}. ({$statuses[$newStatusId]}).";
+    }
+
+    protected function orderAddressCreated(): void
+    {
+        if (!$this->order) {
+            throw new InvalidConfigException("Object Order id missed.");
+        }
+
+        $addressAttributes = $this->getSanitisedAttributes($this->order->address->attributes);
+        $this->notes = "Order #{$this->order->id} address (Ship To) is added.";
+        $this->notes .= "\r\nAddress Attributes: " . Json::encode($addressAttributes, JSON_PRETTY_PRINT);
+    }
+
+    protected function orderItemAdded(): void
+    {
+        if (!$this->item) {
+            throw new InvalidConfigException("Object Item id missed.");
+        }
+
+        $itemAttributes = $this->getSanitisedAttributes($this->item->attributes);
+        $this->notes = "Item #{$this->item->id} is added.";
+        $this->notes .= "\r\nItem Attributes: " . Json::encode($itemAttributes, JSON_PRETTY_PRINT);
     }
 
     protected function getSanitisedAttributes($attributes)

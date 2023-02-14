@@ -6,6 +6,8 @@ use common\pdf\OrderPackingSlip;
 use common\models\forms\OrderForm;
 use common\models\{base\BaseBatch,
     Country,
+    events\OrderViewedEvent,
+    OrderHistory,
     OrderImport,
     ScheduledOrder,
     State,
@@ -27,6 +29,7 @@ use yii\web\{BadRequestHttpException,
     NotFoundHttpException,
     Response,
     ServerErrorHttpException};
+use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\helpers\ArrayHelper;
@@ -265,12 +268,19 @@ class OrderController extends Controller
     public function actionView(int $id): string
     {
         $model = $this->findModel($id);
-        $model->trigger(Order::EVENT_ORDER_VIEWED);
+        $model->trigger(OrderViewedEvent::EVENT_ORDER_VIEWED, new OrderViewedEvent(['order' => $model]));
+
+        $dataProviderHistory = new ActiveDataProvider([
+            'query' => OrderHistory::find()
+                ->where(['order_id' => $model->id])
+                ->orderBy(['id' => SORT_DESC])
+        ]);
 
         return $this->render(
             'view',
             [
                 'model' => $model,
+                'dataProviderHistory' => $dataProviderHistory,
             ]
         );
     }
@@ -302,7 +312,6 @@ class OrderController extends Controller
 
         // Validate model and save
         if (Yii::$app->request->post() && $model->validate() && $model->save()) {
-            $model->order->trigger(Order::EVENT_ORDER_CREATED);
             Yii::$app->getSession()->setFlash('success', 'Order created.');
 
             return $this->redirect(['view', 'id' => $model->order->id]);

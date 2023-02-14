@@ -7,8 +7,9 @@ use yii\db\ActiveRecord;
 /**
  * This is the model class for table "order_history".
  *
- * @property int    $id
- * @property int    $order_id
+ * @property int $id
+ * @property int $user_id
+ * @property int $order_id
  * @property string $created_date
  * @property string $notes
  */
@@ -28,8 +29,8 @@ class BaseOrderHistory extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['order_id'], 'required'],
-            [['order_id'], 'integer'],
+            [['user_id', 'order_id'], 'required'],
+            [['user_id', 'order_id'], 'integer'],
             [['created_date'], 'safe'],
             [['notes'], 'string'],
         ];
@@ -41,10 +42,11 @@ class BaseOrderHistory extends ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'id'           => 'ID',
-            'order_id'     => 'Order ID',
+            'id' => 'ID',
+            'user_id' => 'User',
+            'order_id' => 'Order',
             'created_date' => 'Created Date',
-            'notes'      => 'Notes',
+            'notes' => 'Notes',
         ];
     }
 }
