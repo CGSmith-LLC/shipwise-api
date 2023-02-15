@@ -30,13 +30,6 @@ class OrderHistory extends BaseOrderHistory
     public ?int $previousStatusId = null;
     public ?array $changedAttributes = null;
 
-    /**
-     * Add attributes you want to skip when adding to the logs
-     */
-    protected array $skipAttributes = [
-        'created_date', 'updated_date'
-    ];
-
     public function scenarios(): array
     {
         return [
@@ -104,7 +97,7 @@ class OrderHistory extends BaseOrderHistory
             throw new InvalidConfigException("Object Order id missed.");
         }
 
-        $orderAttributes = $this->getSanitisedAttributes($this->order->attributes);
+        $orderAttributes = $this->order->attributes;
         $this->notes = "Order #{$this->order->id} is created.";
         $this->notes .= "\r\nOrder Attributes: " . Json::encode($orderAttributes, JSON_PRETTY_PRINT);
     }
@@ -128,7 +121,7 @@ class OrderHistory extends BaseOrderHistory
             throw new InvalidConfigException("Variable \$changedAttributes id missed.");
         }
 
-        $changedAttributes = $this->getSanitisedAttributes($this->changedAttributes);
+        $changedAttributes = $this->changedAttributes;
 
         $this->notes = "Order #{$this->order->id} is changed.";
         $this->notes .= "\r\nChanged Attributes: " . Json::encode($changedAttributes, JSON_PRETTY_PRINT);
@@ -159,7 +152,7 @@ class OrderHistory extends BaseOrderHistory
             throw new InvalidConfigException("Object Order id missed.");
         }
 
-        $addressAttributes = $this->getSanitisedAttributes($this->order->address->attributes);
+        $addressAttributes = $this->order->address->attributes;
         $this->notes = "Order #{$this->order->id} address (Ship To) is added.";
         $this->notes .= "\r\nAddress Attributes: " . Json::encode($addressAttributes, JSON_PRETTY_PRINT);
     }
@@ -178,7 +171,7 @@ class OrderHistory extends BaseOrderHistory
             throw new InvalidConfigException("Variable \$changedAttributes id missed.");
         }
 
-        $changedAttributes = $this->getSanitisedAttributes($this->changedAttributes);
+        $changedAttributes = $this->changedAttributes;
 
         $this->notes = "Address #{$this->address->id} is changed.";
         $this->notes .= "\r\nChanged Attributes: " . Json::encode($changedAttributes, JSON_PRETTY_PRINT);
@@ -190,7 +183,7 @@ class OrderHistory extends BaseOrderHistory
             throw new InvalidConfigException("Object Item id missed.");
         }
 
-        $itemAttributes = $this->getSanitisedAttributes($this->item->attributes);
+        $itemAttributes = $this->item->attributes;
         $this->notes = "Item #{$this->item->id} is added.";
         $this->notes .= "\r\nItem Attributes: " . Json::encode($itemAttributes, JSON_PRETTY_PRINT);
     }
@@ -205,7 +198,7 @@ class OrderHistory extends BaseOrderHistory
             throw new InvalidConfigException("Variable \$changedAttributes id missed.");
         }
 
-        $changedAttributes = $this->getSanitisedAttributes($this->changedAttributes);
+        $changedAttributes = $this->changedAttributes;
 
         $this->notes = "Item #{$this->item->id} is changed.";
         $this->notes .= "\r\nChanged Attributes: " . Json::encode($changedAttributes, JSON_PRETTY_PRINT);
@@ -217,19 +210,8 @@ class OrderHistory extends BaseOrderHistory
             throw new InvalidConfigException("Object Item id missed.");
         }
 
-        $itemAttributes = $this->getSanitisedAttributes($this->item->attributes);
+        $itemAttributes = $this->item->attributes;
         $this->notes = "Item #{$this->item->id} is deleted.";
         $this->notes .= "\r\nItem Attributes: " . Json::encode($itemAttributes, JSON_PRETTY_PRINT);
-    }
-
-    protected function getSanitisedAttributes($attributes): array
-    {
-        foreach ($attributes as $key => $value) {
-            if (in_array($key, $this->skipAttributes)) {
-                unset($attributes[$key]);
-            }
-        }
-
-        return $attributes;
     }
 }
