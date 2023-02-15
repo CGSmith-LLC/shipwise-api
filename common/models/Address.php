@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseAddress;
+use common\traits\AttachableOrderAddressEventsTrait;
 
 /**
  * Class Address
@@ -14,6 +15,14 @@ use common\models\base\BaseAddress;
  */
 class Address extends BaseAddress
 {
+    use AttachableOrderAddressEventsTrait;
+
+    public function init(): void
+    {
+        $this->attachEvents();
+
+        parent::init();
+    }
 
     /**
      * Get State

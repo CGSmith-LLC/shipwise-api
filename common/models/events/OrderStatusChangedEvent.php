@@ -16,6 +16,10 @@ class OrderStatusChangedEvent extends Event
 
     public static function orderStatusChanged(Event $event): bool
     {
+        if (!self::EVENT_IS_ENABLED) {
+            return false;
+        }
+
         $orderHistory = new OrderHistory([
             'scenario' => OrderHistory::SCENARIO_ORDER_STATUS_CHANGED,
             'order' => $event->order,
@@ -23,14 +27,5 @@ class OrderStatusChangedEvent extends Event
         ]);
 
         return $orderHistory->save();
-    }
-
-    public static function trigger($class, $name, $event = null): bool
-    {
-        if (self::EVENT_IS_ENABLED) {
-            parent::trigger($class, $name, $event);
-        }
-
-        return false;
     }
 }

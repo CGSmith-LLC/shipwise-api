@@ -6,22 +6,22 @@ use yii\base\Event;
 use common\models\Order;
 use common\models\OrderHistory;
 
-class OrderCreatedEvent extends Event
+class OrderViewedEvent extends Event
 {
-    public const EVENT_IS_ENABLED = true;
-    public const EVENT_ORDER_CREATED = 'eventOrderCreated';
+    public const EVENT_IS_ENABLED = false;
+    public const EVENT_ORDER_VIEWED = 'eventOrderViewed';
 
     public Order $order;
 
-    public static function orderCreated(Event $event): bool
+    public static function orderViewed(Event $event): bool
     {
         if (!self::EVENT_IS_ENABLED) {
             return false;
         }
 
         $orderHistory = new OrderHistory([
-            'scenario' => OrderHistory::SCENARIO_ORDER_CREATED,
-            'order' => $event->order
+            'scenario' => OrderHistory::SCENARIO_ORDER_VIEWED,
+            'order' => $event->order,
         ]);
 
         return $orderHistory->save();

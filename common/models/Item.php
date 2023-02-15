@@ -3,7 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseItem;
-use common\models\events\OrderItemAddedEvent;
+use common\traits\AttachableOrderItemEventsTrait;
 
 /**
  * Class Item
@@ -12,20 +12,12 @@ use common\models\events\OrderItemAddedEvent;
  */
 class Item extends BaseItem
 {
+    use AttachableOrderItemEventsTrait;
+
     public function init(): void
     {
-        $this->on(OrderItemAddedEvent::EVENT_ORDER_ITEM_ADDED, [
-            'common\models\events\OrderItemAddedEvent',
-            'orderItemAdded'
-        ]);
+        $this->attachEvents();
 
-        $this->on(self::EVENT_AFTER_INSERT, function () {
-            $this->trigger(
-                OrderItemAddedEvent::EVENT_ORDER_ITEM_ADDED,
-                new OrderItemAddedEvent([
-                    'item' => $this
-                ])
-            );
-        });
+        parent::init();
     }
 }

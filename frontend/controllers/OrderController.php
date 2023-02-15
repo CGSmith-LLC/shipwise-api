@@ -271,9 +271,11 @@ class OrderController extends Controller
         $model->trigger(OrderViewedEvent::EVENT_ORDER_VIEWED, new OrderViewedEvent(['order' => $model]));
 
         $dataProviderHistory = new ActiveDataProvider([
-            'query' => OrderHistory::find()
-                ->where(['order_id' => $model->id])
-                ->orderBy(['id' => SORT_DESC])
+            'query' => OrderHistory::find()->where(['order_id' => $model->id]),
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
+            'pagination' => [
+                'pageSize' => 10,
+            ],
         ]);
 
         return $this->render(

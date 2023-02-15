@@ -19,11 +19,16 @@ class OrderHistory extends BaseOrderHistory
     public const SCENARIO_ORDER_CHANGED = 'scenarioOrderChanged';
     public const SCENARIO_ORDER_STATUS_CHANGED = 'scenarioOrderStatusChanged';
     public const SCENARIO_ORDER_ADDRESS_CREATED = 'scenarioOrderAddressCreated';
+    public const SCENARIO_ORDER_ADDRESS_CHANGED = 'scenarioOrderAddressChanged';
     public const SCENARIO_ORDER_ITEM_ADDED = 'scenarioOrderItemAdded';
+    public const SCENARIO_ORDER_ITEM_CHANGED = 'scenarioOrderItemChanged';
+    public const SCENARIO_ORDER_ITEM_DELETED = 'scenarioOrderItemDeleted';
 
     public ?Order $order = null;
-    public ?int $previousStatusId = null;
     public ?Item $item = null;
+    public ?Address $address = null;
+    public ?int $previousStatusId = null;
+    public ?array $changedAttributes = null;
 
     /**
      * Add attributes you want to skip when adding to the logs
@@ -40,7 +45,10 @@ class OrderHistory extends BaseOrderHistory
             self::SCENARIO_ORDER_CHANGED => [],
             self::SCENARIO_ORDER_STATUS_CHANGED => [],
             self::SCENARIO_ORDER_ADDRESS_CREATED => [],
+            self::SCENARIO_ORDER_ADDRESS_CHANGED => [],
             self::SCENARIO_ORDER_ITEM_ADDED => [],
+            self::SCENARIO_ORDER_ITEM_CHANGED => [],
+            self::SCENARIO_ORDER_ITEM_DELETED => [],
         ];
     }
 
@@ -82,7 +90,10 @@ class OrderHistory extends BaseOrderHistory
             self::SCENARIO_ORDER_CHANGED => $this->orderChanged(),
             self::SCENARIO_ORDER_STATUS_CHANGED => $this->orderStatusChanged(),
             self::SCENARIO_ORDER_ADDRESS_CREATED => $this->orderAddressCreated(),
+            self::SCENARIO_ORDER_ADDRESS_CHANGED => $this->orderAddressChanged(),
             self::SCENARIO_ORDER_ITEM_ADDED => $this->orderItemAdded(),
+            self::SCENARIO_ORDER_ITEM_CHANGED => $this->orderItemChanged(),
+            self::SCENARIO_ORDER_ITEM_DELETED => $this->orderItemDeleted(),
             default => throw new \InvalidArgumentException(),
         };
     }
@@ -113,7 +124,14 @@ class OrderHistory extends BaseOrderHistory
             throw new InvalidConfigException("Object Order id missed.");
         }
 
+        if (!$this->changedAttributes) {
+            throw new InvalidConfigException("Variable \$changedAttributes id missed.");
+        }
+
+        $changedAttributes = $this->getSanitisedAttributes($this->changedAttributes);
+
         $this->notes = "Order #{$this->order->id} is changed.";
+        $this->notes .= "\r\nChanged Attributes: " . Json::encode($changedAttributes, JSON_PRETTY_PRINT);
     }
 
     protected function orderStatusChanged(): void
@@ -146,6 +164,26 @@ class OrderHistory extends BaseOrderHistory
         $this->notes .= "\r\nAddress Attributes: " . Json::encode($addressAttributes, JSON_PRETTY_PRINT);
     }
 
+    protected function orderAddressChanged(): void
+    {
+        if (!$this->order) {
+            throw new InvalidConfigException("Object Order id missed.");
+        }
+
+        if (!$this->address) {
+            throw new InvalidConfigException("Object Address id missed.");
+        }
+
+        if (!$this->changedAttributes) {
+            throw new InvalidConfigException("Variable \$changedAttributes id missed.");
+        }
+
+        $changedAttributes = $this->getSanitisedAttributes($this->changedAttributes);
+
+        $this->notes = "Address #{$this->address->id} is changed.";
+        $this->notes .= "\r\nChanged Attributes: " . Json::encode($changedAttributes, JSON_PRETTY_PRINT);
+    }
+
     protected function orderItemAdded(): void
     {
         if (!$this->item) {
@@ -157,7 +195,34 @@ class OrderHistory extends BaseOrderHistory
         $this->notes .= "\r\nItem Attributes: " . Json::encode($itemAttributes, JSON_PRETTY_PRINT);
     }
 
-    protected function getSanitisedAttributes($attributes)
+    protected function orderItemChanged(): void
+    {
+        if (!$this->item) {
+            throw new InvalidConfigException("Object Item id missed.");
+        }
+
+        if (!$this->changedAttributes) {
+            throw new InvalidConfigException("Variable \$changedAttributes id missed.");
+        }
+
+        $changedAttributes = $this->getSanitisedAttributes($this->changedAttributes);
+
+        $this->notes = "Item #{$this->item->id} is changed.";
+        $this->notes .= "\r\nChanged Attributes: " . Json::encode($changedAttributes, JSON_PRETTY_PRINT);
+    }
+
+    protected function orderItemDeleted(): void
+    {
+        if (!$this->item) {
+            throw new InvalidConfigException("Object Item id missed.");
+        }
+
+        $itemAttributes = $this->getSanitisedAttributes($this->item->attributes);
+        $this->notes = "Item #{$this->item->id} is deleted.";
+        $this->notes .= "\r\nItem Attributes: " . Json::encode($itemAttributes, JSON_PRETTY_PRINT);
+    }
+
+    protected function getSanitisedAttributes($attributes): array
     {
         foreach ($attributes as $key => $value) {
             if (in_array($key, $this->skipAttributes)) {
