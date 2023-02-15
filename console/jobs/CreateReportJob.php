@@ -20,9 +20,10 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
     const TTR = 600; // in seconds
 
     /**
-     * @var int $customer
+     * @var int[] $customer_ids array of customer IDs.
+     * Limits the orders to one or more customers.
      */
-    public int $customer;
+    public array $customer_ids;
 
     /**
      * @var int $userId
@@ -50,9 +51,10 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
     public bool $items;
 
     /**
-     * @var array if set, the report will be generated on order numbers instead of date range.
+     * @var array|null if set, the report will be generated on order numbers instead of date range.
      */
-    public array $order_nrs;
+    public ?array $order_nrs = null;
+
 
     /**
      * @inheritDoc
@@ -97,9 +99,10 @@ class CreateReportJob extends BaseObject implements RetryableJobInterface
         if (is_array($this->order_nrs)) {
             $ordersQuery->where(['customer_reference' => $this->order_nrs]);
         } else {
-            $ordersQuery->where(['customer_id' => $this->customer]);
-            $ordersQuery->andWhere(['between', 'created_date', $this->start_date, $this->end_date])
+            $ordersQuery->andWhere(['between', 'created_date', $this->start_date, $this->end_date]);
         }
+        // limit access by customer
+        $ordersQuery->andWhere(['IN', 'customer_id', $this->customer_ids]);
 
 
         $dir = Yii::getAlias('@console') . '/runtime/reports/';

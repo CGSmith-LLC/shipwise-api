@@ -66,6 +66,14 @@ DEF
 
 CSV
                 , ['ABC', '123', 'DEF']],
+            [<<<CSV
+ABC,
+ 123  ,
+   DEF
+
+
+CSV
+                , ['ABC', '123', 'DEF']],
         ];
     }
 

@@ -3,10 +3,8 @@
 namespace frontend\controllers;
 
 use Yii;
-use console\jobs\CreateReportJob;
-use frontend\models\Customer;
 use frontend\models\forms\ReportForm;
-use frontend\models\User;
+use yii\filters\AccessControl;
 
 /**
  * Class ReportController
@@ -20,7 +18,7 @@ class ReportController extends Controller
     {
         return [
             'access' => [
-                'class' => 'yii\filters\AccessControl',
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -34,7 +32,6 @@ class ReportController extends Controller
     /**
      * Index for creating CSV report
      *
-     * @return string|void
      * @throws \yii\base\InvalidConfigException
      */
     public function actionIndex($scenario = null)
@@ -60,7 +57,6 @@ class ReportController extends Controller
                 return $this->redirect(['report/index', 'scenario' => $model->scenario]);
             }
         }
-
 
         return $this->render(
             'index',

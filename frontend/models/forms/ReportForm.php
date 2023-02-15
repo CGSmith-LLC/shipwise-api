@@ -100,7 +100,7 @@ class ReportForm extends Model
         switch ($this->scenario) {
             case self::SCENARIO_BY_DATE:
                 $job = new CreateReportJob([
-                    'customer' => $this->customer,
+                    'customer_ids' => [$this->customer],
                     'start_date' => $this->start_date,
                     'end_date' => $this->end_date,
                     'items' => $this->items,
@@ -109,6 +109,7 @@ class ReportForm extends Model
             case self::SCENARIO_BY_ORDER_NR:
                 $job = new CreateReportJob([
                     'order_nrs' => $this->getOrderNrs(),
+                    'customer_ids' => array_keys($this->getCustomerList()),
                     'items' => $this->items,
                 ]);
                 break;

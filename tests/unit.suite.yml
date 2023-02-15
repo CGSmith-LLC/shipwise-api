@@ -12,4 +12,4 @@ modules:
         - Yii2:
             configFile: 'common/config/test-local.php'
             transaction: false
-    step_decorators: ~        
+    step_decorators: ~
