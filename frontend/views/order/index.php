@@ -18,6 +18,30 @@ use yii\widgets\Pjax;
 
 $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
+
+if ($searchModel->carrier_id) {
+    $serviceFilter = Html::activeDropDownList(
+        $searchModel,
+        'service_id',
+        $services,
+        [
+            'class' => 'form-control',
+            'prompt' => Yii::t('app', 'All')
+        ]
+    );
+} else {
+    $serviceFilter = Html::activeDropDownList(
+        $searchModel,
+        'service_id',
+        [],
+        [
+            'class' => 'form-control',
+            'disabled' => true,
+            'title' => 'Please choose a needed carrier first.',
+            'prompt' => Yii::t('app', 'All')
+        ]
+    );
+}
 ?>
     <div class="order-index">
 
@@ -125,12 +149,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'service_id',
                     'options' => ['width' => '10%'],
                     'value' => 'service.name',
-                    'filter' => Html::activeDropDownList(
-                        $searchModel,
-                        'service_id',
-                        $services,
-                        ['class' => 'form-control', 'prompt' => Yii::t('app', 'All')]
-                    ),
+                    'filter' => $serviceFilter,
                 ],
                 [
                     'attribute' => 'address',
