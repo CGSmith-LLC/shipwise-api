@@ -2,6 +2,8 @@
 
 namespace common\models\base;
 
+use yii\db\ActiveRecord;
+
 /**
  * This is the model class for table "items".
  *
@@ -15,7 +17,7 @@ namespace common\models\base;
  * @property string $name
  * @property string $notes
  */
-class BaseItem extends \yii\db\ActiveRecord
+class BaseItem extends ActiveRecord
 {
 
     /**
@@ -33,7 +35,8 @@ class BaseItem extends \yii\db\ActiveRecord
     {
         return [
             [['order_id', 'quantity', 'sku'], 'required'],
-            [['order_id', 'quantity', 'alias_quantity'], 'integer'],
+            [['order_id', 'alias_quantity'], 'integer'],
+            [['quantity'], 'integer', 'min' => 1],
             [['sku', 'uuid', 'alias_sku', 'type'], 'string', 'max' => 64],
             [['notes', 'name'], 'string', 'max' => 512],
         ];
