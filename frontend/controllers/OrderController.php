@@ -294,14 +294,13 @@ class OrderController extends Controller
         $model->order->origin = Yii::$app->name;
         $model->order->address_id = 0; // to avoid validation, as we validate address model separately
 
-        // Load from POST
-        $model->setAttributes(Yii::$app->request->post());
+        if (Yii::$app->request->post()) {
+            $model->setAttributes(Yii::$app->request->post());
 
-        // Validate model and save
-        if (Yii::$app->request->post() && $model->validate() && $model->save()) {
-            Yii::$app->getSession()->setFlash('success', 'Order created.');
-
-            return $this->redirect(['view', 'id' => $model->order->id]);
+            if ($model->validate() && $model->save()) {
+                Yii::$app->getSession()->setFlash('success', 'Order created.');
+                return $this->redirect(['view', 'id' => $model->order->id]);
+            }
         }
 
         return $this->render(
@@ -360,8 +359,7 @@ class OrderController extends Controller
         $model->setAttributes(Yii::$app->request->post());
 
         if (Yii::$app->request->post() && $model->validate() && $model->save()) {
-            Yii::$app->getSession()->setFlash('success', 'Order has been updated.');
-
+            Yii::$app->session->setFlash('success', 'Order has been updated.');
             return $this->redirect(['view', 'id' => $model->order->id]);
         }
 

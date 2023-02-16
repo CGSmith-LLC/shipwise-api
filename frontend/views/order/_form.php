@@ -41,7 +41,10 @@ $item->loadDefaultValues();
                 ],
             ],
         ]); ?>
-        <?= $model->errorSummary($form); ?>
+
+        <?php if (Yii::$app->request->post()) { ?>
+            <?= $model->errorSummary($form); ?>
+        <?php } ?>
 
         <div class="row">
             <div class="col-md-6">
@@ -134,7 +137,7 @@ $item->loadDefaultValues();
                     <div class="panel-body">
 
                         <div id="items">
-                            <?= Html::a('<i class="glyphicon glyphicon-plus"></i> add another item', 'javascript:void(0);', [
+                            <?= Html::a('<i class="glyphicon glyphicon-plus"></i> Add another item', 'javascript:void(0);', [
                                 'id'    => 'btn-add-item',
                                 'class' => 'btn btn-warning btn-sm',
                             ]) ?>
@@ -328,22 +331,14 @@ ob_start(); // output buffer the javascript to register later ?>
          * Add new item
          */
         function addItem() {
-
             itemKey += 1;
+
             $("#items").append(
                 '<div class="row item item-' + itemKey + '">'
                 + $('#new-item-block').html().replace(/__id__/g, 'new' + itemKey)
                 + '</div>'
             );
-            // disable remove button on first item
-            var row = $('.item-0').length ? $('.item-0') : $('.item-1');
-            row.find('.btn-remove-item').addClass('hidden');
-            if (itemKey !== 1) {
-                // hide label titles
-                $('.item-' + itemKey).find('label').not('.fake').html('');
-                // enable remove btn
-                $('.item-' + itemKey).find('.btn-remove-item').removeClass('hidden');
-            }
+
             initListeners();
         }
 
