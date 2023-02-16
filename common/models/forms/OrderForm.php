@@ -220,8 +220,18 @@ class OrderForm extends BaseForm
             'Order' => $this->order,
             'Address' => $this->address,
         ];
-        foreach ($this->items as $id => $item) {
-            $models['Item.' . $id] = $this->items[$id];
+
+        if (!$this->items) {
+            $emptyItem = new Item();
+            $emptyItem->addError('Items', 'Items are empty.');
+            $models['Items'] = $emptyItem;
+        } else {
+            $i = 1;
+
+            foreach ($this->items as $id => $item) {
+                $models['Item ' . $i] = $this->items[$id];
+                $i++;
+            }
         }
 
         return $models;
