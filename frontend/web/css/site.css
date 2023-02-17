@@ -379,3 +379,7 @@ pre {
     background-color: ivory;
     font-size: 12px;
 }
+
+.form-actions {
+    margin: 0 0 15px 0 !important;
+}
