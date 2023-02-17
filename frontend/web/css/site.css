@@ -370,3 +370,7 @@ ul.auth-clients {
     text-align: center;
     font-size: 16px;
 }
+
+.form-actions {
+    margin: 0 0 15px 0 !important;
+}
