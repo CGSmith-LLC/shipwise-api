@@ -41,7 +41,10 @@ $item->loadDefaultValues();
                 ],
             ],
         ]); ?>
-        <?= $model->errorSummary($form); ?>
+
+        <?php if (Yii::$app->request->post()) { ?>
+            <?= $model->errorSummary($form); ?>
+        <?php } ?>
 
         <div class="row">
             <div class="col-md-6">
@@ -82,14 +85,14 @@ $item->loadDefaultValues();
                             'inputTemplate' =>
                                 '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
                         ])->textInput([
-                            'value' => (isset($model->order->requested_ship_date)) ? Yii::$app->formatter->asDate($model->order->requested_ship_date) : '',
+                            'value' => ($model->order->requested_ship_date) ? Yii::$app->formatter->asDate($model->order->requested_ship_date) : null,
                         ]) ?>
 
                         <?= $form->field($model->order, 'must_arrive_by_date', [
                             'inputTemplate' =>
                                 '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
                         ])->textInput([
-                            'value' => (isset($model->order->must_arrive_by_date)) ? Yii::$app->formatter->asDate($model->order->must_arrive_by_date) : '',
+                            'value' => ($model->order->must_arrive_by_date) ? Yii::$app->formatter->asDate($model->order->must_arrive_by_date) : null,
                         ]) ?>
 
                     </div>
@@ -134,7 +137,7 @@ $item->loadDefaultValues();
                     <div class="panel-body">
 
                         <div id="items">
-                            <?= Html::a('<i class="glyphicon glyphicon-plus"></i> add another item', 'javascript:void(0);', [
+                            <?= Html::a('<i class="glyphicon glyphicon-plus"></i> Add another item', 'javascript:void(0);', [
                                 'id'    => 'btn-add-item',
                                 'class' => 'btn btn-warning btn-sm',
                             ]) ?>
@@ -163,9 +166,6 @@ $item->loadDefaultValues();
                                 ?>
                             </div>
                         </div>
-
-
-
                     </div>
                 </div>
             </div>
@@ -173,13 +173,12 @@ $item->loadDefaultValues();
         <hr>
         <div class="row">
             <div class="col-md-12">
-                <div class="form-group">
+                <div class="form-group form-actions">
                     <?= Html::submitButton('Save', ['class' => 'btn btn-lg btn-success']) ?>
                     <?= Html::a('Cancel', ['index'], ['class' => 'btn btn-lg btn-default']) ?>
                 </div>
             </div>
         </div>
-
 
         <?php ActiveForm::end(); ?>
 
@@ -328,22 +327,14 @@ ob_start(); // output buffer the javascript to register later ?>
          * Add new item
          */
         function addItem() {
-
             itemKey += 1;
+
             $("#items").append(
                 '<div class="row item item-' + itemKey + '">'
                 + $('#new-item-block').html().replace(/__id__/g, 'new' + itemKey)
                 + '</div>'
             );
-            // disable remove button on first item
-            var row = $('.item-0').length ? $('.item-0') : $('.item-1');
-            row.find('.btn-remove-item').addClass('hidden');
-            if (itemKey !== 1) {
-                // hide label titles
-                $('.item-' + itemKey).find('label').not('.fake').html('');
-                // enable remove btn
-                $('.item-' + itemKey).find('.btn-remove-item').removeClass('hidden');
-            }
+
             initListeners();
         }
 
