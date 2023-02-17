@@ -41,9 +41,7 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
 
         // Using API model so it sends the full request. Should match what we are sending from our API anyway
         // Fixes https://github.com/CGSmith-LLC/shipwise-api/issues/147
-        $this->order = OrderEx::find()
-            ->where(['id' => $this->order_id])
-            ->one();
+        $this->order = OrderEx::findOne($this->order_id);
 
         if (!$this->webhook) {
             throw new Exception(
