@@ -23,6 +23,8 @@ class OrderAddressEventsBehavior extends Behavior
 
     public function eventBeforeUpdate(Event $event)
     {
+        // We need to use `ORDER BY id DESC` since we used to have one
+        // address for several different orders:
         $order = Order::find()
             ->where(['address_id' => $this->owner->id])
             ->orderBy(['id' => SORT_DESC])
