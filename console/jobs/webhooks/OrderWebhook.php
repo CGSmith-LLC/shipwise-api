@@ -2,7 +2,7 @@
 
 namespace console\jobs\webhooks;
 
-use common\models\Order;
+use api\modules\v1\models\order\OrderEx;
 use common\models\Webhook;
 use common\models\WebhookLog;
 use console\jobs\NotificationJob;
@@ -39,7 +39,11 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
                 ->one();
         }
 
-        $this->order = Order::findOne($this->order_id);
+        // Using API model so it sends the full request. Should match what we are sending from our API anyway
+        // Fixes https://github.com/CGSmith-LLC/shipwise-api/issues/147
+        $this->order = OrderEx::find()
+            ->where(['id' => $this->order_id])
+            ->one();
 
         if (!$this->webhook) {
             throw new Exception(
