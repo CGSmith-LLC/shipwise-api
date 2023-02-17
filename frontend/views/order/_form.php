@@ -170,7 +170,7 @@ $item->loadDefaultValues();
         <hr>
         <div class="row">
             <div class="col-md-12">
-                <div class="form-group" style="margin: 0 0 15px 0;">
+                <div class="form-group form-actions">
                     <?= Html::submitButton('Save', ['class' => 'btn btn-lg btn-success']) ?>
                     <?= Html::a('Cancel', ['index'], ['class' => 'btn btn-lg btn-default']) ?>
                 </div>
