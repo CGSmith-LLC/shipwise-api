@@ -14,10 +14,6 @@ class OrderChangedEvent extends Event
     public Order $order;
     public array $changedAttributes;
 
-    public static array $skipAttributes = [
-        'created_date', 'updated_date'
-    ];
-
     public static function orderChanged(Event $event): bool
     {
         if (!self::EVENT_IS_ENABLED) {
@@ -43,13 +39,6 @@ class OrderChangedEvent extends Event
                     'previous' => $oldAttributes[$key],
                     'new' => $dirtyAttribute,
                 ];
-            }
-        }
-
-        // Remove attributes that must be skipped:
-        foreach ($changedAttributes as $key => $value) {
-            if (in_array($key, self::$skipAttributes)) {
-                unset($changedAttributes[$key]);
             }
         }
 

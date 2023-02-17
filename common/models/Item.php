@@ -3,7 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseItem;
-use common\traits\AttachableOrderItemEventsTrait;
+use common\behaviors\OrderItemEventsBehavior;
 
 /**
  * Class Item
@@ -12,12 +12,12 @@ use common\traits\AttachableOrderItemEventsTrait;
  */
 class Item extends BaseItem
 {
-    use AttachableOrderItemEventsTrait;
-
-    public function init(): void
+    public function behaviors(): array
     {
-        $this->attachEvents();
-
-        parent::init();
+        return [
+            [
+                'class' => OrderItemEventsBehavior::class,
+            ],
+        ];
     }
 }

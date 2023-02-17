@@ -49,13 +49,6 @@ class OrderAddressChangedEvent extends Event
             }
         }
 
-        // Remove attributes that must be skipped:
-        foreach ($changedAttributes as $key => $value) {
-            if (in_array($key, self::$skipAttributes)) {
-                unset($changedAttributes[$key]);
-            }
-        }
-
         return $changedAttributes;
     }
 }
