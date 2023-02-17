@@ -5,6 +5,7 @@
 /* @var $content string */
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
@@ -13,7 +14,8 @@ use common\widgets\Alert;
 
 AppAsset::register($this);
 ?>
-<?php $this->beginPage() ?>
+<?php
+$this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>">
 <head>
@@ -45,28 +47,61 @@ AppAsset::register($this);
         var stripe = Stripe('<?=Yii::$app->stripe->publicKey?>');
     </script>
     <script>
-        (function(h,o,t,j,a,r){
-            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
-            h._hjSettings={hjid:2765222,hjsv:6};
-            a=o.getElementsByTagName('head')[0];
-            r=o.createElement('script');r.async=1;
-            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        (function (h, o, t, j, a, r) {
+            h.hj = h.hj || function () {
+                (h.hj.q = h.hj.q || []).push(arguments)
+            };
+            h._hjSettings = {hjid: 2765222, hjsv: 6};
+            a = o.getElementsByTagName('head')[0];
+            r = o.createElement('script');
+            r.async = 1;
+            r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
             a.appendChild(r);
-        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+        })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
     </script>
-    <?php $this->registerCsrfMetaTags() ?>
+    <script>
+        window.fwSettings = {
+            'widget_id': 150000002310
+        };
+        !function () {
+            if ("function" != typeof window.FreshworksWidget) {
+                var n = function () {
+                    n.q.push(arguments)
+                };
+                n.q = [], window.FreshworksWidget = n
+            }
+        }()
+
+        <?php
+        if (!Yii::$app->user->isGuest) { ?>
+        FreshworksWidget('identify', 'ticketForm', {
+            'email': '<?= Yii::$app->user->identity->email ?>',
+        })
+        <?php
+        }
+        ?>
+
+    </script>
+    <script type='text/javascript' src='https://widget.freshworks.com/widgets/150000002310.js' async defer></script>
+    <?php
+    $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
+    <?php
+    $this->head() ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 
 </head>
 <body>
-<?php $this->beginBody() ?>
+<?php
+$this->beginBody() ?>
 
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => Html::img('@web/images/logo-with-text.png', ['alt' => Yii::$app->name, 'style' => 'height: 32px']),
+        'brandLabel' => Html::img(
+            '@web/images/logo-with-text.png',
+            ['alt' => Yii::$app->name, 'style' => 'height: 32px']
+        ),
         'brandOptions' => ['class' => 'shipwise-brand'],
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
@@ -81,15 +116,14 @@ AppAsset::register($this);
         echo Html::a(
             '<span class="glyphicon glyphicon-user"></span> Back to original user',
             ['/user/admin/switch-identity'],
-            ['class' => 'btn btn-primary pull-right', 'data-method' => 'POST', 'style' => 'margin:8px']);
+            ['class' => 'btn btn-primary pull-right', 'data-method' => 'POST', 'style' => 'margin:8px']
+        );
     }
 
     $menuItems = [];
     if (Yii::$app->user->isGuest) {
-
         $menuItems[] = ['label' => 'Signup', 'url' => ['/user/register']];
         $menuItems[] = ['label' => 'Login', 'url' => ['/user/login']];
-
     } else {
         $menuItems[] = [
             'label' => 'Orders',
@@ -103,6 +137,13 @@ AppAsset::register($this);
             ]
         ];
         $menuItems[] = ['label' => 'Reports', 'url' => ['/report']];
+        $menuItems[] = ['label' => 'Support', 'url' => Url::to('https://support.getshipwise.com')];
+        $menuItems[] = [
+            'encode' => false,
+            'label' => '<i class="fa fa-lightbulb-o"></i> Suggestions',
+            'linkOptions' => ['target' => '_blank'],
+            'url' => Url::to('https://shipwise.kampsite.co/')
+        ];
 
         if (Yii::$app->user->identity->isAdmin) {
             $menuItems[] = [
@@ -125,7 +166,9 @@ AppAsset::register($this);
         }
 
         $menuItems[] = [
-            'label' => '<img src="https://www.gravatar.com/avatar/' . md5(Yii::$app->user->identity->email) . '?s=24&d=mp" style="border-radius:50%"> ' .  Yii::$app->user->identity->username,
+            'label' => '<img src="https://www.gravatar.com/avatar/' . md5(
+                    Yii::$app->user->identity->email
+                ) . '?s=24&d=mp" style="border-radius:50%"> ' . Yii::$app->user->identity->username,
             'url' => ['/user/settings/account'],
             'encode' => false,
             'items' => [
@@ -147,7 +190,7 @@ AppAsset::register($this);
                     'url' => '/webhook',
                 ],
                 [
-                    'label'=>'<li style="margin-top: -6px;">'
+                    'label' => '<li style="margin-top: -6px;">'
                         . Html::beginForm(['/user/logout'], 'post')
                         . Html::submitButton('Logout', ['class' => 'logout', 'style' => 'padding: 3px 20px;'])
                         . Html::endForm()
@@ -156,8 +199,8 @@ AppAsset::register($this);
                     'url' => '/user/logout',
                 ],
 
-            ]];
-
+            ]
+        ];
     }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
@@ -183,7 +226,8 @@ AppAsset::register($this);
     </div>
 </footer>
 
-<?php $this->endBody() ?>
+<?php
+$this->endBody() ?>
 <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 <script>
     // Setup notyf for use on any page
@@ -191,4 +235,5 @@ AppAsset::register($this);
 </script>
 </body>
 </html>
-<?php $this->endPage() ?>
+<?php
+$this->endPage() ?>

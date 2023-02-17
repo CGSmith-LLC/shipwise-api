@@ -85,14 +85,14 @@ $item->loadDefaultValues();
                             'inputTemplate' =>
                                 '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
                         ])->textInput([
-                            'value' => (isset($model->order->requested_ship_date)) ? Yii::$app->formatter->asDate($model->order->requested_ship_date) : '',
+                            'value' => ($model->order->requested_ship_date) ? Yii::$app->formatter->asDate($model->order->requested_ship_date) : null,
                         ]) ?>
 
                         <?= $form->field($model->order, 'must_arrive_by_date', [
                             'inputTemplate' =>
                                 '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
                         ])->textInput([
-                            'value' => (isset($model->order->must_arrive_by_date)) ? Yii::$app->formatter->asDate($model->order->must_arrive_by_date) : '',
+                            'value' => ($model->order->must_arrive_by_date) ? Yii::$app->formatter->asDate($model->order->must_arrive_by_date) : null,
                         ]) ?>
 
                     </div>
@@ -166,9 +166,6 @@ $item->loadDefaultValues();
                                 ?>
                             </div>
                         </div>
-
-
-
                     </div>
                 </div>
             </div>
@@ -176,13 +173,12 @@ $item->loadDefaultValues();
         <hr>
         <div class="row">
             <div class="col-md-12">
-                <div class="form-group">
+                <div class="form-group form-actions">
                     <?= Html::submitButton('Save', ['class' => 'btn btn-lg btn-success']) ?>
                     <?= Html::a('Cancel', ['index'], ['class' => 'btn btn-lg btn-default']) ?>
                 </div>
             </div>
         </div>
-
 
         <?php ActiveForm::end(); ?>
 
