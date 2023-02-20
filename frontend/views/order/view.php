@@ -1,15 +1,16 @@
 <?php
-
-use common\models\Package;
-use common\models\PackageItemLotInfo;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
+use yii\data\ActiveDataProvider;
+use yii\grid\GridView;
 use common\models\Status;
+use yii\helpers\HtmlPurifier;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Order */
+/* @var $dataProviderHistory ActiveDataProvider */
 
 $this->title = 'Order ' . $model->customer_reference;
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
@@ -185,7 +186,7 @@ $this->registerJs($js);
             <h2>Items (<?= count($model->items) ?? null ?>)</h2>
             <?php
 
-            $dataProvider = new \yii\data\ActiveDataProvider(['query' => \frontend\models\Item::find()->where(['order_id' => $model->id]),]);
+            $dataProvider = new ActiveDataProvider(['query' => \frontend\models\Item::find()->where(['order_id' => $model->id]),]);
             $count = Yii::$app->db->createCommand('
                 SELECT COUNT(*) FROM package_items WHERE order_id=:order_id
             ', [':order_id' => $model->id])->queryScalar();
@@ -206,44 +207,45 @@ $this->registerJs($js);
 
             // get the user records in the current page
             $models = $dataProvider->getModels();
-            echo \yii\grid\GridView::widget(['dataProvider' => $dataProvider,
+            echo GridView::widget(['dataProvider' => $dataProvider,
                 'columns' => ['quantity',
                     'sku',
                     'name','type'],]); ?>
-            <?php
-            if (!$simple) {
-                ?>
+
+            <?php if (!$simple) { ?>
                 <h2>Packages</h2>
-                <?php
-                echo \yii\grid\GridView::widget(['dataProvider' => $dataProviderPackages,
-                    'columns' => ['tracking',
-                        'quantity',
-                        'sku',
-                        'lot_number',],]);
 
+                <?=
+                    GridView::widget(['dataProvider' => $dataProviderPackages,
+                        'columns' => [
+                            'tracking',
+                            'quantity',
+                            'sku',
+                            'lot_number'
+                        ]])
                 ?>
-                <h2>Order History</h2>
-                <?php
 
-                $dataproviderHistory = new \yii\data\ActiveDataProvider([
-                    'query' => \common\models\OrderHistory::find()
-                        ->where(['order_id' => $model->id])
-                        ->orderBy(['created_date' => SORT_DESC])
-                ]);
-                echo \yii\grid\GridView::widget(['dataProvider' => $dataproviderHistory,
-                    'columns' => [
-                        'created_date:datetime',
-                        [
-                            'attribute' => 'comment',
-                            'value' => function ($model) {
-                                return '<p style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;width: 900px;">'.nl2br($model->comment).'</p>';
-                            },
-                            'format' => 'raw',
+                <h2>Order History</h2>
+
+                <?=
+                    GridView::widget(['dataProvider' => $dataProviderHistory,
+                        'columns' => [
+                            [
+                                'attribute' => 'user.username',
+                            ],
+                            'created_date:datetime',
+                            [
+                                'attribute' => 'notes',
+                                'value' => function ($model) {
+                                    return '<pre>' . HtmlPurifier::process(nl2br($model->notes)) . '</pre>';
+                                },
+                                'format' => 'raw',
+                                'enableSorting' => false,
+                            ],
                         ],
-                    ],
-                ]);
-            }
-            ?>
+                    ])
+                ?>
+            <?php } ?>
         </div>
 
     </div>

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseAddress;
+use common\behaviors\OrderAddressEventsBehavior;
 
 /**
  * Class Address
@@ -14,6 +15,14 @@ use common\models\base\BaseAddress;
  */
 class Address extends BaseAddress
 {
+    public function behaviors(): array
+    {
+        return [
+            [
+                'class' => OrderAddressEventsBehavior::class,
+            ],
+        ];
+    }
 
     /**
      * Get State

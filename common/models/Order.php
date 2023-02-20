@@ -2,12 +2,13 @@
 
 namespace common\models;
 
+use Yii;
+use common\behaviors\OrderEventsBehavior;
 use api\modules\v1\models\core\AddressEx;
 use common\models\base\BaseOrder;
 use common\models\query\OrderQuery;
 use common\models\shipping\{Carrier, Service, PackageType, Shipment, ShipmentPackage};
 use console\jobs\webhooks\OrderWebhook;
-use Yii;
 
 /**
  * Class Order
@@ -26,11 +27,20 @@ use Yii;
  */
 class Order extends BaseOrder
 {
+    public function behaviors(): array
+    {
+        return [
+            [
+                'class' => OrderEventsBehavior::class,
+            ],
+        ];
+    }
 
-    public function init()
+    public function init(): void
     {
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'createJobIfNeeded']);
         $this->on(self::EVENT_AFTER_INSERT, [$this, 'createJobIfNeeded']);
+
         parent::init();
     }
 
@@ -169,11 +179,12 @@ class Order extends BaseOrder
      */
     public function getHistory()
     {
-        return $this->hasMany('common\models\OrderHistory', ['order_id' => 'id']);
+        return $this
+            ->hasMany('common\models\OrderHistory', ['order_id' => 'id'])
+            ->orderBy(['id' => SORT_DESC]);
     }
 
     /**
-     * <<<<<<< HEAD
      * Get carrier
      *
      * @return \yii\db\ActiveQuery

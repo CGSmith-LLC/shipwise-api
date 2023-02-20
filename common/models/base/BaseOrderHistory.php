@@ -2,22 +2,23 @@
 
 namespace common\models\base;
 
+use yii\db\ActiveRecord;
+
 /**
  * This is the model class for table "order_history".
  *
- * @property int    $id
- * @property int    $status_id
- * @property int    $order_id
+ * @property int $id
+ * @property int $user_id
+ * @property int $order_id
  * @property string $created_date
- * @property string $comment
+ * @property string $notes
  */
-class BaseOrderHistory extends \yii\db\ActiveRecord
+class BaseOrderHistory extends ActiveRecord
 {
-
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'order_history';
     }
@@ -25,27 +26,27 @@ class BaseOrderHistory extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            [['status_id', 'order_id'], 'required'],
-            [['status_id', 'order_id'], 'integer'],
+            [['user_id', 'order_id'], 'required'],
+            [['user_id', 'order_id'], 'integer'],
             [['created_date'], 'safe'],
-            [['comment'], 'string'],
+            [['notes'], 'string'],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
-            'id'           => 'ID',
-            'status_id'    => 'Status ID',
-            'order_id'     => 'Order ID',
+            'id' => 'ID',
+            'user_id' => 'User',
+            'order_id' => 'Order',
             'created_date' => 'Created Date',
-            'comment'      => 'Comment',
+            'notes' => 'Notes',
         ];
     }
 }

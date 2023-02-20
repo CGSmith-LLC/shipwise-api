@@ -50,7 +50,6 @@ class OrderEx extends Order
      *     @SWG\Property( property = "createdDate", type = "string", format = "date-time" ),
      *     @SWG\Property( property = "updatedDate", type = "string", format = "date-time" ),
      *     @SWG\Property( property = "status", ref = "#/definitions/Status" ),
-     *     @SWG\Property( property = "history", ref = "#/definitions/OrderHistory" ),
      *     @SWG\Property( property = "customer", ref = "#/definitions/Customer" ),
      *     @SWG\Property( property = "poNumber", type = "string", description = "PO Number of ecommerce customer" ),
      *     @SWG\Property( property = "uuid", type = "string", description = "Reference to ecommerce UUID" ),
@@ -122,18 +121,6 @@ class OrderEx extends Order
     public function getStatus()
     {
         return $this->hasOne('api\modules\v1\models\order\StatusEx', ['id' => 'status_id']);
-    }
-
-    /**
-     * Get Order History
-     *
-     * Overwrite parent method to use OrderHistoryEx
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getHistory()
-    {
-        return $this->hasMany('api\modules\v1\models\order\OrderHistoryEx', ['order_id' => 'id'])->limit(3)->orderBy(['id' => SORT_DESC]);
     }
 
     /**

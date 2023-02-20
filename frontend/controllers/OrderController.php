@@ -6,6 +6,8 @@ use common\pdf\OrderPackingSlip;
 use common\models\forms\OrderForm;
 use common\models\{base\BaseBatch,
     Country,
+    events\OrderViewedEvent,
+    OrderHistory,
     OrderImport,
     ScheduledOrder,
     State,
@@ -27,6 +29,7 @@ use yii\web\{BadRequestHttpException,
     NotFoundHttpException,
     Response,
     ServerErrorHttpException};
+use yii\base\Event;
 use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\helpers\ArrayHelper;
@@ -259,15 +262,27 @@ class OrderController extends Controller
      *
      * @param integer $id
      *
-     * @return mixed
+     * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView(int $id): string
     {
+        $model = $this->findModel($id);
+        $model->trigger(OrderViewedEvent::EVENT_ORDER_VIEWED, new OrderViewedEvent(['order' => $model]));
+
+        $dataProviderHistory = new ActiveDataProvider([
+            'query' => OrderHistory::find()->where(['order_id' => $model->id]),
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+        ]);
+
         return $this->render(
             'view',
             [
-                'model' => $this->findModel($id),
+                'model' => $model,
+                'dataProviderHistory' => $dataProviderHistory,
             ]
         );
     }
