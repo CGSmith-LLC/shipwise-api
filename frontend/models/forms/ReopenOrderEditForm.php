@@ -24,7 +24,6 @@ class ReopenOrderEditForm extends ScheduledOrder
             [['confirmed', 'reopen_enable'], 'boolean'],
             [['open_date'], 'string'],
             [['open_date'], 'required', 'when' => function($model){
-                //district required if country is set
                 return $model->reopen_enable === true;
             }, 'whenClient' => "function (attribute, value){
                 return $('#reopenordereditform-reopen_enable').val() != true;

@@ -292,7 +292,8 @@ $this->registerJs('
                         [
                             'attribute' => 'comment',
                             'value' => function ($model) {
-                                return '<p style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;width: 900px;">'.nl2br($model->comment).'</p>';
+                                return '<p style="text-overflow:ellipsis;overflow:hidden;white-space:nowrap;width: 900px;">'.nl2br(Html::encode($model->comment)).'</p>';
+
                             },
                             'format' => 'raw',
                         ],

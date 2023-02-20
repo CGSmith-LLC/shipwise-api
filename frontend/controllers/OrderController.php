@@ -283,7 +283,7 @@ class OrderController extends Controller
         $reopenModel->setAttributes(Yii::$app->request->post('ReopenOrderEditForm'));
 
         if (Yii::$app->request->post() && $reopenModel->validate()) {
-            if($reopenModel->reopen_enable){
+            if ($reopenModel->reopen_enable) {
                 $scheduledOrder = new ScheduledOrder([
                     'customer_id' => $order->customer_id,
                     'order_id' => $order->id,
@@ -293,13 +293,13 @@ class OrderController extends Controller
 
                 $transaction = \Yii::$app->db->beginTransaction();
 
-                if(!$scheduledOrder->save()){
+                if (!$scheduledOrder->save()) {
                     $transaction->rollBack();
                     return $this->errorMessage(400, 'Could not update order');
                 };
                 $transaction->commit();
-            }elseif(!is_null($scheduledOrder)){
-                if(!$scheduledOrder->delete()){
+            } elseif(!is_null($scheduledOrder)) {
+                if (!$scheduledOrder->delete()) {
                     return $this->errorMessage(400, 'Could not update order');
                 }
                 $scheduledOrder = null;
@@ -308,18 +308,18 @@ class OrderController extends Controller
             return $this->redirect(Yii::$app->request->referrer);
         }
 
-        if($scheduledOrder){
+        if ($scheduledOrder) {
             $reopenModel->open_date = $scheduledOrder->scheduled_date;
             $reopenModel->reopen_enable = true;
         }
 
-        //TODO remove sql from here
+        // TODO: remove SQL from here
         $itemsDataProvider = new \yii\data\ActiveDataProvider(['query' => \frontend\models\Item::find()->where(['order_id' => $order->id]),]);
         $itemsCount = Yii::$app->db->createCommand('
                 SELECT COUNT(*) FROM package_items WHERE order_id=:order_id
             ', [':order_id' => $order->id])->queryScalar();
 
-        if(!$isSimpleViewMode){
+        if (!$isSimpleViewMode) {
             $packagesDataProvider = new \yii\data\SqlDataProvider(['sql' => 'SELECT * from package_items_lot_info
                             left join package_items on
                             package_items.id = package_items_lot_info.package_items_id
@@ -354,7 +354,7 @@ class OrderController extends Controller
                 ]
             );
 
-        }else{
+        } else {
             return $this->render(
                 'view',
                 [
