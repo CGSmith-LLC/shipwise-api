@@ -6,6 +6,7 @@ use yii\widgets\DetailView;
 use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
 use common\models\Status;
+use yii\helpers\HtmlPurifier;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Order */
@@ -44,16 +45,6 @@ $(".status-links").on('click', function () {
 JS;
 
 $this->registerJs($js);
-$this->registerCss("
-    pre {
-        border: none;
-        padding: 5px;
-        line-height: 1;
-        max-height: 300px;
-        background-color: ivory;
-        font-size: 12px; 
-    }
-");
 ?>
 
 <div class="order-view">
@@ -246,7 +237,7 @@ $this->registerCss("
                             [
                                 'attribute' => 'notes',
                                 'value' => function ($model) {
-                                    return '<pre>' . nl2br($model->notes) . '</pre>';
+                                    return '<pre>' . HtmlPurifier::process(nl2br($model->notes)) . '</pre>';
                                 },
                                 'format' => 'raw',
                                 'enableSorting' => false,

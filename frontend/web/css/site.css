@@ -370,3 +370,16 @@ ul.auth-clients {
     text-align: center;
     font-size: 16px;
 }
+
+pre {
+    border: none;
+    padding: 5px;
+    line-height: 1;
+    max-height: 300px;
+    background-color: ivory;
+    font-size: 12px;
+}
+
+.form-actions {
+    margin: 0 0 15px 0 !important;
+}
