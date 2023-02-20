@@ -12,19 +12,21 @@ use yii\bootstrap\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Order */
 /* @var $reopenModel frontend\models\forms\ReopenOrderEditForm */
+/* @var $historyDataProvider yii\data\ActiveDataProvider */
+/* @var $packagesDataProvider yii\data\SqlDataProvider */
+/* @var $itemsDataProvider yii\data\ActiveDataProvider */
+/* @var $simple boolean view mode */
+/* @var $status int hold status */
+/* @var $statusesList array  status list */
 
 $this->title = 'Order ' . $model->customer_reference;
 $this->params['breadcrumbs'][] = ['label' => 'Orders', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
-$cookies = Yii::$app->request->cookies;
-$simple = $cookies->getValue('simple');
 
-$statusesList = Status::getList();
 $statusUrl = Url::to(['order/status-update']);
 
 \frontend\assets\ToggleAsset::register($this);
-$status = \common\models\Status::ON_HOLD;
 
 $js = <<<JS
 
@@ -90,7 +92,7 @@ $this->registerJs('
 <div class="order-view">
 
     <h1 style="display: inline"><?= Html::encode($this->title) ?></h1>
-    <div style="display: inline;" id="order-status"><?= Html::encode($model->status->getStatusLabel()) ?></div>
+    <div style="display: inline;" id="order-status"><?= $model->status->getStatusLabel() ?></div>
 
     <h4 style="margin-top: -0.5rem; color: #575555;"><?= Html::encode($model->customer->name) ?> </h4>
 
@@ -115,11 +117,6 @@ $this->registerJs('
         </ul>
     </div>
 
-    <?php
-    $confirmed = true;
-    ?>
-
-
     <div class="btn-group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
@@ -138,9 +135,6 @@ $this->registerJs('
         </ul>
     </div>
 
-
-
-
     <div class="row">
         <div class="col-md-6">
 
@@ -153,7 +147,7 @@ $this->registerJs('
             <div class="panel-body">
         <label>Do you want to automatically change the status to Open at a specific time?</label>
         <?= $form->field($reopenModel, 'reopen_enable')->checkbox([
-            'readonly' => $confirmed,
+            'readonly' => true,
             'data-toggle' => 'toggle',
             'data-on' => 'Yes',
             'data-off' => 'No',
@@ -164,12 +158,12 @@ $this->registerJs('
             <?= $form->field($reopenModel, 'open_date', [
                 'inputOptions' => ['autocomplete' => 'off']
             ])->textInput([
-                'readonly' => $confirmed,
+                'readonly' => true,
                 'class' => 'date',
                 'value' => (isset($reopenModel->open_date)) ? $reopenModel->open_date : '',
             ])->label('Date and time to automatically change orders to Open'); ?>
         </div>
-        <?= Html::submitButton(($confirmed) ? 'Save Changes' : 'Review &rarr;', ['id'=>'reopen-form-submit-btn', 'class' => 'btn  btn-success disabled']); ?>
+        <?= Html::submitButton( 'Save Changes', ['id'=>'reopen-form-submit-btn', 'class' => 'btn  btn-success disabled']); ?>
     </div>
 
 
@@ -274,28 +268,8 @@ $this->registerJs('
             <h2>Items (<?= count($model->items) ?? null ?>)</h2>
             <?php
 
-            $dataProvider = new \yii\data\ActiveDataProvider(['query' => \frontend\models\Item::find()->where(['order_id' => $model->id]),]);
-            $count = Yii::$app->db->createCommand('
-                SELECT COUNT(*) FROM package_items WHERE order_id=:order_id
-            ', [':order_id' => $model->id])->queryScalar();
-
-            $dataProviderPackages = new \yii\data\SqlDataProvider(['sql' => 'SELECT * from package_items_lot_info
-                            left join package_items on
-                            package_items.id = package_items_lot_info.package_items_id
-                            left join packages on
-                            packages.id = package_items.package_id where packages.order_id = :order_id order by tracking',
-                'params' => [':order_id' => $model->id],
-                'totalCount' => $count,
-                'sort' => ['attributes' => ['packages.tracking',
-                    'name' => ['asc' => ['first_name' => SORT_ASC, 'last_name' => SORT_ASC],
-                        'desc' => ['first_name' => SORT_DESC, 'last_name' => SORT_DESC],
-                        'default' => SORT_DESC,
-                        'label' => 'Name',],],],
-                'pagination' => ['pageSize' => 20,],]);
-
             // get the user records in the current page
-            $models = $dataProvider->getModels();
-            echo \yii\grid\GridView::widget(['dataProvider' => $dataProvider,
+            echo \yii\grid\GridView::widget(['dataProvider' => $itemsDataProvider,
                 'columns' => ['quantity',
                     'sku',
                     'name','type'],]); ?>
@@ -304,22 +278,15 @@ $this->registerJs('
                 ?>
                 <h2>Packages</h2>
                 <?php
-                echo \yii\grid\GridView::widget(['dataProvider' => $dataProviderPackages,
+                echo \yii\grid\GridView::widget(['dataProvider' => $packagesDataProvider,
                     'columns' => ['tracking',
                         'quantity',
                         'sku',
                         'lot_number',],]);
-
                 ?>
                 <h2>Order History</h2>
                 <?php
-
-                $dataproviderHistory = new \yii\data\ActiveDataProvider([
-                    'query' => \common\models\OrderHistory::find()
-                        ->where(['order_id' => $model->id])
-                        ->orderBy(['created_date' => SORT_DESC])
-                ]);
-                echo \yii\grid\GridView::widget(['dataProvider' => $dataproviderHistory,
+                echo \yii\grid\GridView::widget(['dataProvider' => $historyDataProvider,
                     'columns' => [
                         'created_date:datetime',
                         [

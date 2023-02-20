@@ -265,6 +265,12 @@ class OrderController extends Controller
      */
     public function actionView($id)
     {
+        $cookies = Yii::$app->request->cookies;
+        $isSimpleViewMode = (bool)$cookies->getValue('simple');
+
+        $holdStatus = \common\models\Status::ON_HOLD;
+        $statusesList = Status::getList();
+
         $order = $this->findModel($id);
 
         $scheduledOrder = ScheduledOrder::findOne([
@@ -272,12 +278,11 @@ class OrderController extends Controller
             'order_id' => $id,
             'status_id' => Status::OPEN,
         ]);
-        $reopenModel = new ReopenOrderEditForm();
 
+        $reopenModel = new ReopenOrderEditForm();
         $reopenModel->setAttributes(Yii::$app->request->post('ReopenOrderEditForm'));
 
         if (Yii::$app->request->post() && $reopenModel->validate()) {
-
             if($reopenModel->reopen_enable){
                 $scheduledOrder = new ScheduledOrder([
                     'customer_id' => $order->customer_id,
@@ -285,11 +290,19 @@ class OrderController extends Controller
                     'status_id' => Status::OPEN,
                     'scheduled_date' => $reopenModel->open_date,
                 ]);
-                $scheduledOrder->save();
-            }else{
-                $scheduledOrder->delete();
+
+                $transaction = \Yii::$app->db->beginTransaction();
+
+                if(!$scheduledOrder->save()){
+                    $transaction->rollBack();
+                    return $this->errorMessage(400, 'Could not update order');
+                };
+                $transaction->commit();
+            }elseif(!is_null($scheduledOrder)){
+                if(!$scheduledOrder->delete()){
+                    return $this->errorMessage(400, 'Could not update order');
+                }
                 $scheduledOrder = null;
-                Yii::debug($scheduledOrder);
             }
 
             return $this->redirect(Yii::$app->request->referrer);
@@ -300,13 +313,60 @@ class OrderController extends Controller
             $reopenModel->reopen_enable = true;
         }
 
-        return $this->render(
-            'view',
-            [
-                'model' => $this->findModel($id),
-                'reopenModel' => $reopenModel
-            ]
-        );
+        //TODO remove sql from here
+        $itemsDataProvider = new \yii\data\ActiveDataProvider(['query' => \frontend\models\Item::find()->where(['order_id' => $order->id]),]);
+        $itemsCount = Yii::$app->db->createCommand('
+                SELECT COUNT(*) FROM package_items WHERE order_id=:order_id
+            ', [':order_id' => $order->id])->queryScalar();
+
+        if(!$isSimpleViewMode){
+            $packagesDataProvider = new \yii\data\SqlDataProvider(['sql' => 'SELECT * from package_items_lot_info
+                            left join package_items on
+                            package_items.id = package_items_lot_info.package_items_id
+                            left join packages on
+                            packages.id = package_items.package_id where packages.order_id = :order_id order by tracking',
+                'params' => [':order_id' => $order->id],
+                'totalCount' => $itemsCount,
+                'sort' => ['attributes' => ['packages.tracking',
+                    'name' => ['asc' => ['first_name' => SORT_ASC, 'last_name' => SORT_ASC],
+                        'desc' => ['first_name' => SORT_DESC, 'last_name' => SORT_DESC],
+                        'default' => SORT_DESC,
+                        'label' => 'Name',],],],
+                'pagination' => ['pageSize' => 20,],]);
+
+            $historyDataProvider = new \yii\data\ActiveDataProvider([
+                'query' => \common\models\OrderHistory::find()
+                    ->where(['order_id' => $order->id])
+                    ->orderBy(['created_date' => SORT_DESC])
+            ]);
+
+            return $this->render(
+                'view',
+                [
+                    'simple' => $isSimpleViewMode,
+                    'model' => $order,
+                    'reopenModel' => $reopenModel,
+                    'statusesList' => $statusesList,
+                    'status' => $holdStatus,
+                    'itemsDataProvider' => $itemsDataProvider,
+                    'historyDataProvider' => $historyDataProvider,
+                    'packagesDataProvider' => $packagesDataProvider,
+                ]
+            );
+
+        }else{
+            return $this->render(
+                'view',
+                [
+                    'simple' => $isSimpleViewMode,
+                    'model' => $order,
+                    'reopenModel' => $reopenModel,
+                    'statusesList' => $statusesList,
+                    'status' => $holdStatus,
+                    'itemsDataProvider' => $itemsDataProvider,
+                ]
+            );
+        }
     }
 
     /**

@@ -3,23 +3,19 @@
 namespace frontend\models\forms;
 
 use common\models\ScheduledOrder;
-use yii\base\Model;
 
 /**
- * Class BulkEditForm
+ * Class ReopenOrderEditForm
  *
- * This model is for modifying multiple orders
+ * This model is for modifying reopen orders scheduler
  *
  * @package frontend\models\forms
  */
 class ReopenOrderEditForm extends ScheduledOrder
 {
-
     public string $open_date ;
     public bool $reopen_enable = false;
-
     public bool $confirmed = false;
-
 
     /** {@inheritdoc} */
     public function rules()
@@ -39,20 +35,7 @@ class ReopenOrderEditForm extends ScheduledOrder
     public function attributeLabels()
     {
         return [
-            'order_ids' => 'Order numbers',
-            'action' => 'Status to change to',
+            'open_date' => 'Open date'
         ];
-    }
-
-    /**
-     * @return bool
-     */
-    public function beforeValidate()
-    {
-        // Break by ; , newline or space
-        $pattern = '/[;,\r\n ]/';
-//        $this->orders = preg_split($pattern, $this->order_ids);
-
-        return parent::beforeValidate();
     }
 }
