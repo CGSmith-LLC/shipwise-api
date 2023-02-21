@@ -8,7 +8,7 @@ use common\models\OrderHistory;
 
 class OrderCreatedEvent extends Event
 {
-    public const EVENT_IS_ENABLED = true;
+    public const EVENT_IS_ENABLED = false;
     public const EVENT_ORDER_CREATED = 'eventOrderCreated';
 
     public Order $order;
