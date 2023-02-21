@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use api\modules\v1\models\core\ApiConsumerEx;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
@@ -77,8 +78,12 @@ class OrderHistory extends BaseOrderHistory
         }
 
         if (!$this->user_id) {
-            if (!Yii::$app->user->isGuest) {
-                $this->user_id = Yii::$app->user->id;
+           if (!Yii::$app->user->isGuest) {
+               if (Yii::$app->user->identityClass == ApiConsumerEx::class) {
+                   $this->user_id = Yii::$app->user->identity->user_id;
+               } else {
+                   $this->user_id = Yii::$app->user->id;
+               }
             }
         }
 
