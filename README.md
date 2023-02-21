@@ -144,8 +144,10 @@ Example of importing a gzipped mysql dump:
 1. Install composer and run `composer install` on the root directory
 1. Run `php init` for development
 
-Frontend: localhost:30000 API: localhost:30001 MySQL: localhost:30002 PhpMyAdmin: localhost:30003 Shopify: localhost:
-30004
+Frontend: localhost:30000  
+API: localhost:30001  
+MySQL: localhost:30002   
+PhpMyAdmin: localhost:30003
 
 ### Running queue jobs locally
 
