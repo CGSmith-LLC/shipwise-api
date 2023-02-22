@@ -36,8 +36,8 @@ class BaseApiConsumer extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['auth_key', 'encrypted_secret'], 'required'],
+            [['id', 'user_id'], 'integer'],
+            [['auth_key', 'encrypted_secret', 'user_id'], 'required'],
             [['last_activity', 'created_date'], 'safe'],
             [['customer_id', 'status', 'superuser'], 'integer'],
             [['auth_key'], 'string', 'max' => 6],

@@ -16,12 +16,11 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'label')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'user_id')
-        ->hiddenInput(['value' => Yii::$app->user->identity->getId()]) ?>
+        ->hiddenInput(['value' => Yii::$app->user->identity->getId()])
+        ->label(false) ?>
 
     <?= $form->field($model, 'customer_id')
-        ->dropdownList($customers, ['prompt' => ' Please select'])
-        ->label(false);
-    ?>
+        ->dropdownList($customers, ['prompt' => ' Please select']) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
