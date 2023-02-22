@@ -5,6 +5,7 @@
 /* @var $content string */
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
@@ -136,7 +137,13 @@ $this->beginBody() ?>
             ]
         ];
         $menuItems[] = ['label' => 'Reports', 'url' => ['/report']];
-        $menuItems[] = ['label' => 'Support', 'url' => \yii\helpers\Url::to('https://support.getshipwise.com')];
+        $menuItems[] = ['label' => 'Support', 'url' => Url::to('https://support.getshipwise.com')];
+        $menuItems[] = [
+            'encode' => false,
+            'label' => '<i class="fa fa-lightbulb-o"></i> Suggestions',
+            'linkOptions' => ['target' => '_blank'],
+            'url' => Url::to('https://shipwise.kampsite.co/')
+        ];
 
         if (Yii::$app->user->identity->isAdmin) {
             $menuItems[] = [
