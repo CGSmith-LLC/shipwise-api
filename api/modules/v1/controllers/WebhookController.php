@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\controllers;
 
+use common\models\User;
 use Yii;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
@@ -52,6 +53,10 @@ class WebhookController extends ControllerEx
         try {
             $csvBox = new CsvBox($data);
             $csvBox->file_path = Yii::$app->params['csvBoxS3Path'];
+            // log in user that requested this for events
+
+            $identity = User::findOne(['email' => $csvBox->user_id]);
+            Yii::$app->user->login($identity);
 
             Yii::debug($csvBox->getS3FilePath());
 

@@ -184,6 +184,20 @@ class OrderForm extends Model
         ];
     }
 
+    public function beforeValidate()
+    {
+        if (isset($this->requestedShipDate)) {
+            $this->requestedShipDate = new \DateTime($this->requestedShipDate);
+            $this->requestedShipDate = $this->requestedShipDate->format('Y-m-d');
+        }
+        if (isset($this->mustArriveByDate)) {
+            $this->mustArriveByDate = new \DateTime($this->mustArriveByDate);
+            $this->mustArriveByDate = $this->mustArriveByDate->format('Y-m-d');
+        }
+        \Yii::debug($this);
+        return parent::beforeValidate();
+    }
+
     /**
      * Custom validator
      * Checks if attribute is an array and has at least one item

@@ -2,8 +2,6 @@
 
 namespace frontend\models;
 
-use Da\User\Model\User as BaseUser;
-use Da\User\Event\UserEvent;
 use Stripe\Customer;
 use yii\helpers\ArrayHelper;
 
@@ -15,29 +13,8 @@ use yii\helpers\ArrayHelper;
  * @property Customer[] $customers
  * @property integer $customer_id
  */
-class User extends BaseUser
+class User extends \common\models\User
 {
-
-    public function init()
-    {
-        $this->on(UserEvent::EVENT_BEFORE_REGISTER, function () {
-            $this->username = $this->email;
-        });
-
-        $this->on(UserEvent::EVENT_BEFORE_CREATE, function () {
-            $this->username = $this->email;
-        });
-
-        parent::init();
-    }
-
-    public function rules()
-    {
-        $rules = parent::rules();
-        $rules['fieldRequired'] = ['customer_id', 'required'];
-        unset($rules['usernameRequired']);
-        return $rules;
-    }
 
     /**
      * Get associated customers
@@ -98,16 +75,6 @@ class User extends BaseUser
         return $customer ? $customer->direct : false;
     }
 
-    /**
-     * Return the customer id
-     *
-     * @return string
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function getCustomerId()
-    {
-        return $this->customer_id;
-    }
 
     /**
      * Get array of associated customers IDs
