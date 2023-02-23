@@ -28,28 +28,33 @@ $this->params['breadcrumbs'][] = $title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'name',
             [
+                'label' => 'Platform:',
+                'attribute' => 'name',
+            ],
+            [
+                'label' => 'Status:',
                 'attribute' => 'status',
                 'format' => 'raw',
                 'value' => function($model) {
                     if ($model->status == EcommercePlatform::STATUS_PLATFORM_ACTIVE) {
-                        $string = '<span class="text-success" title="Active"><i class="glyphicon glyphicon-ok-circle"></i> Active</span>';
+                        $string = '<span>Active</span> <i class="glyphicon glyphicon-ok-circle text-success" title="Active"></i>';
                     } else {
-                        $string = '<span class="text-danger" title="Inactive"><i class="glyphicon glyphicon-ban-circle"></i> Inactive</span>';
+                        $string = '<span>Inactive</span> <i class="glyphicon glyphicon-ban-circle text-danger" title="Inactive"></i>';
                     }
 
                     return $string;
                 },
             ],
             [
-                'label' => 'Connected Customers',
+                'label' => 'Connected users:',
                 'format' => 'raw',
                 'value' => function($model) {
-                    return $model->getConnectedCustomersCounter();
+                    return $model->getConnectedUsersCounter();
                 },
             ],
             [
+                'label' => 'Meta data:',
                 'attribute' => 'meta',
                 'format' => 'raw',
                 'value' => function ($model) {
@@ -58,8 +63,16 @@ $this->params['breadcrumbs'][] = $title;
                         : null;
                 },
             ],
-            'created_date:datetime',
-            'updated_date:datetime',
+            [
+                'label' => 'Created date:',
+                'attribute' => 'created_date',
+                'format' => 'datetime',
+            ],
+            [
+                'label' => 'Updated date:',
+                'attribute' => 'updated_date',
+                'format' => 'datetime',
+            ],
         ],
     ]) ?>
 </div>

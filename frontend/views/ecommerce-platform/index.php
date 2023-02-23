@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $title;
                 'format' => 'raw',
                 'value' => function($model) {
                     $string = Html::encode($model->name);
-                    $string .= '<br><small class="text-muted">Connected customers: ' . $model->getConnectedCustomersCounter() . '</small>';
+                    $string .= '<br><small class="text-muted">Connected users: ' . $model->getConnectedUsersCounter() . '</small>';
 
                     if ($model->updated_date) {
                         $string .= '<br><small class="text-muted">Last update: ' . Yii::$app->formatter->asDatetime($model->updated_date) . '</small>';
@@ -54,9 +54,9 @@ $this->params['breadcrumbs'][] = $title;
                 ),
                 'value' => function($model) {
                     if ($model->status == EcommercePlatform::STATUS_PLATFORM_ACTIVE) {
-                        $string = '<span class="text-success" title="Active"><i class="glyphicon glyphicon-ok-circle"></i> Active</span>';
+                        $string = '<span>Active</span> <i class="glyphicon glyphicon-ok-circle text-success" title="Active"></i>';
                     } else {
-                        $string = '<span class="text-danger" title="Inactive"><i class="glyphicon glyphicon-ban-circle"></i> Inactive</span>';
+                        $string = '<span>Inactive</span> <i class="glyphicon glyphicon-ban-circle text-danger" title="Inactive"></i>';
                     }
 
                     return $string;
@@ -74,7 +74,7 @@ $this->params['breadcrumbs'][] = $title;
                             ? '<i class="glyphicon glyphicon-ban-circle" title="Make inactive"></i>'
                             : '<i class="glyphicon glyphicon-ok-circle" title="Make active"></i>';
                         $confirm = ($model->isActive())
-                            ? 'Are you sure you want to make this platform inactive? In this case, all integrations with the platform will be paused.'
+                            ? 'Are you sure you want to make this platform inactive? In this case, all integrations (orders) with the platform will not be processed.'
                             : 'Are you sure you want to make this platform active?';
 
                         return '<a href="' . $url . '" onclick="return confirm(\'' . $confirm . '\')">' . $icon . '</a>';

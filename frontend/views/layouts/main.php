@@ -175,6 +175,8 @@ $this->beginBody() ?>
             'items' => [
                 ['label' => 'Account', 'url' => ['/user/settings/profile']],
 
+                ['label' => 'Integrations', 'url' => ['/ecommerce-integration']],
+
                 ['label' => 'Items', 'url' => ['/sku']],
 
                 [

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\models\base\BaseEcommercePlatform;
+use yii\db\ActiveQuery;
 
 /**
  * Class EcommercePlatform
@@ -23,6 +24,11 @@ class EcommercePlatform extends BaseEcommercePlatform
         ];
     }
 
+    public function getEcommerceIntegration(): ActiveQuery
+    {
+        return $this->hasOne(EcommerceIntegration::class, ['platform_id' => 'id']);
+    }
+
     public function isActive(): bool
     {
         return $this->status === self::STATUS_PLATFORM_ACTIVE;
@@ -37,7 +43,7 @@ class EcommercePlatform extends BaseEcommercePlatform
     /**
      * TODO: implement this later
      */
-    public function getConnectedCustomersCounter(): int
+    public function getConnectedUsersCounter(): int
     {
         return 0;
     }
