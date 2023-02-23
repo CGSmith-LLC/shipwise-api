@@ -64,7 +64,7 @@ class OrderHistory extends BaseOrderHistory
 
     public function getUser(): ActiveQuery
     {
-        return $this->hasOne('frontend\models\User', ['id' => 'user_id']);
+        return $this->hasOne('common\models\User', ['id' => 'user_id']);
     }
 
     protected function orderHistoryPopulate(): void
@@ -78,12 +78,8 @@ class OrderHistory extends BaseOrderHistory
         }
 
         if (!$this->user_id) {
-           if (!Yii::$app->user->isGuest) {
-               if (Yii::$app->user->identityClass == ApiConsumerEx::class) {
-                   $this->user_id = Yii::$app->user->identity->user_id;
-               } else {
-                   $this->user_id = Yii::$app->user->id;
-               }
+            if (!Yii::$app->user->isGuest) {
+                $this->user_id = Yii::$app->user->identity->id;
             }
         }
 
