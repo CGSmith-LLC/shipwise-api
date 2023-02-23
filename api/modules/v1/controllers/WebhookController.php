@@ -151,6 +151,7 @@ class WebhookController extends ControllerEx
         \Yii::$app->queue->push(
             new NotificationJob([
                 'customer_id' => $csvBox->customer_id,
+                'user_id' => Yii::$app->user->identity->id,
                 'subject' => '⚠️ Problem importing order file ' . $csvBox->original_filename,
                 'message' => 'This file failed to import for the following reasons: <ul>' . $errors . '</ul>',
                 'url' => ['/order/import',],
