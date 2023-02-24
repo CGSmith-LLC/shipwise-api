@@ -6,7 +6,7 @@ use common\models\EcommercePlatform;
 /**
  * Class m230221_134343_add_shopify_mock_ecommerce_platfort
  */
-class m230221_134343_add_shopify_mock_ecommerce_platfort extends Migration
+class m230221_134343_add_shopify_mock_ecommerce_platform extends Migration
 {
     /**
      * {@inheritdoc}
