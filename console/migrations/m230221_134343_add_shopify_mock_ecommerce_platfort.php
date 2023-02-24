@@ -1,7 +1,6 @@
 <?php
 
 use yii\db\Migration;
-use common\models\EcommercePlatform;
 
 /**
  * Class m230221_134343_add_shopify_mock_ecommerce_platfort
@@ -13,10 +12,9 @@ class m230221_134343_add_shopify_mock_ecommerce_platform extends Migration
      */
     public function safeUp()
     {
-        $ecommercePlatform = new EcommercePlatform();
-        $ecommercePlatform->name = EcommercePlatform::SHOPIFY_PLATFORM_NAME;
-        $ecommercePlatform->save();
-
+        $this->insert('{{%ecommerce_platform}}', [
+            'name' => 'Shopify'
+        ]);
     }
 
     /**
@@ -24,12 +22,8 @@ class m230221_134343_add_shopify_mock_ecommerce_platform extends Migration
      */
     public function safeDown()
     {
-        $ecommercePlatform = EcommercePlatform::find()
-            ->where(['name' => EcommercePlatform::SHOPIFY_PLATFORM_NAME])
-            ->one();
-
-        if ($ecommercePlatform) {
-            $ecommercePlatform->delete();
-        }
+        $this->delete('{{%ecommerce_platform}}', [
+            'name' => 'Shopify'
+        ]);
     }
 }
