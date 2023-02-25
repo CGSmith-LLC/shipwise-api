@@ -3,13 +3,13 @@
 namespace frontend\controllers;
 
 use Yii;
+use yii\helpers\Url;
 use yii\web\Response;
-use common\models\EcommercePlatform;
 use yii\filters\AccessControl;
-use yii\web\NotFoundHttpException;
 use Da\User\Filter\AccessRuleFilter;
-use common\models\EcommerceIntegration;
-use yii\web\ServerErrorHttpException;
+use common\models\{EcommercePlatform, EcommerceIntegration};
+use common\models\forms\platforms\ConnectShopifyStoreForm;
+use yii\web\{NotFoundHttpException, ServerErrorHttpException};
 
 class EcommerceIntegrationController extends Controller
 {
@@ -32,6 +32,46 @@ class EcommerceIntegrationController extends Controller
                 ],
             ],
         ];
+    }
+
+    /**
+     * Connects Shopify shop.
+     * @return string|Response
+     * @throws ServerErrorHttpException
+     */
+    public function actionShopify(): string|Response
+    {
+        if (Yii::$app->request->isPost) {
+            // Step 1 - Send request to receive access token:
+            $model = new ConnectShopifyStoreForm([
+                'scenario' => ConnectShopifyStoreForm::SCENARIO_AUTH_REQUEST
+            ]);
+            $model->load(Yii::$app->request->post());
+
+            if ($model->validate()) {
+                $model->auth();
+            }
+        } elseif (Yii::$app->request->get('code')) {
+            // Step 2 - Receive and save access token:
+            $model = new ConnectShopifyStoreForm([
+                'scenario' => ConnectShopifyStoreForm::SCENARIO_SAVE_ACCESS_TOKEN,
+                'url' => Yii::$app->request->get('shop'),
+                'code' => Yii::$app->request->get('code')
+            ]);
+
+            if ($model->validate()) {
+                $model->saveAccessToken();
+
+                Yii::$app->session->setFlash('success', 'Shopify shop has been connected.');
+                return $this->redirect(['index']);
+            }
+        } else {
+            $model = new ConnectShopifyStoreForm();
+        }
+
+        return $this->render('shopify', [
+            'model' => $model,
+        ]);
     }
 
     /**

@@ -24,7 +24,8 @@
         "2amigos/2fa-library": "^2.0",
         "2amigos/qrcode-library": "^2.0",
         "frostealth/yii2-aws-s3": "~2.0",
-        "league/csv": "^9.8"
+        "league/csv": "^9.8",
+        "phpclassic/php-shopify": "^1.2"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
