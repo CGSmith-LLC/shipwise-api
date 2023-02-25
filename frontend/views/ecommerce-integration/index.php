@@ -1,6 +1,7 @@
 <?php
 use yii\web\View;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use common\models\EcommercePlatform;
 
 /* @var $this View */
@@ -16,9 +17,15 @@ $this->params['breadcrumbs'][] = $title;
         <?= Html::encode($title) ?>
     </h1>
 
-    <?php foreach ($models as $model) { ?>
-        <?= $this->render('_platform', [
-            'model' => $model,
-        ]) ?>
-    <?php } ?>
+    <div class="well well-sm">
+        <a href="<?= Url::to(['/ecommerce-integration/shopify']) ?>" class="btn btn-success">Connect Shopify shop</a>
+    </div>
+
+    <div>
+        <?php foreach ($models as $model) { ?>
+            <?= $this->render('_platform', [
+                'model' => $model,
+            ]) ?>
+        <?php } ?>
+    </div>
 </div>

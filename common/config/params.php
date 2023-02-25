@@ -63,4 +63,20 @@ return [
     'csvBoxS3Bucket' => '',
     'csvBoxS3Path' => '',
     'csvBoxImportKey' => '',
+
+    /**
+     * Shopify
+     */
+    'shopify' => [
+        /**
+         * Visit https://partners.shopify.com/ -> Apps -> Your App -> Overview -> Client credentials
+         */
+        'client_id' => '',
+        'client_secret' => '',
+        /**
+         * You can set `https://shipwise.ngrok.io` to test it locally.
+         * Otherwise, if leave the default value, the current server's domain name will be used automatically.
+         */
+        'override_redirect_domain' => false,
+    ],
 ];

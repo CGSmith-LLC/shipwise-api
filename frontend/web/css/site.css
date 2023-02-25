@@ -383,3 +383,11 @@ pre {
 .form-actions {
     margin: 0 0 15px 0 !important;
 }
+
+.mb-2 {
+    margin-bottom: 20px;
+}
+
+.mt-2 {
+    margin-top: 20px;
+}
