@@ -282,7 +282,7 @@ class BulkAction extends BaseBulkAction
     public function changeStatus($params = null)
     {
         Yii::debug($params);
-        if (isset($params[0]) && in_array($params[0], Status::getList('id', 'id'))) {
+        if (isset($params[0]) && in_array($params[0], array_keys(Status::getList('id', 'id')))) {
             $newStatus = $params[0];
         } else {
             $this->addError('params', 'Incorrect parameters');
