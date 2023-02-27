@@ -4,6 +4,7 @@ namespace common\models\base;
 
 use yii\db\ActiveRecord;
 use yii\db\ActiveQuery;
+use common\models\query\EcommerceIntegrationQuery;
 use common\models\EcommercePlatform;
 use common\models\Customer;
 use frontend\models\User;
@@ -26,6 +27,14 @@ use frontend\models\User;
  */
 class BaseEcommerceIntegration extends ActiveRecord
 {
+    /**
+     * @return EcommerceIntegrationQuery
+     */
+    public static function find(): EcommerceIntegrationQuery
+    {
+        return new EcommerceIntegrationQuery(get_called_class());
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -79,7 +88,7 @@ class BaseEcommerceIntegration extends ActiveRecord
     /**
      * @return ActiveQuery
      */
-    public function getPlatform(): ActiveQuery
+    public function getEcommercePlatform(): ActiveQuery
     {
         return $this->hasOne(EcommercePlatform::class, ['id' => 'platform_id']);
     }

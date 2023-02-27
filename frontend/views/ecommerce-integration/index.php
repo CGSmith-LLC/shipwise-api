@@ -2,12 +2,12 @@
 use yii\web\View;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use common\models\EcommercePlatform;
+use common\models\EcommerceIntegration;
 
 /* @var $this View */
-/* @var $models EcommercePlatform[] */
+/* @var $models EcommerceIntegration[] */
 
-$title = 'Ecommerce Integrations';
+$title = 'E-commerce Integrations';
 $this->title = $title . ' - ' . Yii::$app->name;
 $this->params['breadcrumbs'][] = $title;
 ?>
@@ -22,10 +22,19 @@ $this->params['breadcrumbs'][] = $title;
     </div>
 
     <div>
-        <?php foreach ($models as $model) { ?>
-            <?= $this->render('_platform', [
-                'model' => $model,
-            ]) ?>
+        <?php if ($models) { ?>
+            <?php foreach ($models as $model) { ?>
+                <?= $this->render('_platform', [
+                    'model' => $model,
+                ]) ?>
+            <?php } ?>
+        <?php } else { ?>
+            <div class="text-center">
+                <h3>
+                    No connected shops yet.
+                    Please connect your first shop.
+                </h3>
+            </div>
         <?php } ?>
     </div>
 </div>

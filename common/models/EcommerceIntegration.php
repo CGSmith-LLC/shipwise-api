@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use yii\helpers\Json;
 use common\models\base\BaseEcommerceIntegration;
 
 /**
@@ -10,14 +11,20 @@ use common\models\base\BaseEcommerceIntegration;
  */
 class EcommerceIntegration extends BaseEcommerceIntegration
 {
-    public const STATUS_INTEGRATION_DISCONNECTED = 0;
     public const STATUS_INTEGRATION_CONNECTED = 1;
-    public const STATUS_INTEGRATION_PAUSED = -1;
+    public const STATUS_INTEGRATION_PAUSED = 0;
+
+    public array $array_meta_data = [];
+
+    public function init(): void
+    {
+        parent::init();
+        $this->on(self::EVENT_AFTER_FIND, [$this, 'convertMetaData']);
+    }
 
     public static function getStatuses(): array
     {
         return [
-            self::STATUS_INTEGRATION_DISCONNECTED => 'Disconnected',
             self::STATUS_INTEGRATION_CONNECTED => 'Connected',
             self::STATUS_INTEGRATION_PAUSED => 'Paused',
         ];
@@ -28,13 +35,32 @@ class EcommerceIntegration extends BaseEcommerceIntegration
         return $this->status === self::STATUS_INTEGRATION_CONNECTED;
     }
 
-    public function isDisconnected(): bool
-    {
-        return $this->status === self::STATUS_INTEGRATION_DISCONNECTED;
-    }
-
     public function isPaused(): bool
     {
         return $this->status === self::STATUS_INTEGRATION_PAUSED;
+    }
+
+    public function disconnect(): bool|int
+    {
+        return $this->delete();
+    }
+
+    public function pause(): bool
+    {
+        $this->status = self::STATUS_INTEGRATION_PAUSED;
+        return $this->save();
+    }
+
+    public function resume(): bool
+    {
+        $this->status = self::STATUS_INTEGRATION_CONNECTED;
+        return $this->save();
+    }
+
+    protected function convertMetaData(): void
+    {
+        if ($this->meta) {
+            $this->array_meta_data = Json::decode($this->meta);
+        }
     }
 }

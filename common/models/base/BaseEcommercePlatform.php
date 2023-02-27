@@ -3,7 +3,6 @@
 namespace common\models\base;
 
 use yii\db\ActiveRecord;
-use common\models\query\EcommercePlatformQuery;
 
 /**
  * This is the model class for table "ecommerce_platform".
@@ -17,14 +16,6 @@ use common\models\query\EcommercePlatformQuery;
  */
 class BaseEcommercePlatform extends ActiveRecord
 {
-    /**
-     * @return EcommercePlatformQuery
-     */
-    public static function find(): EcommercePlatformQuery
-    {
-        return new EcommercePlatformQuery(get_called_class());
-    }
-
     /**
      * {@inheritdoc}
      */

@@ -11,7 +11,7 @@ use common\models\search\EcommercePlatformSearch;
 /* @var $searchModel EcommercePlatformSearch */
 /* @var $dataProvider ActiveDataProvider */
 
-$title = 'Ecommerce Platforms';
+$title = 'E-commerce Platforms';
 $this->title = $title . ' - ' . Yii::$app->name;
 $this->params['breadcrumbs'][] = $title;
 ?>

@@ -47,4 +47,9 @@ class EcommercePlatform extends BaseEcommercePlatform
     {
         return 0;
     }
+
+    public static function getShopifyObject(): ?EcommercePlatform
+    {
+        return self::findOne(['name' => self::SHOPIFY_PLATFORM_NAME]);
+    }
 }

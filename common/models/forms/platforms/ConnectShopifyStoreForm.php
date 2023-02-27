@@ -5,11 +5,16 @@ namespace common\models\forms\platforms;
 use Yii;
 use yii\base\Model;
 use yii\db\Expression;
+use PHPShopify\Exception\SdkException;
+use yii\web\ServerErrorHttpException;
 use common\services\platforms\ShopifyService;
 use common\models\EcommerceIntegration;
 use common\models\EcommercePlatform;
-use yii\web\ServerErrorHttpException;
 
+/**
+ * Class ConnectShopifyStoreForm
+ * @package common\models\forms\platforms
+ */
 class ConnectShopifyStoreForm extends Model
 {
     public const SCENARIO_AUTH_REQUEST = 'scenarioAuthRequest';
@@ -56,7 +61,7 @@ class ConnectShopifyStoreForm extends Model
     {
         if (EcommerceIntegration::find()
             ->andWhere(new Expression('`meta` LIKE :name', [':name' => '%"' . $this->name . '"%']))
-            ->andWhere(['platform_id' => EcommercePlatform::findOne(['name' => EcommercePlatform::SHOPIFY_PLATFORM_NAME])->id])
+            ->andWhere(['platform_id' => EcommercePlatform::getShopifyObject()->id])
             ->exists())
         {
             $this->addError('name', 'Shop name already exists.');
@@ -67,13 +72,16 @@ class ConnectShopifyStoreForm extends Model
     {
         if (EcommerceIntegration::find()
             ->andWhere(new Expression('`meta` LIKE :url', [':url' => '%"' . $this->url . '"%']))
-            ->andWhere(['platform_id' => EcommercePlatform::findOne(['name' => EcommercePlatform::SHOPIFY_PLATFORM_NAME])->id])
+            ->andWhere(['platform_id' => EcommercePlatform::getShopifyObject()->id])
             ->exists())
         {
             $this->addError('url', 'Shop URL already exists.');
         }
     }
 
+    /**
+     * @throws SdkException
+     */
     public function auth(): void
     {
         $this->saveShopName();
@@ -85,6 +93,7 @@ class ConnectShopifyStoreForm extends Model
 
     /**
      * @throws ServerErrorHttpException
+     * @throws SdkException
      */
     public function saveAccessToken(): void
     {
