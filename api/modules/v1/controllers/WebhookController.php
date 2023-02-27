@@ -122,6 +122,8 @@ class WebhookController extends ControllerEx
     {
         $headers = Yii::$app->request->headers;
         $customer_id = 76;
+        $identity = User::findOne(1);
+        Yii::$app->user->login($identity);
         if ($headers->get('authorization') === 'Basic c2hpcHdpc2U6bmVlc3ZpZ3M=') {
             $duda = new DudaAdapter();
             $duda->customer_id = $customer_id; // urban smokehouse
