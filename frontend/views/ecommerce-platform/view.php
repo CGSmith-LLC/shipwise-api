@@ -47,10 +47,10 @@ $this->params['breadcrumbs'][] = $title;
                 },
             ],
             [
-                'label' => 'Connected users:',
+                'label' => 'Connected shops:',
                 'format' => 'raw',
                 'value' => function($model) {
-                    return $model->getConnectedUsersCounter();
+                    return $model->getConnectedShopsCounter();
                 },
             ],
             [

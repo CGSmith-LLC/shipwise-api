@@ -40,12 +40,11 @@ class EcommercePlatform extends BaseEcommercePlatform
         $this->save();
     }
 
-    /**
-     * TODO: implement this later
-     */
-    public function getConnectedUsersCounter(): int
+    public function getConnectedShopsCounter(): int
     {
-        return 0;
+        return EcommerceIntegration::find()
+            ->where(['platform_id' => $this->id])
+            ->count();
     }
 
     public static function getShopifyObject(): ?EcommercePlatform
