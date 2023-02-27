@@ -1,7 +1,6 @@
 <?php
 use yii\web\View;
 use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use common\models\forms\platforms\ConnectShopifyStoreForm;
 
@@ -10,7 +9,7 @@ use common\models\forms\platforms\ConnectShopifyStoreForm;
 
 $title = 'Shopify Integration';
 $this->title = $title . ' - ' . Yii::$app->name;
-$this->params['breadcrumbs'][] = ['label' => 'Ecommerce Integrations', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'E-commerce Integrations', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $title;
 ?>
 

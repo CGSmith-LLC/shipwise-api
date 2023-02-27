@@ -10,6 +10,7 @@ use PHPShopify\AuthHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\ServerErrorHttpException;
+use PHPShopify\Exception\SdkException;
 
 /**
  * Class ShopifyService
@@ -52,6 +53,9 @@ class ShopifyService
         $this->shopify = new ShopifySDK($config);
     }
 
+    /**
+     * @throws SdkException
+     */
     public function auth(): void
     {
         $redirectDomain = trim(Url::to(['/'], true), '/');
@@ -65,8 +69,13 @@ class ShopifyService
         exit;
     }
 
-    public function accessToken(string $shopName)
+    /**
+     * @throws SdkException
+     * @throws ServerErrorHttpException
+     */
+    public function accessToken(string $shopName): void
     {
+        // Step 2 - Receive and save access token:
         $accessToken = AuthHelper::createAuthRequest($this->scopes);
 
         $meta = [

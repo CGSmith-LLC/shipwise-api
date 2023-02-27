@@ -10,8 +10,8 @@ use common\models\EcommercePlatform;
 /* @var $model EcommercePlatform */
 
 $title = $model->name;
-$this->title = $title . ' - Ecommerce Platforms - ' . Yii::$app->name;
-$this->params['breadcrumbs'][] = ['label' => 'Ecommerce Platforms', 'url' => ['index']];
+$this->title = $title . ' - E-commerce Platforms - ' . Yii::$app->name;
+$this->params['breadcrumbs'][] = ['label' => 'E-commerce Platforms', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $title;
 ?>
 

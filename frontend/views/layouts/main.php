@@ -158,7 +158,7 @@ $this->beginBody() ?>
                     ['label' => 'Subscriptions', 'url' => ['/subscription']],
                     ['label' => 'One-Time Charges', 'url' => ['/one-time-charge']],
                     ['label' => 'Invoices', 'url' => ['/invoice']],
-                    ['label' => 'Ecommerce Platforms', 'url' => ['/ecommerce-platform']],
+                    ['label' => 'E-commerce Platforms', 'url' => ['/ecommerce-platform']],
                     ['label' => 'Integrations', 'url' => ['/integration']],
                     ['label' => 'Behaviors', 'url' => ['/behavior']],
                     ['label' => 'Jobs', 'url' => ['/monitor/jobs']],
