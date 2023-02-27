@@ -38,7 +38,7 @@ to `https://shipwise.ngrok.io`.
 
 1. Go to `https://partners.shopify.com/` -> `Stores`.
 
-2. Press `Add store` -> `Create developemrnt store`.
+2. Press `Add store` -> `Create development store`.
 
 3. Choose `Development store use`, specify `Store name`, specify `Store URL`.
 In `Data and configurations`, choose `Start with test data`.

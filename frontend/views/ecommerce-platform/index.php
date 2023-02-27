@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $title;
                 'format' => 'raw',
                 'value' => function($model) {
                     $string = Html::encode($model->name);
-                    $string .= '<br><small class="text-muted">Connected users: ' . $model->getConnectedUsersCounter() . '</small>';
+                    $string .= '<br><small class="text-muted">Connected shops: ' . $model->getConnectedShopsCounter() . '</small>';
 
                     if ($model->updated_date) {
                         $string .= '<br><small class="text-muted">Last update: ' . Yii::$app->formatter->asDatetime($model->updated_date) . '</small>';
