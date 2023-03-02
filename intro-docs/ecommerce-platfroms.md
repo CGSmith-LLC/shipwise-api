@@ -16,7 +16,12 @@
 
 1. Visit our website - `/ecommerce-platform` (you must be an `Admin`).
 
-# Shopify
+# Constraints
+
+1. A new integration can be added by a user only if the needed e-commerce platform
+has the status `Active`.
+
+# E-commerce Integrations - Shopify
 
 ### App:
 

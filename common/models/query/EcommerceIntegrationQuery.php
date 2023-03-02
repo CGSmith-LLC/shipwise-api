@@ -2,6 +2,7 @@
 
 namespace common\models\query;
 
+use common\models\EcommerceIntegration;
 use yii\db\ActiveQuery;
 
 /**
@@ -10,6 +11,11 @@ use yii\db\ActiveQuery;
  */
 class EcommerceIntegrationQuery extends ActiveQuery
 {
+    public function active(): EcommerceIntegrationQuery
+    {
+        return $this->andWhere(['status' => EcommerceIntegration::STATUS_INTEGRATION_CONNECTED]);
+    }
+
     public function for(?int $userId = null, ?int $customerId = null): EcommerceIntegrationQuery
     {
         if ($userId) {

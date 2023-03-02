@@ -1,8 +1,10 @@
 <?php
 use yii\web\View;
 use yii\helpers\Html;
+use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use common\models\forms\platforms\ConnectShopifyStoreForm;
+use common\models\Customer;
 
 /* @var $this View */
 /* @var $model ConnectShopifyStoreForm */
@@ -11,6 +13,11 @@ $title = 'Shopify Integration';
 $this->title = $title . ' - ' . Yii::$app->name;
 $this->params['breadcrumbs'][] = ['label' => 'E-commerce Integrations', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $title;
+
+$customersList = ArrayHelper::map(
+    Customer::find()
+        ->orderBy(['name' => SORT_ASC])
+        ->all(), 'id','name');
 ?>
 
 <div>
@@ -42,6 +49,17 @@ $this->params['breadcrumbs'][] = $title;
                         ->textInput([
                             'class' => 'form-control',
                             'placeholder' => $model->getAttributeLabel('url') . '...',
+                            'required' => true,
+                            'maxlength' => true
+                        ]) ?>
+                </div>
+                <div class="col-sm-12">
+                    <?= $form
+                        ->field($model, 'customer_id')
+                        ->dropdownList($customersList, [
+                            'class' => 'form-control',
+                            'prompt' => $model->getAttributeLabel('customer_id') . '...',
+                            'placeholder' => $model->getAttributeLabel('customer_id') . '...',
                             'required' => true,
                             'maxlength' => true
                         ]) ?>

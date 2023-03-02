@@ -50,7 +50,7 @@ class BaseEcommerceIntegration extends ActiveRecord
     {
         return [
             [['meta'], 'default', 'value' => null],
-            [['user_id', 'platform_id'], 'required'],
+            [['user_id', 'customer_id', 'platform_id'], 'required'],
             [['user_id', 'customer_id', 'platform_id', 'status'], 'integer'],
             [['meta'], 'string'],
             [['created_date', 'updated_date'], 'safe'],

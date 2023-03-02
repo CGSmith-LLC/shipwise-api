@@ -3,6 +3,7 @@
 namespace common\models\forms\platforms;
 
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\db\Expression;
 use PHPShopify\Exception\SdkException;
@@ -10,6 +11,7 @@ use yii\web\ServerErrorHttpException;
 use common\services\platforms\ShopifyService;
 use common\models\EcommerceIntegration;
 use common\models\EcommercePlatform;
+use common\models\Customer;
 
 /**
  * Class ConnectShopifyStoreForm
@@ -22,12 +24,13 @@ class ConnectShopifyStoreForm extends Model
 
     public ?string $name = null;
     public ?string $url = null;
+    public ?int $customer_id = null;
     public ?string $code = null;
 
     public function scenarios(): array
     {
         return [
-            self::SCENARIO_AUTH_REQUEST => ['name', 'url'],
+            self::SCENARIO_AUTH_REQUEST => ['name', 'url', 'customer_id'],
             self::SCENARIO_SAVE_ACCESS_TOKEN => ['code'],
         ];
     }
@@ -40,9 +43,10 @@ class ConnectShopifyStoreForm extends Model
             /** @see https://www.regextester.com/104785 */
             ['url', 'match', 'pattern' => '/[^.\s]+\.myshopify\.com$/', 'message' => 'Invalid shop URL.'],
 
-            [['name', 'url'], 'required', 'on' => self::SCENARIO_AUTH_REQUEST],
+            [['name', 'url', 'customer_id'], 'required', 'on' => self::SCENARIO_AUTH_REQUEST],
             [['name'], 'validateShopName', 'on' => self::SCENARIO_AUTH_REQUEST],
             [['url'], 'validateShopUrl', 'on' => self::SCENARIO_AUTH_REQUEST],
+            ['customer_id', 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id'], 'on' => self::SCENARIO_AUTH_REQUEST],
 
             [['url', 'code'], 'required', 'on' => self::SCENARIO_SAVE_ACCESS_TOKEN],
         ];
@@ -53,6 +57,7 @@ class ConnectShopifyStoreForm extends Model
         return [
             'name' => 'Shop Name',
             'url' => 'Shop URL',
+            'customer_id' => 'Customer',
             'code' => 'Code',
         ];
     }
@@ -81,10 +86,12 @@ class ConnectShopifyStoreForm extends Model
 
     /**
      * @throws SdkException
+     * @throws InvalidConfigException
      */
     public function auth(): void
     {
         $this->saveShopName();
+        $this->saveCustomerId();
 
         // Step 1 - Send request to receive access token
         $shopifyService = new ShopifyService($this->url);
@@ -94,16 +101,25 @@ class ConnectShopifyStoreForm extends Model
     /**
      * @throws ServerErrorHttpException
      * @throws SdkException
+     * @throws InvalidConfigException
      */
     public function saveAccessToken(): void
     {
         // Step 2 - Receive and save access token:
         $shopifyService = new ShopifyService($this->url);
-        $shopifyService->accessToken(Yii::$app->session->get('shop_name', 'Shop Name'));
+        $shopifyService->accessToken(
+            Yii::$app->session->get('shop_name', 'Shop Name'),
+            Yii::$app->user->id,
+            Yii::$app->session->get('customer_id'));
     }
 
     protected function saveShopName()
     {
         Yii::$app->session->set('shop_name', $this->name);
+    }
+
+    protected function saveCustomerId()
+    {
+        Yii::$app->session->set('customer_id', $this->customer_id);
     }
 }

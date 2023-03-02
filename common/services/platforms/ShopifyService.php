@@ -3,12 +3,15 @@
 namespace common\services\platforms;
 
 use Yii;
+use common\models\Order;
+use yii\base\InvalidConfigException;
+use yii\helpers\Json;
+use yii\helpers\Url;
+use console\jobs\platforms\ParseShopifyOrderJob;
 use common\models\EcommerceIntegration;
 use common\models\EcommercePlatform;
 use PHPShopify\ShopifySDK;
 use PHPShopify\AuthHelper;
-use yii\helpers\Json;
-use yii\helpers\Url;
 use yii\web\ServerErrorHttpException;
 use PHPShopify\Exception\SdkException;
 
@@ -26,32 +29,43 @@ use PHPShopify\Exception\SdkException;
  */
 class ShopifyService
 {
-    protected ?string $token = null;
+    protected const API_VERSION = '2023-01';
     protected string $shopUrl;
     protected string $scopes = 'read_products,read_customers,read_fulfillments,read_orders,read_shipping,read_returns';
     protected string $redirectUrl = '/ecommerce-integration/shopify';
     protected ShopifySDK $shopify;
+    protected ?EcommerceIntegration $ecommerceIntegration = null;
 
-    public function __construct(string $shopUrl, string $token = null)
+    /**
+     * @throws InvalidConfigException
+     */
+    public function __construct(string $shopUrl, EcommerceIntegration $ecommerceIntegration = null)
     {
         $this->shopUrl = $shopUrl;
-        $this->token = $token;
+        $this->ecommerceIntegration = $ecommerceIntegration;
+        $config = [
+            'ApiVersion' => self::API_VERSION,
+            'ShopUrl' => $this->shopUrl,
+        ];
 
-        if (!$this->token) { // Authorize user's shop
-            $config = [
-                'ShopUrl' => $this->shopUrl,
-                'ApiKey' => Yii::$app->params['shopify']['client_id'],
-                'SharedSecret' => Yii::$app->params['shopify']['client_secret'],
-            ];
-        } else { // Use existing user's shop
-            $config = [
-                'ShopUrl' => $this->shopUrl,
-                'AccessToken' => $this->token,
-            ];
+        if (!$this->ecommerceIntegration) { // Authorize user's shop:
+            $config['ApiKey'] = Yii::$app->params['shopify']['client_id'];
+            $config['SharedSecret'] = Yii::$app->params['shopify']['client_secret'];
+        } else { // Use existing user's shop:
+            $config['AccessToken'] = $this->ecommerceIntegration->array_meta_data['access_token'];
         }
 
         $this->shopify = new ShopifySDK($config);
+
+        // Check if the provided token is valid:
+        if ($this->ecommerceIntegration) {
+            $this->isTokenValid();
+        }
     }
+
+    #########
+    # Auth: #
+    #########
 
     /**
      * @throws SdkException
@@ -73,7 +87,7 @@ class ShopifyService
      * @throws SdkException
      * @throws ServerErrorHttpException
      */
-    public function accessToken(string $shopName): void
+    public function accessToken(string $shopName, int $userId, int $customerId): void
     {
         // Step 2 - Receive and save access token:
         $accessToken = AuthHelper::createAuthRequest($this->scopes);
@@ -86,7 +100,8 @@ class ShopifyService
         ];
 
         $ecommerceIntegration = new EcommerceIntegration();
-        $ecommerceIntegration->user_id = Yii::$app->user->id;
+        $ecommerceIntegration->user_id = $userId;
+        $ecommerceIntegration->customer_id = $customerId;
         $ecommerceIntegration->platform_id = EcommercePlatform::findOne(['name' => EcommercePlatform::SHOPIFY_PLATFORM_NAME])->id;
         $ecommerceIntegration->status = EcommerceIntegration::STATUS_INTEGRATION_CONNECTED;
         $ecommerceIntegration->meta = Json::encode($meta, JSON_PRETTY_PRINT);
@@ -96,10 +111,80 @@ class ShopifyService
         }
     }
 
-    public function makeReq()
+    /**
+     * @throws InvalidConfigException
+     */
+    protected function isTokenValid()
     {
-        echo '<pre>';
-        print_r($this->shopify->Product->get());
-        exit;
+        try {
+            $this->getProductsList();
+        } catch (\Exception $e) {
+            throw new InvalidConfigException('Shopify token for the shop `' . $this->shopUrl . '` is invalid.');
+        }
+    }
+
+    #####################
+    # Get data via API: #
+    #####################
+
+    public function getProductsList(): array
+    {
+        return $this->shopify->Product->get();
+    }
+
+    public function getProductById(int $id): array
+    {
+        return $this->shopify->Product($id)->get();
+    }
+
+    public function getOrdersList(array $params = []): array
+    {
+        return $this->shopify->Order->get($params);
+    }
+
+    public function getOrderById(int $id): array
+    {
+        return $this->shopify->Order($id)->get();
+    }
+
+    public function getCustomerById(int $id): array
+    {
+        return $this->shopify->Customer($id)->get();
+    }
+
+    public function getCustomerAddressById(int $customerId, int $addressId): array
+    {
+        return $this->shopify->Customer($customerId)->Address($addressId)->get();
+    }
+
+    ##################
+    # Order parsing: #
+    ##################
+
+    public function parseRawOrderJob(array $order): void
+    {
+        if ($this->canBeParsed($order) && $this->isNotDuplicate($order)) {
+            Yii::$app->queue->push(
+                new ParseShopifyOrderJob([
+                    'rawOrder' => $order,
+                    'ecommerceIntegrationId' => $this->ecommerceIntegration->id
+                ])
+            );
+        }
+    }
+
+    protected function canBeParsed(array $order): bool
+    {
+        return (isset($order['shipping_address']) && isset($order['customer']));
+    }
+
+    protected function isNotDuplicate(array $order): bool
+    {
+        return !Order::find()->where([
+            'origin' => EcommercePlatform::SHOPIFY_PLATFORM_NAME,
+            'order_reference' => $order['name'],
+            'customer_reference' => $order['id'],
+            'customer_id' => $this->ecommerceIntegration->customer_id,
+        ])->exists();
     }
 }

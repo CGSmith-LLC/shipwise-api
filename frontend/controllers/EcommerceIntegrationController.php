@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\services\platforms\ShopifyService;
 use Yii;
 use yii\web\Response;
 use yii\filters\AccessControl;
@@ -32,6 +33,34 @@ class EcommerceIntegrationController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionTest()
+    {
+        $integrations = EcommerceIntegration::find()
+            ->active()
+            ->orderById()
+            ->all();
+
+        foreach ($integrations as $integration) {
+            $accessToken = $integration->array_meta_data['access_token'];
+
+            if ($accessToken) {
+                $shopifyService = new ShopifyService($integration->array_meta_data['shop_url'], $integration);
+
+                $params = [
+                    'status' => 'open',
+                    'fufillment_status' => 'unfulfilled',
+                    'limit' => 250,
+                ];
+
+                $orders = $shopifyService->getOrdersList($params);
+
+                foreach ($orders as $order) {
+                    $shopifyService->parseRawOrderJob($order);
+                }
+            }
+        }
     }
 
     /**
