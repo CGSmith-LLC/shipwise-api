@@ -3,6 +3,7 @@ use yii\web\View;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use common\models\EcommerceIntegration;
+use common\models\EcommercePlatform;
 
 /* @var $this View */
 /* @var $models EcommerceIntegration[] */
@@ -18,13 +19,15 @@ $this->params['breadcrumbs'][] = $title;
     </h1>
 
     <div class="well well-sm">
-        <a href="<?= Url::to(['/ecommerce-integration/shopify']) ?>" class="btn btn-success">Connect Shopify shop</a>
+        <?php if (EcommercePlatform::getShopifyObject()->isActive()) { ?>
+            <a href="<?= Url::to(['/ecommerce-integration/shopify']) ?>" class="btn btn-success">Connect Shopify shop</a>
+        <?php } ?>
     </div>
 
     <div>
         <?php if ($models) { ?>
             <?php foreach ($models as $model) { ?>
-                <?= $this->render('_platform', [
+                <?= $this->render('_integration', [
                     'model' => $model,
                 ]) ?>
             <?php } ?>

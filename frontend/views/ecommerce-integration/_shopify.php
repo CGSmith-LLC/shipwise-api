@@ -70,6 +70,13 @@ $pauseConfirm .= ' In this case, all orders with the platform will not be proces
             },
         ],
         [
+            'label' => 'Customer',
+            'format' => 'raw',
+            'value' => function($model) {
+                return Html::encode($model->customer->name);
+            },
+        ],
+        [
             'label' => 'Connected:',
             'attribute' => 'created_date',
             'format' => 'datetime',
