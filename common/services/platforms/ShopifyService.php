@@ -29,6 +29,39 @@ use PHPShopify\Exception\SdkException;
  */
 class ShopifyService
 {
+    /**
+     * @see https://shopify.dev/docs/api/admin-rest/2023-01/resources/order#get-orders?status=any-examples
+     */
+    public static array $orderStatuses = [
+        'open' => 'Open',
+        'closed' => 'Closed',
+        'cancelled' => 'Cancelled',
+    ];
+
+    /**
+     * @see https://shopify.dev/docs/api/admin-rest/2023-01/resources/order#get-orders?status=any
+     */
+    public static array $financialStatuses = [
+        'authorized' => 'Authorized',
+        'pending' => 'Pending',
+        'paid' => 'Paid',
+        'partially_paid' => 'Partially paid',
+        'refunded' => 'Refunded',
+        'voided' => 'Voided',
+        'partially_refunded' => 'Partially refunded',
+        'unpaid' => 'Unpaid',
+    ];
+
+    /**
+     * @see https://shopify.dev/docs/api/admin-rest/2023-01/resources/order#get-orders?status=any
+     */
+    public static array $fulfillmentStatuses = [
+        'shipped' => 'Shipped', // Show orders that have been shipped. Returns orders with `fulfillment_status` of `fulfilled`
+        'partial' => 'Partial', // Show partially shipped orders
+        'unshipped' => 'Unshipped', // Show orders that have not yet been shipped. Returns orders with `fulfillment_status` of `null`
+        'unfulfilled' => 'Unfulfilled', // Returns orders with `fulfillment_status` of `null` or `partial`
+    ];
+
     protected const API_VERSION = '2023-01';
     protected string $shopUrl;
     protected string $scopes = 'read_products,read_customers,read_fulfillments,read_orders,read_shipping,read_returns';
@@ -87,7 +120,7 @@ class ShopifyService
      * @throws SdkException
      * @throws ServerErrorHttpException
      */
-    public function accessToken(string $shopName, int $userId, int $customerId): void
+    public function accessToken(array $data): void
     {
         // Step 2 - Receive and save access token:
         $accessToken = AuthHelper::createAuthRequest($this->scopes);
@@ -95,13 +128,16 @@ class ShopifyService
         $meta = [
             'platform' => EcommercePlatform::SHOPIFY_PLATFORM_NAME,
             'shop_url' => $this->shopUrl,
-            'shop_name' => $shopName,
+            'shop_name' => $data['shop_name'],
+            'order_statuses' => $data['order_statuses'],
+            'financial_statuses' => $data['financial_statuses'],
+            'fulfillment_statuses' => $data['fulfillment_statuses'],
             'access_token' => $accessToken,
         ];
 
         $ecommerceIntegration = new EcommerceIntegration();
-        $ecommerceIntegration->user_id = $userId;
-        $ecommerceIntegration->customer_id = $customerId;
+        $ecommerceIntegration->user_id = $data['user_id'];
+        $ecommerceIntegration->customer_id = $data['customer_id'];
         $ecommerceIntegration->platform_id = EcommercePlatform::findOne(['name' => EcommercePlatform::SHOPIFY_PLATFORM_NAME])->id;
         $ecommerceIntegration->status = EcommerceIntegration::STATUS_INTEGRATION_CONNECTED;
         $ecommerceIntegration->meta = Json::encode($meta, JSON_PRETTY_PRINT);

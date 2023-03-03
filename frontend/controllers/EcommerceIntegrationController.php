@@ -48,13 +48,30 @@ class EcommerceIntegrationController extends Controller
             if ($accessToken) {
                 $shopifyService = new ShopifyService($integration->array_meta_data['shop_url'], $integration);
 
+                /**
+                 * @see https://shopify.dev/docs/api/admin-rest/2022-10/resources/order#get-orders?status=any
+                 */
                 $params = [
-                    'status' => 'open',
-                    'fufillment_status' => 'unfulfilled',
                     'limit' => 250,
                 ];
 
+                if ($integration->isMetaKeyExistsAndNotEmpty('order_statuses')) {
+                    $params['status'] = implode(',', $integration->array_meta_data['order_statuses']);
+                }
+
+                if ($integration->isMetaKeyExistsAndNotEmpty('financial_statuses')) {
+                    $params['financial_status'] = implode(',', $integration->array_meta_data['financial_statuses']);
+                }
+
+                if ($integration->isMetaKeyExistsAndNotEmpty('fulfillment_statuses')) {
+                    $params['fulfillment_status'] = implode(',', $integration->array_meta_data['fulfillment_statuses']);
+                }
+
                 $orders = $shopifyService->getOrdersList($params);
+
+                echo '<pre>';
+                print_r($orders);
+                exit;
 
                 foreach ($orders as $order) {
                     $shopifyService->parseRawOrderJob($order);

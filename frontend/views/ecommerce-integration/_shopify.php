@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\DetailView;
 use common\models\EcommerceIntegration;
+use common\services\platforms\ShopifyService;
 
 /* @var $this View */
 /* @var $model EcommerceIntegration */
@@ -70,7 +71,46 @@ $pauseConfirm .= ' In this case, all orders with the platform will not be proces
             },
         ],
         [
-            'label' => 'Customer',
+            'label' => 'Order Statuses:',
+            'format' => 'raw',
+            'value' => function($model) {
+                if ($model->isMetaKeyExistsAndNotEmpty('order_statuses')) {
+                    return implode(', ', array_map(function ($el) {
+                        return ShopifyService::$orderStatuses[$el];
+                    }, $model->array_meta_data['order_statuses']));
+                }
+
+                return 'Any';
+            },
+        ],
+        [
+            'label' => 'Financial Statuses:',
+            'format' => 'raw',
+            'value' => function($model) {
+                if ($model->isMetaKeyExistsAndNotEmpty('financial_statuses')) {
+                    return implode(', ', array_map(function ($el) {
+                        return ShopifyService::$financialStatuses[$el];
+                    }, $model->array_meta_data['financial_statuses']));
+                }
+
+                return 'Any';
+            },
+        ],
+        [
+            'label' => 'Fulfillment Statuses:',
+            'format' => 'raw',
+            'value' => function($model) {
+                if ($model->isMetaKeyExistsAndNotEmpty('fulfillment_statuses')) {
+                    return implode(', ', array_map(function ($el) {
+                        return ShopifyService::$fulfillmentStatuses[$el];
+                    }, $model->array_meta_data['fulfillment_statuses']));
+                }
+
+                return 'Any';
+            },
+        ],
+        [
+            'label' => 'Customer:',
             'format' => 'raw',
             'value' => function($model) {
                 return Html::encode($model->customer->name);

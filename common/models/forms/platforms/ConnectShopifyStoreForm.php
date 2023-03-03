@@ -24,13 +24,16 @@ class ConnectShopifyStoreForm extends Model
 
     public ?string $name = null;
     public ?string $url = null;
+    public string|array|null $order_statuses = null;
+    public string|array|null $financial_statuses = null;
+    public string|array|null $fulfillment_statuses = null;
     public ?int $customer_id = null;
     public ?string $code = null;
 
     public function scenarios(): array
     {
         return [
-            self::SCENARIO_AUTH_REQUEST => ['name', 'url', 'customer_id'],
+            self::SCENARIO_AUTH_REQUEST => ['name', 'url', 'order_statuses', 'financial_statuses', 'fulfillment_statuses', 'customer_id'],
             self::SCENARIO_SAVE_ACCESS_TOKEN => ['code'],
         ];
     }
@@ -43,12 +46,23 @@ class ConnectShopifyStoreForm extends Model
             /** @see https://www.regextester.com/104785 */
             ['url', 'match', 'pattern' => '/[^.\s]+\.myshopify\.com$/', 'message' => 'Invalid shop URL.'],
 
-            [['name', 'url', 'customer_id'], 'required', 'on' => self::SCENARIO_AUTH_REQUEST],
-            [['name'], 'validateShopName', 'on' => self::SCENARIO_AUTH_REQUEST],
-            [['url'], 'validateShopUrl', 'on' => self::SCENARIO_AUTH_REQUEST],
-            ['customer_id', 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id'], 'on' => self::SCENARIO_AUTH_REQUEST],
+            [['name', 'url', 'customer_id'], 'required',
+                'on' => self::SCENARIO_AUTH_REQUEST],
+            [['name'], 'validateShopName',
+                'on' => self::SCENARIO_AUTH_REQUEST],
+            [['url'], 'validateShopUrl',
+                'on' => self::SCENARIO_AUTH_REQUEST],
+            ['order_statuses', 'in', 'allowArray' => true,  'range' => array_keys(ShopifyService::$orderStatuses),
+                'on' => self::SCENARIO_AUTH_REQUEST],
+            ['financial_statuses', 'in', 'allowArray' => true,  'range' => array_keys(ShopifyService::$financialStatuses),
+                'on' => self::SCENARIO_AUTH_REQUEST],
+            ['fulfillment_statuses', 'in', 'allowArray' => true,  'range' => array_keys(ShopifyService::$fulfillmentStatuses),
+                'on' => self::SCENARIO_AUTH_REQUEST],
+            ['customer_id', 'exist', 'skipOnError' => true, 'targetClass' => Customer::class, 'targetAttribute' => ['customer_id' => 'id'],
+                'on' => self::SCENARIO_AUTH_REQUEST],
 
-            [['url', 'code'], 'required', 'on' => self::SCENARIO_SAVE_ACCESS_TOKEN],
+            [['url', 'code'], 'required',
+                'on' => self::SCENARIO_SAVE_ACCESS_TOKEN],
         ];
     }
 
@@ -57,6 +71,9 @@ class ConnectShopifyStoreForm extends Model
         return [
             'name' => 'Shop Name',
             'url' => 'Shop URL',
+            'order_statuses' => 'Order Statuses',
+            'financial_statuses' => 'Financial Statuses',
+            'fulfillment_statuses' => 'Fulfillment Statuses',
             'customer_id' => 'Customer',
             'code' => 'Code',
         ];
@@ -90,8 +107,7 @@ class ConnectShopifyStoreForm extends Model
      */
     public function auth(): void
     {
-        $this->saveShopName();
-        $this->saveCustomerId();
+        $this->saveDataForSecondStep();
 
         // Step 1 - Send request to receive access token
         $shopifyService = new ShopifyService($this->url);
@@ -105,21 +121,24 @@ class ConnectShopifyStoreForm extends Model
      */
     public function saveAccessToken(): void
     {
+        $data = unserialize(Yii::$app->session->get('shopify_connection_second_step'));
+
         // Step 2 - Receive and save access token:
         $shopifyService = new ShopifyService($this->url);
-        $shopifyService->accessToken(
-            Yii::$app->session->get('shop_name', 'Shop Name'),
-            Yii::$app->user->id,
-            Yii::$app->session->get('customer_id'));
+        $shopifyService->accessToken($data);
     }
 
-    protected function saveShopName()
+    protected function saveDataForSecondStep()
     {
-        Yii::$app->session->set('shop_name', $this->name);
-    }
+        $data = [
+            'shop_name' => $this->name,
+            'customer_id' => $this->customer_id,
+            'user_id' => Yii::$app->user->id,
+            'order_statuses' => $this->order_statuses,
+            'financial_statuses' => $this->financial_statuses,
+            'fulfillment_statuses' => $this->fulfillment_statuses,
+        ];
 
-    protected function saveCustomerId()
-    {
-        Yii::$app->session->set('customer_id', $this->customer_id);
+        Yii::$app->session->set('shopify_connection_second_step', serialize($data));
     }
 }
