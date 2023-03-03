@@ -9,16 +9,12 @@ use common\models\Customer;
 
 /* @var $this View */
 /* @var $model ConnectShopifyStoreForm */
+/* @var $customersList array */
 
 $title = 'Shopify Integration';
 $this->title = $title . ' - ' . Yii::$app->name;
 $this->params['breadcrumbs'][] = ['label' => 'E-commerce Integrations', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $title;
-
-$customersList = ArrayHelper::map(
-    Customer::find()
-        ->orderBy(['name' => SORT_ASC])
-        ->all(), 'id','name');
 
 $orderStatuses = '<span><i class="glyphicon glyphicon-info-sign" title="Choose specific statuses for orders we must work with. Leave it empty if you want to have orders with ANY statuses."></i> Order Statuses</span>';
 $financialStatusesLabel = '<span><i class="glyphicon glyphicon-info-sign" title="Choose specific financial statuses for orders we must work with. Leave it empty if you want to have orders with ANY statuses."></i> Financial Statuses</span>';

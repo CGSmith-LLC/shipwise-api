@@ -3,7 +3,9 @@
 namespace frontend\controllers;
 
 use common\services\platforms\ShopifyService;
+use frontend\models\Customer;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Response;
 use yii\filters\AccessControl;
 use Da\User\Filter\AccessRuleFilter;
@@ -137,6 +139,7 @@ class EcommerceIntegrationController extends Controller
 
         return $this->render('shopify', [
             'model' => $model,
+            'customersList' => $this->getCustomersList(),
         ]);
     }
 
@@ -201,6 +204,24 @@ class EcommerceIntegrationController extends Controller
          * @var $model EcommerceIntegration
          */
         return $model;
+    }
+
+    protected function getCustomersList(): array
+    {
+        if (Yii::$app->user->identity->isAdmin) {
+            $data = Customer::find()
+                ->orderBy(['name' => SORT_ASC])
+                ->all();
+        } else {
+            $data = Customer::find()
+                ->where("`id` IN(SELECT DISTINCT(`customer_id`) FROM `user_customer` WHERE `user_id` = :user_id)", [
+                    'user_id' => Yii::$app->user->id
+                ])
+                ->orderBy(['name' => SORT_ASC])
+                ->all();
+        }
+
+        return ArrayHelper::map($data, 'id','name');
     }
 
     /**
