@@ -64,7 +64,7 @@ class ShopifyService
 
     protected const API_VERSION = '2023-01';
     protected string $shopUrl;
-    protected string $scopes = 'read_products,read_customers,read_fulfillments,read_orders,read_shipping,read_returns';
+    protected string $scopes = 'read_products,write_products,read_customers,write_customers,read_fulfillments,write_fulfillments,read_orders,read_shipping,write_shipping,read_returns,write_orders,write_third_party_fulfillment_orders,read_third_party_fulfillment_orders,read_assigned_fulfillment_orders,write_assigned_fulfillment_orders,';
     protected string $redirectUrl = '/ecommerce-integration/shopify';
     protected ShopifySDK $shopify;
     protected ?EcommerceIntegration $ecommerceIntegration = null;
@@ -120,7 +120,7 @@ class ShopifyService
      * @throws SdkException
      * @throws ServerErrorHttpException
      */
-    public function accessToken(array $data): void
+    public function accessToken(array $data, ?EcommerceIntegration $ecommerceIntegration = null): void
     {
         // Step 2 - Receive and save access token:
         $accessToken = AuthHelper::createAuthRequest($this->scopes);
@@ -135,7 +135,9 @@ class ShopifyService
             'access_token' => $accessToken,
         ];
 
-        $ecommerceIntegration = new EcommerceIntegration();
+        if (!$ecommerceIntegration) {
+            $ecommerceIntegration = new EcommerceIntegration();
+        }
         $ecommerceIntegration->user_id = $data['user_id'];
         $ecommerceIntegration->customer_id = $data['customer_id'];
         $ecommerceIntegration->platform_id = EcommercePlatform::findOne(['name' => EcommercePlatform::SHOPIFY_PLATFORM_NAME])->id;
@@ -155,6 +157,10 @@ class ShopifyService
         try {
             $this->getProductsList();
         } catch (\Exception $e) {
+            if (!$this->ecommerceIntegration->isUninstalled()) {
+                $this->ecommerceIntegration->uninstall();
+            }
+
             throw new InvalidConfigException('Shopify token for the shop `' . $this->shopUrl . '` is invalid.');
         }
     }
