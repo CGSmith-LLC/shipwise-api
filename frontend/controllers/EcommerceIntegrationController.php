@@ -72,9 +72,9 @@ class EcommerceIntegrationController extends Controller
 
                 $orders = $shopifyService->getOrdersList($params);
 
-                echo '<pre>';
-                print_r($orders);
-                exit;
+//                echo '<pre>';
+//                print_r($orders);
+//                exit;
 
                 foreach ($orders as $order) {
                     $shopifyService->parseRawOrderJob($order);
