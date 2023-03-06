@@ -22,6 +22,8 @@ class ConnectShopifyStoreForm extends Model
     public const SCENARIO_AUTH_REQUEST = 'scenarioAuthRequest';
     public const SCENARIO_SAVE_ACCESS_TOKEN = 'scenarioSaveAccessToken';
 
+    public ?EcommerceIntegration $ecommerceIntegration = null;
+
     public ?string $name = null;
     public ?string $url = null;
     public string|array|null $order_statuses = null;
@@ -81,10 +83,15 @@ class ConnectShopifyStoreForm extends Model
 
     public function validateShopName(): void
     {
-        if (EcommerceIntegration::find()
+        $query = EcommerceIntegration::find()
             ->andWhere(new Expression('`meta` LIKE :name', [':name' => '%"' . $this->name . '"%']))
-            ->andWhere(['platform_id' => EcommercePlatform::getShopifyObject()->id])
-            ->exists())
+            ->andWhere(['platform_id' => EcommercePlatform::getShopifyObject()->id]);
+
+        if ($this->ecommerceIntegration) {
+            $query->andWhere('id != :id', ['id' => $this->ecommerceIntegration->id]);
+        }
+
+        if ($query->exists())
         {
             $this->addError('name', 'Shop name already exists.');
         }
@@ -92,10 +99,15 @@ class ConnectShopifyStoreForm extends Model
 
     public function validateShopUrl(): void
     {
-        if (EcommerceIntegration::find()
+        $query = EcommerceIntegration::find()
             ->andWhere(new Expression('`meta` LIKE :url', [':url' => '%"' . $this->url . '"%']))
-            ->andWhere(['platform_id' => EcommercePlatform::getShopifyObject()->id])
-            ->exists())
+            ->andWhere(['platform_id' => EcommercePlatform::getShopifyObject()->id]);
+
+        if ($this->ecommerceIntegration) {
+            $query->andWhere('id != :id', ['id' => $this->ecommerceIntegration->id]);
+        }
+
+        if ($query->exists())
         {
             $this->addError('url', 'Shop URL already exists.');
         }
@@ -123,9 +135,13 @@ class ConnectShopifyStoreForm extends Model
     {
         $data = unserialize(Yii::$app->session->get('shopify_connection_second_step'));
 
+        if (isset($data['integration_id'])) {
+            $this->ecommerceIntegration = EcommerceIntegration::findOne($data['integration_id']);
+        }
+
         // Step 2 - Receive and save access token:
         $shopifyService = new ShopifyService($this->url);
-        $shopifyService->accessToken($data);
+        $shopifyService->accessToken($data, $this->ecommerceIntegration);
     }
 
     protected function saveDataForSecondStep()
@@ -138,6 +154,10 @@ class ConnectShopifyStoreForm extends Model
             'financial_statuses' => $this->financial_statuses,
             'fulfillment_statuses' => $this->fulfillment_statuses,
         ];
+
+        if ($this->ecommerceIntegration) {
+            $data['integration_id'] = $this->ecommerceIntegration->id;
+        }
 
         Yii::$app->session->set('shopify_connection_second_step', serialize($data));
     }

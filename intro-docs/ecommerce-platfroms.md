@@ -39,6 +39,12 @@ If you're going to **test it locally**, specify:
 4. If you're going to **test it locally**, in `common\config\params-local.php` set the parameter `override_redirect_domain`
 to `https://shipwise.ngrok.io`.
    
+5. You need to request `Protected customer data access`. Go to `Apps` -> `Your app` -> `App setup` -> Find the section `Protected customer data access` ->
+Press the button `Request access`. On the page, select and request access for:
+   
+- `Protected customer data`
+- `Protected customer fields (optional)` -- all the fields
+   
 ### Test shop(s):
 
 1. Go to `https://partners.shopify.com/` -> `Stores`.

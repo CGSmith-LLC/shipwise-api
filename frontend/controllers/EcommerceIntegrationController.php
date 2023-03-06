@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\services\platforms\ShopifyService;
 use frontend\models\Customer;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\web\Response;
 use yii\filters\AccessControl;
@@ -101,19 +102,37 @@ class EcommerceIntegrationController extends Controller
 
     /**
      * Connects a new Shopify shop.
-     * @throws SdkException
+     * @param int|null $id Reconnect a shop by ID.
+     * @return string|Response
+     * @throws InvalidConfigException
      * @throws NotFoundHttpException
+     * @throws SdkException
      * @throws ServerErrorHttpException
      */
-    public function actionShopify(): string|Response
+    public function actionShopify(?int $id = null): string|Response
     {
         $this->checkEcommercePlatformByName(EcommercePlatform::SHOPIFY_PLATFORM_NAME);
 
+        $model = new ConnectShopifyStoreForm();
+        $model->scenario = ConnectShopifyStoreForm::SCENARIO_AUTH_REQUEST;
+
+        if ($id) { // Edit existing model (Reconnect action):
+            $ecommerceIntegration = $this->getEcommerceIntegrationById($id);
+            $model->ecommerceIntegration = $ecommerceIntegration;
+
+            $model->setAttributes([
+                'name' => $ecommerceIntegration->array_meta_data['shop_name'],
+                'url' => $ecommerceIntegration->array_meta_data['shop_url'],
+                'customer_id' => $ecommerceIntegration->customer_id,
+                'order_statuses' => $ecommerceIntegration->array_meta_data['order_statuses'],
+                'financial_statuses' => $ecommerceIntegration->array_meta_data['financial_statuses'],
+                'fulfillment_statuses' => $ecommerceIntegration->array_meta_data['fulfillment_statuses'],
+            ]);
+        }
+
         if (Yii::$app->request->isPost) {
             // Step 1 - Send request to receive access token:
-            $model = new ConnectShopifyStoreForm([
-                'scenario' => ConnectShopifyStoreForm::SCENARIO_AUTH_REQUEST
-            ]);
+            $model->scenario = ConnectShopifyStoreForm::SCENARIO_AUTH_REQUEST;
             $model->load(Yii::$app->request->post());
 
             if ($model->validate()) {
@@ -121,11 +140,9 @@ class EcommerceIntegrationController extends Controller
             }
         } elseif (Yii::$app->request->get('code')) {
             // Step 2 - Receive and save access token:
-            $model = new ConnectShopifyStoreForm([
-                'scenario' => ConnectShopifyStoreForm::SCENARIO_SAVE_ACCESS_TOKEN,
-                'url' => Yii::$app->request->get('shop'),
-                'code' => Yii::$app->request->get('code')
-            ]);
+            $model->scenario = ConnectShopifyStoreForm::SCENARIO_SAVE_ACCESS_TOKEN;
+            $model->url = Yii::$app->request->get('shop');
+            $model->code = Yii::$app->request->get('code');
 
             if ($model->validate()) {
                 $model->saveAccessToken();
@@ -133,14 +150,25 @@ class EcommerceIntegrationController extends Controller
                 Yii::$app->session->setFlash('success', 'Shopify shop has been connected.');
                 return $this->redirect(['index']);
             }
-        } else {
-            $model = new ConnectShopifyStoreForm();
         }
 
         return $this->render('shopify', [
             'model' => $model,
             'customersList' => $this->getCustomersList(),
         ]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionReconnect(int $id): Response
+    {
+        $ecommerceIntegration = $this->getEcommerceIntegrationById($id);
+
+        return match ($ecommerceIntegration->ecommercePlatform->name) {
+            EcommercePlatform::SHOPIFY_PLATFORM_NAME => $this->redirect(['shopify', 'id' => $ecommerceIntegration->id]),
+            default => throw new NotFoundHttpException('Ecommerce platform not found.'),
+        };
     }
 
     /**

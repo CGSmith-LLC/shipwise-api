@@ -9,12 +9,12 @@ use common\services\platforms\ShopifyService;
 /* @var $this View */
 /* @var $model EcommerceIntegration */
 
-$disconnectConfirm = 'Are you sure you want to disconnect this platform?';
-$disconnectConfirm .= ' In this case, all orders related to the platform will not be processed.';
-$disconnectConfirm .= ' Also, you will lose all your current credentials and will need to reconnect this platform again.';
+$disconnectConfirm = 'Are you sure you want to remove this shop?';
+$disconnectConfirm .= ' In this case, all orders related to the shop will not be processed.';
+$disconnectConfirm .= ' Also, you will lose all your current credentials and will need to reconnect the shop again.';
 
-$pauseConfirm = 'Are you sure you want to pause this platform?';
-$pauseConfirm .= ' In this case, all orders with the platform will not be processed.';
+$pauseConfirm = 'Are you sure you want to pause this shop?';
+$pauseConfirm .= ' In this case, all orders related to the shop will not be processed.';
 ?>
 
 <?= DetailView::widget([
@@ -46,8 +46,11 @@ $pauseConfirm .= ' In this case, all orders with the platform will not be proces
                     $icon = '<i class="glyphicon glyphicon-ok-circle text-success" title="' . EcommerceIntegration::getStatuses()[EcommerceIntegration::STATUS_INTEGRATION_CONNECTED] . '"></i>';
                     $string = '<span>' . EcommerceIntegration::getStatuses()[EcommerceIntegration::STATUS_INTEGRATION_CONNECTED] . ' ' . $icon . '</span>';
                 } elseif ($model->isPaused()) {
-                    $icon = '<i class="glyphicon glyphicon glyphicon-pause text-warning" title="' . EcommerceIntegration::getStatuses()[EcommerceIntegration::STATUS_INTEGRATION_PAUSED] . '"></i>';
+                    $icon = '<i class="glyphicon glyphicon-pause text-warning" title="' . EcommerceIntegration::getStatuses()[EcommerceIntegration::STATUS_INTEGRATION_PAUSED] . '"></i>';
                     $string = '<span>' . EcommerceIntegration::getStatuses()[EcommerceIntegration::STATUS_INTEGRATION_PAUSED] . ' ' . $icon . '</span>';
+                } elseif ($model->isUninstalled()) {
+                    $icon = '<i class="glyphicon glyphicon-remove text-warning" title="' . EcommerceIntegration::getStatuses()[EcommerceIntegration::STATUS_INTEGRATION_UNINSTALLED] . '"></i>';
+                    $string = '<span>' . EcommerceIntegration::getStatuses()[EcommerceIntegration::STATUS_INTEGRATION_UNINSTALLED] . ' ' . $icon . '</span>';
                 } else {
                     $string = null;
                 }
@@ -134,14 +137,21 @@ $pauseConfirm .= ' In this case, all orders with the platform will not be proces
                         $buttons = '<a href="' . $url . '" class="btn btn-warning" onclick="return confirm(\'' . $pauseConfirm . '\')">Pause</a>';
 
                         $url = Url::to(['/ecommerce-integration/disconnect', 'id' => $model->id]);
-                        $buttons .= ' <a href="' . $url . '" class="btn btn-danger" onclick="return confirm(\'' . $disconnectConfirm. '\')">Disconnect</a>';
+                        $buttons .= ' <a href="' . $url . '" class="btn btn-danger" onclick="return confirm(\'' . $disconnectConfirm. '\')">Remove</a>';
                         break;
                     case EcommerceIntegration::STATUS_INTEGRATION_PAUSED:
                         $url = Url::to(['/ecommerce-integration/resume', 'id' => $model->id]);
                         $buttons = '<a href="' . $url . '" class="btn btn-success">Resume</a>';
 
                         $url = Url::to(['/ecommerce-integration/disconnect', 'id' => $model->id]);
-                        $buttons .= ' <a href="' . $url . '" class="btn btn-danger" onclick="return confirm(\'' . $disconnectConfirm . '\')">Disconnect</a>';
+                        $buttons .= ' <a href="' . $url . '" class="btn btn-danger" onclick="return confirm(\'' . $disconnectConfirm . '\')">Remove</a>';
+                        break;
+                    case EcommerceIntegration::STATUS_INTEGRATION_UNINSTALLED:
+                        $url = Url::to(['/ecommerce-integration/reconnect', 'id' => $model->id]);
+                        $buttons = '<a href="' . $url . '" class="btn btn-success">Reconnect</a>';
+
+                        $url = Url::to(['/ecommerce-integration/disconnect', 'id' => $model->id]);
+                        $buttons .= ' <a href="' . $url . '" class="btn btn-danger" onclick="return confirm(\'' . $disconnectConfirm . '\')">Remove</a>';
                         break;
                     default:
                         $buttons = '';

@@ -13,6 +13,7 @@ class EcommerceIntegration extends BaseEcommerceIntegration
 {
     public const STATUS_INTEGRATION_CONNECTED = 1;
     public const STATUS_INTEGRATION_PAUSED = 0;
+    public const STATUS_INTEGRATION_UNINSTALLED = -1;
 
     public array $array_meta_data = [];
 
@@ -27,6 +28,7 @@ class EcommerceIntegration extends BaseEcommerceIntegration
         return [
             self::STATUS_INTEGRATION_CONNECTED => 'Connected',
             self::STATUS_INTEGRATION_PAUSED => 'Paused',
+            self::STATUS_INTEGRATION_UNINSTALLED => 'Uninstalled',
         ];
     }
 
@@ -40,9 +42,20 @@ class EcommerceIntegration extends BaseEcommerceIntegration
         return $this->status === self::STATUS_INTEGRATION_PAUSED;
     }
 
+    public function isUninstalled(): bool
+    {
+        return $this->status === self::STATUS_INTEGRATION_UNINSTALLED;
+    }
+
     public function disconnect(): bool|int
     {
         return $this->delete();
+    }
+
+    public function uninstall(): void
+    {
+        $this->status = self::STATUS_INTEGRATION_UNINSTALLED;
+        $this->save();
     }
 
     public function pause(): bool
