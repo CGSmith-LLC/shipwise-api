@@ -2,6 +2,7 @@
 
 namespace common\services\platforms;
 
+use common\models\EcommerceOrderLog;
 use Yii;
 use common\models\Order;
 use yii\base\InvalidConfigException;
@@ -205,7 +206,7 @@ class ShopifyService
 
     public function parseRawOrderJob(array $order): void
     {
-        if ($this->canBeParsed($order) && $this->isNotDuplicate($order)) {
+        if ($this->isNotDuplicate($order)) {
             Yii::$app->queue->push(
                 new ParseShopifyOrderJob([
                     'rawOrder' => $order,
@@ -215,17 +216,11 @@ class ShopifyService
         }
     }
 
-    protected function canBeParsed(array $order): bool
-    {
-        return (isset($order['shipping_address']) && isset($order['customer']));
-    }
-
     protected function isNotDuplicate(array $order): bool
     {
         return !Order::find()->where([
             'origin' => EcommercePlatform::SHOPIFY_PLATFORM_NAME,
-            'order_reference' => $order['name'],
-            'customer_reference' => $order['id'],
+            'uuid' => (string)$order['id'],
             'customer_id' => $this->ecommerceIntegration->customer_id,
         ])->exists();
     }

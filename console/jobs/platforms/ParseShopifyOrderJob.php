@@ -4,7 +4,9 @@ namespace console\jobs\platforms;
 
 use common\models\Country;
 use common\models\EcommerceIntegration;
+use common\models\EcommerceOrderLog;
 use common\models\EcommercePlatform;
+use common\models\Order;
 use common\models\State;
 use common\models\Status;
 use common\services\platforms\CreateOrderService;
@@ -34,10 +36,18 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
     public function execute($queue): void
     {
         $this->setEcommerceIntegration();
-        $this->parseOrderData();
-        $this->parseAddressData();
-        $this->parseItemsData();
-        $this->saveOrder();
+        $parsingErrors = $this->getParsingErrors();
+
+        if (!$parsingErrors) {
+            $this->parseOrderData();
+            $this->parseAddressData();
+            $this->parseItemsData();
+            $order = $this->saveOrder();
+
+            EcommerceOrderLog::success($this->ecommerceIntegration, $this->rawOrder, $order);
+        } else {
+            EcommerceOrderLog::failed($this->ecommerceIntegration, $this->rawOrder, ['errors' => $parsingErrors]);
+        }
     }
 
     /**
@@ -52,6 +62,21 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
         }
 
         $this->ecommerceIntegration = $ecommerceIntegration;
+    }
+
+    protected function getParsingErrors(): array
+    {
+        $errors = [];
+
+        if (!isset($this->rawOrder['shipping_address'])) {
+            $errors[] = 'Shipping address is missed.';
+        }
+
+        if (!isset($this->rawOrder['customer'])) {
+            $errors[] = 'Customer is missed.';
+        }
+
+        return $errors;
     }
 
     protected function parseOrderData(): void
@@ -71,7 +96,7 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
 
     protected function parseAddressData(): void
     {
-        $notProvided = 'Not provided.';
+        $notProvided = 'Not provided';
         $name = null;
         $address1 = null;
         $address2 = null;
@@ -155,7 +180,7 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
         }
     }
 
-    protected function saveOrder(): void
+    protected function saveOrder(): Order|bool
     {
         $createOrderService = new CreateOrderService($this->ecommerceIntegration->customer_id);
         $createOrderService->setOrder($this->parsedOrderAttributes);
@@ -164,7 +189,7 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
         $createOrderService->setItems($this->parsedItemsAttributes);
 
         if ($createOrderService->isValid()) {
-            $createOrderService->create();
+            return $createOrderService->create();
         }
     }
 

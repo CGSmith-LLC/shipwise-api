@@ -96,7 +96,7 @@ class CreateOrderService
         return ($orderIsValid && $addressIsValid && $itemsAreValid);
     }
 
-    public function create(): bool
+    public function create(): bool|Order
     {
         if (!$this->isValid()) {
             return false;
@@ -115,7 +115,7 @@ class CreateOrderService
             $orderItem->save();
         }
 
-        return true;
+        return $this->order;
     }
 
     protected function getExcludedItems(): array
