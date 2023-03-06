@@ -158,7 +158,7 @@ class ShopifyService
             $this->getProductsList();
         } catch (\Exception $e) {
             if (!$this->ecommerceIntegration->isUninstalled()) {
-                $this->ecommerceIntegration->uninstall();
+                $this->ecommerceIntegration->uninstall(true);
             }
 
             throw new InvalidConfigException('Shopify token for the shop `' . $this->shopUrl . '` is invalid.');

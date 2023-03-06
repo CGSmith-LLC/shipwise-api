@@ -2,8 +2,11 @@
 
 namespace common\models;
 
+use Yii;
+use yii\helpers\Html;
 use yii\helpers\Json;
 use common\models\base\BaseEcommerceIntegration;
+use console\jobs\NotificationJob;
 
 /**
  * Class EcommerceIntegration
@@ -52,10 +55,28 @@ class EcommerceIntegration extends BaseEcommerceIntegration
         return $this->delete();
     }
 
-    public function uninstall(): void
+    public function uninstall(bool $withNotification = false): void
     {
         $this->status = self::STATUS_INTEGRATION_UNINSTALLED;
         $this->save();
+
+        if ($withNotification) {
+            $shopUrl = Html::encode($this->array_meta_data['shop_url']);
+            $subject = '⚠️ Problem pulling data from ' . $shopUrl;
+            $message = 'We were not able to pull data from the Shopify shop ' . $shopUrl .'.';
+            $message .= ' The status of the shop is changed to `Uninstalled`.';
+            $message .= ' Please click the link below and try to reconnect the shop.';
+
+            Yii::$app->queue->push(
+                new NotificationJob([
+                    'customer_id' => $this->customer_id,
+                    'subject' => $subject,
+                    'message' => $message,
+                    'url' => ['/ecommerce-integration/index'],
+                    'urlText' => 'Reconnect the shop',
+                ])
+            );
+        }
     }
 
     public function pause(): bool
