@@ -38,6 +38,9 @@ order pulling.
 4. Once we cannot pull orders from an E-commerce platform like Shopify, the E-commerce integration must become `uninstalled` automatically.
 See `common\services\platforms\ShopifyService` -> `isTokenValid()` as an example. So we will not make any requests for the
 E-commerce integration until the user reconnects the shop (URL: `/ecommerce-integration`).
+   
+5. Each E-commerce platform-integration can have specific user-based settings (access token, specific order statuses, etc.). 
+For this, use the `meta` attribute (JSON) of the model `common\models\EcommerceIntegration`.
 
 # E-commerce Integrations - Shopify
 
