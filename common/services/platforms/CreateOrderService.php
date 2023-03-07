@@ -125,4 +125,23 @@ class CreateOrderService
                 ->where(['customer_id' => $this->customerId, 'excluded' => 1])
                 ->all(), 'id','sku');
     }
+
+    public static function isOrderExists(array $params): bool
+    {
+        $exists = Order::find();
+
+        if (isset($params['origin'])) {
+            $exists->andWhere(['origin' => $params['origin']]);
+        }
+
+        if (isset($params['uuid'])) {
+            $exists->andWhere(['uuid' => (string)$params['uuid']]);
+        }
+
+        if (isset($params['customer_id'])) {
+            $exists->andWhere(['customer_id' => $params['customer_id']]);
+        }
+
+        return $exists->exists();
+    }
 }
