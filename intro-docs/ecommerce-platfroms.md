@@ -7,19 +7,37 @@
 2. Implement a new `insert` query for the table `ecommerce_platform`. Specify the needed platform. Example - `console\migrations\m230221_134343_add_shopify_mock_ecommerce_platform.php`.
 
 3. Add implementation to:
-- `common\models\EcommercePlatform.php`
-- `common\models\EcommerceIntegration.php`
-- `frontend\controllers\EcommercePlatformController.php`
-- `frontend\controllers\EcommerceIntegrationController.php`
+- `common\models\EcommercePlatform`
+- `common\models\EcommerceIntegration`
+- `frontend\controllers\EcommercePlatformController`
+- `frontend\controllers\EcommerceIntegrationController`
+
+4. Create a Service similar to `common\services\platforms\ShopifyService`.
+
+5. Create a Job similar to `console\jobs\platforms\ParseShopifyOrderJob`.
+
+### Cron:
+
+1. See `console\controllers\CronController.php` -> `runEcommerceIntegrations()`.
+We need this method to pull existing orders from a needed E-commerce platform.
 
 ### How to manage existing platforms:
 
-1. Visit our website - `/ecommerce-platform` (you must be an `Admin`).
+1. Visit our website - URL: `/ecommerce-platform` (you must be an `Admin`).
 
 # Constraints
 
-1. A new integration can be added by a user only if the needed e-commerce platform
+1. A new integration (URL: `/ecommerce-integration`) can be added by a user only if the needed e-commerce platform
 has the status `Active`.
+   
+2. Try to use `common\services\platforms\CreateOrderService` when you parse raw orders from E-commerce platforms.
+
+3. In the cron method `runEcommerceIntegrations()`, only active (`status=connected`) E-commerce integrations are used for
+order pulling.
+   
+4. Once we cannot pull orders from an E-commerce platform like Shopify, the E-commerce integration must become `uninstalled` automatically.
+See `common\services\platforms\ShopifyService` -> `isTokenValid()` as an example. So we will not make any requests for the
+E-commerce integration until the user reconnects the shop (URL: `/ecommerce-integration`).
 
 # E-commerce Integrations - Shopify
 
