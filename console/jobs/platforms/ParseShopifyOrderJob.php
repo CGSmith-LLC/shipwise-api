@@ -36,17 +36,25 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
     public function execute($queue): void
     {
         $this->setEcommerceIntegration();
-        $parsingErrors = $this->getParsingErrors();
 
-        if (!$parsingErrors) {
-            $this->parseOrderData();
-            $this->parseAddressData();
-            $this->parseItemsData();
-            $order = $this->saveOrder();
+        // Parse the order only if it doesn't exist in our table:
+        if (!CreateOrderService::isOrderExists([
+            'origin' => EcommercePlatform::SHOPIFY_PLATFORM_NAME,
+            'uuid' => (string)$this->rawOrder['id'],
+            'customer_id' => $this->ecommerceIntegration->customer_id,
+        ])) {
+            $parsingErrors = $this->getParsingErrors();
 
-            EcommerceOrderLog::success($this->ecommerceIntegration, $this->rawOrder, $order);
-        } else {
-            EcommerceOrderLog::failed($this->ecommerceIntegration, $this->rawOrder, ['errors' => $parsingErrors]);
+            if (!$parsingErrors) {
+                $this->parseOrderData();
+                $this->parseAddressData();
+                $this->parseItemsData();
+                $order = $this->saveOrder();
+
+                EcommerceOrderLog::success($this->ecommerceIntegration, $this->rawOrder, $order);
+            } else {
+                EcommerceOrderLog::failed($this->ecommerceIntegration, $this->rawOrder, ['errors' => $parsingErrors]);
+            }
         }
     }
 
@@ -173,7 +181,7 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
         foreach ($this->rawOrder['line_items'] as $item) {
             $this->parsedItemsAttributes[] = [
                 'quantity' => $item['fulfillable_quantity'],
-                'sku' => ($item['sku']) ?: 'Not provided.',
+                'sku' => ($item['sku']) ?: 'Not provided',
                 'name' => $item['name'],
                 'uuid' => (string)$item['id'],
             ];

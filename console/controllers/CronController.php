@@ -3,13 +3,17 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
+use common\models\EcommerceIntegration;
+use common\models\EcommercePlatform;
 use common\models\FulfillmentMeta;
 use common\models\Order;
 use common\models\ScheduledOrder;
+use common\services\platforms\ShopifyService;
 use console\jobs\orders\FetchJob;
 use console\jobs\orders\SendTo3PLJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
+use yii\base\InvalidConfigException;
 use yii\db\Exception;
 
 // To create/edit crontab file: crontab -e
@@ -39,7 +43,7 @@ class CronController extends Controller
      * Action Index
      * @return int exit code
      */
-    public function actionIndex()
+    public function actionIndex(): int
     {
         $this->stdout('Yes, service cron is running');
         return ExitCode::OK;
@@ -49,8 +53,9 @@ class CronController extends Controller
      * Action Frequent
      * Called every five minutes
      * @return int exit code
+     * @throws InvalidConfigException
      */
-    public function actionFrequent()
+    public function actionFrequent(): int
     {
         /**
          * 1. Loop through customers and customer meta data to find ecommerce site
@@ -67,7 +72,44 @@ class CronController extends Controller
         $this->runIntegrations(Integration::ACTIVE);
         $this->runScheduledOrders();
 
+        $this->runEcommerceIntegrations();
+
         return ExitCode::OK;
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    protected function runEcommerceIntegrations(): void
+    {
+        $ecommerceIntegrations = EcommerceIntegration::find()
+            ->active()
+            ->orderById()
+            ->all();
+
+        foreach ($ecommerceIntegrations as $ecommerceIntegration) {
+            switch ($ecommerceIntegration->ecommercePlatform->name) {
+
+                /**
+                 * Shopify:
+                 */
+                case EcommercePlatform::SHOPIFY_PLATFORM_NAME:
+
+                    $accessToken = $ecommerceIntegration->array_meta_data['access_token'];
+
+                    if ($accessToken) {
+                        $shopifyService = new ShopifyService($ecommerceIntegration->array_meta_data['shop_url'], $ecommerceIntegration);
+                        $orders = $shopifyService->getOrdersList();
+
+                        foreach ($orders as $order) {
+                            $shopifyService->parseRawOrderJob($order);
+                        }
+                    }
+
+                    break;
+
+            }
+        }
     }
 
     public function runIntegrations($status)

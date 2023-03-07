@@ -77,8 +77,13 @@ class OrderHistory extends BaseOrderHistory
         }
 
         if (!$this->user_id) {
-            if (!Yii::$app->user->isGuest) {
-                $this->user_id = Yii::$app->user->id;
+            /**
+             * TODO: Replace with something like `system`
+             */
+            if (Yii::$app->request->isConsoleRequest) {
+                $this->user_id = 1;
+            } else {
+                $this->user_id = (!Yii::$app->user->isGuest) ? Yii::$app->user->id : 1;
             }
         }
 

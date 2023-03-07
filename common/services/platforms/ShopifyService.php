@@ -180,9 +180,9 @@ class ShopifyService
         return $this->shopify->Product($id)->get();
     }
 
-    public function getOrdersList(array $params = []): array
+    public function getOrdersList(): array
     {
-        return $this->shopify->Order->get($params);
+        return $this->shopify->Order->get($this->getRequestParamsForOrders());
     }
 
     public function getOrderById(int $id): array
@@ -200,13 +200,42 @@ class ShopifyService
         return $this->shopify->Customer($customerId)->Address($addressId)->get();
     }
 
+    /**
+     * @see https://shopify.dev/docs/api/admin-rest/2022-10/resources/order#get-orders?status=any
+     * @return array
+     */
+    protected function getRequestParamsForOrders(): array
+    {
+        $params = [
+            'limit' => 250,
+        ];
+
+        if ($this->ecommerceIntegration->isMetaKeyExistsAndNotEmpty('order_statuses')) {
+            $params['status'] = implode(',', $this->ecommerceIntegration->array_meta_data['order_statuses']);
+        }
+
+        if ($this->ecommerceIntegration->isMetaKeyExistsAndNotEmpty('financial_statuses')) {
+            $params['financial_status'] = implode(',', $this->ecommerceIntegration->array_meta_data['financial_statuses']);
+        }
+
+        if ($this->ecommerceIntegration->isMetaKeyExistsAndNotEmpty('fulfillment_statuses')) {
+            $params['fulfillment_status'] = implode(',', $this->ecommerceIntegration->array_meta_data['fulfillment_statuses']);
+        }
+
+        return $params;
+    }
+
     ##################
     # Order parsing: #
     ##################
 
     public function parseRawOrderJob(array $order): void
     {
-        if ($this->isNotDuplicate($order)) {
+        if (!CreateOrderService::isOrderExists([
+            'origin' => EcommercePlatform::SHOPIFY_PLATFORM_NAME,
+            'uuid' => (string)$order['id'],
+            'customer_id' => $this->ecommerceIntegration->customer_id,
+        ])) {
             Yii::$app->queue->push(
                 new ParseShopifyOrderJob([
                     'rawOrder' => $order,
@@ -214,14 +243,5 @@ class ShopifyService
                 ])
             );
         }
-    }
-
-    protected function isNotDuplicate(array $order): bool
-    {
-        return !Order::find()->where([
-            'origin' => EcommercePlatform::SHOPIFY_PLATFORM_NAME,
-            'uuid' => (string)$order['id'],
-            'customer_id' => $this->ecommerceIntegration->customer_id,
-        ])->exists();
     }
 }
