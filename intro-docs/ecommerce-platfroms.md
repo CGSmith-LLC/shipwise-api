@@ -16,10 +16,14 @@
 
 5. Create a Job similar to `console\jobs\platforms\ParseShopifyOrderJob`.
 
+> php yii queue/listen --verbose
+
 ### Cron:
 
 1. See `console\controllers\CronController.php` -> `runEcommerceIntegrations()`.
 We need this method to pull existing orders from a needed E-commerce platform.
+   
+> php yii cron/frequent
 
 ### How to manage existing platforms:
 

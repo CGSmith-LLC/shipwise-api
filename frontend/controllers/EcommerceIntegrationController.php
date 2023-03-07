@@ -38,51 +38,6 @@ class EcommerceIntegrationController extends Controller
         ];
     }
 
-    public function actionTest()
-    {
-        $integrations = EcommerceIntegration::find()
-            ->active()
-            ->orderById()
-            ->all();
-
-        foreach ($integrations as $integration) {
-            $accessToken = $integration->array_meta_data['access_token'];
-
-            if ($accessToken) {
-                $shopifyService = new ShopifyService($integration->array_meta_data['shop_url'], $integration);
-
-                /**
-                 * @see https://shopify.dev/docs/api/admin-rest/2022-10/resources/order#get-orders?status=any
-                 */
-                $params = [
-                    'limit' => 250,
-                ];
-
-                if ($integration->isMetaKeyExistsAndNotEmpty('order_statuses')) {
-                    $params['status'] = implode(',', $integration->array_meta_data['order_statuses']);
-                }
-
-                if ($integration->isMetaKeyExistsAndNotEmpty('financial_statuses')) {
-                    $params['financial_status'] = implode(',', $integration->array_meta_data['financial_statuses']);
-                }
-
-                if ($integration->isMetaKeyExistsAndNotEmpty('fulfillment_statuses')) {
-                    $params['fulfillment_status'] = implode(',', $integration->array_meta_data['fulfillment_statuses']);
-                }
-
-                $orders = $shopifyService->getOrdersList($params);
-
-//                echo '<pre>';
-//                print_r($orders);
-//                exit;
-
-                foreach ($orders as $order) {
-                    $shopifyService->parseRawOrderJob($order);
-                }
-            }
-        }
-    }
-
     /**
      * Lists all EcommerceIntegration models for the current user.
      * @return string
