@@ -2,6 +2,7 @@
 
 namespace common\services\platforms;
 
+use console\jobs\platforms\RegisterShopifyWebhookListenersJob;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\Json;
@@ -23,6 +24,7 @@ use PHPShopify\Exception\SdkException;
  * @see https://shopify.dev/docs/api/usage/access-scopes
  * @see https://shopify.dev/docs/apps/webhooks
  * @see https://shopify.dev/docs/apps/webhooks/configuration
+ * @see https://shopify.dev/docs/api/admin-rest/2023-01/resources/webhook
  * @see https://github.com/phpclassic/php-shopify
  * @see https://community.shopify.com/c/shopify-apis-and-sdks/will-access-token-expired/td-p/559870
  */
@@ -59,6 +61,22 @@ class ShopifyService
         'partial' => 'Partial', // Show partially shipped orders
         'unshipped' => 'Unshipped', // Show orders that have not yet been shipped. Returns orders with `fulfillment_status` of `null`
         'unfulfilled' => 'Unfulfilled', // Returns orders with `fulfillment_status` of `null` or `partial`
+    ];
+
+    public static string $webhooksUrl = '/ecommerce-webhook/shopify';
+
+    /**
+     * @see https://shopify.dev/docs/api/admin-rest/2023-01/resources/webhook#event-topics
+     */
+    public static array $webhookListeners = [
+        'orders/create',
+        'orders/cancelled',
+        'orders/updated',
+        'orders/delete',
+        'orders/fulfilled',
+        'orders/partially_fulfilled',
+        'orders/paid',
+        'app/uninstalled'
     ];
 
     protected const API_VERSION = '2023-01';
@@ -146,6 +164,8 @@ class ShopifyService
         if (!$ecommerceIntegration->save()) {
             throw new ServerErrorHttpException('Shopify integration is not added. Something went wrong.');
         }
+
+        $this->ecommerceIntegration = $ecommerceIntegration;
     }
 
     /**
@@ -167,6 +187,11 @@ class ShopifyService
     #####################
     # Get data via API: #
     #####################
+
+    public function getShop(): array
+    {
+        return $this->shopify->Shop->get();
+    }
 
     public function getProductsList(): array
     {
@@ -223,9 +248,9 @@ class ShopifyService
         return $params;
     }
 
-    ##################
-    # Order parsing: #
-    ##################
+    #########
+    # Jobs: #
+    #########
 
     public function parseRawOrderJob(array $order): void
     {
@@ -242,4 +267,64 @@ class ShopifyService
             );
         }
     }
+
+    public function addWebhookListenersJob(): void
+    {
+        Yii::$app->queue->push(
+            new RegisterShopifyWebhookListenersJob([
+                'ecommerceIntegrationId' => $this->ecommerceIntegration->id
+            ])
+        );
+    }
+
+    #############
+    # Webhooks: #
+    #############
+
+    public function getWebhooksList(): array
+    {
+        return $this->shopify->Webhook()->get();
+    }
+
+    public function createWebhook($params): array
+    {
+        return $this->shopify->Webhook()->post($params);
+    }
+
+    public function getWebhookById(int $id): array
+    {
+        return $this->shopify->Webhook($id)->get();
+    }
+
+    public function deleteWebhookById(int $id): array
+    {
+        return $this->shopify->Webhook($id)->delete();
+    }
+
+//
+//    public function createWebhookOrderCreated()
+//    {
+//        $redirectDomain = trim(Url::to(['/'], true), '/');
+//
+//        if (Yii::$app->params['shopify']['override_redirect_domain'] != false) {
+//            $redirectDomain = Yii::$app->params['shopify']['override_redirect_domain'];
+//        }
+//
+////        $res = $this->shopify->Webhook()->post([
+////            'topic' => 'orders/updated',
+////            'address' => $redirectDomain . '/ecommerce-webhook/shopify?event=order_updated',
+////            'format' => 'json',
+////        ]);
+//
+//
+//
+////        $res = $this->shopify->Webhook(1266747506984)->get();
+// //       $res = $this->shopify->Webhook(1266742624552)->delete();
+//
+//        $res = $this->getWebhooksList();
+//
+//        echo '<pre>';
+//        print_r($res);
+//        exit;
+//    }
 }
