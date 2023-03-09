@@ -46,6 +46,11 @@ E-commerce integration until the user reconnects the shop (URL: `/ecommerce-inte
 5. Each E-commerce platform-integration can have specific user-based settings (access token, specific order statuses, etc.). 
 For this, use the `meta` attribute (JSON) of the model `common\models\EcommerceIntegration`.
 
+6. For storing webhook listeners list, also use the `meta` field.
+
+7. When you save orders to the table `orders`, use the field `uuid` for storing the Order ID of the original E-commerce platform.
+
+
 # E-commerce Integrations - Shopify
 
 ### App:

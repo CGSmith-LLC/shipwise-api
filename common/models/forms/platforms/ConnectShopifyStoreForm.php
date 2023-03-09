@@ -131,7 +131,7 @@ class ConnectShopifyStoreForm extends Model
      * @throws SdkException
      * @throws InvalidConfigException
      */
-    public function saveAccessToken(): void
+    public function saveAccessToken(bool $addWebHookListeners = true): void
     {
         $data = unserialize(Yii::$app->session->get('shopify_connection_second_step'));
 
@@ -142,6 +142,11 @@ class ConnectShopifyStoreForm extends Model
         // Step 2 - Receive and save access token:
         $shopifyService = new ShopifyService($this->url);
         $shopifyService->accessToken($data, $this->ecommerceIntegration);
+
+        // Add Webhook listeners:
+        if ($addWebHookListeners) {
+            $shopifyService->addWebhookListenersJob();
+        }
     }
 
     protected function saveDataForSecondStep()
