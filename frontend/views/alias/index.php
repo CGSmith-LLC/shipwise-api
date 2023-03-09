@@ -48,11 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $raw;
                 }
             ],
-            [
-                'attribute' => 'active',
-                'format' => 'boolean',
-                'filter' => [0 => 'No', 1 => 'Yes'],
-            ],
+           'active:boolean',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
