@@ -4,6 +4,7 @@ namespace common\models;
 
 use yii\helpers\Json;
 use common\models\base\BaseEcommerceOrderLog;
+use common\traits\MetaDataFieldTrait;
 
 /**
  * Class EcommerceOrderLog
@@ -11,6 +12,8 @@ use common\models\base\BaseEcommerceOrderLog;
  */
 class EcommerceOrderLog extends BaseEcommerceOrderLog
 {
+    use MetaDataFieldTrait;
+
     public const STATUS_SUCCESS = 'success';
     public const STATUS_FAILED = 'failed';
 

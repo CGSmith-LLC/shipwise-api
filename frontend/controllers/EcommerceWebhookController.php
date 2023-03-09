@@ -2,18 +2,10 @@
 
 namespace frontend\controllers;
 
-use common\models\EcommerceIntegration;
-use common\services\platforms\ShopifyService;
 use Yii;
-use yii\filters\VerbFilter;
-use yii\web\BadRequestHttpException;
-use yii\web\Response;
-use Da\User\Filter\AccessRuleFilter;
-use common\models\EcommercePlatform;
-use common\models\search\EcommercePlatformSearch;
-use yii\filters\AccessControl;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
+use yii\web\{BadRequestHttpException, Response, Controller, NotFoundHttpException, ServerErrorHttpException};
+use common\models\{EcommercePlatform, EcommerceWebhook, EcommerceIntegration};
+use common\services\platforms\ShopifyService;
 
 /**
  * Class EcommerceWebhookController
@@ -32,20 +24,67 @@ class EcommerceWebhookController extends Controller
     }
 
     /**
+     * Receives and saves webhooks from the Shopify e-commerce platform.
      * @return array
      * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
     public function actionShopify(): array
     {
+        // file_put_contents('shopify.txt', "\r\n\r\n\r\n" . Yii::$app->request->rawBody, FILE_APPEND);
+
+
+        $ecommercePlatform = $this->getEcommercePlatformByName(EcommercePlatform::SHOPIFY_PLATFORM_NAME);
         $event = Yii::$app->request->get('event');
 
         if (!in_array($event, ShopifyService::$webhookListeners)) {
             throw new NotFoundHttpException('Event not found.');
         }
 
+        $ecommerceWebhook = $this->getNewEcommerceWebhookObject($ecommercePlatform->id);
+        $ecommerceWebhook->event = $event;
+        $ecommerceWebhook->payload = Yii::$app->request->rawBody;
+
+        if (!$ecommerceWebhook->save()) {
+            throw new ServerErrorHttpException('Event not saved.');
+        }
+
         return [
             'result' => 'success',
         ];
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    protected function getEcommercePlatformByName(string $name): EcommercePlatform
+    {
+        /**
+         * @var EcommercePlatform $model
+         */
+        $model = EcommercePlatform::find()
+            ->where(['name' => $name])
+            ->one();
+
+        if (!$model) {
+            throw new NotFoundHttpException('Ecommerce platform does not exist.');
+        }
+
+        if (!$model->isActive()) {
+            throw new ServerErrorHttpException('Ecommerce platform is not active.');
+        }
+
+        return $model;
+    }
+
+    protected function getNewEcommerceWebhookObject(int $ecommercePlatformId): EcommerceWebhook
+    {
+        $ecommerceWebhook = new EcommerceWebhook();
+        $ecommerceWebhook->platform_id = $ecommercePlatformId;
+        $ecommerceWebhook->status = EcommerceWebhook::STATUS_RECEIVED;
+
+        return $ecommerceWebhook;
     }
 
     public function actionTest()

@@ -4,9 +4,9 @@ namespace common\models;
 
 use Yii;
 use yii\helpers\Html;
-use yii\helpers\Json;
 use common\models\base\BaseEcommerceIntegration;
 use console\jobs\NotificationJob;
+use common\traits\MetaDataFieldTrait;
 
 /**
  * Class EcommerceIntegration
@@ -14,11 +14,11 @@ use console\jobs\NotificationJob;
  */
 class EcommerceIntegration extends BaseEcommerceIntegration
 {
+    use MetaDataFieldTrait;
+
     public const STATUS_INTEGRATION_CONNECTED = 1;
     public const STATUS_INTEGRATION_PAUSED = 0;
     public const STATUS_INTEGRATION_UNINSTALLED = -1;
-
-    public array $array_meta_data = [];
 
     public function init(): void
     {
@@ -89,17 +89,5 @@ class EcommerceIntegration extends BaseEcommerceIntegration
     {
         $this->status = self::STATUS_INTEGRATION_CONNECTED;
         return $this->save();
-    }
-
-    public function isMetaKeyExistsAndNotEmpty(string $key): bool
-    {
-        return (isset($this->array_meta_data[$key]) && !empty($this->array_meta_data[$key]));
-    }
-
-    protected function convertMetaData(): void
-    {
-        if ($this->meta) {
-            $this->array_meta_data = Json::decode($this->meta);
-        }
     }
 }
