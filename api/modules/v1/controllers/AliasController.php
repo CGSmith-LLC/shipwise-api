@@ -3,6 +3,7 @@
 namespace api\modules\v1\controllers;
 
 use api\modules\v1\components\PaginatedControllerEx;
+use api\modules\v1\models\alias\AliasChildrenEx;
 use api\modules\v1\models\alias\AliasEx;
 use api\modules\v1\models\forms\AliasForm;
 use yii\data\ActiveDataProvider;
@@ -20,6 +21,7 @@ class AliasController extends PaginatedControllerEx
         return [
             'create' => ['POST'],
             'index'  => ['GET'],
+            'delete'  => ['DELETE'],
         ];
     }
 
@@ -177,5 +179,111 @@ class AliasController extends PaginatedControllerEx
             $model = AliasEx::findOne($id);
         }
         return $this->success($model, 201);
+    }
+
+
+    /**
+     * @SWG\Delete(
+     *     path = "/aliases/{id}",
+     *     tags = { "Alias" },
+     *     summary = "Delete an alias",
+     *     description = "Deletes a specific alias",
+     *
+     *     @SWG\Parameter( name = "id", in = "path", type = "integer", required = true ),
+     *
+     *     @SWG\Response(
+     *          response = 204,
+     *          description = "Alias deleted successfully",
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 400,
+     *          description = "Error while deleting alias",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 401,
+     *          description = "Impossible to authenticate user",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     @SWG\Response(
+     *          response = 403,
+     *          description = "User is inactive",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 404,
+     *          description = "Alias not found",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 422,
+     *          description = "Fields are missing or invalid",
+     *          @SWG\Schema( ref = "#/definitions/ErrorData" )
+     *     ),
+     *
+     *     @SWG\Response(
+     *          response = 500,
+     *          description = "Unexpected error",
+     *          @SWG\Schema( ref = "#/definitions/ErrorMessage" )
+     *       ),
+     *
+     *     security = {{
+     *            "basicAuth": {}
+     *     }}
+     * )
+     */
+
+    /**
+     * Delete order
+     *
+     * @param int $id Order ID
+     *
+     * @return array
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function actionDelete($id)
+    {
+        // Find the order to delete
+        if (($order = AliasEx::find()
+                ->byId($id)
+                ->forCustomer($this->apiConsumer->customer->id)
+                ->one()
+            ) === null) {
+            return $this->errorMessage(404, 'Alias not found');
+        }
+
+        // Begin DB transaction
+        $transaction = \Yii::$app->db->beginTransaction();
+
+        try {
+
+            // Delete order and items
+            if ($order->delete()) {
+                AliasChildrenEx::deleteAll(['alias_id' => (int)$id]);
+            } else {
+                $transaction->rollBack();
+
+                return $this->errorMessage(400, 'Could not delete alias');
+            }
+
+            $transaction->commit();
+
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+
+            return $this->errorMessage(400, 'Could not delete alias');
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+
+            return $this->errorMessage(400, 'Could not delete alias');
+        }
+
+        $this->response->setStatusCode(204);
     }
 }

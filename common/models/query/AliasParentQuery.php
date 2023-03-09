@@ -3,6 +3,7 @@
 namespace common\models\query;
 
 use common\models\AliasParent;
+use common\models\Sku;
 
 /**
  * This is the ActiveQuery class for [[AliasParent]].
@@ -33,4 +34,17 @@ class AliasParentQuery extends BaseQuery
     {
         return parent::one($db);
     }
+
+    /**
+     * Query condition to get order by order id
+     *
+     * @param int $id Order Id
+     *
+     * @return SkuQuery
+     */
+    public function byId($id)
+    {
+        return $this->andWhere([AliasParent::tableName() . '.id' => (int)$id]);
+    }
+
 }
