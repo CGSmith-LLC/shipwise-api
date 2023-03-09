@@ -3,15 +3,12 @@
 namespace common\models\forms\platforms;
 
 use Yii;
-use yii\base\InvalidConfigException;
-use yii\base\Model;
+use yii\base\{InvalidConfigException, Model};
 use yii\db\Expression;
 use PHPShopify\Exception\SdkException;
 use yii\web\ServerErrorHttpException;
 use common\services\platforms\ShopifyService;
-use common\models\EcommerceIntegration;
-use common\models\EcommercePlatform;
-use common\models\Customer;
+use common\models\{EcommerceIntegration, EcommercePlatform, Customer};
 
 /**
  * Class ConnectShopifyStoreForm
@@ -149,7 +146,7 @@ class ConnectShopifyStoreForm extends Model
         }
     }
 
-    protected function saveDataForSecondStep()
+    protected function saveDataForSecondStep(): void
     {
         $data = [
             'shop_name' => $this->name,

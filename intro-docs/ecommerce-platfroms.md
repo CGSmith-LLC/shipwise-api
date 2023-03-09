@@ -11,6 +11,7 @@
 - `common\models\EcommerceIntegration`
 - `frontend\controllers\EcommercePlatformController`
 - `frontend\controllers\EcommerceIntegrationController`
+- `frontend\controllers\EcommerceWebhookController`
 
 4. Create a Service similar to `common\services\platforms\ShopifyService`.
 
@@ -49,6 +50,10 @@ For this, use the `meta` attribute (JSON) of the model `common\models\EcommerceI
 6. For storing webhook listeners list, also use the `meta` field.
 
 7. When you save orders to the table `orders`, use the field `uuid` for storing the Order ID of the original E-commerce platform.
+
+8. Use the controller `frontend\controllers\EcommerceWebhookController` for accepting webhook requests from E-commerce platforms.
+
+9. Don't accept webhooks if our E-commerce Platform `is not active`. See `frontend\controllers\EcommerceWebhookController` -> `getEcommercePlatformByName()`. 
 
 
 # E-commerce Integrations - Shopify

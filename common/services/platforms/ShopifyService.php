@@ -2,16 +2,12 @@
 
 namespace common\services\platforms;
 
-use console\jobs\platforms\RegisterShopifyWebhookListenersJob;
 use Yii;
 use yii\base\InvalidConfigException;
-use yii\helpers\Json;
-use yii\helpers\Url;
-use console\jobs\platforms\ParseShopifyOrderJob;
-use common\models\EcommerceIntegration;
-use common\models\EcommercePlatform;
-use PHPShopify\ShopifySDK;
-use PHPShopify\AuthHelper;
+use yii\helpers\{Json, Url};
+use console\jobs\platforms\{ParseShopifyOrderJob, RegisterShopifyWebhookListenersJob};
+use common\models\{EcommerceIntegration, EcommercePlatform};
+use PHPShopify\{ShopifySDK, AuthHelper};
 use yii\web\ServerErrorHttpException;
 use PHPShopify\Exception\SdkException;
 
@@ -300,31 +296,4 @@ class ShopifyService
     {
         return $this->shopify->Webhook($id)->delete();
     }
-
-//
-//    public function createWebhookOrderCreated()
-//    {
-//        $redirectDomain = trim(Url::to(['/'], true), '/');
-//
-//        if (Yii::$app->params['shopify']['override_redirect_domain'] != false) {
-//            $redirectDomain = Yii::$app->params['shopify']['override_redirect_domain'];
-//        }
-//
-////        $res = $this->shopify->Webhook()->post([
-////            'topic' => 'orders/updated',
-////            'address' => $redirectDomain . '/ecommerce-webhook/shopify?event=order_updated',
-////            'format' => 'json',
-////        ]);
-//
-//
-//
-////        $res = $this->shopify->Webhook(1266747506984)->get();
-// //       $res = $this->shopify->Webhook(1266742624552)->delete();
-//
-//        $res = $this->getWebhooksList();
-//
-//        echo '<pre>';
-//        print_r($res);
-//        exit;
-//    }
 }

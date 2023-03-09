@@ -2,8 +2,9 @@
 
 namespace common\models;
 
-use common\models\base\BaseEcommercePlatform;
 use yii\db\ActiveQuery;
+use common\models\base\BaseEcommercePlatform;
+use common\traits\MetaDataFieldTrait;
 
 /**
  * Class EcommercePlatform
@@ -11,6 +12,8 @@ use yii\db\ActiveQuery;
  */
 class EcommercePlatform extends BaseEcommercePlatform
 {
+    use MetaDataFieldTrait;
+
     public const STATUS_PLATFORM_ACTIVE = 1;
     public const STATUS_PLATFORM_INACTIVE = 0;
 
