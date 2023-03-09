@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use frontend\models\search\AliasSearch;
+use PhpParser\Node\Stmt\TraitUseAdaptation\Alias;
 use Yii;
 use common\models\AliasChildren;
 use common\models\AliasParent;
@@ -37,12 +39,19 @@ class AliasController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-                                                   'query' => AliasParent::find(),
-                                               ]);
+        $searchModel = new AliasSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+
+        if (!Yii::$app->user->identity->getIsAdmin()) {
+            $customerDropdownList = Yii::$app->user->identity->getCustomerList();
+        } else {
+            $customerDropdownList = Customer::getList();
+        }
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+            'customerDropdownList' => $customerDropdownList
         ]);
     }
 

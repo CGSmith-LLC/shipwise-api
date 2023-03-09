@@ -19,7 +19,11 @@ class AliasEx extends AliasParent
      *     @SWG\Property( property = "id",   type = "integer", description = "Identifier of the SKU" ),
      *     @SWG\Property( property = "name", type = "string",  description = "Name of the SKU" ),
      *     @SWG\Property( property = "sku",  type = "string",  description = "Stock keeping unit" ),
-     *
+     *     @SWG\Property(
+     *          property = "children",
+     *          type = "array",
+     *          @SWG\Items( ref = "#/definitions/AliasChildren" )
+     *     ),
      * )
      */
 
