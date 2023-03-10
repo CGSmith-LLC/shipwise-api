@@ -1,0 +1,26 @@
+version: '3.2'
+
+services:
+
+  frontend:
+    ports:
+      - 30000:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/opt/composer/cache:delegated
+
+  api:
+    ports:
+      - 30001:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/opt/composer/cache:delegated
+
+
+  mysql:
+    ports:
+      - "30002:3306"
+
+  phpmyadmin:
+    ports:
+      - '30003:80'

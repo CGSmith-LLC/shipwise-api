@@ -37,3 +37,4 @@ phpunit.phar
 # Persistent data in Docker volumes
 /mysql-data
 
+/docker-compose.override.yml

@@ -14,7 +14,7 @@ For the first time installation, please refer to the following guide:
 https://github.com/yiisoft/yii2-app-advanced/blob/master/docs/guide/start-installation.md
 
 Deployment is handled by [BitBucket pipelines](bitbucket-pipelines.yml). There is a deploy script on the web server that
-sits in `/usr/local/bin/deploy-api.sh` that can also be [viewed in the repo](deploy-api.sh).
+sits in `/usr/local/bin/deploy.sh` that can also be [viewed in the repo](deploy.sh).
 
 ### Cronjobs:
 
@@ -40,7 +40,7 @@ crontab -l
 
 **Yii2 Queue** is an extension for running tasks asynchronously via queues.
 
-https://github.com/yiisoft/yii2-queue/blob/master/docs/guide/worker.md
+<https://github.com/yiisoft/yii2-queue/blob/master/docs/guide/worker.md>
 
 `sudo vim /etc/systemd/system/yii-queue@.service`
 
@@ -65,9 +65,9 @@ WantedBy=multi-user.target
 
 `sudo systemctl daemon-reload`
 
-`sudo systemctl start yii-queue@1 yii-queue@2`
-
 `sudo systemctl enable yii-queue@1 yii-queue@2`
+
+`sudo systemctl start yii-queue@1 yii-queue@2`
 
 `systemctl status "yii-queue@*"`
 
@@ -126,35 +126,56 @@ environments/            contains environment-based overrides
 
 # Local development with Docker
 
-Prerequisite: Download and install Docker Desktop for your OS.
+Prerequisite: Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/) for your OS.
 
 Start your Docker container with:
-
-`docker-compose up -d`
-
-Example of importing a gzipped mysql dump:
-
-`zcat cgsmpoim_shipwise.sql.gz | mysql -h mysql -u root -p cgsmpoim_shipwise`
 
 1. Run `docker-compose up -d`
 1. Update the SQL database.
     1. Copy the `devshipwise.sql` file to `/mysql-data/var/lib/mysql/devshipwise.sql`
     1. Enter MySQL instance `docker exec -it rest-api_mysql_1 bash`
     1. Run `mysql -u app -p123 cgsmpoim_shipwise < /var/lib/mysql/devshipwise.sql`
-1. Install composer and run `composer install` on the root directory
+       If your SQL Dump is gzipped, run this command instead:
+
+       `zcat devshipwise.sql.gz | mysql -h mysql -u root -p cgsmpoim_shipwise`
+
+1. Install composer and run `composer install` on the root directory, this should be run inside the docker container, see `make cli` below
 1. Run `php init` for development
 
-Frontend: localhost:30000 API: localhost:30001 MySQL: localhost:30002 PhpMyAdmin: localhost:30003 Shopify: localhost:
-30004
+
+There is also a `Makefile` with useful commands:
+
+- `make cli` - run a bash inside of the `api` container (runs as your user to avoid permission issues),
+  This is similar to running `docker-compose exec --user=$(id -u) api bash`.
+- `make docker-up` - start docker stack and enhance the dev environment, you can run this instead of `docker-compose up -d`
+- `make docker-down` - stop docker stack, same as `docker-compose down`
+
+Using `make` has the advantage that some tasks you would need to do manually are
+done automatically because make can detect changes to files and automatically create
+default configs or run commands based on that.
+
+If you have not change the ports in `docker-compose.override.yml`:
+
+- Frontend: <http://localhost:30000>
+- API: <http://localhost:30001>
+- MySQL: localhost:30002
+- PhpMyAdmin: <http://localhost:30003>
+
 
 ### Running queue jobs locally
 
 When you are developing in a local environment, all you need to have the queue jobs executed is this:
 
-- open the CLI on your local dev server, eg. docker or vagrant instance, then enter this command and keep the terminal
-  open:
+open the CLI on your local dev server, eg. docker (`make cli`) or vagrant instance, then enter this command and keep the terminal
+open:
 
 `php yii queue/listen --verbose`
+
+if you only want to run a single command:
+
+`php yii queue/run --verbose`
+
+TODO describe xdebug
 
 ### Image Magick
 
