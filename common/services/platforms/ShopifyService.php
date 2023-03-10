@@ -75,6 +75,15 @@ class ShopifyService
         'app/uninstalled'
     ];
 
+    /**
+     * @see https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks
+     */
+    public static array $mandatoryWebhookListeners = [
+        'customers/data_request',
+        'customers/redact',
+        'shop/redact',
+    ];
+
     protected const API_VERSION = '2023-01';
     protected string $shopUrl;
     protected string $scopes = 'read_products,write_products,read_customers,write_customers,read_fulfillments,write_fulfillments,read_orders,read_shipping,write_shipping,read_returns,write_orders,write_third_party_fulfillment_orders,read_third_party_fulfillment_orders,read_assigned_fulfillment_orders,write_assigned_fulfillment_orders,';
