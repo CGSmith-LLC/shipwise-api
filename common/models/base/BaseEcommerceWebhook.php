@@ -4,6 +4,7 @@ namespace common\models\base;
 
 use yii\db\{ActiveQuery, ActiveRecord};
 use common\models\{EcommercePlatform};
+use common\models\query\EcommerceWebhookQuery;
 
 /**
  * This is the model class for table "ecommerce_webhook".
@@ -21,6 +22,14 @@ use common\models\{EcommercePlatform};
  */
 class BaseEcommerceWebhook extends ActiveRecord
 {
+    /**
+     * @return EcommerceWebhookQuery
+     */
+    public static function find(): EcommerceWebhookQuery
+    {
+        return new EcommerceWebhookQuery(get_called_class());
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -40,7 +49,7 @@ class BaseEcommerceWebhook extends ActiveRecord
             [['payload', 'meta'], 'string'],
             [['created_date', 'updated_date'], 'safe'],
             [['status', 'event'], 'string', 'max' => 64],
-            [['platform_id'], 'exist', 'skipOnError' => true, 'targetClass' => EcommercePlatform::className(), 'targetAttribute' => ['platform_id' => 'id']],
+            [['platform_id'], 'exist', 'skipOnError' => true, 'targetClass' => EcommercePlatform::class, 'targetAttribute' => ['platform_id' => 'id']],
         ];
     }
 
@@ -66,6 +75,6 @@ class BaseEcommerceWebhook extends ActiveRecord
      */
     public function getPlatform(): ActiveQuery
     {
-        return $this->hasOne(EcommercePlatform::className(), ['id' => 'platform_id']);
+        return $this->hasOne(EcommercePlatform::class, ['id' => 'platform_id']);
     }
 }

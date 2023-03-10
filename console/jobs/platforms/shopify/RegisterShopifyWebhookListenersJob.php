@@ -1,20 +1,18 @@
 <?php
 
-namespace console\jobs\platforms;
+namespace console\jobs\platforms\shopify;
 
 use Yii;
 use common\models\EcommerceIntegration;
 use common\services\platforms\ShopifyService;
-use yii\base\BaseObject;
-use yii\base\InvalidConfigException;
-use yii\helpers\Json;
-use yii\helpers\Url;
+use yii\base\{BaseObject, InvalidConfigException};
+use yii\helpers\{Json, Url};
 use yii\queue\RetryableJobInterface;
 use yii\web\NotFoundHttpException;
 
 /**
  * Class RegisterShopifyWebhookListenersJob
- * @package console\jobs\platforms
+ * @package console\jobs\platforms\shopify
  * @see https://shopify.dev/docs/api/admin-rest/2023-01/resources/webhook
  * @see https://shopify.dev/docs/api/admin-rest/2023-01/resources/webhook#event-topics
  */

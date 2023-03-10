@@ -5,7 +5,7 @@ namespace common\services\platforms;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\{Json, Url};
-use console\jobs\platforms\{ParseShopifyOrderJob, RegisterShopifyWebhookListenersJob};
+use console\jobs\platforms\shopify\{ParseShopifyOrderJob, RegisterShopifyWebhookListenersJob};
 use common\models\{EcommerceIntegration, EcommercePlatform};
 use PHPShopify\{ShopifySDK, AuthHelper};
 use yii\web\ServerErrorHttpException;

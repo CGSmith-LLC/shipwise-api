@@ -5,6 +5,7 @@ namespace console\controllers;
 use common\models\BulkAction;
 use common\models\EcommerceIntegration;
 use common\models\EcommercePlatform;
+use common\models\EcommerceWebhook;
 use common\models\FulfillmentMeta;
 use common\models\Order;
 use common\models\ScheduledOrder;
@@ -73,11 +74,14 @@ class CronController extends Controller
         $this->runScheduledOrders();
 
         $this->runEcommerceIntegrations();
+        $this->runEcommerceWebhooks();
 
         return ExitCode::OK;
     }
 
     /**
+     * This method is used for pulling first (initial) raw orders from E-commerce platforms like Shopify.
+     * For working with webhooks, the method `runEcommerceWebhooks()` is used.
      * @throws InvalidConfigException
      */
     protected function runEcommerceIntegrations(): void
@@ -85,6 +89,7 @@ class CronController extends Controller
         $ecommerceIntegrations = EcommerceIntegration::find()
             ->active()
             ->orderById()
+            ->limit(100)
             ->all();
 
         foreach ($ecommerceIntegrations as $ecommerceIntegration) {
@@ -109,6 +114,25 @@ class CronController extends Controller
                     break;
 
             }
+        }
+    }
+
+    /**
+     * This method is used for creating Jobs for webhooks with the status "received".
+     */
+    protected function runEcommerceWebhooks(): void
+    {
+        $ecommerceWebhooks = EcommerceWebhook::find()
+            ->received()
+            ->orderById()
+            ->limit(100)
+            ->all();
+
+        /**
+         * @var $ecommerceWebhook EcommerceWebhook
+         */
+        foreach ($ecommerceWebhooks as $ecommerceWebhook) {
+            $ecommerceWebhook->createJob();
         }
     }
 
