@@ -2,11 +2,9 @@
 
 namespace common\models\base;
 
-use yii\db\ActiveRecord;
-use yii\db\ActiveQuery;
+use yii\db\{ActiveRecord, ActiveQuery};
+use common\models\{EcommercePlatform, Customer};
 use common\models\query\EcommerceIntegrationQuery;
-use common\models\EcommercePlatform;
-use common\models\Customer;
 use frontend\models\User;
 
 /**

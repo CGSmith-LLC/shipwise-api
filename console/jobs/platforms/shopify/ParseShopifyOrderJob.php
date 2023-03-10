@@ -1,14 +1,14 @@
 <?php
 
-namespace console\jobs\platforms;
+namespace console\jobs\platforms\shopify;
 
-use common\models\Country;
-use common\models\EcommerceIntegration;
-use common\models\EcommerceOrderLog;
-use common\models\EcommercePlatform;
-use common\models\Order;
-use common\models\State;
-use common\models\Status;
+use common\models\{Country,
+    Order,
+    State,
+    Status,
+    EcommerceIntegration,
+    EcommerceOrderLog,
+    EcommercePlatform};
 use common\services\platforms\CreateOrderService;
 use yii\base\BaseObject;
 use yii\queue\RetryableJobInterface;
@@ -16,7 +16,7 @@ use yii\web\NotFoundHttpException;
 
 /**
  * Class ParseShopifyOrderJob
- * @package console\jobs\platforms
+ * @package console\jobs\platforms\shopify
  * @see https://shopify.dev/docs/api/admin-rest/2023-01/resources/order
  */
 class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface

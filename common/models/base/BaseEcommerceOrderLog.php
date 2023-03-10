@@ -3,11 +3,8 @@
 namespace common\models\base;
 
 use Yii;
-use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
-use common\models\EcommercePlatform;
-use common\models\EcommerceIntegration;
-use common\models\Order;
+use yii\db\{ActiveQuery, ActiveRecord};
+use common\models\{EcommercePlatform, EcommerceIntegration, Order};
 
 /**
  * This is the model class for table "ecommerce_order_log".
@@ -50,9 +47,9 @@ class BaseEcommerceOrderLog extends ActiveRecord
             [['created_date', 'updated_date'], 'safe'],
             [['status'], 'string', 'max' => 64],
             [['original_order_id'], 'string', 'max' => 256],
-            [['integration_id'], 'exist', 'skipOnError' => true, 'targetClass' => EcommerceIntegration::className(), 'targetAttribute' => ['integration_id' => 'id']],
-            [['internal_order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['internal_order_id' => 'id']],
-            [['platform_id'], 'exist', 'skipOnError' => true, 'targetClass' => EcommercePlatform::className(), 'targetAttribute' => ['platform_id' => 'id']],
+            [['integration_id'], 'exist', 'skipOnError' => true, 'targetClass' => EcommerceIntegration::class, 'targetAttribute' => ['integration_id' => 'id']],
+            [['internal_order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::class, 'targetAttribute' => ['internal_order_id' => 'id']],
+            [['platform_id'], 'exist', 'skipOnError' => true, 'targetClass' => EcommercePlatform::class, 'targetAttribute' => ['platform_id' => 'id']],
         ];
     }
 
@@ -80,7 +77,7 @@ class BaseEcommerceOrderLog extends ActiveRecord
      */
     public function getIntegration(): ActiveQuery
     {
-        return $this->hasOne(EcommerceIntegration::className(), ['id' => 'integration_id']);
+        return $this->hasOne(EcommerceIntegration::class, ['id' => 'integration_id']);
     }
 
     /**
@@ -88,7 +85,7 @@ class BaseEcommerceOrderLog extends ActiveRecord
      */
     public function getInternalOrder(): ActiveQuery
     {
-        return $this->hasOne(Order::className(), ['id' => 'internal_order_id']);
+        return $this->hasOne(Order::class, ['id' => 'internal_order_id']);
     }
 
     /**
@@ -96,6 +93,6 @@ class BaseEcommerceOrderLog extends ActiveRecord
      */
     public function getPlatform(): ActiveQuery
     {
-        return $this->hasOne(EcommercePlatform::className(), ['id' => 'platform_id']);
+        return $this->hasOne(EcommercePlatform::class, ['id' => 'platform_id']);
     }
 }
