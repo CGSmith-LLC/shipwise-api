@@ -98,3 +98,25 @@ In `Data and configurations`, choose `Start with test data`.
 2. In the form, specify your test shop's details (`name` and `URL`).
 
 3. If you want to remove the Shopify app from your test shop, visit `https://admin.shopify.com/` -> `Apps` -> `Apps and sales channels` -> and press `Uninstall`.
+
+### Important URLs:
+
+*Common:*
+
+- https://partners.shopify.com/
+- https://github.com/phpclassic/php-shopify
+  
+*API:*
+
+- https://shopify.dev/docs/apps/auth/oauth/getting-started
+- https://shopify.dev/docs/api/usage/access-scopes
+- https://community.shopify.com/c/shopify-apis-and-sdks/will-access-token-expired/td-p/559870
+- https://shopify.dev/docs/apps/store/data-protection/protected-customer-data
+
+*Webhooks:*
+
+- https://shopify.dev/docs/apps/webhooks
+- https://shopify.dev/docs/apps/webhooks/configuration
+- https://shopify.dev/docs/api/admin-rest/2023-01/resources/webhook
+- https://shopify.dev/docs/api/admin-rest/2023-01/resources/webhook#event-topics
+- https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks

@@ -37,7 +37,8 @@ class EcommerceWebhookController extends Controller
         $ecommercePlatform = $this->getEcommercePlatformByName(EcommercePlatform::SHOPIFY_PLATFORM_NAME);
         $event = Yii::$app->request->get('event');
 
-        if (!in_array($event, ShopifyService::$webhookListeners)) {
+        if (!in_array($event, ShopifyService::$webhookListeners) &&
+            !in_array($event, ShopifyService::$mandatoryWebhookListeners)) {
             throw new NotFoundHttpException('Event not found.');
         }
 
@@ -50,6 +51,7 @@ class EcommerceWebhookController extends Controller
         }
 
         return [
+            'status' => 200,
             'result' => 'success',
         ];
     }
