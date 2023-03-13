@@ -58,7 +58,7 @@ class EcommerceIntegration extends BaseEcommerceIntegration
      */
     public function disconnect(): bool|int
     {
-        switch ($this->platform->name) {
+        switch ($this->ecommercePlatform->name) {
             case EcommercePlatform::SHOPIFY_PLATFORM_NAME:
 
                 $shopifyService = new ShopifyService($this->array_meta_data['shop_url'], $this);
