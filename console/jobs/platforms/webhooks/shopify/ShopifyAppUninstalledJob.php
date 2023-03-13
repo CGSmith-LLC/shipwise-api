@@ -9,6 +9,7 @@ use yii\helpers\Json;
 /**
  * Class ShopifyAppUninstalledJob
  * @package console\jobs\platforms\webhooks\shopify
+ * @see https://shopify.dev/docs/api/admin-rest/2023-01/resources/webhook#event-topics-app-uninstalled
  */
 class ShopifyAppUninstalledJob extends BaseWebhookProcessingJob
 {
