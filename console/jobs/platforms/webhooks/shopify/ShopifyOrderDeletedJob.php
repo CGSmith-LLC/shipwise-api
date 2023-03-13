@@ -14,5 +14,6 @@ class ShopifyOrderDeletedJob extends BaseWebhookProcessingJob
     {
         parent::execute($queue);
         echo " deleted ";
+        $this->ecommerceWebhook->setSuccess();
     }
 }

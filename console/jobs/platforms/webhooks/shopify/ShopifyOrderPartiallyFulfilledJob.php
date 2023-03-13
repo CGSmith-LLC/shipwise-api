@@ -14,5 +14,6 @@ class ShopifyOrderPartiallyFulfilledJob extends BaseWebhookProcessingJob
     {
         parent::execute($queue);
         echo " part. fulfilled ";
+        $this->ecommerceWebhook->setSuccess();
     }
 }

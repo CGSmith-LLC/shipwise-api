@@ -120,8 +120,6 @@ class EcommerceWebhook extends BaseEcommerceWebhook
                     break;
             }
 
-            //$this->setProcessing();
-
             return true;
         }
 

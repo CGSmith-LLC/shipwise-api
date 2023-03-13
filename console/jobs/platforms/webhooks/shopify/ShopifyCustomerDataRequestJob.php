@@ -14,5 +14,6 @@ class ShopifyCustomerDataRequestJob extends BaseWebhookProcessingJob
     {
         parent::execute($queue);
         echo " customer data request ";
+        $this->ecommerceWebhook->setSuccess();
     }
 }
