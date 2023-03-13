@@ -43,6 +43,7 @@ class BaseAddress extends \yii\db\ActiveRecord
             [['company', 'name', 'address1', 'address2', 'city'], 'string', 'max' => 64],
             [['zip'], 'string', 'max' => 16],
             [['phone'], 'string', 'max' => 32],
+            [['email'], 'string', 'max' => 255],
             [['notes'], 'string', 'max' => 600],
             [['country'], 'string', 'max' => 2],
             [['country'], 'default', 'value' => 'US'],

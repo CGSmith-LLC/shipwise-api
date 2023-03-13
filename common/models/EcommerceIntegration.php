@@ -63,7 +63,7 @@ class EcommerceIntegration extends BaseEcommerceIntegration
 
                 $shopifyService = new ShopifyService($this->array_meta_data['shop_url'], $this);
                 $shopifyService->deleteWebhookListenersJob();
-                
+
                 break;
         }
 
