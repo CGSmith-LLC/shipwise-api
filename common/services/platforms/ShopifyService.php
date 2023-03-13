@@ -5,7 +5,9 @@ namespace common\services\platforms;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\{Json, Url};
-use console\jobs\platforms\shopify\{ParseShopifyOrderJob, RegisterShopifyWebhookListenersJob};
+use console\jobs\platforms\shopify\{ParseShopifyOrderJob,
+    RegisterShopifyWebhookListenersJob,
+    UnregisterShopifyWebhookListenersJob};
 use common\models\{EcommerceIntegration, EcommercePlatform};
 use PHPShopify\{ShopifySDK, AuthHelper};
 use yii\web\ServerErrorHttpException;
@@ -84,7 +86,8 @@ class ShopifyService
         'shop/redact',
     ];
 
-    protected const API_VERSION = '2023-01';
+    public const API_VERSION = '2023-01';
+
     protected string $shopUrl;
     protected string $scopes = 'read_products,write_products,read_customers,write_customers,read_fulfillments,write_fulfillments,read_orders,read_shipping,write_shipping,read_returns,write_orders,write_third_party_fulfillment_orders,read_third_party_fulfillment_orders,read_assigned_fulfillment_orders,write_assigned_fulfillment_orders,';
     protected string $redirectUrl = '/ecommerce-integration/shopify';
@@ -278,6 +281,16 @@ class ShopifyService
         Yii::$app->queue->push(
             new RegisterShopifyWebhookListenersJob([
                 'ecommerceIntegrationId' => $this->ecommerceIntegration->id
+            ])
+        );
+    }
+
+    public function deleteWebhookListenersJob(): void
+    {
+        Yii::$app->queue->push(
+            new UnregisterShopifyWebhookListenersJob([
+                'shopUrl' => $this->shopUrl,
+                'accessToken' => $this->ecommerceIntegration->array_meta_data['access_token']
             ])
         );
     }

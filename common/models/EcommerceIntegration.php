@@ -7,6 +7,7 @@ use yii\helpers\Html;
 use common\models\base\BaseEcommerceIntegration;
 use console\jobs\NotificationJob;
 use common\traits\MetaDataFieldTrait;
+use common\services\platforms\ShopifyService;
 
 /**
  * Class EcommerceIntegration
@@ -50,8 +51,22 @@ class EcommerceIntegration extends BaseEcommerceIntegration
         return $this->status === self::STATUS_INTEGRATION_UNINSTALLED;
     }
 
+    /**
+     * @throws \yii\db\StaleObjectException
+     * @throws \Throwable
+     * @throws \yii\base\InvalidConfigException
+     */
     public function disconnect(): bool|int
     {
+        switch ($this->platform->name) {
+            case EcommercePlatform::SHOPIFY_PLATFORM_NAME:
+
+                $shopifyService = new ShopifyService($this->array_meta_data['shop_url'], $this);
+                $shopifyService->deleteWebhookListenersJob();
+                
+                break;
+        }
+
         return $this->delete();
     }
 
