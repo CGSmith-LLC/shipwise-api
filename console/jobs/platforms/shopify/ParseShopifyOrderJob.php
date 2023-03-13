@@ -51,7 +51,9 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
                 $this->parseItemsData();
                 $order = $this->saveOrder();
 
-                EcommerceOrderLog::success($this->ecommerceIntegration, $this->rawOrder, $order);
+                if ($order) {
+                    EcommerceOrderLog::success($this->ecommerceIntegration, $this->rawOrder, $order);
+                }
             } else {
                 EcommerceOrderLog::failed($this->ecommerceIntegration, $this->rawOrder, ['errors' => $parsingErrors]);
             }
@@ -105,14 +107,8 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
     protected function parseAddressData(): void
     {
         $notProvided = 'Not provided';
-        $name = null;
-        $address1 = null;
-        $address2 = null;
-        $company = null;
-        $city = null;
-        $phone = null;
+        $name = $address1 = $address2 = $company = $city = $phone = $email = $zip = null;
         $stateId = 0;
-        $zip = null;
         $countryCode = State::DEFAULT_COUNTRY_ABBR;
 
         if (isset($this->rawOrder['shipping_address']['name'])) {
@@ -135,8 +131,17 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
             $city = trim($this->rawOrder['shipping_address']['city']);
         }
 
+        if (isset($this->rawOrder['contact_email'])) {
+            $email = trim($this->rawOrder['contact_email']);
+        }
+
+        // Trying to find the phone number:
         if (isset($this->rawOrder['shipping_address']['phone'])) {
             $phone = trim($this->rawOrder['shipping_address']['phone']);
+        } elseif (isset($this->rawOrder['phone']) && !empty($this->rawOrder['phone'])) {
+            $phone = trim($this->rawOrder['phone']);
+        } elseif (isset($this->rawOrder['customer']) && isset($this->rawOrder['customer']['phone']) && !empty($this->rawOrder['customer']['phone'])) {
+            $phone = trim($this->rawOrder['customer']['phone']);
         }
 
         if (isset($this->rawOrder['shipping_address']['zip'])) {
@@ -169,6 +174,7 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
             'address2' => $address2,
             'company' => $company,
             'city' => ($city) ?: $notProvided,
+            'email' => $email,
             'phone' => ($phone) ?: $notProvided,
             'state_id' => $stateId,
             'zip' => ($zip) ?: $notProvided,
@@ -199,6 +205,8 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
         if ($createOrderService->isValid()) {
             return $createOrderService->create();
         }
+
+        return false;
     }
 
     public function canRetry($attempt, $error): bool
