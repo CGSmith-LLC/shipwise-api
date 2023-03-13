@@ -27,7 +27,11 @@ class UnregisterShopifyWebhookListenersJob extends BaseObject implements Retryab
             'AccessToken' => $this->accessToken
         ]);
 
-        $webhooksList = $shopify->Webhook()->get();
+        try {
+            $webhooksList = $shopify->Webhook()->get();
+        } catch (\Exception $e) {
+            $webhooksList = [];
+        }
 
         if ($webhooksList) {
             foreach ($webhooksList as $webhook) {
