@@ -14,5 +14,6 @@ class ShopifyOrderCreatedJob extends BaseWebhookProcessingJob
     {
         parent::execute($queue);
         echo " created ";
+        $this->ecommerceWebhook->setSuccess();
     }
 }

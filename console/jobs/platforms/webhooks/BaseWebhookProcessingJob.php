@@ -24,6 +24,7 @@ abstract class BaseWebhookProcessingJob extends BaseObject implements RetryableJ
     public function execute($queue): void
     {
         $this->setEcommerceWebhook();
+        $this->ecommerceWebhook->setProcessing();
 
         if ($this->isPayloadJson()) {
             $this->arrayPayload = Json::decode($this->ecommerceWebhook->payload);

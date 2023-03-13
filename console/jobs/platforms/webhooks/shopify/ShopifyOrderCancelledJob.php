@@ -14,5 +14,6 @@ class ShopifyOrderCancelledJob extends BaseWebhookProcessingJob
     {
         parent::execute($queue);
         echo " cancelled ";
+        $this->ecommerceWebhook->setSuccess();
     }
 }

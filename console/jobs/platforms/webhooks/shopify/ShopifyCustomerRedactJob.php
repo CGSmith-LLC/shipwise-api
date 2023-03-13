@@ -14,5 +14,6 @@ class ShopifyCustomerRedactJob extends BaseWebhookProcessingJob
     {
         parent::execute($queue);
         echo " customer redact ";
+        $this->ecommerceWebhook->setSuccess();
     }
 }

@@ -14,5 +14,6 @@ class ShopifyOrderPaidJob extends BaseWebhookProcessingJob
     {
         parent::execute($queue);
         echo " paid ";
+        $this->ecommerceWebhook->setSuccess();
     }
 }

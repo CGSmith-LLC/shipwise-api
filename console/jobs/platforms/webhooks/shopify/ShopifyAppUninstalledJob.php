@@ -14,5 +14,6 @@ class ShopifyAppUninstalledJob extends BaseWebhookProcessingJob
     {
         parent::execute($queue);
         echo " app uninstalled ";
+        $this->ecommerceWebhook->setSuccess();
     }
 }

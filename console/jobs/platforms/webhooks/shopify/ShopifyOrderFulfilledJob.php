@@ -14,5 +14,6 @@ class ShopifyOrderFulfilledJob extends BaseWebhookProcessingJob
     {
         parent::execute($queue);
         echo " fulfilled ";
+        $this->ecommerceWebhook->setSuccess();
     }
 }
