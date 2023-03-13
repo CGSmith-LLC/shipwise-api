@@ -29,8 +29,7 @@ class ShopifyOrderCancelledJob extends BaseWebhookProcessingJob
         $payload = Json::decode($this->ecommerceWebhook->payload);
 
         if (isset($payload['id'])) {
-            $externalOrderId = (int)$payload['id'];
-            $internalOrder = $this->getOrderByExternalId($externalOrderId);
+            $internalOrder = $this->getOrderByExternalId((int)$payload['id']);
 
             if ($internalOrder) {
                 $internalOrder->status_id = Status::CANCELLED;
