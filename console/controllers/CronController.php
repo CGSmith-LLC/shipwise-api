@@ -106,8 +106,10 @@ class CronController extends Controller
                         $shopifyService = new ShopifyService($ecommerceIntegration->array_meta_data['shop_url'], $ecommerceIntegration);
                         $orders = $shopifyService->getOrdersList();
 
-                        foreach ($orders as $order) {
-                            $shopifyService->parseRawOrderJob($order);
+                        if ($orders) {
+                            foreach ($orders as $order) {
+                                $shopifyService->parseRawOrderJob($order);
+                            }
                         }
                     }
 

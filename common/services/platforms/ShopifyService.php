@@ -9,7 +9,7 @@ use console\jobs\platforms\shopify\{ParseShopifyOrderJob,
     RegisterShopifyWebhookListenersJob,
     UnregisterShopifyWebhookListenersJob};
 use common\models\{EcommerceIntegration, EcommercePlatform};
-use PHPShopify\{ShopifySDK, AuthHelper};
+use PHPShopify\{Exception\ApiException, ShopifySDK, AuthHelper};
 use yii\web\ServerErrorHttpException;
 use PHPShopify\Exception\SdkException;
 
@@ -179,7 +179,7 @@ class ShopifyService
     /**
      * @throws InvalidConfigException
      */
-    protected function isTokenValid()
+    protected function isTokenValid(bool $withException = false): bool
     {
         try {
             $this->getProductsList();
@@ -188,47 +188,80 @@ class ShopifyService
                 $this->ecommerceIntegration->uninstall(true);
             }
 
-            throw new InvalidConfigException('Shopify token for the shop `' . $this->shopUrl . '` is invalid.');
+            if ($withException) {
+                throw new InvalidConfigException('Shopify token for the shop `' . $this->shopUrl . '` is invalid.');
+            }
+            return false;
         }
+
+        return true;
     }
 
     #####################
     # Get data via API: #
     #####################
 
-    public function getShop(): array
+    public function getShop(): array|bool
     {
-        return $this->shopify->Shop->get();
+        try {
+            return $this->shopify->Shop->get();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
-    public function getProductsList(): array
+    public function getProductsList(): array|bool
     {
-        return $this->shopify->Product->get();
+        try {
+            return $this->shopify->Product->get();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
-    public function getProductById(int $id): array
+    public function getProductById(int $id): array|bool
     {
-        return $this->shopify->Product($id)->get();
+        try {
+            return $this->shopify->Product($id)->get();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
-    public function getOrdersList(): array
+    public function getOrdersList(): array|bool
     {
-        return $this->shopify->Order->get($this->getRequestParamsForOrders());
+        try {
+            return $this->shopify->Order->get($this->getRequestParamsForOrders());
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
-    public function getOrderById(int $id): array
+    public function getOrderById(int $id): array|bool
     {
-        return $this->shopify->Order($id)->get();
+        try {
+            return $this->shopify->Order($id)->get();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
-    public function getCustomerById(int $id): array
+    public function getCustomerById(int $id): array|bool
     {
-        return $this->shopify->Customer($id)->get();
+        try {
+            return $this->shopify->Customer($id)->get();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
-    public function getCustomerAddressById(int $customerId, int $addressId): array
+    public function getCustomerAddressById(int $customerId, int $addressId): array|bool
     {
-        return $this->shopify->Customer($customerId)->Address($addressId)->get();
+        try {
+            return $this->shopify->Customer($customerId)->Address($addressId)->get();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
