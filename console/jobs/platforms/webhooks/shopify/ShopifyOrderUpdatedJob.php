@@ -45,7 +45,7 @@ class ShopifyOrderUpdatedJob extends BaseWebhookProcessingJob
 
     protected function updateOrder(Order $internalOrder, array $payload): void
     {
-        $internalOrder->notes = trim($payload['tags']);
+        $internalOrder->notes = trim($payload['note']);
         $internalOrder->save();
     }
 

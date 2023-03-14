@@ -99,7 +99,7 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
             'uuid' => (string)$this->rawOrder['id'],
             'created_date' => (new \DateTime($this->rawOrder['created_at']))->format('Y-m-d'),
             'origin' => EcommercePlatform::SHOPIFY_PLATFORM_NAME,
-            'notes' => trim($this->rawOrder['tags']),
+            'notes' => trim($this->rawOrder['note']),
             'address_id' => 0, // To skip validation, will be overwritten in `CreateOrderService`
         ];
     }
