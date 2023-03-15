@@ -166,6 +166,20 @@ if ($searchModel->carrier_id) {
                     }
                 ],
                 [
+                    'attribute' => 'order_attributes',
+                    'filter' => true,
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        if ($model->order_attributes_array) {
+                            return implode(', ', array_map(function ($attr) {
+                                return Html::a(Html::encode($attr), Url::to(['index', 'OrderSearch[order_attributes]' => Html::encode($attr)]));
+                            }, $model->order_attributes_array));
+                        }
+
+                        return null;
+                    },
+                ],
+                [
                     'attribute' => 'status_id',
                     'options' => ['width' => '10%'],
                     'value' => 'status.name',

@@ -2,6 +2,8 @@
 
 namespace common\models\base;
 
+use yii\db\ActiveRecord;
+
 /**
  * This is the model class for table "orders".
  *
@@ -15,6 +17,7 @@ namespace common\models\base;
  * @property string $updated_date
  * @property int    $address_id
  * @property string $notes
+ * @property string $order_attributes
  * @property string $po_number
  * @property string $uuid
  * @property string $origin
@@ -36,7 +39,7 @@ namespace common\models\base;
  * @property int $transit
  * @property string $packagingNotes
  */
-class BaseOrder extends \yii\db\ActiveRecord
+class BaseOrder extends ActiveRecord
 {
 
     /**
@@ -60,7 +63,7 @@ class BaseOrder extends \yii\db\ActiveRecord
             [['customer_reference', 'origin', 'uuid'], 'string', 'max' => 64],
             [['notes', 'packagingNotes'], 'string', 'max' => 6000],
             [['po_number'], 'string', 'max' => 64],
-            [['label_data'], 'string'],
+            [['label_data', 'order_attributes'], 'string'],
             [['label_type'], 'string', 'max' => 6],
             [
                 [
@@ -98,6 +101,7 @@ class BaseOrder extends \yii\db\ActiveRecord
             'updated_date'       => 'Updated Date',
             'address_id'         => 'Address ID',
             'notes'              => 'Notes',
+            'order_attributes'   => 'Attributes',
             'origin'             => 'Origin of Order',
             'label_data'         => 'Label Data',
             'label_type'         => 'Label Type',

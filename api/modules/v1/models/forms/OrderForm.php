@@ -101,6 +101,11 @@ use api\modules\v1\models\order\StatusEx;
  *            property = "service_id",
  *            type = "integer"
  *        ),
+ *     @SWG\Property(
+ *            property = "orderAttributes",
+ *            type = "string",
+ *            description = "Specific order attributes, separated by a comma. Example: one,two,three"
+ *        ),
  * )
  */
 
@@ -152,6 +157,8 @@ class OrderForm extends Model
     public $transit;
     /** @var string  */
     public $packagingNotes;
+    /** @var string */
+    public $orderAttributes;
 
 
     /**
@@ -168,6 +175,7 @@ class OrderForm extends Model
             [['poNumber', 'uuid', 'origin', 'customerReference', 'packagingNotes'], 'string', 'length' => [1, 64]],
             ['orderReference', 'string', 'length' => [1, 45]],
             ['notes', 'string', 'length' => [1, 6000]],
+            [['orderAttributes'], 'string'],
             ['transit', 'integer'],
             [['requestedShipDate', 'mustArriveByDate'], 'date', 'format' => 'php:Y-m-d'],
             ['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],

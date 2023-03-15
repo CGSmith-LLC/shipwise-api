@@ -54,6 +54,7 @@ class OrderEx extends Order
      *     @SWG\Property( property = "poNumber", type = "string", description = "PO Number of ecommerce customer" ),
      *     @SWG\Property( property = "uuid", type = "string", description = "Reference to ecommerce UUID" ),
      *     @SWG\Property( property = "notes", type = "string", description = "Notes specific to an order" ),
+     *     @SWG\Property( property = "orderAttributes", type = "string", description = "Specific attributes of order separated by comma" ),
      *     @SWG\Property( property = "origin", type = "string", description = "Origination of order. Such as
     SquareSpace or Zoho" ),
      *     @SWG\Property( property = "transit", type = "integer", description = "Days in transit if available" ),
@@ -91,6 +92,9 @@ class OrderEx extends Order
             'poNumber'          => 'po_number',
             'uuid'              => 'uuid',
             'notes'             => 'notes',
+            'orderAttributes'   => function () {
+                return ($this->order_attributes_array) ? implode(',', $this->order_attributes_array) : null;
+            },
             'origin'            => 'origin',
             'packages'          => 'packages',
             'transit'           => 'transit',

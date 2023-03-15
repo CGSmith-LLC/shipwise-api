@@ -9,6 +9,7 @@ use common\models\base\BaseOrder;
 use common\models\query\OrderQuery;
 use common\models\shipping\{Carrier, Service, PackageType, Shipment, ShipmentPackage};
 use console\jobs\webhooks\OrderWebhook;
+use yii\helpers\Json;
 
 /**
  * Class Order
@@ -24,9 +25,17 @@ use console\jobs\webhooks\OrderWebhook;
  * @property OrderHistory[] $history
  * @property Carrier        $carrier
  * @property Service        $service
+ *
+ * @property array          $order_attributes_array
  */
 class Order extends BaseOrder
 {
+    /**
+     * The property is used for storing the `order_attributes` attribute converted from JSON everytime the model is found.
+     * @var array
+     */
+    public array $order_attributes_array = [];
+
     public function behaviors(): array
     {
         return [
@@ -40,6 +49,11 @@ class Order extends BaseOrder
     {
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'createJobIfNeeded']);
         $this->on(self::EVENT_AFTER_INSERT, [$this, 'createJobIfNeeded']);
+
+        $this->on(self::EVENT_AFTER_FIND, [$this, 'executeAfterFind']);
+        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'executeBeforeInsertAndUpdate']);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'executeBeforeInsertAndUpdate']);
+
 
         parent::init();
     }
@@ -341,6 +355,20 @@ class Order extends BaseOrder
                 $this->label_type = null;
                 $this->save(false);
             }
+        }
+    }
+
+    protected function executeAfterFind(): void
+    {
+        // From JSON:
+        $this->order_attributes_array = ($this->order_attributes) ? Json::decode($this->order_attributes) : [];
+    }
+
+    protected function executeBeforeInsertAndUpdate(): void
+    {
+        // Into JSON:
+        if ($this->order_attributes && !preg_match("/\[(.*?)\]/si", $this->order_attributes)) {
+            $this->order_attributes = Json::encode(explode(',', strip_tags($this->order_attributes)), JSON_PRETTY_PRINT);
         }
     }
 }

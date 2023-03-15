@@ -1,15 +1,13 @@
 <?php
-
-use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
-use yii\helpers\Url;
 use yii\web\View;
-use frontend\assets\DatePickerAsset;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\{Html, Url};
+use frontend\assets\{DatePickerAsset, TagsInputAsset};
 use frontend\models\Item;
 
-/* @var $this yii\web\View */
+/* @var $this View */
 /* @var $model common\models\forms\OrderForm */
-/* @var $form yii\bootstrap\ActiveForm */
+/* @var $form ActiveForm */
 /* @var $customers array List of customers */
 /* @var $statuses array List of order statuses */
 /* @var $carriers array List of carriers */
@@ -18,10 +16,17 @@ use frontend\models\Item;
 /* @var $countries array list of states */
 
 DatePickerAsset::register($this);
+TagsInputAsset::register($this);
 
 $item = new Item();
 $item->loadDefaultValues();
 
+$this->registerJs("
+    $('input[data-tags-input]').tagsinput({
+      trimValue: true,
+      tagClass: 'label label-default'
+    });
+");
 ?>
 
     <div class="order-form">
@@ -93,6 +98,12 @@ $item->loadDefaultValues();
                                 '<div class="input-group date"><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>{input}</div>',
                         ])->textInput([
                             'value' => ($model->order->must_arrive_by_date) ? Yii::$app->formatter->asDate($model->order->must_arrive_by_date) : null,
+                        ]) ?>
+
+                        <?= $form->field($model->order, 'order_attributes')->textInput([
+                            'value' => ($model->order->order_attributes_array) ? implode(',', $model->order->order_attributes_array) : null,
+                            'data-tags-input' => true,
+                            'maxlength' => true
                         ]) ?>
 
                     </div>
