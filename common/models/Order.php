@@ -3,13 +3,12 @@
 namespace common\models;
 
 use Yii;
-use common\behaviors\OrderEventsBehavior;
+use common\behaviors\{OrderEventsBehavior, JsonAttributeBehavior};
 use api\modules\v1\models\core\AddressEx;
 use common\models\base\BaseOrder;
 use common\models\query\OrderQuery;
 use common\models\shipping\{Carrier, Service, PackageType, Shipment, ShipmentPackage};
 use console\jobs\webhooks\OrderWebhook;
-use yii\helpers\Json;
 
 /**
  * Class Order
@@ -42,6 +41,11 @@ class Order extends BaseOrder
             [
                 'class' => OrderEventsBehavior::class,
             ],
+            [
+                'class' => JsonAttributeBehavior::class,
+                'jsonAttributes' => ['order_attributes'],
+                'convertFromJsonAttributes' => ['order_attributes_array' => 'order_attributes'],
+            ],
         ];
     }
 
@@ -49,11 +53,6 @@ class Order extends BaseOrder
     {
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'createJobIfNeeded']);
         $this->on(self::EVENT_AFTER_INSERT, [$this, 'createJobIfNeeded']);
-
-        $this->on(self::EVENT_AFTER_FIND, [$this, 'executeAfterFind']);
-        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'executeBeforeInsertAndUpdate']);
-        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'executeBeforeInsertAndUpdate']);
-
 
         parent::init();
     }
@@ -355,20 +354,6 @@ class Order extends BaseOrder
                 $this->label_type = null;
                 $this->save(false);
             }
-        }
-    }
-
-    protected function executeAfterFind(): void
-    {
-        // From JSON:
-        $this->order_attributes_array = ($this->order_attributes) ? Json::decode($this->order_attributes) : [];
-    }
-
-    protected function executeBeforeInsertAndUpdate(): void
-    {
-        // Into JSON:
-        if ($this->order_attributes && !preg_match("/\[(.*?)\]/si", $this->order_attributes)) {
-            $this->order_attributes = Json::encode(explode(',', strip_tags($this->order_attributes)));
         }
     }
 }
