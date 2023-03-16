@@ -1,5 +1,9 @@
 <?php
 
+namespace tests\functional;
+
+use FunctionalTester;
+
 /**
  * Class NotSignedInCest
  */

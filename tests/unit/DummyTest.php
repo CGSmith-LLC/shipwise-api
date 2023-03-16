@@ -1,5 +1,7 @@
 <?php
 
+namespace tests\unit;
+
 class DummyTest extends \Codeception\Test\Unit
 {
     /**

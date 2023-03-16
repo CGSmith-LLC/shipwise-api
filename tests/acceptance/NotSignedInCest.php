@@ -1,5 +1,9 @@
 <?php
 
+namespace tests\acceptance;
+
+use AcceptanceTester;
+
 /**
  * Class NotSignedInCest
  */
