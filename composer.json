@@ -1,7 +1,13 @@
 {
+    "name": "cgsmith/shipwise-api",
+    "description": "",
+    "type": "project",
+    "license": "proprietary",
     "minimum-stability": "stable",
     "require": {
         "php": "^8.0",
+        "ext-json": "*",
+
         "yiisoft/yii2": "~2.0.28",
         "yiisoft/yii2-bootstrap": "~2.0.10",
         "yiisoft/yii2-swiftmailer": "~2.1.0",
@@ -16,8 +22,7 @@
         "yii2tech/csv-grid": "^1.0",
         "bp-sys/yii2-aws-s3": "~2.0",
         "bilberrry/yii2-digitalocean-spaces": "^0.1.2",
-        "ext-json": "*",
-        "yiisoft/yii2-httpclient": "*",
+        "yiisoft/yii2-httpclient": "~2.0.14",
         "zhuravljov/yii2-queue-monitor": "^0.3.4",
         "2amigos/yii2-usuario": "^1.5",
         "yiisoft/yii2-authclient": "^2.2",

@@ -17,9 +17,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate
-
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v3
@@ -31,6 +28,9 @@ jobs:
 
     - name: Start docker-compose
       run: make docker-up
+
+    - name: Validate composer.json and composer.lock
+      run: make lint
 
     - name: Run Codeception tests
       run: make test

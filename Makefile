@@ -3,7 +3,7 @@
 
 CONTAINER_NAME=api
 
-.PHONY: cli bash docker-up docker-down
+.PHONY: cli bash docker-up docker-down lint test
 
 # Run a bash in a Docker container as your local user,
 # so files are created owned by that user instead of root.
@@ -50,3 +50,8 @@ api/web/index.php: environments/dev/api/web/index.php
 
 test:
 	docker-compose exec --user=$$(id -u) $(CONTAINER_NAME) vendor/bin/codecept run
+
+
+lint:
+	docker-compose exec --user=$$(id -u) $(CONTAINER_NAME) composer validate --strict
+
