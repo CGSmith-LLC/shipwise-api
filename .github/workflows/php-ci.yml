@@ -17,19 +17,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Prepare docker
-      run: make docker-compose.override.yml
-
-    - name: Set up Docker Compose
-      uses: docker/compose-action@1.2.0
-      with:
-        compose-file: docker-compose.yaml
-
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
-
-    - name: Setup config files
-      run: make api/web/index.php
 
     - name: Cache Composer packages
       id: composer-cache
@@ -40,8 +29,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-php-
 
-    - name: Install dependencies
-      run: make vendor/autoload.php
+    - name: Start docker-compose
+      run: make docker-up
 
     - name: Run Codeception tests
       run: make test
