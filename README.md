@@ -164,6 +164,28 @@ If you have not change the ports in `docker-compose.override.yml`:
 - PhpMyAdmin: <http://localhost:30003>
 
 
+### Tests
+
+`make test`
+`make test TESTCASE="acceptance tests/functional/ --fail-fast"`
+
+#### VNC
+
+For Acceptance tests with Selenium, you can use VNC to view the browser that runs the tests.
+Call the following url with the VNC viewer:
+
+    localhost:35900
+
+VNC password is 'secret'
+
+#### VNC Video
+
+The test scenario can be recorded on video with the following tool:
+<http://www.unixuser.org/~euske/python/vnc2flv/index.html#usage>
+
+    flvrec.py localhost 35900
+    password: secret
+
 ### Running queue jobs locally
 
 When you are developing in a local environment, all you need to have the queue jobs executed is this:

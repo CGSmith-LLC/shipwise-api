@@ -6,8 +6,10 @@
 # Remove this suite if you don't use frameworks
 
 actor: FunctionalTester
+bootstrap: bootstrap.php
 modules:
     enabled:
         # add a framework module here
+        - Yii2
         - \Helper\Functional
     step_decorators: ~        

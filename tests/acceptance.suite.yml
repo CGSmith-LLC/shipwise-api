@@ -7,9 +7,28 @@
 actor: AcceptanceTester
 modules:
     enabled:
-        - PhpBrowser:
+        - Asserts
+        # use WebDriver instead of PhpBrowser to enable javascript testing
+        - WebDriver:
             # uncomment localhost:30000 if you want to run tests outside of docker
             #url: http://localhost:30000/
-            url: http://frontend:80/
+            url: 'http://frontend:80/'
+            host: selenium
+            port: 4444
+            log_js_errors: true
+            # use a new browser window for all tests to avoid weird problems
+            # with scroll failing to scroll to elements in second iteration
+            restart: True
+            #browser: chrome
+            browser: firefox
+            # window_size: 1900x950
+            window_size: maximize
+            capabilities:
+              javascriptEnabled: true
+              acceptSslCerts: true
+              acceptInsecureCerts: true
+
         - \Helper\Acceptance
+        - Db
+
 step_decorators: ~        
