@@ -14,7 +14,7 @@ class m230315_124607_order_attributes_field extends Migration
     {
         $this->addColumn('{{%orders}}', 'order_attributes',
             $this
-                ->text()
+                ->json()
                 ->defaultValue(null)
                 ->after('notes'));
     }

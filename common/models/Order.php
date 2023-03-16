@@ -368,7 +368,7 @@ class Order extends BaseOrder
     {
         // Into JSON:
         if ($this->order_attributes && !preg_match("/\[(.*?)\]/si", $this->order_attributes)) {
-            $this->order_attributes = Json::encode(explode(',', strip_tags($this->order_attributes)), JSON_PRETTY_PRINT);
+            $this->order_attributes = Json::encode(explode(',', strip_tags($this->order_attributes)));
         }
     }
 }
