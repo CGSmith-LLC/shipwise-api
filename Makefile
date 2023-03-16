@@ -35,7 +35,7 @@ bash: ## Run a bash in a Docker container as your local user,
 # 2. Create a user with the same name and ID inside the docker conterainer if it does not exists.
 #    The user is also added to the www-data group to work well with files created by the webserver.
 #    The users home directory is /app/api/runtime/docker-home so bash history files are stored in the docker/home directory in this repo.
-docker-up: .start-containers vendor/autoload.php environments/dev/api/web/index.php ## Start Docker containers and prepare Docker environment, auto-rebulids containers when Dockerfile changes
+docker-up: .start-containers vendor/autoload.php api/web/index.php ## Start Docker containers and prepare Docker environment, auto-rebulids containers when Dockerfile changes
 .start-containers: docker-compose.override.yml api/runtime/docker-build
 	docker-compose up -d
 	mkdir -p api/runtime/docker-home
@@ -63,7 +63,7 @@ docker-compose.override.yml: docker-compose.override.dist.yml
 
 # run php init on first start
 api/web/index.php: environments/dev/api/web/index.php
-	test -f $@ || docker-compose exec -T --user=$$(id -u) $(CONTAINER_NAME) php init
+	test -f $@ || docker-compose exec -T --user=$$(id -u) $(CONTAINER_NAME) php init --env=Development --overwrite=n
 
 
 test: ## Run codeception tests, run a specific test by setting the TESTCASE variable: make test TESTCASE="acceptance tests/acceptance/NotSignedInCest.php" 
