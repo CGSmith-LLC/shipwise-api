@@ -31,9 +31,6 @@ class EcommerceWebhookController extends Controller
      */
     public function actionShopify(): array
     {
-        // file_put_contents('shopify.txt', "\r\n\r\n\r\n" . Yii::$app->request->rawBody, FILE_APPEND);
-
-
         $ecommercePlatform = $this->getEcommercePlatformByName(EcommercePlatform::SHOPIFY_PLATFORM_NAME);
         $event = Yii::$app->request->get('event');
 
@@ -87,22 +84,5 @@ class EcommerceWebhookController extends Controller
         $ecommerceWebhook->status = EcommerceWebhook::STATUS_RECEIVED;
 
         return $ecommerceWebhook;
-    }
-
-    public function actionTest()
-    {
-        $ecommerceIntegrations = EcommerceIntegration::find()
-            ->active()
-            ->orderById()
-            ->all();
-
-        foreach ($ecommerceIntegrations as $ecommerceIntegration) {
-            $accessToken = $ecommerceIntegration->array_meta_data['access_token'];
-
-            if ($accessToken) {
-                $shopifyService = new ShopifyService($ecommerceIntegration->array_meta_data['shop_url'], $ecommerceIntegration);
-                return $shopifyService->getWebhooksList();
-            }
-        }
     }
 }
