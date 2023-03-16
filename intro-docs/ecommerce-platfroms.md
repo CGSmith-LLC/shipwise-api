@@ -9,20 +9,24 @@
 3. Add implementation to:
 - `common\models\EcommercePlatform`
 - `common\models\EcommerceIntegration`
+- `common\models\EcommerceWebhook`
 - `frontend\controllers\EcommercePlatformController`
 - `frontend\controllers\EcommerceIntegrationController`
 - `frontend\controllers\EcommerceWebhookController`
 
 4. Create a Service similar to `common\services\platforms\ShopifyService`.
 
-5. Create a Job similar to `console\jobs\platforms\ParseShopifyOrderJob`.
+5. Create Jobs similar to `console\jobs\platforms\*`.
 
 > php yii queue/listen --verbose
 
 ### Cron:
 
 1. See `console\controllers\CronController.php` -> `runEcommerceIntegrations()`.
-We need this method to pull existing orders from a needed E-commerce platform.
+We need this method to pull initial existing orders from a needed E-commerce platform.
+   
+2. See `console\controllers\CronController.php` -> `runEcommerceWebhooks()`.
+We need this method to process received webhooks (`status=received`).
    
 > php yii cron/frequent
 
@@ -74,7 +78,8 @@ If you're going to **test it locally**, specify:
 4. If you're going to **test it locally**, in `common\config\params-local.php` set the parameter `override_redirect_domain`
 to `https://shipwise.ngrok.io`.
    
-5. You need to request `Protected customer data access`. Go to `Apps` -> `Your app` -> `App setup` -> Find the section `Protected customer data access` ->
+5. You need to request `Protected customer data access` for data like shipping address. 
+Go to `Apps` -> `Your app` -> `App setup` -> Find the section `Protected customer data access` ->
 Press the button `Request access`. On the page, select and request access for:
    
 - `Protected customer data`
