@@ -27,7 +27,7 @@ jobs:
           ${{ runner.os }}-php-
 
     - name: Start docker-compose
-      run: make docker-up
+      run: make docker-up vendor/autoload.php
 
     - name: Validate composer.json and composer.lock
       run: make lint
