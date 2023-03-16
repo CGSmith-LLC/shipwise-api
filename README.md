@@ -150,6 +150,8 @@ There is also a `Makefile` with useful commands:
 - `make docker-up` - start docker stack and enhance the dev environment, you can run this instead of `docker-compose up -d`
 - `make docker-down` - stop docker stack, same as `docker-compose down`
 
+Run `make help` for a list of all available commands.
+
 Using `make` has the advantage that some tasks you would need to do manually are
 done automatically because make can detect changes to files and automatically create
 default configs or run commands based on that.
