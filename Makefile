@@ -37,7 +37,7 @@ docker-down:
 
 # Run composer install if vendor/autoload.php does not exist or is outdated (older than composer.json)
 vendor/autoload.php: composer.json docker-up
-	@docker-compose exec --user=$$(id -u) $(CONTAINER_NAME) composer install
+	@docker-compose exec -T --user=$$(id -u) $(CONTAINER_NAME) composer install
 
 # create docker-compose.override.yml if it does not exist
 docker-compose.override.yml: docker-compose.override.dist.yml
@@ -45,13 +45,13 @@ docker-compose.override.yml: docker-compose.override.dist.yml
 
 # run php init on first start
 api/web/index.php: environments/dev/api/web/index.php
-	test -f $@ || docker-compose exec --user=$$(id -u) $(CONTAINER_NAME) php init
+	test -f $@ || docker-compose exec -T --user=$$(id -u) $(CONTAINER_NAME) php init
 
 
 test:
-	docker-compose exec --user=$$(id -u) $(CONTAINER_NAME) vendor/bin/codecept run
+	docker-compose exec -T --user=$$(id -u) $(CONTAINER_NAME) vendor/bin/codecept run
 
 
 lint:
-	docker-compose exec --user=$$(id -u) $(CONTAINER_NAME) composer validate --strict
+	docker-compose exec -T --user=$$(id -u) $(CONTAINER_NAME) composer validate --strict
 
