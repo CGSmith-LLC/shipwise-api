@@ -170,7 +170,7 @@ class OrderWebhook extends \yii\base\BaseObject implements \yii\queue\RetryableJ
             \Yii::$app->queue->push(
                 new NotificationJob([
                     'user_id' => $webhook->user_id,
-                    'subject' => '🚨 Your webhook is failing: ' . $this->webhook->name,
+                    'subject' => '🚨 Your webhook is failing: ' . $webhook->name,
                     'message' => 'This is possible if your endpoint isn\'t correct or is failing. <strong>We will disable it going forward.</strong>',
                     'url' => ['/webhook',],
                     'urlText' => 'See the failure message',

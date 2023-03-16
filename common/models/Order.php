@@ -48,7 +48,9 @@ class Order extends BaseOrder
     {
         // Only create a job if the status is changed
         // sender attribute needs to be cast as an int as it comes down as a string
-        if (isset($event->changedAttributes['status_id']) && $event->changedAttributes['status_id'] !== (int) $event->sender->status_id) {
+        // if afterInsert - just make sure status_id is set as this is a newly created order
+        if (($event->name == self::EVENT_AFTER_INSERT && isset($event->sender->status_id)) ||
+            (isset($event->changedAttributes['status_id']) && $event->changedAttributes['status_id'] !== (int) $event->sender->status_id)) {
             // Only create a webhook that has a trigger set for the status
             $webhooks = Webhook::find()
                 ->joinWith('webhookTrigger')

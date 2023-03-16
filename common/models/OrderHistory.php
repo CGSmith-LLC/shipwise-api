@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use api\modules\v1\models\core\ApiConsumerEx;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
@@ -63,7 +64,7 @@ class OrderHistory extends BaseOrderHistory
 
     public function getUser(): ActiveQuery
     {
-        return $this->hasOne('frontend\models\User', ['id' => 'user_id']);
+        return $this->hasOne('common\models\User', ['id' => 'user_id']);
     }
 
     protected function orderHistoryPopulate(): void
