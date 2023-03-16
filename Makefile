@@ -23,7 +23,7 @@ bash: docker-up vendor/autoload.php
 #    The users home directory is /app/docker/home so bash history files are stored in the docker/home directory in this repo.
 docker-up: docker-compose.override.yml api/runtime/docker-build environments/dev/api/web/index.php
 	docker-compose up -d
-	docker-compose exec $(CONTAINER_NAME) bash -c "grep '^$(shell whoami):' /etc/passwd || useradd '$(shell whoami)' --uid=$(shell id -u) -G www-data -s /bin/bash -d /app/docker/home"
+	docker-compose exec -T $(CONTAINER_NAME) bash -c "grep '^$(shell whoami):' /etc/passwd || useradd '$(shell whoami)' --uid=$(shell id -u) -G www-data -s /bin/bash -d /app/docker/home"
 
 # auto rebuild docker containers when Dockerfile changes
 # will change timestamp of runtime/docker-build to only run this when docker files change
