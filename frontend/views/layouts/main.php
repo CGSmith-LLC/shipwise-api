@@ -166,6 +166,7 @@ $this->beginBody() ?>
                     ['label' => 'Subscriptions', 'url' => ['/subscription']],
                     ['label' => 'One-Time Charges', 'url' => ['/one-time-charge']],
                     ['label' => 'Invoices', 'url' => ['/invoice']],
+                    ['label' => 'Ecommerce Platforms', 'url' => ['/ecommerce-platform']],
                     ['label' => 'Integrations', 'url' => ['/integration']],
                     ['label' => 'Behaviors', 'url' => ['/behavior']],
                     ['label' => 'Jobs', 'url' => ['/monitor/jobs']],
@@ -181,6 +182,8 @@ $this->beginBody() ?>
             'encode' => false,
             'items' => [
                 ['label' => 'Account', 'url' => ['/user/settings/profile']],
+
+                ['label' => 'Integrations', 'url' => ['/ecommerce-integration']],
 
                 ['label' => 'Items', 'url' => ['/sku']],
 
