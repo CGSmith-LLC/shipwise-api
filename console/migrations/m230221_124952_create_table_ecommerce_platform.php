@@ -24,6 +24,10 @@ class m230221_124952_create_table_ecommerce_platform extends Migration
         ");
 
         $this->execute("
+            ALTER TABLE `ecommerce_platform` ADD INDEX(`name`);
+        ");
+
+        $this->execute("
             ALTER TABLE `ecommerce_platform` CHANGE `updated_date` `updated_date` DATETIME on update CURRENT_TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;
         ");
     }

@@ -30,6 +30,10 @@ class m230222_112448_add_ecommerce_integration_table extends Migration
                 CHANGE `updated_date` `updated_date` DATETIME on update CURRENT_TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;
         ");
 
+        $this->execute("
+            ALTER TABLE `ecommerce_integration` ADD INDEX(`status`);
+        ");
+
         $this->addForeignKey(
             '{{%fk-ecommerce_integration-user_id}}',
             '{{%ecommerce_integration}}',
