@@ -6,7 +6,10 @@ $params = array_merge(
 
 );
 
+$appName = 'Shipwise';
+
 return [
+    'name' => $appName,
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm' => '@vendor/npm-asset',
@@ -87,6 +90,31 @@ return [
             'clientId' => $params['coldco']['clientId'],
             'secret' => $params['coldco']['secret'],
         ]
-
+    ],
+    'modules' => [
+        'user' => [
+            'class' => Da\User\Module::class,
+            'enableTwoFactorAuthentication' => true,
+            'mailParams' => [
+                'fromEmail' => [$params['senderEmail'] => $appName],
+            ],
+            'enableFlashMessages' => false,
+            'administrators' => $params['adminEmail'],
+            'controllerMap' => [
+                'admin' => 'frontend\controllers\user\AdminController',
+                'registration' => [
+                    'class' => frontend\controllers\user\RegistrationController::class,
+                    'on ' . Da\User\Event\FormEvent::EVENT_AFTER_REGISTER => [
+                        'frontend\events\user\AfterRegisterEvent',
+                        'notifyAdmin'
+                    ]
+                ],
+            ],
+            'classMap' => [
+                'User' => 'frontend\models\User',
+                'RegistrationForm' => 'frontend\models\forms\RegistrationForm',
+                'Profile' => 'frontend\models\Profile',
+            ]
+        ],
     ],
 ];

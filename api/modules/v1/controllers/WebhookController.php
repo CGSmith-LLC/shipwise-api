@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\controllers;
 
+use common\models\User;
 use Yii;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
@@ -52,6 +53,10 @@ class WebhookController extends ControllerEx
         try {
             $csvBox = new CsvBox($data);
             $csvBox->file_path = Yii::$app->params['csvBoxS3Path'];
+            // log in user that requested this for events
+
+            $identity = User::findOne(['email' => $csvBox->user_id]);
+            Yii::$app->user->login($identity);
 
             Yii::debug($csvBox->getS3FilePath());
 
@@ -117,6 +122,8 @@ class WebhookController extends ControllerEx
     {
         $headers = Yii::$app->request->headers;
         $customer_id = 76;
+        $identity = User::findOne(1);
+        Yii::$app->user->login($identity);
         if ($headers->get('authorization') === 'Basic c2hpcHdpc2U6bmVlc3ZpZ3M=') {
             $duda = new DudaAdapter();
             $duda->customer_id = $customer_id; // urban smokehouse
@@ -146,6 +153,7 @@ class WebhookController extends ControllerEx
         \Yii::$app->queue->push(
             new NotificationJob([
                 'customer_id' => $csvBox->customer_id,
+                'user_id' => Yii::$app->user->identity->id,
                 'subject' => '⚠️ Problem importing order file ' . $csvBox->original_filename,
                 'message' => 'This file failed to import for the following reasons: <ul>' . $errors . '</ul>',
                 'url' => ['/order/import',],

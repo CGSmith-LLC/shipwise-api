@@ -6,11 +6,9 @@ $params = array_merge(
     require __DIR__ . '/params-local.php'
 );
 
-$appName = 'ShipWise';
 
 return [
     'id' => 'app-frontend',
-    'name' => $appName,
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log', 'monitor'],
     'controllerNamespace' => 'frontend\controllers',
@@ -83,30 +81,6 @@ return [
     'modules' => [
         'monitor' => [
             'class' => \zhuravljov\yii\queue\monitor\Module::class,
-        ],
-        'user' => [
-            'class' => Da\User\Module::class,
-            'enableTwoFactorAuthentication' => true,
-            'mailParams' => [
-                'fromEmail' => [$params['senderEmail'] => $appName],
-            ],
-            'enableFlashMessages' => false,
-            'administrators' => $params['adminEmail'],
-            'controllerMap' => [
-                'admin' => 'frontend\controllers\user\AdminController',
-                'registration' => [
-                    'class' => frontend\controllers\user\RegistrationController::class,
-                    'on ' . Da\User\Event\FormEvent::EVENT_AFTER_REGISTER => [
-                        'frontend\events\user\AfterRegisterEvent',
-                        'notifyAdmin'
-                    ]
-                ],
-            ],
-            'classMap' => [
-                'User' => 'frontend\models\User',
-                'RegistrationForm' => 'frontend\models\forms\RegistrationForm',
-                'Profile' => 'frontend\models\Profile',
-            ]
         ],
     ],
 ];

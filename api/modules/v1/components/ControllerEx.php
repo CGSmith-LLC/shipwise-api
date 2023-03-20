@@ -10,6 +10,7 @@ use api\modules\v1\models\order\OrderEx;
 use api\modules\v1\models\order\PackageEx;
 use common\models\PackageItem;
 use common\models\PackageItemLotInfo;
+use common\models\User;
 use yii\helpers\ArrayHelper;
 use yii\rest\Controller;
 use Yii;
@@ -78,7 +79,6 @@ class ControllerEx extends Controller
             // Create Order
             $order = new OrderEx();
             $order->customer_id = $this->apiConsumer->customer->id;
-            $order->notes = $orderForm->notes;
             $order->uuid = $orderForm->uuid;
             $order->po_number = $orderForm->poNumber;
             $order->origin = $orderForm->origin;
@@ -473,7 +473,8 @@ class ControllerEx extends Controller
          * Set user identity without touching session or cookie.
          * (this is preferred use in stateless RESTful API implementation)
          */
-        Yii::$app->user->setIdentity($this->apiConsumer);
+        $identity = User::findOne($this->apiConsumer->user_id);
+        Yii::$app->user->setIdentity($identity);
 
         /**
          * User successfully authenticated.
@@ -488,7 +489,7 @@ class ControllerEx extends Controller
         // Log user activity
         $this->apiConsumer->updateLastActivity()->save();
 
-        return $this->apiConsumer;
+        return $identity;
     }
 
     /**
