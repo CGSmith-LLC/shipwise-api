@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 
 use common\models\Sku;
+use frontend\models\search\SkuSearch;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -46,18 +47,16 @@ class SkuController extends Controller
      */
     public function actionIndex()
     {
-        $query = Sku::find();
+        $searchModel = new SkuSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
 
         if (!Yii::$app->user->identity->isAdmin) {
             $query->forCustomers(Yii::$app->user->identity->getCustomerIds());
         }
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
-
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel
         ]);
     }
 

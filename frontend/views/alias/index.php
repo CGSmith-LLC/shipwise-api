@@ -22,8 +22,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
         'columns' => [
-            'customer.name',
+            [
+                'attribute' => 'customer.name',
+                // Visible if admin or has a count higher than 0 for associated users
+                'visible' => ((count($customerDropdownList) > 1) || Yii::$app->user->identity->getIsAdmin()),
+                'filter' => Html::activeDropDownList(
+                    $searchModel,
+                    'customer_id',
+                    $customerDropdownList,
+                    ['class' => 'form-control', 'prompt' => Yii::t('app', 'All Customers')]
+                ),
+            ],
             'sku',
             'name',
             [
@@ -37,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $raw;
                 }
             ],
-            'active:boolean',
+           'active:boolean',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
