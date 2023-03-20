@@ -67,9 +67,6 @@ class m230208_103100_add_sql_indexes extends Migration
         $this->execute("ALTER TABLE {{%scheduled_orders}} ADD INDEX(`status_id`);");
         $this->execute("ALTER TABLE {{%scheduled_orders}} ADD INDEX(`customer_id`);");
 
-        $this->execute("ALTER TABLE {{%shopify_app}} ADD INDEX(`customer_id`);");
-        $this->execute("ALTER TABLE {{%shopify_webhook}} ADD INDEX(`customer_id`);");
-
         $this->execute("ALTER TABLE {{%sku}} ADD INDEX(`customer_id`);");
         $this->execute("ALTER TABLE {{%sku}} ADD INDEX(`sku`);");
         $this->execute("ALTER TABLE {{%sku}} ADD INDEX(`excluded`);");
@@ -153,9 +150,6 @@ class m230208_103100_add_sql_indexes extends Migration
         $this->execute("ALTER TABLE {{%scheduled_orders}} DROP INDEX `order_id`;");
         $this->execute("ALTER TABLE {{%scheduled_orders}} DROP INDEX `status_id`;");
         $this->execute("ALTER TABLE {{%scheduled_orders}} DROP INDEX `customer_id`;");
-
-        $this->execute("ALTER TABLE {{%shopify_app}} DROP INDEX `customer_id`;");
-        $this->execute("ALTER TABLE {{%shopify_webhook}} DROP INDEX `customer_id`;");
 
         $this->execute("ALTER TABLE {{%sku}} DROP INDEX `customer_id`;");
         $this->execute("ALTER TABLE {{%sku}} DROP INDEX `sku`;");
