@@ -15,6 +15,8 @@ use yii\helpers\Json;
  */
 class OrderHistory extends BaseOrderHistory
 {
+    public const SYSTEM_USER_ID = NULL;
+
     public const SCENARIO_ORDER_CREATED = 'scenarioOrderCreated';
     public const SCENARIO_ORDER_VIEWED = 'scenarioOrderViewed';
     public const SCENARIO_ORDER_CHANGED = 'scenarioOrderChanged';
@@ -78,13 +80,10 @@ class OrderHistory extends BaseOrderHistory
         }
 
         if (!$this->user_id) {
-            /**
-             * TODO: Replace with something like `system`
-             */
             if (Yii::$app->request->isConsoleRequest) {
-                $this->user_id = 1;
+                $this->user_id = self::SYSTEM_USER_ID;
             } else {
-                $this->user_id = (!Yii::$app->user->isGuest) ? Yii::$app->user->id : 1;
+                $this->user_id = (!Yii::$app->user->isGuest) ? Yii::$app->user->id : self::SYSTEM_USER_ID;
             }
         }
 
