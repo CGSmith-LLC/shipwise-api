@@ -9,6 +9,7 @@ use PHPShopify\Exception\SdkException;
 use yii\web\ServerErrorHttpException;
 use common\services\platforms\ShopifyService;
 use common\models\{EcommerceIntegration, EcommercePlatform, Customer};
+use yii\helpers\Json;
 
 /**
  * Class ConnectShopifyStoreForm
@@ -130,7 +131,7 @@ class ConnectShopifyStoreForm extends Model
      */
     public function saveAccessToken(bool $addWebHookListeners = true): void
     {
-        $data = unserialize(Yii::$app->session->get('shopify_connection_second_step'));
+        $data = Json::decode(Yii::$app->session->get('shopify_connection_second_step'));
 
         if (isset($data['integration_id'])) {
             $this->ecommerceIntegration = EcommerceIntegration::findOne($data['integration_id']);
@@ -161,6 +162,6 @@ class ConnectShopifyStoreForm extends Model
             $data['integration_id'] = $this->ecommerceIntegration->id;
         }
 
-        Yii::$app->session->set('shopify_connection_second_step', serialize($data));
+        Yii::$app->session->set('shopify_connection_second_step', Json::encode($data));
     }
 }

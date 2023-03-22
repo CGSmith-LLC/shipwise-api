@@ -70,7 +70,7 @@ $pauseConfirm .= ' In this case, all orders related to the shop will not be proc
             'label' => 'Shop URL:',
             'format' => 'raw',
             'value' => function($model) {
-                return '<a href="https://'. $model->array_meta_data['shop_url'] .'" target="_blank">' . $model->array_meta_data['shop_url'] . ' </a>';
+                return '<a href="https://'. Html::encode($model->array_meta_data['shop_url']) .'" target="_blank">' . Html::encode($model->array_meta_data['shop_url']) . ' </a>';
             },
         ],
         [
@@ -116,7 +116,7 @@ $pauseConfirm .= ' In this case, all orders related to the shop will not be proc
             'label' => 'Customer:',
             'format' => 'raw',
             'value' => function($model) {
-                return Html::encode($model->customer->name);
+                return $model->customer->name;
             },
         ],
         [

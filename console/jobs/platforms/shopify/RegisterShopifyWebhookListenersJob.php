@@ -84,14 +84,11 @@ class RegisterShopifyWebhookListenersJob extends BaseObject implements Retryable
 
     protected function sendRequest(string $event): void
     {
-        $res = $this->shopifyService->createWebhook([
+        $this->shopifyService->createWebhook([
             'topic' => $event,
             'address' => $this->domain . ShopifyService::$webhooksUrl . '?event=' . $event,
             'format' => 'json',
         ]);
-
-//        echo '<pre>' . $event . ': ';
-//        print_r($res);
     }
 
     public function canRetry($attempt, $error): bool
