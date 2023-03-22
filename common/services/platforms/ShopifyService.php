@@ -270,9 +270,7 @@ class ShopifyService
      */
     protected function getRequestParamsForOrders(): array
     {
-        $params = [
-            'limit' => 250,
-        ];
+        $params = [];
 
         if ($this->ecommerceIntegration->isMetaKeyExistsAndNotEmpty('order_statuses')) {
             $params['status'] = implode(',', $this->ecommerceIntegration->array_meta_data['order_statuses']);
