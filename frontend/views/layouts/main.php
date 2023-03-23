@@ -41,7 +41,15 @@ $this->beginPage() ?>
     <meta name="msapplication-TileImage" content="/images/ms-icon-144x144.png">
     <meta name="theme-color" content="#2c9fd6">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QWCXL2NN10"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
+      gtag('config', 'G-QWCXL2NN10');
+    </script>
     <script src="https://js.stripe.com/v3/"></script>
     <script type="application/javascript">
         var stripe = Stripe('<?=Yii::$app->stripe->publicKey?>');
