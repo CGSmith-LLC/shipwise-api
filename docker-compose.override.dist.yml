@@ -8,6 +8,8 @@ services:
     volumes:
       # Re-use local composer cache via host-volume
       - ~/.composer-docker/cache:/opt/composer/cache:delegated
+    extra_hosts: # https://stackoverflow.com/a/67158212/1106908
+      - "host.docker.internal:host-gateway"
 
   api:
     ports:
@@ -15,6 +17,8 @@ services:
     volumes:
       # Re-use local composer cache via host-volume
       - ~/.composer-docker/cache:/opt/composer/cache:delegated
+    extra_hosts: # https://stackoverflow.com/a/67158212/1106908
+      - "host.docker.internal:host-gateway"
 
 
   mysql:

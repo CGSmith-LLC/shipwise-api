@@ -7,4 +7,5 @@ RUN apt-get update; \
     ghostscript
 
 RUN echo "xdebug.discover_client_host=1" >> /usr/local/etc/php/conf.d/xdebug.ini
+RUN echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/xdebug.ini
 RUN echo "xdebug.idekey=shipwise_frontend" >> /usr/local/etc/php/conf.d/xdebug.ini

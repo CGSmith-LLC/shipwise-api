@@ -127,10 +127,30 @@ environments/            contains environment-based overrides
 # Local development with Docker
 
 Prerequisite: Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/) for your OS.
+Also install Docker Compose and [GNU Make](https://www.gnu.org/software/make/).
 
-Start your Docker container with:
+## Quick-start
 
-1. Run `docker-compose up -d`
+1. `git clone git@github.com:CGSmith-LLC/shipwise-api.git shipwise-api`
+2. `cd shipwise-api`
+3. `make docker-up`
+4. Load DB via PhpMyAdmin at <http://localhost:30003>
+
+## Ports / Services
+
+If you have not changed the ports in `docker-compose.override.yml`:
+
+- Frontend: <http://localhost:30000>
+- API: <http://localhost:30001>
+- MySQL: localhost:30002
+- PhpMyAdmin: <http://localhost:30003>
+
+## More
+
+If you do not have GNU Make, the setup is a bit longer:
+
+1. Create Docker-compose config: `cp docker-compose.override.dist.yml docker-compose.override.yml` 
+1. Start your Docker container with: `docker-compose up -d`
 1. Update the SQL database.
     1. Copy the `devshipwise.sql` file to `/mysql-data/var/lib/mysql/devshipwise.sql`
     1. Enter MySQL instance `docker exec -it rest-api_mysql_1 bash`
@@ -140,7 +160,7 @@ Start your Docker container with:
        `zcat devshipwise.sql.gz | mysql -h mysql -u root -p cgsmpoim_shipwise`
 
 1. Install composer and run `composer install` on the root directory, this should be run inside the docker container, see `make cli` below
-1. Run `php init` for development
+1. Run `php init` for setting up the development config
 
 
 There is also a `Makefile` with useful commands:
@@ -156,12 +176,23 @@ Using `make` has the advantage that some tasks you would need to do manually are
 done automatically because make can detect changes to files and automatically create
 default configs or run commands based on that.
 
-If you have not change the ports in `docker-compose.override.yml`:
+## xdebug
 
-- Frontend: <http://localhost:30000>
-- API: <http://localhost:30001>
-- MySQL: localhost:30002
-- PhpMyAdmin: <http://localhost:30003>
+For debugging with xdebug, you need to set up PHP remote debug in PHPStorm (or other IDE).
+
+- The xdebug IDEKEY is `shipwise_api` for the API application and `shipwise_frontend` for the frontend application.
+  In PHPStorm you need to set up two separate configs for these.
+- You need to set up Path Mapping. The "Absolute Path on the Server" for the shipwise repo directory is `/app`. 
+- xdebug is configured to automatically connect back to your IP when you debug the frontend or API requests initiated from the
+  same machine where your IDE runs.
+- for debugging console commands xdebug will try to connect to the docker host. CLI is running in the 
+  api container so the IDEKEY is `shipwise_api`. If you want to change the IP for docker to connect to, you can do it like this: 
+
+  ```
+  make cli
+  php -dxdebug.client_host=172.30.0.2 ./yii some/command
+  ```
+  
 
 
 ### Tests
@@ -193,13 +224,15 @@ When you are developing in a local environment, all you need to have the queue j
 open the CLI on your local dev server, eg. docker (`make cli`) or vagrant instance, then enter this command and keep the terminal
 open:
 
-`php yii queue/listen --verbose`
+    php yii queue/listen --verbose
 
 if you only want to run a single command:
 
-`php yii queue/run --verbose`
+    php yii queue/run --verbose
 
-TODO describe xdebug
+To debug queue jobs you can add the `--isolate=0` argument to run them in the same process: 
+
+    php yii queue/run --verbose --isolate=0
 
 ### Image Magick
 
