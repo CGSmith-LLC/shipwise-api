@@ -75,7 +75,7 @@ tests/_data/dump.sql: tests/_data/shipwise_dump.sql $(shell find console/migrati
 	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'echo "DROP DATABASE IF EXISTS \`$(TEST_DB)\`; CREATE DATABASE \`$(TEST_DB)\` CHARSET utf8mb4; GRANT ALL ON \`$(TEST_DB)\`.* TO \"app\"@\"%\"; " | mysql -h mysql -uroot -p123'
 	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'cat $< | mysql -h mysql -uapp -p123 $(TEST_DB)'
 	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'YII_ENV=test ./yii_test migrate/up --interactive=0'
-	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'mysqldump -h mysql -uapp -p123 $(TEST_DB) > $@'
+	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'mysqldump -h mysql -uroot -p123 $(TEST_DB) > $@'
 
 wait-for-mysql:
 	@echo "Waiting for mysql to start up..."
