@@ -7,7 +7,7 @@ TESTCASE=
 UID := $(shell id -u)
 #GID := $(shell id -g)
 
-.PHONY: cli bash docker-up .start-containers docker-down lint test help
+.PHONY: cli bash docker-up .start-containers docker-down lint test wait-for-mysql help
 .DEFAULT_GOAL := help
 
 help: # https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
@@ -71,11 +71,15 @@ test: tests/_data/dump.sql ## Run codeception tests, run a specific test by sett
 
 # generate database dump for test env
 TEST_DB := shipwise_test
-tests/_data/dump.sql: tests/_data/shipwise_dump.sql $(shell find console/migrations -type f)
+tests/_data/dump.sql: tests/_data/shipwise_dump.sql $(shell find console/migrations -type f) wait-for-mysql
 	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'echo "DROP DATABASE IF EXISTS \`$(TEST_DB)\`; CREATE DATABASE \`$(TEST_DB)\` CHARSET utf8mb4; GRANT ALL ON \`$(TEST_DB)\`.* TO \"app\"@\"%\"; " | mysql -h mysql -uroot -p123'
 	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'cat $< | mysql -h mysql -uapp -p123 $(TEST_DB)'
 	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'YII_ENV=test ./yii_test migrate/up --interactive=0'
 	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'mysqldump -h mysql -uapp -p123 $(TEST_DB) > $@'
+
+wait-for-mysql:
+	@echo "Waiting for mysql to start up..."
+	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) timeout 30s sh -c "while ! (mysql -h mysql -uapp -p123 --execute 'SELECT 1;' > /dev/null 2>&1); do echo -n '.'; sleep 0.1 ; done; echo 'ok'" || (docker-compose ps; docker-compose logs mysql; exit 1)
 
 lint: ## Validate composer.{json|lock}
 	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) composer validate --strict

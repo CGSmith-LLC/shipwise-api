@@ -197,8 +197,13 @@ For debugging with xdebug, you need to set up PHP remote debug in PHPStorm (or o
 
 ### Tests
 
-`make test`
-`make test TESTCASE="acceptance tests/functional/ --fail-fast"`
+Run all tests:
+
+    make test
+
+Run a single test case or add more options to Codeception:
+
+    make test TESTCASE="acceptance tests/functional/ --fail-fast"
 
 #### VNC
 
