@@ -3,7 +3,7 @@
 use yii\db\Migration;
 
 /**
- * Class m230221_134343_add_shopify_mock_ecommerce_platfort
+ * Class m230221_134343_add_shopify_mock_ecommerce_platform
  */
 class m230221_134343_add_shopify_mock_ecommerce_platform extends Migration
 {
