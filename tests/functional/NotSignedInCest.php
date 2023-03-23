@@ -71,6 +71,9 @@ class NotSignedInCest
             $i->amOnPage($url);
             $i->see('Sign in');
         }
+
+        $i->haveInDatabase('country', ['name' => "Di", 'abbreviation' => 'D1']);
+        $i->seeInDatabase('country', ['abbreviation' => 'D1']);
     }
 
 }

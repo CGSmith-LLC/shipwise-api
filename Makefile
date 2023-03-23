@@ -54,7 +54,7 @@ docker-down: ## Stop Docker containers
 
 # Run composer install if vendor/autoload.php does not exist or is outdated (older than composer.json)
 vendor/autoload.php: composer.json
-	@docker-compose exec -T --user=$$(id -u) $(CONTAINER_NAME) composer install
+	@docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) composer install
 	touch $@
 
 # create docker-compose.override.yml if it does not exist
@@ -63,13 +63,20 @@ docker-compose.override.yml: docker-compose.override.dist.yml
 
 # run php init on first start
 api/web/index.php: environments/dev/api/web/index.php
-	test -f $@ || docker-compose exec -T --user=$$(id -u) $(CONTAINER_NAME) php init --env=Development --overwrite=n
+	test -f $@ || docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) php init --env=Development --overwrite=n
 
 
-test: ## Run codeception tests, run a specific test by setting the TESTCASE variable: make test TESTCASE="acceptance tests/acceptance/NotSignedInCest.php" 
-	docker-compose exec -T --user=$$(id -u) $(CONTAINER_NAME) vendor/bin/codecept run $(TESTCASE)
+test: tests/_data/dump.sql ## Run codeception tests, run a specific test by setting the TESTCASE variable: make test TESTCASE="acceptance tests/acceptance/NotSignedInCest.php"
+	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) vendor/bin/codecept run $(TESTCASE)
 
+# generate database dump for test env
+TEST_DB := shipwise_test
+tests/_data/dump.sql: tests/_data/shipwise_dump.sql $(shell find console/migrations -type f)
+	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'echo "DROP DATABASE IF EXISTS \`$(TEST_DB)\`; CREATE DATABASE \`$(TEST_DB)\` CHARSET utf8mb4; GRANT ALL ON \`$(TEST_DB)\`.* TO \"app\"@\"%\"; " | mysql -h mysql -uroot -p123'
+	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'cat $< | mysql -h mysql -uapp -p123 $(TEST_DB)'
+	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'YII_ENV=test ./yii_test migrate/up --interactive=0'
+	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) sh -c 'mysqldump -h mysql -uapp -p123 $(TEST_DB) > $@'
 
 lint: ## Validate composer.{json|lock}
-	docker-compose exec -T --user=$$(id -u) $(CONTAINER_NAME) composer validate --strict
+	docker-compose exec -T --user=$(UID) $(CONTAINER_NAME) composer validate --strict
 
