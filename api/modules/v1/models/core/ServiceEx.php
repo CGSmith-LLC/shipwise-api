@@ -33,7 +33,7 @@ class ServiceEx extends Service
 
     public static function getListForCsvBox($carrierId)
     {
-        $services = self::getList(carrierId: $carrierId);
+        $services = self::getList($carrierId);
         $newArray = [];
 
         foreach ($services as $id => $name) {
