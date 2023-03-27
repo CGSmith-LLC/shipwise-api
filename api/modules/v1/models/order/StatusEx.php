@@ -27,16 +27,4 @@ class StatusEx extends Status
     {
         return ['id', 'name'];
     }
-
-    public static function getListForCsvBox(): array
-    {
-        $statuses = self::getList();
-        $data = [];
-
-        foreach ($statuses as $id => $name) {
-            $data[] = ['value' => (string)$id, 'display_label' => $name];
-        }
-
-        return $data;
-    }
 }

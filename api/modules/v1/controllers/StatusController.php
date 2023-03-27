@@ -46,6 +46,21 @@ class StatusController extends ControllerEx
      *     summary = "Fetch all Order Statuses",
      *     description = "Fetch all Order Statuses in list format.",
      *
+     *      @SWG\Parameter(
+     *           name = "key_name",
+     *           in = "query",
+     *           type = "string",
+     *           description = "The name of the key in the response.",
+     *           default = "value"
+     *      ),
+     *      @SWG\Parameter(
+     *           name = "value_name",
+     *           in = "query",
+     *           type = "string",
+     *           description = "The name of the value in the response.",
+     *           default = "display_label"
+     *      ),
+     *
      *     @SWG\Response(
      *          response = 200,
      *          description = "Successful operation. Response contains a list of Order Statuses.",
@@ -61,8 +76,14 @@ class StatusController extends ControllerEx
      *       )
      * )
      */
-    public function actionIndex(): array
+    public function actionIndex(string $key_name = 'value', string $value_name = 'display_label'): array
     {
-        return $this->success(StatusEx::getListForCsvBox());
+        $list = [];
+
+        foreach (StatusEx::getList() as $id => $name) {
+            $list[] = [strip_tags($key_name) => (string)$id, strip_tags($value_name) => $name];
+        }
+
+        return $this->success($list);
     }
 }
