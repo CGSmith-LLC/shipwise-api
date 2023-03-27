@@ -2,21 +2,14 @@
 
 namespace api\modules\v1\models;
 
-use api\modules\v1\models\core\CarrierEx;
-use api\modules\v1\models\core\ServiceEx;
-use Aws\ResultInterface;
-use common\models\Address;
-use common\models\Country;
-use common\models\Item;
-use common\models\Order;
-use common\models\shipping\Shipment;
-use common\models\State;
-use common\models\Status;
-use League\Csv\Reader;
-use League\Csv\Statement;
-use yii\base\Exception;
 use yii\helpers\Json;
-use yii\base\Model;
+use Aws\ResultInterface;
+use api\modules\v1\models\core\{CarrierEx, ServiceEx};
+use api\modules\v1\models\order\StatusEx;
+use common\models\{Address, Country, Item, Order, State, Status};
+use common\models\shipping\Shipment;
+use League\Csv\{Reader, Statement};
+use yii\base\{Exception, Model};
 
 /**
  * Class CsvBox
@@ -156,7 +149,7 @@ class CsvBox extends Model
                     $order->origin = !empty(trim($record['Origin'])) ? trim($record['Origin']) : \Yii::$app->name . ' CSV import';
                     $order->customer_reference = $orderNo;
                     $order->address_id = $address->id;
-                    $order->status_id = Status::OPEN;
+                    $order->status_id = $this->getRecordStatusId($record);
                     $order->requested_ship_date = $requestedShipDate;
                     $order->must_arrive_by_date = $mustArriveByDate;
                     $order->service_id = $service->id;
@@ -221,5 +214,20 @@ class CsvBox extends Model
             '_' .
             $this->user_id .
             '.csv';
+    }
+
+    protected function getRecordStatusId(array $record): int
+    {
+        $statusId = Status::OPEN;
+
+        if (isset($record['Status']) && $record['Status']) {
+            $status = StatusEx::findOne((int)$record['Status']);
+
+            if ($status) {
+                $statusId = $status->id;
+            }
+        }
+
+        return $statusId;
     }
 }
