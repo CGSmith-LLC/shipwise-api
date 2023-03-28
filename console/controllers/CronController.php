@@ -73,50 +73,9 @@ class CronController extends Controller
         $this->runIntegrations(Integration::ACTIVE);
         $this->runScheduledOrders();
 
-        $this->runEcommerceIntegrations();
         $this->runEcommerceWebhooks();
 
         return ExitCode::OK;
-    }
-
-    /**
-     * This method is used for pulling first (initial) raw orders from E-commerce platforms like Shopify.
-     * For working with webhooks, the method `runEcommerceWebhooks()` is used.
-     * @throws InvalidConfigException
-     */
-    protected function runEcommerceIntegrations(): void
-    {
-        $ecommerceIntegrations = EcommerceIntegration::find()
-            ->active()
-            ->orderById()
-            ->limit(100)
-            ->all();
-
-        foreach ($ecommerceIntegrations as $ecommerceIntegration) {
-            switch ($ecommerceIntegration->ecommercePlatform->name) {
-
-                /**
-                 * Shopify:
-                 */
-                case EcommercePlatform::SHOPIFY_PLATFORM_NAME:
-
-                    $accessToken = $ecommerceIntegration->array_meta_data['access_token'];
-
-                    if ($accessToken) {
-                        $shopifyService = new ShopifyService($ecommerceIntegration->array_meta_data['shop_url'], $ecommerceIntegration);
-                        $orders = $shopifyService->getOrdersList();
-
-                        if ($orders) {
-                            foreach ($orders as $order) {
-                                $shopifyService->parseRawOrderJob($order);
-                            }
-                        }
-                    }
-
-                    break;
-
-            }
-        }
     }
 
     /**
