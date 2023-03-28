@@ -15,6 +15,7 @@ use console\jobs\platforms\webhooks\shopify\{ShopifyAppUninstalledJob,
     ShopifyOrderFulfilledJob,
     ShopifyOrderPaidJob,
     ShopifyOrderPartiallyFulfilledJob,
+    ShopifyOrderRefundJob,
     ShopifyOrderUpdatedJob,
     ShopifyShopRedactJob};
 
@@ -151,6 +152,7 @@ class EcommerceWebhook extends BaseEcommerceWebhook
             'orders/fulfilled' => new ShopifyOrderFulfilledJob(['ecommerceWebhookId' => $this->id]),
             'orders/partially_fulfilled' => new ShopifyOrderPartiallyFulfilledJob(['ecommerceWebhookId' => $this->id]),
             'orders/paid' => new ShopifyOrderPaidJob(['ecommerceWebhookId' => $this->id]),
+            'refunds/create' => new ShopifyOrderRefundJob(['ecommerceWebhookId' => $this->id]),
             'app/uninstalled' => new ShopifyAppUninstalledJob(['ecommerceWebhookId' => $this->id]),
             'customers/data_request' => new ShopifyCustomerDataRequestJob(['ecommerceWebhookId' => $this->id]),
             'customers/redact' => new ShopifyCustomerRedactJob(['ecommerceWebhookId' => $this->id]),

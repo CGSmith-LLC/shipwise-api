@@ -74,6 +74,7 @@ class ShopifyService
         'orders/fulfilled',
         'orders/partially_fulfilled',
         'orders/paid',
+        'refunds/create',
         'app/uninstalled'
     ];
 
