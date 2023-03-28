@@ -93,8 +93,7 @@ class ParseShopifyOrderJob extends BaseObject implements RetryableJobInterface
     {
         $this->parsedOrderAttributes = [
             'customer_id' => $this->ecommerceIntegration->customer_id,
-            'customer_reference' => (string)$this->rawOrder['id'],
-            'order_reference' => $this->rawOrder['name'],
+            'customer_reference' => str_replace('#', '', (string)$this->rawOrder['name']),
             'status_id' => Status::OPEN,
             'uuid' => (string)$this->rawOrder['id'],
             'created_date' => (new \DateTime($this->rawOrder['created_at']))->format('Y-m-d'),
