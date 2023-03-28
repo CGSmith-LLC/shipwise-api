@@ -232,6 +232,9 @@ $this->registerJs($js);
                         'columns' => [
                             [
                                 'attribute' => 'user.username',
+                                'value' => function ($model) {
+                                    return ($model->user) ? $model->user->username : 'System';
+                                }
                             ],
                             'created_date:datetime',
                             [

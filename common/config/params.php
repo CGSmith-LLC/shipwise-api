@@ -7,8 +7,6 @@ return [
     'user.passwordResetTokenExpire' => 3600,
     'stripePublicKey'               => '1234',
     'stripePrivateKey'              => '1234',
-    'shopifyPublicKey'              => '5678',
-    'shopifyPrivateKey'             => '5678',
     'encryptionKey'                 => 'secret',
     'digitalOceanKey'               => 'key',
     'digitalOceanSecret'            => 'secret',
@@ -18,10 +16,6 @@ return [
         'clientId' => 'lolno',
         'secret' => 'lulz',
     ],
-    /**
-     * Shopify App Parameters and App Credentials
-     */
-
 
     /**
      * Put here default values for when customers meta value does not exist
@@ -69,4 +63,20 @@ return [
     'csvBoxS3Bucket' => '',
     'csvBoxS3Path' => '',
     'csvBoxImportKey' => '',
+
+    /**
+     * Shopify
+     */
+    'shopify' => [
+        /**
+         * Visit https://partners.shopify.com/ -> Apps -> Your App -> Overview -> Client credentials
+         */
+        'client_id' => '',
+        'client_secret' => '',
+        /**
+         * You can set `https://shipwise.ngrok.io` to test it locally.
+         * Otherwise, if leave the default value, the current server's domain name will be used automatically.
+         */
+        'override_redirect_domain' => false,
+    ],
 ];

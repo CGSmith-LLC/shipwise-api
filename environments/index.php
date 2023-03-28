@@ -37,8 +37,6 @@ return [
             'console/runtime',
             'frontend/runtime',
             'frontend/web/assets',
-            'shopify/runtime',
-            'shopify/web/assets',
         ],
         'setExecutable' => [
             'yii',

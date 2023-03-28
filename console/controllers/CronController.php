@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
+use common\models\EcommerceWebhook;
 use common\models\FulfillmentMeta;
 use common\models\Order;
 use common\models\ScheduledOrder;
@@ -10,6 +11,7 @@ use console\jobs\orders\FetchJob;
 use console\jobs\orders\SendTo3PLJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
+use yii\base\InvalidConfigException;
 use yii\db\Exception;
 
 // To create/edit crontab file: crontab -e
@@ -39,7 +41,7 @@ class CronController extends Controller
      * Action Index
      * @return int exit code
      */
-    public function actionIndex()
+    public function actionIndex(): int
     {
         $this->stdout('Yes, service cron is running');
         return ExitCode::OK;
@@ -49,8 +51,9 @@ class CronController extends Controller
      * Action Frequent
      * Called every five minutes
      * @return int exit code
+     * @throws InvalidConfigException
      */
-    public function actionFrequent()
+    public function actionFrequent(): int
     {
         /**
          * 1. Loop through customers and customer meta data to find ecommerce site
@@ -67,7 +70,28 @@ class CronController extends Controller
         $this->runIntegrations(Integration::ACTIVE);
         $this->runScheduledOrders();
 
+        $this->runEcommerceWebhooks();
+
         return ExitCode::OK;
+    }
+
+    /**
+     * This method is used for creating Jobs for webhooks with the status "received".
+     */
+    protected function runEcommerceWebhooks(): void
+    {
+        $ecommerceWebhooks = EcommerceWebhook::find()
+            ->received()
+            ->orderById()
+            ->limit(100)
+            ->all();
+
+        /**
+         * @var $ecommerceWebhook EcommerceWebhook
+         */
+        foreach ($ecommerceWebhooks as $ecommerceWebhook) {
+            $ecommerceWebhook->createJob();
+        }
     }
 
     public function runIntegrations($status)
