@@ -3,13 +3,10 @@
 namespace console\controllers;
 
 use common\models\BulkAction;
-use common\models\EcommerceIntegration;
-use common\models\EcommercePlatform;
 use common\models\EcommerceWebhook;
 use common\models\FulfillmentMeta;
 use common\models\Order;
 use common\models\ScheduledOrder;
-use common\services\platforms\ShopifyService;
 use console\jobs\orders\FetchJob;
 use console\jobs\orders\SendTo3PLJob;
 use yii\console\{Controller, ExitCode};
