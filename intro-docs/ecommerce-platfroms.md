@@ -21,11 +21,8 @@
 > php yii queue/listen --verbose
 
 ### Cron:
-
-1. See `console\controllers\CronController.php` -> `runEcommerceIntegrations()`.
-We need this method to pull initial existing orders from a needed E-commerce platform.
-   
-2. See `console\controllers\CronController.php` -> `runEcommerceWebhooks()`.
+ 
+1. See `console\controllers\CronController.php` -> `runEcommerceWebhooks()`.
 We need this method to process received webhooks (`status=received`).
    
 > php yii cron/frequent
