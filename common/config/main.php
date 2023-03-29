@@ -33,11 +33,6 @@ return [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-        'stripe' => [
-            'class' => 'cgsmith\stripe\Stripe',
-            'publicKey' => $params['stripePublicKey'],
-            'privateKey' => $params['stripePrivateKey'],
-        ],
         'storage' => [
             'class' => 'bilberrry\spaces\Service',
             'credentials' => [

@@ -74,6 +74,7 @@ return [
      * Stripe
      */
     'stripe' => [
-
+        'publishable_key' => '',
+        'secret_key' => '',
     ],
 ];
