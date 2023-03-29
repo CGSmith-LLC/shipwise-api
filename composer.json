@@ -16,7 +16,7 @@
         "codemix/yii2-localeurls": "^1.7",
         "yiisoft/yii2-queue": "^2.3",
         "setasign/fpdf": "^1.8",
-        "cgsmith/yii2-stripe": "dev-master",
+        "stripe/stripe-php": "*",
         "serzh/amazon-mws-merchant-fulfillment": "^1.0",
         "osiset/basic-shopify-api": "^9.1",
         "yii2tech/csv-grid": "^1.0",
@@ -50,7 +50,8 @@
             "enabled": false
         },
         "allow-plugins": {
-            "yiisoft/yii2-composer": true
+            "yiisoft/yii2-composer": true,
+            "php-http/discovery": true
         }
     },
     "repositories": [

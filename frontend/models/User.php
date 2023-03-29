@@ -57,11 +57,6 @@ class User extends \common\models\User
         return $customer->stripe_customer_id;
     }
 
-    public function hasPaymentMethod()
-    {
-        return PaymentMethod::find()->where(['customer_id' => $this->customer_id])->exists();
-    }
-
     public function isDirectCustomer()
     {
         /**
