@@ -81,9 +81,7 @@ return [
                 }
             },
         ],
-        'fulfillment' => function () {
-            return new \common\components\FulfillmentService();
-        },
+        'fulfillment' => fn() => new \common\components\FulfillmentService(),
         'coldco' => [
             'class' => 'common\components\ColdcoFulfillmentService',
             'baseUrl' => $params['coldco']['baseUrl'],

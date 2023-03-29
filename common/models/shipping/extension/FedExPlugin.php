@@ -25,21 +25,21 @@ class FedExPlugin extends ShipmentPlugin
      *
      * @var string Constant
      */
-    const PLUGIN_NAME = "FedEx";
+    final const PLUGIN_NAME = "FedEx";
 
     /**
      * Development API url
      *
      * @var string
      */
-    private $urlDev = 'https://wsbeta.fedex.com:443/web-services/';
+    private string $urlDev = 'https://wsbeta.fedex.com:443/web-services/';
 
     /**
      * Production API url
      *
      * @var string
      */
-    private $urlProd = 'https://ws.fedex.com:443/web-services/';
+    private string $urlProd = 'https://ws.fedex.com:443/web-services/';
 
     /**
      * Base Tracking URL
@@ -65,7 +65,7 @@ class FedExPlugin extends ShipmentPlugin
      *
      * @var string
      */
-    private $dropOffType = "REGULAR_PICKUP";
+    private string $dropOffType = "REGULAR_PICKUP";
 
     /**
      * Multiple piece shipment flag
@@ -573,19 +573,19 @@ class FedExPlugin extends ShipmentPlugin
     }
 
     // @todo
-    protected function shipmentPrepare()
+    protected function shipmentPrepare(): never
     {
         throw new \Exception('Method not implemented');
     }
 
     // @todo
-    protected function shipmentExecute()
+    protected function shipmentExecute(): never
     {
         throw new \Exception('Method not implemented');
     }
 
     // @todo
-    protected function shipmentProcess()
+    protected function shipmentProcess(): never
     {
         throw new \Exception('Method not implemented');
     }

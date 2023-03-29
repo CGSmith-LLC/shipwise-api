@@ -75,7 +75,7 @@ class OrderPackingSlip extends \FPDF
      * @return false|string
      * @throws \yii\base\InvalidConfigException
      */
-    protected function asCurrency($amount)
+    protected function asCurrency(mixed $amount): false|string
     {
         return Yii::$app->formatter->asCurrency($amount);
     }
@@ -93,6 +93,7 @@ class OrderPackingSlip extends \FPDF
      */
     public function Code39($xpos, $ypos, $code, $baseline=0.5, $height=5)
     {
+        $barChar = [];
         $wide = $baseline;
         $narrow = $baseline / 3 ;
         $gap = $narrow;
@@ -375,7 +376,7 @@ class OrderPackingSlip extends \FPDF
      *
      * @return float|int
      */
-    protected function px2mm($px)
+    protected function px2mm($px): float|int
     {
         return $px * 25.4 / 72;
     }

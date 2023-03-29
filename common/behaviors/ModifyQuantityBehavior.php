@@ -11,6 +11,7 @@ class ModifyQuantityBehavior extends \yii\base\Behavior
 
     public function run()
     {
+        $event = null;
         \Yii::debug($event->data);
     }
     

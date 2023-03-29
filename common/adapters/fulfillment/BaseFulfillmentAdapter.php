@@ -8,7 +8,7 @@ use yii\base\Component;
 
 abstract class BaseFulfillmentAdapter extends Component implements FulfillmentAdapter
 {
-	public const EVENT_CARTONIZATION = 'cartonizationEvent'; // TODO: Attach CartonizationEvent::handleEvent to this event
+	final public const EVENT_CARTONIZATION = 'cartonizationEvent'; // TODO: Attach CartonizationEvent::handleEvent to this event
 
     public abstract function getCreateOrderRequestInfo(Order $order): array;
 }

@@ -80,7 +80,7 @@ class InvoicePDF extends \FPDF
      * @return false|string
      * @throws \yii\base\InvalidConfigException
      */
-    protected function asCurrency($amount)
+    protected function asCurrency(mixed $amount): false|string
     {
         return Yii::$app->formatter->asCurrency($amount);
     }
@@ -92,7 +92,7 @@ class InvoicePDF extends \FPDF
      *
      * @return false|string
      */
-    private function sanitizeOutput($str = null)
+    private function sanitizeOutput($str = null): false|string
     {
         $str = str_replace("’", "'", $str);
 
@@ -106,7 +106,7 @@ class InvoicePDF extends \FPDF
      *
      * @return false|string
      */
-    private function out($str = null)
+    private function out($str = null): false|string
     {
         return $this->sanitizeOutput($str);
     }
@@ -336,7 +336,7 @@ class InvoicePDF extends \FPDF
      *
      * @return float|int
      */
-    protected function px2mm($px)
+    protected function px2mm($px): float|int
     {
         return $px * 25.4 / 72;
     }

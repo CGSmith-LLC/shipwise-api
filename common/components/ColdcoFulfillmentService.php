@@ -12,7 +12,7 @@ class ColdcoFulfillmentService extends \yii\base\Component
 
     public Client $client;
 
-    const ORDERS = 'orders';
+    final const ORDERS = 'orders';
 
     public $baseUrl;
     public $clientId;
@@ -62,6 +62,7 @@ class ColdcoFulfillmentService extends \yii\base\Component
 
     public function getTracking(Order $order)
     {
+        $id = null;
         $this->client->request(
             'GET',
             self::ORDERS . '/' . $id,

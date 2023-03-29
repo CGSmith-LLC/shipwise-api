@@ -15,5 +15,5 @@ class AmazonUSPSPlugin extends AmazonMWS
      *
      * @var string Constant
      */
-    const PLUGIN_NAME = "AmazonUSPS";
+    final const PLUGIN_NAME = "AmazonUSPS";
 }

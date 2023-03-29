@@ -20,7 +20,7 @@ class Country extends ActiveRecord
 
     protected const LIST_CACHE_KEY = 'countries-list';
 
-    private static $list = [
+    private static array $list = [
         'US' => 'United States',
         'CA' => 'Canada',
         'AU' => 'Australia',

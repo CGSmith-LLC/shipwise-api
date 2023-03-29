@@ -15,5 +15,5 @@ class AmazonFedExPlugin extends AmazonMWS
      *
      * @var string Constant
      */
-    const PLUGIN_NAME = "AmazonFedEx";
+    final const PLUGIN_NAME = "AmazonFedEx";
 }

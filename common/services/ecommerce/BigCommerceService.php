@@ -30,12 +30,12 @@ class BigCommerceService extends BaseEcommerceService
     protected bool $canCreateWebhooks = true;
 
 
-    public const API_BASEURL = 'https://api.bigcommerce.com/stores/';
-    public const API_ORDERS = 'v2/orders';
-    public const API_SHIPPING_ADDRESS = 'shipping_addresses';
-    public const API_PRODUCTS = 'products';
+    final public const API_BASEURL = 'https://api.bigcommerce.com/stores/';
+    final public const API_ORDERS = 'v2/orders';
+    final public const API_SHIPPING_ADDRESS = 'shipping_addresses';
+    final public const API_PRODUCTS = 'products';
     // @see https://developer.bigcommerce.com/api-docs/store-management/webhooks/overview
-    public const API_WEBHOOKS = 'v3/hooks';
+    final public const API_WEBHOOKS = 'v3/hooks';
 
     /**
      * Ingest an array of the meta data for the service and apply to internal objects where needed

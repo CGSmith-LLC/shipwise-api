@@ -30,7 +30,7 @@ class AmazonMWS extends ShipmentPlugin
      *
      * @var string
      */
-    private $urlDev = 'n/a';
+    private string $urlDev = 'n/a';
 
     /**
      * Production API url
@@ -40,7 +40,7 @@ class AmazonMWS extends ShipmentPlugin
      *
      * @var string
      */
-    private $urlProd = 'https://mws.amazonservices.com/MerchantFulfillment/2015-06-01';
+    private string $urlProd = 'https://mws.amazonservices.com/MerchantFulfillment/2015-06-01';
 
     /**
      * Marketplace ID
@@ -50,7 +50,7 @@ class AmazonMWS extends ShipmentPlugin
      *
      * @var string
      */
-    private $marketplaceId = 'ATVPDKIKX0DER';
+    private string $marketplaceId = 'ATVPDKIKX0DER';
 
     /**
      * Base Tracking URL

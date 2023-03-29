@@ -27,12 +27,12 @@ use yii\helpers\ArrayHelper;
  */
 class Webhook extends \yii\db\ActiveRecord
 {
-    const STATUS_ACTIVE = 1;
-    const STATUS_INACTIVE = 0;
+    final const STATUS_ACTIVE = 1;
+    final const STATUS_INACTIVE = 0;
 
-    const NO_AUTH = 0;
-    const BASIC_AUTH = 1;
-    const HEADER_AUTH = 2;
+    final const NO_AUTH = 0;
+    final const BASIC_AUTH = 1;
+    final const HEADER_AUTH = 2;
 
     public array $authenticationOptions = [
         self::NO_AUTH => 'None',
@@ -226,7 +226,7 @@ class Webhook extends \yii\db\ActiveRecord
         }
 
         if (isset($this->$attribute)) {
-            return sprintf($template, $infoColor, (isset($name)) ? $name : $this->$attribute);
+            return sprintf($template, $infoColor, $name ?? $this->$attribute);
         }
 
         // return empty string if nothing to match

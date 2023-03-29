@@ -15,15 +15,15 @@ use yii\helpers\Json;
  */
 class OrderHistory extends BaseOrderHistory
 {
-    public const SCENARIO_ORDER_CREATED = 'scenarioOrderCreated';
-    public const SCENARIO_ORDER_VIEWED = 'scenarioOrderViewed';
-    public const SCENARIO_ORDER_CHANGED = 'scenarioOrderChanged';
-    public const SCENARIO_ORDER_STATUS_CHANGED = 'scenarioOrderStatusChanged';
-    public const SCENARIO_ORDER_ADDRESS_CREATED = 'scenarioOrderAddressCreated';
-    public const SCENARIO_ORDER_ADDRESS_CHANGED = 'scenarioOrderAddressChanged';
-    public const SCENARIO_ORDER_ITEM_ADDED = 'scenarioOrderItemAdded';
-    public const SCENARIO_ORDER_ITEM_CHANGED = 'scenarioOrderItemChanged';
-    public const SCENARIO_ORDER_ITEM_DELETED = 'scenarioOrderItemDeleted';
+    final public const SCENARIO_ORDER_CREATED = 'scenarioOrderCreated';
+    final public const SCENARIO_ORDER_VIEWED = 'scenarioOrderViewed';
+    final public const SCENARIO_ORDER_CHANGED = 'scenarioOrderChanged';
+    final public const SCENARIO_ORDER_STATUS_CHANGED = 'scenarioOrderStatusChanged';
+    final public const SCENARIO_ORDER_ADDRESS_CREATED = 'scenarioOrderAddressCreated';
+    final public const SCENARIO_ORDER_ADDRESS_CHANGED = 'scenarioOrderAddressChanged';
+    final public const SCENARIO_ORDER_ITEM_ADDED = 'scenarioOrderItemAdded';
+    final public const SCENARIO_ORDER_ITEM_CHANGED = 'scenarioOrderItemChanged';
+    final public const SCENARIO_ORDER_ITEM_DELETED = 'scenarioOrderItemDeleted';
 
     public ?Order $order = null;
     public ?Item $item = null;
@@ -53,7 +53,7 @@ class OrderHistory extends BaseOrderHistory
 
     public function init(): void
     {
-        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'orderHistoryPopulate']);
+        $this->on(self::EVENT_BEFORE_INSERT, $this->orderHistoryPopulate(...));
         parent::init();
     }
 

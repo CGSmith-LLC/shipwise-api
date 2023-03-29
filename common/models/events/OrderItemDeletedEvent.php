@@ -8,8 +8,8 @@ use common\models\OrderHistory;
 
 class OrderItemDeletedEvent extends Event
 {
-    public const EVENT_IS_ENABLED = true;
-    public const EVENT_ORDER_ITEM_DELETED = 'eventOrderItemDeleted';
+    final public const EVENT_IS_ENABLED = true;
+    final public const EVENT_ORDER_ITEM_DELETED = 'eventOrderItemDeleted';
 
     public Item $item;
 

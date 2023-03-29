@@ -15,10 +15,10 @@ use Yii;
 class ApiConsumer extends BaseApiConsumer
 {
 
-    const STATUS_ACTIVE = 1;
-    const STATUS_INACTIVE = 0;
-    const SUPERUSER_ACTIVE = 1;
-    const SUPERUSER_INACTIVE = 0;
+    final const STATUS_ACTIVE = 1;
+    final const STATUS_INACTIVE = 0;
+    final const SUPERUSER_ACTIVE = 1;
+    final const SUPERUSER_INACTIVE = 0;
 
     public $plainTextAuthSecret;
 

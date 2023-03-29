@@ -17,7 +17,7 @@ class State extends BaseState
     use CacheableListTrait;
 
     protected const LIST_CACHE_KEY = 'states-list';
-    public const DEFAULT_COUNTRY_ABBR = 'US';
+    final public const DEFAULT_COUNTRY_ABBR = 'US';
 
     public function init(): void
     {
@@ -56,7 +56,7 @@ class State extends BaseState
      *
      * @return State|ActiveRecord|bool The State model or False if not found
      */
-    public static function findByAbbrOrName($country, $abbr = '', $name = '')
+    public static function findByAbbrOrName($country, $abbr = '', $name = ''): \common\models\State|\yii\db\ActiveRecord|bool
     {
         if (empty($country) || (empty($abbr) && empty($name))) {
             return false;

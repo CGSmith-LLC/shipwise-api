@@ -13,8 +13,8 @@ use yii\console\Exception;
 
 class BigCommerceAdapter extends Component
 {
-    const EVENT_BEFORE_PARSE = 'beforeParse';
-    const EVENT_AFTER_PARSE = 'afterParse';
+    final const EVENT_BEFORE_PARSE = 'beforeParse';
+    final const EVENT_AFTER_PARSE = 'afterParse';
 
     public int $customer_id;
 
@@ -24,6 +24,7 @@ class BigCommerceAdapter extends Component
      */
     public function parseOrder($unparsedOrder)
     {
+        $items = [];
         $model = new OrderForm();
         $model->order = new Order();
         $model->address = new Address();

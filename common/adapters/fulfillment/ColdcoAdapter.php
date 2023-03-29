@@ -15,8 +15,8 @@ use stdClass;
 
 class ColdcoAdapter extends BaseFulfillmentAdapter
 {
-	public const RENO_ID = 2;
-	public const ST_LOUIS_ID = 1;
+	final public const RENO_ID = 2;
+	final public const ST_LOUIS_ID = 1;
 
 	public function getCreateOrderRequestInfo(Order $order, bool $deferNotification = false): array
 	{
