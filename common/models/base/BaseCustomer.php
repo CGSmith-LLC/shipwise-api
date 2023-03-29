@@ -4,7 +4,6 @@ namespace common\models\base;
 
 use Aws\Result;
 use common\models\Customer;
-use common\models\PaymentMethod;
 use Stripe\Event;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
@@ -165,16 +164,6 @@ class BaseCustomer extends \yii\db\ActiveRecord
     public function getState()
     {
         return $this->hasOne('common\models\State', ['id' => 'state_id']);
-    }
-
-    /**
-     * Payment method relation
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPaymentMethods()
-    {
-        return $this->hasMany(PaymentMethod::class, ['customer_id' => 'id']);
     }
 
     /**

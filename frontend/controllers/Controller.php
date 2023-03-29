@@ -2,9 +2,8 @@
 
 namespace frontend\controllers;
 
-use common\models\Customer;
-use frontend\models\PaymentMethod;
 use Yii;
+use common\models\Customer;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -38,20 +37,19 @@ class Controller extends \yii\web\Controller
         /** @var Da\User\Module $module */
         $module = Yii::$app->getModule('user');
         if (!Yii::$app->user->isGuest) {
-            if (!Yii::$app->session->has($module->switchIdentitySessionKey) &&
-                !Yii::$app->user->identity->isAdmin &&
-                Yii::$app->user->identity->isDirectCustomer() &&
-                !Yii::$app->user->identity->hasPaymentMethod() &&
-                !in_array($this->module->requestedRoute, $this->excludedRoutes)) {
-
-                Yii::$app->getSession()->setFlash('error', 'Please Set Up Payment Method and Add A Card To Your Profile.');
-
-                //Cant return because init function does not return.
-                $this->redirect(['/billing/create']);
-
-                //Need to stop the app from continuing to display the Flash Message.
-                Yii::$app->end();
-            }
+//            if (!Yii::$app->session->has($module->switchIdentitySessionKey) &&
+//                !Yii::$app->user->identity->isAdmin &&
+//                Yii::$app->user->identity->isDirectCustomer() &&
+//                !in_array($this->module->requestedRoute, $this->excludedRoutes)) {
+//
+//                Yii::$app->getSession()->setFlash('error', 'Please Set Up Payment Method and Add A Card To Your Profile.');
+//
+//                //Cant return because init function does not return.
+//                $this->redirect(['/billing/create']);
+//
+//                //Need to stop the app from continuing to display the Flash Message.
+//                Yii::$app->end();
+//            }
 
             /**
              * Set the customer ids for all controllers

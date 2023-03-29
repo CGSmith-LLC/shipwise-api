@@ -69,4 +69,11 @@ return [
     'csvBoxS3Bucket' => '',
     'csvBoxS3Path' => '',
     'csvBoxImportKey' => '',
+
+    /**
+     * Stripe
+     */
+    'stripe' => [
+
+    ],
 ];
