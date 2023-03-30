@@ -16,8 +16,8 @@ use yii\queue\RetryableJobInterface;
 
 class CreateReportJob extends BaseObject implements RetryableJobInterface
 {
-    const MAX_ATTEMPTS = 3;
-    const TTR = 600; // in seconds
+    final const MAX_ATTEMPTS = 3;
+    final const TTR = 600; // in seconds
 
     /**
      * @var int $customer
