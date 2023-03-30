@@ -17,7 +17,7 @@ class ShipmentEx extends Shipment
      *
      * @var ShipmentRateEx[]
      */
-    private $_rates = [];
+    private array $_rates = [];
 
     /**
      * Override parent to return array of ShipmentRateEx objects

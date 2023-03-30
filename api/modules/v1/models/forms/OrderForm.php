@@ -112,9 +112,9 @@ use api\modules\v1\models\order\StatusEx;
 class OrderForm extends Model
 {
 
-    const SCENARIO_DEFAULT = 'default'; // the create scenario
-    const SCENARIO_UPDATE = 'update';  // the update scenario
-    const SCENARIO_DELETE = 'delete';  // the delete scenario
+    final const SCENARIO_DEFAULT = 'default'; // the create scenario
+    final const SCENARIO_UPDATE = 'update';  // the update scenario
+    final const SCENARIO_DELETE = 'delete';  // the delete scenario
 
     /** @var string */
     public $uuid;

@@ -36,7 +36,7 @@ use api\modules\v1\models\order\StatusEx;
 class StatusForm extends Model
 {
 
-    const SCENARIO_DEFAULT = 'default'; // the create scenario
+    final const SCENARIO_DEFAULT = 'default'; // the create scenario
 
 
     /** @var string */

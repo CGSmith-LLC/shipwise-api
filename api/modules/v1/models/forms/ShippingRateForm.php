@@ -128,17 +128,13 @@ class ShippingRateForm extends Model
             [
                 'carrier',
                 'required',
-                'when'    => function ($model) {
-                    return (empty($this->carrier) && empty($this->service));
-                },
+                'when'    => fn($model) => empty($this->carrier) && empty($this->service),
                 'message' => "Carrier code is required when service code is not set. Set the carrier to get all available services. Or set the service code to get rates for that specific service.",
             ],
             [
                 'service',
                 'required',
-                'when'    => function ($model) {
-                    return (empty($this->carrier) && empty($this->service));
-                },
+                'when'    => fn($model) => empty($this->carrier) && empty($this->service),
                 'message' => "Service code is required when carrier code is not set. Set the carrier to get all available services. Or set the service code to get rates for that specific service.",
             ],
             [

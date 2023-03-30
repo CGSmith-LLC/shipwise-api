@@ -148,7 +148,7 @@ class CustomerController extends ControllerEx
      * @throws \yii\base\InvalidConfigException
      * @throws ForbiddenHttpException
      */
-    public function actionCreate()
+    public function actionCreate(): array|\api\modules\v1\models\customer\CustomerEx
     {
         // Check permissions
         if (!$this->apiConsumer->isSuperuser()) {
@@ -238,7 +238,7 @@ class CustomerController extends ControllerEx
      * @return array|\api\modules\v1\models\customer\CustomerEx
      * @throws ForbiddenHttpException
      */
-    public function actionView($id)
+    public function actionView($id): array|\api\modules\v1\models\customer\CustomerEx
     {
         // Check permissions
         if (!$this->apiConsumer->isSuperuser()) {
@@ -325,7 +325,7 @@ class CustomerController extends ControllerEx
      * @throws \yii\base\InvalidConfigException
      * @throws ForbiddenHttpException
      */
-    public function actionUpdate($id)
+    public function actionUpdate($id): array|\api\modules\v1\models\customer\CustomerEx
     {
 
         // Check permissions
