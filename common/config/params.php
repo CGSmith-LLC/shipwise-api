@@ -76,5 +76,6 @@ return [
     'stripe' => [
         'publishable_key' => '',
         'secret_key' => '',
+        'pricing_table_id' => '',
     ],
 ];
