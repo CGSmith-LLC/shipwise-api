@@ -52,7 +52,6 @@ class BaseCustomer extends \yii\db\ActiveRecord
     {
         parent::init();
 
-        Stripe::setApiKey(\Yii::$app->stripe->privateKey);
 //        if (!YII_ENV_DEV) {
 //             Configure events to call Stripe
         $this->on(self::EVENT_BEFORE_INSERT, [$this, 'stripeCreate']);

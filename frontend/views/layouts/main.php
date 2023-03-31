@@ -50,10 +50,6 @@ $this->beginPage() ?>
 
       gtag('config', 'G-QWCXL2NN10');
     </script>
-    <script src="https://js.stripe.com/v3/"></script>
-    <script type="application/javascript">
-        var stripe = Stripe('<?=Yii::$app->stripe->publicKey?>');
-    </script>
     <script>
         (function (h, o, t, j, a, r) {
             h.hj = h.hj || function () {
