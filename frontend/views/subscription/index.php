@@ -1,4 +1,23 @@
-<script async src="https://js.stripe.com/v3/pricing-table.js"></script>
-<stripe-pricing-table pricing-table-id="prctbl_1MmNdnAVtR6J0zbouXceXi2G"
-                      publishable-key="pk_test_UdowAZ9Ju8kv7WWAHoG4UzbT">
-</stripe-pricing-table>
+<?php
+    use yii\web\View;
+    use common\services\subscription\SubscriptionService;
+
+    /* @var $this View */
+    /* @var $subscriptionService SubscriptionService */
+
+    $title = 'Subscription';
+    $this->params['breadcrumbs'][] = $title;
+    $this->title = $title . ' - ' . Yii::$app->name;
+?>
+
+<div>
+    <?php if (!$subscriptionService->hasActiveSubscription()) { ?>
+        <?= $this->render('_stripe-widget', [
+            'subscriptionService' => $subscriptionService,
+        ]) ?>
+    <?php } else { ?>
+        <?= $this->render('_subscribed', [
+            'subscriptionService' => $subscriptionService,
+        ]) ?>
+    <?php } ?>
+</div>
