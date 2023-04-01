@@ -77,5 +77,10 @@ return [
         'publishable_key' => '',
         'secret_key' => '',
         'pricing_table_id' => '',
+        /**
+         * Pricing table -> Customer portal
+         * Example: https://billing.stripe.com/p/login/test_cN24i5ffoeQQg5qaEE
+         */
+        'customer_portal_url' => '',
     ],
 ];
