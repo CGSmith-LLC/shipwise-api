@@ -66,7 +66,11 @@ return [
             'db' => 'db', // DB connection component or its config
             'tableName' => '{{%queue}}', // Table name
             'channel' => 'default', // Queue channel key
-            'mutex' => 'yii\mutex\MysqlMutex', // Mutex used to sync queries
+            'mutex' => [ // Mutex used to sync queries
+                'class' => 'yii\mutex\MysqlMutex',
+                'db' => 'db',
+                'keyPrefix' => 'queuePrefix' // Your custom prefix which determines the "scope" of the mutex.
+            ],
             'as log' => 'yii\queue\LogBehavior',
             //'as deadLetterBehavior' => \common\behaviors\DeadLetterQueue::class,
             'as jobMonitor' => \zhuravljov\yii\queue\monitor\JobMonitor::class,
