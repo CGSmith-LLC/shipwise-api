@@ -19,7 +19,7 @@ ToggleAsset::register($this);
     $form = ActiveForm::begin();
     // if only one customer associated then select that customer on a hidden input
     // not sure if this logic should be in the controller
-    if (Yii::$app->user->identity->isAdmin || count(Yii::$app->user->identity->customerIds) > 1) {
+    if (Yii::$app->user->identity->isAdmin || (is_countable(Yii::$app->user->identity->customerIds) ? count(Yii::$app->user->identity->customerIds) : 0) > 1) {
         echo $form->field($model, 'customer_id')
             ->label('Customer Name')
             ->dropDownList($customers, ['prompt' => 'Please Select']);

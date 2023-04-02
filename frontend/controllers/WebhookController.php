@@ -164,7 +164,7 @@ class WebhookController extends Controller
                 );
                 Yii::$app->getSession()->setFlash('success', 'Test sent to your endpoint - please check the logs');
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             Yii::$app->getSession()->setFlash('error', 'We had a problem generating a test. You may not have an order to send as a test.');
 
         }

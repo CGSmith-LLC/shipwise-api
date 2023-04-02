@@ -124,7 +124,7 @@ if ($searchModel->carrier_id) {
                 [
                     'attribute' => 'customer.name',
                     // Visible if admin or has a count higher than 0 for associated users
-                    'visible' => ((count($customerDropdownList) > 1) || Yii::$app->user->identity->getIsAdmin()),
+                    'visible' => (((is_countable($customerDropdownList) ? count($customerDropdownList) : 0) > 1) || Yii::$app->user->identity->getIsAdmin()),
                     'filter' => Html::activeDropDownList(
                         $searchModel,
                         'customer_id',
@@ -161,9 +161,7 @@ if ($searchModel->carrier_id) {
                 'must_arrive_by_date:datetime',
                 [
                     'attribute' => 'notes',
-                    'value' => function ($model) {
-                        return yii\helpers\StringHelper::truncate($model->notes, 40);
-                    }
+                    'value' => fn($model) => yii\helpers\StringHelper::truncate($model->notes, 40)
                 ],
                 [
                     'attribute' => 'status_id',

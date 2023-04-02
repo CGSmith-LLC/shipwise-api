@@ -49,7 +49,7 @@ class AfterRegisterEvent
                     ->setSubject('New user registered')
                     ->send();
 
-            } catch (\Exception $ex) {
+            } catch (\Exception) {
                 Yii::warning('Failed to send admin email notification on new user register.');
             }
         }

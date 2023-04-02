@@ -74,9 +74,7 @@ QZAsset::register($this);
                 [
                     'attribute' => 'status',
                     'format'    => 'raw',
-                    'value'     => function ($model) {
-                        return '<span class="label label-' . $model->statusColor . '"> ' . $model->statusName . '</span>';
-                    },
+                    'value'     => fn($model) => '<span class="label label-' . $model->statusColor . '"> ' . $model->statusName . '</span>',
                 ],
                 [
                     'label'  => 'Print status',
@@ -93,9 +91,7 @@ QZAsset::register($this);
                 [
                     'attribute' => 'errors',
                     'format'    => 'raw',
-                    'value'     => function ($model) {
-                        return '<span class="label label-danger">' . $model->errors . '</span>';
-                    },
+                    'value'     => fn($model) => '<span class="label label-danger">' . $model->errors . '</span>',
                 ],
             ],
         ]);

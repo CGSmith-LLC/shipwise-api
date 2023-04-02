@@ -26,9 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'encrypted_secret',
                 'label' => 'API Secret',
-                'value' => function($model) {
-                    return Yii::$app->getSecurity()->decryptByKey(base64_decode($model->encrypted_secret), Yii::$app->params['encryptionKey']);
-                }
+                'value' => fn($model) => Yii::$app->getSecurity()->decryptByKey(base64_decode((string) $model->encrypted_secret), Yii::$app->params['encryptionKey'])
             ],
         ],
     ]) ?>

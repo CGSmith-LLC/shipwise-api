@@ -110,8 +110,8 @@ $this->registerJs($js);
                     [
                         'label' => 'Shipping',
                         'value' => function ($model) {
-                            $carrier = (isset($model->carrier->name)) ? $model->carrier->name : '';
-                            $service = (isset($model->service->name)) ? $model->service->name : '';
+                            $carrier = $model->carrier->name ?? '';
+                            $service = $model->service->name ?? '';
                             return $carrier . ' ' . $service;
                         },
                     ],
@@ -156,6 +156,7 @@ $this->registerJs($js);
                 <?= DetailView::widget(['model' => $model->address,
                     'attributes' => [['label' => 'Name',
                         'value' => function ($model) {
+                            $ship = [];
                             $ship[] = $model->name;
 
                             if (isset($model->company) && !empty($model->company)) {
@@ -236,9 +237,7 @@ $this->registerJs($js);
                             'created_date:datetime',
                             [
                                 'attribute' => 'notes',
-                                'value' => function ($model) {
-                                    return '<pre>' . HtmlPurifier::process(nl2br($model->notes)) . '</pre>';
-                                },
+                                'value' => fn($model) => '<pre>' . HtmlPurifier::process(nl2br((string) $model->notes)) . '</pre>',
                                 'format' => 'raw',
                                 'enableSorting' => false,
                             ],

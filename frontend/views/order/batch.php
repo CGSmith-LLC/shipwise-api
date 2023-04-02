@@ -29,9 +29,7 @@ if ((!Yii::$app->user->identity->getIsAdmin())) {
             'id',
             [
                 'attribute' => 'name',
-                'value' => function ($model) {
-                    return Html::a($model->name, \yii\helpers\Url::toRoute(['order/batch', 'id' => $model->id]));
-                },
+                'value' => fn($model) => Html::a($model->name, \yii\helpers\Url::toRoute(['order/batch', 'id' => $model->id])),
                 'format' => 'raw',
             ]
         ],

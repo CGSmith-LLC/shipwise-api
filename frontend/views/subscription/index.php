@@ -23,9 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             [
                 'attribute' => 'customer_id',
-                'value' => function ($model) {
-                    return $model->customer->name;
-                }
+                'value' => fn($model) => $model->customer->name
             ],
             'next_invoice',
             'months_to_recur',

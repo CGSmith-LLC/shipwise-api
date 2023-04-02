@@ -24,15 +24,13 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'customer.name',
                 'label' => 'Customer',
-                'visible' => Yii::$app->user->identity->isAdmin || count(Yii::$app->user->identity->customerIds) > 1,
+                'visible' => Yii::$app->user->identity->isAdmin || (is_countable(Yii::$app->user->identity->customerIds) ? count(Yii::$app->user->identity->customerIds) : 0) > 1,
             ],
             'name',
             [
                 'attribute' => 'endpoint',
                 'format' => 'raw',
-                'value' => function ($model) {
-                    return $model->endpoint . ' ' . $model->getLabelFor('authentication_type');
-                }
+                'value' => fn($model) => $model->endpoint . ' ' . $model->getLabelFor('authentication_type')
             ],
             [
                 'attribute' => 'recentStatusCode',
@@ -64,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'active',
-                'value' => function ($model) { return $model->getLabelFor('active');},
+                'value' => fn($model) => $model->getLabelFor('active'),
                 'format' => 'raw',
             ],
             ['class' => 'yii\grid\ActionColumn'],

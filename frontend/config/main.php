@@ -70,7 +70,7 @@ return [
             'class' => 'yii\authclient\Collection',
             'clients' => [
                 'google' => [
-                    'class' => 'Da\User\AuthClient\Google',
+                    'class' => \Da\User\AuthClient\Google::class,
                     'clientId' => $params['google_client_id'],
                     'clientSecret' => $params['google_client_secret'],
                 ],
