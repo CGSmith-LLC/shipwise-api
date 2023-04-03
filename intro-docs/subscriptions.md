@@ -17,6 +17,8 @@ You can [pass](https://stripe.com/docs/api/customer_portal/configurations/create
 
 > stripe listen --forward-to https://shipwise.ngrok.io/subscription-webhook/stripe --skip-verify
 
+**Copy** the `webhook signing secret` from the console and **paste** into `common\config\params-local.php`.
+
 4. See [stripe.com/docs/webhooks/test](https://stripe.com/docs/webhooks/test) for more details and **available events/triggers**.
 For instance, the command to simulate the event that occurs when a customer payment is successful:
    
@@ -24,7 +26,44 @@ For instance, the command to simulate the event that occurs when a customer paym
 
 5. See **types of webhook events** - [stripe.com/docs/api/events/types](https://stripe.com/docs/api/events/types).
 
-## Test credit card details:
+## How to connect webhooks:
+
+1. Go to [dashboard.stripe.com/test/developers](https://dashboard.stripe.com/test/developers) -> **Webhooks**.
+2. Press the button "**Add an endpoint**".
+3. For the test mode, use `https://shipwise.ngrok.io/subscription-webhook/stripe` as **Endpoint URL**.
+Use the **production URL** in live mode.
+Choose the **following events**: 
+   
+- customer.created
+- checkout.session.completed
+- customer.subscription.created
+- customer.subscription.trial_will_end
+- customer.subscription.deleted
+- customer.subscription.paused
+- customer.subscription.resumed
+- customer.subscription.updated
+- invoice.created
+- invoice.finalized
+- invoice.finalization_failed
+- invoice.paid
+- invoice.payment_action_required
+- invoice.payment_failed
+- invoice.upcoming
+- invoice.updated
+- payment_intent.created
+- payment_intent.succeeded
+
+4. Once the previous step is completed, **copy** `Webhook ID` and `Signing secret` and **paste** them into `common\config\params-local.php`.
+
+## Jobs:
+
+1. Jobs are located here - `console\jobs\subscription\stripe`.
+2. Run:
+
+> php yii queue/listen --verbose
+
+
+## Test payment details:
 
 Card number: `4242 4242 4242 4242`  
 Use a valid future date, such as `12/34`    
@@ -53,3 +92,5 @@ See [stripe.com/docs/testing](https://stripe.com/docs/testing).
 - https://stripe.com/docs/webhooks
 - https://stripe.com/docs/webhooks/test
 - https://stripe.com/docs/api/events/types
+- https://stripe.com/docs/billing/subscriptions/webhooks
+- https://stripe.com/docs/webhooks/signatures

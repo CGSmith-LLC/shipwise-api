@@ -3,6 +3,9 @@
 namespace common\models;
 
 use common\models\base\BaseSubscriptionWebhook;
+use common\services\subscription\SubscriptionService;
+use console\jobs\subscription\stripe\StripeCheckoutSessionCompletedJob;
+use yii\helpers\Json;
 
 class SubscriptionWebhook extends BaseSubscriptionWebhook
 {
@@ -12,6 +15,12 @@ class SubscriptionWebhook extends BaseSubscriptionWebhook
     public const STATUS_PROCESSING = 'processing';
     public const STATUS_SUCCESS = 'success';
     public const STATUS_FAILED = 'failed';
+
+    public function init(): void
+    {
+        parent::init();
+        $this->on(self::EVENT_AFTER_INSERT, [$this, 'createJob']);
+    }
 
     #############
     # Statuses: #
@@ -80,6 +89,26 @@ class SubscriptionWebhook extends BaseSubscriptionWebhook
 
         if ($withSave) {
             $this->save();
+        }
+    }
+
+    #########
+    # Jobs: #
+    #########
+
+    protected function createJob(): void
+    {
+        $arrayPayload = Json::decode($this->payload);
+
+        switch ($this->event) {
+            case SubscriptionService::CHECKOUT_SESSION_COMPLETED_WEBHOOK_EVENT:
+                \Yii::$app->queue->push(
+                    new StripeCheckoutSessionCompletedJob([
+                        'payload' => $arrayPayload,
+                        'subscriptionWebhookId' => $this->id
+                    ])
+                );
+                break;
         }
     }
 }

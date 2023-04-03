@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use common\services\subscription\SubscriptionService;
+use Stripe\Exception\SignatureVerificationException;
 use Yii;
 use yii\web\{Response, BadRequestHttpException, ServerErrorHttpException};
 use yii\helpers\Json;
@@ -25,13 +27,18 @@ class SubscriptionWebhookController extends Controller
 
     /**
      * @throws ServerErrorHttpException
+     * @throws SignatureVerificationException
      */
     public function actionStripe(): array
     {
-        //file_put_contents('stripe.txt', Yii::$app->request->rawBody);
+        //file_put_contents('stripe.txt', Yii::$app->request->rawBody, FILE_APPEND);
 
         if (!Yii::$app->request->rawBody) {
             throw new ServerErrorHttpException('No request body.');
+        }
+
+        if (!SubscriptionService::isWebhookVerified(Yii::$app->request->rawBody, Yii::$app->request->headers->get('stripe-signature'))) {
+            throw new ServerErrorHttpException('Request verification is failed.');
         }
 
         $data = Json::decode(Yii::$app->request->rawBody);
