@@ -38,8 +38,8 @@ class Order extends BaseOrder
 
     public function init(): void
     {
-        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'createJobIfNeeded']);
-        $this->on(self::EVENT_AFTER_INSERT, [$this, 'createJobIfNeeded']);
+        $this->on(self::EVENT_AFTER_UPDATE, $this->createJobIfNeeded(...));
+        $this->on(self::EVENT_AFTER_INSERT, $this->createJobIfNeeded(...));
 
         parent::init();
     }
@@ -80,7 +80,7 @@ class Order extends BaseOrder
      */
     public static function find()
     {
-        return new OrderQuery(get_called_class());
+        return new OrderQuery(static::class);
     }
 
     /**
@@ -101,15 +101,15 @@ class Order extends BaseOrder
     public function getFromAddress()
     {
         $address = new AddressEx();
-        $address->name = isset($this->ship_from_name) ? $this->ship_from_name : $this->customer->name;
-        $address->address1 = isset($this->ship_from_address1) ? $this->ship_from_address1 : $this->customer->address1;
-        $address->address2 = isset($this->ship_from_address2) ? $this->ship_from_address2 : $this->customer->address2;
-        $address->city = isset($this->ship_from_city) ? $this->ship_from_city : $this->customer->city;
-        $address->state_id = isset($this->ship_from_state_id) ? $this->ship_from_state_id : $this->customer->state_id;
-        $address->zip = isset($this->ship_from_zip) ? $this->ship_from_zip : $this->customer->zip;
-        $address->country = isset($this->ship_from_country_code) ? $this->ship_from_country_code : $this->customer->country;
-        $address->phone = isset($this->ship_from_phone) ? $this->ship_from_phone : $this->customer->phone;
-        $address->email = isset($this->ship_from_email) ? $this->ship_from_email : $this->customer->email;
+        $address->name = $this->ship_from_name ?? $this->customer->name;
+        $address->address1 = $this->ship_from_address1 ?? $this->customer->address1;
+        $address->address2 = $this->ship_from_address2 ?? $this->customer->address2;
+        $address->city = $this->ship_from_city ?? $this->customer->city;
+        $address->state_id = $this->ship_from_state_id ?? $this->customer->state_id;
+        $address->zip = $this->ship_from_zip ?? $this->customer->zip;
+        $address->country = $this->ship_from_country_code ?? $this->customer->country;
+        $address->phone = $this->ship_from_phone ?? $this->customer->phone;
+        $address->email = $this->ship_from_email ?? $this->customer->email;
 
         return $address;
     }
@@ -218,7 +218,7 @@ class Order extends BaseOrder
      * @return Shipment|bool Shipment object on success or false on error
      * @throws \Exception
      */
-    public function createShipment()
+    public function createShipment(): \common\models\shipping\Shipment|bool
     {
         /**
          * Build Shipment object from Order data.

@@ -148,8 +148,8 @@ use api\modules\v1\models\core\StateEx;
  */
 class AddressForm extends Model
 {
-    const SCENARIO_DEFAULT = 'default'; // ship to address
-    const SCENARIO_FROM = 'from';  // ship from address
+    final const SCENARIO_DEFAULT = 'default'; // ship to address
+    final const SCENARIO_FROM = 'from';  // ship from address
 
     /** @var string */
     public $name;

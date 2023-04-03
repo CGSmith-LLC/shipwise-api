@@ -28,9 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'customer_id',
                 'label' => 'Customer Name',
-                'value' => function ($model) {
-                    return $model->customer->name;
-                },
+                'value' => fn($model) => $model->customer->name,
             ],
             [
                 'attribute' => 'name',

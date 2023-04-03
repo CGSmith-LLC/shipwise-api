@@ -9,8 +9,8 @@ use common\models\OrderHistory;
 
 class OrderAddressChangedEvent extends Event
 {
-    public const EVENT_IS_ENABLED = true;
-    public const EVENT_ORDER_ADDRESS_CHANGED = 'eventOrderAddressChanged';
+    final public const EVENT_IS_ENABLED = true;
+    final public const EVENT_ORDER_ADDRESS_CHANGED = 'eventOrderAddressChanged';
 
     public Order $order;
     public Address $address;

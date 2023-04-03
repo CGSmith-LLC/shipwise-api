@@ -30,9 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'status',
                 'format' => 'raw',
-                'value' => function ($model) {
-                    return $model->getStatusLabel();
-                }
+                'value' => fn($model) => $model->getStatusLabel()
             ],
             'status_message',
             [

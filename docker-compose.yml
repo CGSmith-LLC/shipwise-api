@@ -11,6 +11,8 @@ services:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       # Mount source-code for development
       - ./:/app
+    environment:
+      PHP_USER_ID: 1000
 
   api:
     build: api
@@ -21,16 +23,18 @@ services:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       # Mount source-code for development
       - ./:/app
+    environment:
+      PHP_USER_ID: 1000
 
-  shopify:
-    build: shopify
-    ports:
-      - 30004:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
+#  shopify:
+#    build: shopify
+#    ports:
+#      - 30004:80
+#    volumes:
+#      # Re-use local composer cache via host-volume
+#      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+#      # Mount source-code for development
+#      - ./:/app
 
   mysql:
     image: mysql:8

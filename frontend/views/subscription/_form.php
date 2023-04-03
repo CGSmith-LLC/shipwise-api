@@ -66,7 +66,7 @@ $this->registerJsFile('@web/js/subscription-create.js');
 
                                 <?= $this->render('partial/_item-row', [
                                     'key'     => $_item->isNewRecord
-                                        ? (strpos($itemKey, 'new') !== false ? $itemKey : 'new' . $itemKey)
+                                        ? (str_contains((string) $itemKey, 'new') ? $itemKey : 'new' . $itemKey)
                                         : $_item->id,
                                     'form'    => $form,
                                     'item'    => $_item ,

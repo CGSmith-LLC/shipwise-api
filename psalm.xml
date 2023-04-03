@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="7"
+    resolveFromConfigFile="true"
+    findUnusedCode="false"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    findUnusedBaselineEntry="true"
+>
+    <projectFiles>
+        <file name="requirements.php" />
+        <directory name="environments" />
+        <directory name="api" />
+        <directory name="common" />
+        <directory name="console" />
+        <directory name="frontend" />
+        <directory name="shopify" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+</psalm>

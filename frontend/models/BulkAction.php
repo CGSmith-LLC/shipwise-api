@@ -25,16 +25,16 @@ use yii\helpers\Url;
 class BulkAction extends BaseBulkAction
 {
 
-    const EXECUTION_TYPE_SYNC = 1;
-    const EXECUTION_TYPE_ASYNC = 2;
+    final const EXECUTION_TYPE_SYNC = 1;
+    final const EXECUTION_TYPE_ASYNC = 2;
 
-    const ACTION_CHANGE_STATUS = 'changeStatus';
-    const ACTION_UPDATE_CARRIER = 'updateCarrier';
-    const ACTION_PACKING_SLIPS = 'packingSlips';
-    const ACTION_SHIPPING_LABELS = 'shippingLabels';
-    const ACTION_SHIPPING_LABELS_PACKING_SLIPS = 'shippingLabelsPackingSlips';
-    const ACTION_BATCH_CREATE = 'createNewBatch';
-    const ACTION_BATCH_ADD = 'addToExistingBatch';
+    final const ACTION_CHANGE_STATUS = 'changeStatus';
+    final const ACTION_UPDATE_CARRIER = 'updateCarrier';
+    final const ACTION_PACKING_SLIPS = 'packingSlips';
+    final const ACTION_SHIPPING_LABELS = 'shippingLabels';
+    final const ACTION_SHIPPING_LABELS_PACKING_SLIPS = 'shippingLabelsPackingSlips';
+    final const ACTION_BATCH_CREATE = 'createNewBatch';
+    final const ACTION_BATCH_ADD = 'addToExistingBatch';
 
     /**
      * List of all available actions
@@ -279,7 +279,7 @@ class BulkAction extends BaseBulkAction
      *
      * @return bool|int False on failure, Integer on success
      */
-    public function changeStatus($params = null)
+    public function changeStatus($params = null): bool|int
     {
         Yii::debug($params);
         if (isset($params[0]) && in_array($params[0], array_keys(Status::getList('id', 'id')))) {
@@ -358,7 +358,7 @@ class BulkAction extends BaseBulkAction
      *
      * @return bool|int False on failure, Integer on success
      */
-    private function packingSlips($params = null)
+    private function packingSlips($params = null): bool|int
     {
         $bulkAction = $this->createBulkAction();
 
@@ -378,7 +378,7 @@ class BulkAction extends BaseBulkAction
      *
      * @return bool|int False on failure, Integer on success
      */
-    private function shippingLabels($params = null)
+    private function shippingLabels($params = null): bool|int
     {
         $bulkAction = $this->createBulkAction();
 
@@ -399,7 +399,7 @@ class BulkAction extends BaseBulkAction
      *
      * @return bool|int False on failure, Integer on success
      */
-    private function shippingLabelsPackingSlips($params = null)
+    private function shippingLabelsPackingSlips($params = null): bool|int
     {
         $bulkAction = $this->createBulkAction();
 
@@ -414,7 +414,7 @@ class BulkAction extends BaseBulkAction
      *
      * @return BaseBulkAction
      */
-    private function createBulkAction()
+    private function createBulkAction(): BaseBulkAction
     {
         $bulkAction = new BaseBulkAction();
         $bulkAction->code = $this->action;
@@ -442,7 +442,7 @@ class BulkAction extends BaseBulkAction
      *
      * @return bool|int False on failure, Integer on success
      */
-    private function asyncExecute($bulkAction, $jobClassName, $params = null)
+    private function asyncExecute($bulkAction, $jobClassName, $params = null): bool|int
     {
         $jobClass = "\\console\\jobs\\{$jobClassName}";
 

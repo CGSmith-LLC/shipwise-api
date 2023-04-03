@@ -138,7 +138,7 @@ class SiteController extends \frontend\controllers\Controller
         return $this->asJson($response);
     }
 
-    private function lookupAvatar($name)
+    private function lookupAvatar($name): string
     {
         $exploded = explode(' ', $name);
 
@@ -159,7 +159,7 @@ class SiteController extends \frontend\controllers\Controller
             ]);
     }
 
-    private function lookupAvatarColor($avatar)
+    private function lookupAvatarColor($avatar): string
     {
         $colors = ['#00AA55', '#009FD4', '#B381B3', '#939393', '#E3BC00', '#D47500', '#DC2A2A'];
         $int = ord($avatar);
@@ -167,7 +167,7 @@ class SiteController extends \frontend\controllers\Controller
         return $colors[$int % count($colors)];
     }
 
-    private function trimName($name)
+    private function trimName(string $name): string
     {
         if (strlen($name) > 12) {
             $name = substr($name, 0, 12) . '...';
@@ -176,26 +176,20 @@ class SiteController extends \frontend\controllers\Controller
         return $name;
     }
 
-    private function lookupSlug($id)
+    private function lookupSlug(int $id): string
     {
-        switch ($id) {
-            case Status::WMS_ERROR:
-                return 'red';
-            case Status::COMPLETED:
-                return 'green';
-            default:
-                return 'blue';
-        }
+        return match ($id) {
+            Status::WMS_ERROR => 'red',
+            Status::COMPLETED => 'green',
+            default => 'blue',
+        };
     }
-    private function lookupColumn($id)
+    private function lookupColumn(int $id): string
     {
-        switch ($id) {
-            case Status::WMS_ERROR:
-                return '1';
-            case Status::COMPLETED:
-                return '2';
-            default:
-                return '1';
-        }
+        return match ($id) {
+            Status::WMS_ERROR => '1',
+            Status::COMPLETED => '2',
+            default => '1',
+        };
     }
 }

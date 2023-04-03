@@ -29,10 +29,10 @@ class WooCommerceService extends BaseEcommerceService
     protected bool $canCreateWebhooks = true;
 
 
-    public const API_BASE = '/wp-json/wc/v3';
-    public const API_ORDERS = 'orders';
+    final public const API_BASE = '/wp-json/wc/v3';
+    final public const API_ORDERS = 'orders';
     // @see https://woocommerce.github.io/woocommerce-rest-api-docs/#batch-update-webhooks
-    public const API_WEBHOOKS = 'webhooks/batch';
+    final public const API_WEBHOOKS = 'webhooks/batch';
 
     /**
      * Ingest an array of the meta data for the service and apply to internal objects where needed

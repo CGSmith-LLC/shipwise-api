@@ -16,7 +16,7 @@ class DefaultController extends Controller
     /**
      * Renders the index view for the module
      */
-    public function actionIndex()
+    public function actionIndex(): never
     {
         throw new NotFoundHttpException('Unsupported action request.');
     }

@@ -13,10 +13,10 @@ class ShipmentPackage extends BaseShipmentPackage
 {
 
     // Package contents
-    const CONTENTS_DOCUMENTS     = 'DOCUMENTS';
-    const CONTENTS_NON_DOCUMENTS = 'NON_DOCUMENTS';
+    final const CONTENTS_DOCUMENTS     = 'DOCUMENTS';
+    final const CONTENTS_NON_DOCUMENTS = 'NON_DOCUMENTS';
 
-    private static $contentsList = [
+    private static array $contentsList = [
         self::CONTENTS_DOCUMENTS     => 'Documents',
         self::CONTENTS_NON_DOCUMENTS => 'Parcel',
     ];

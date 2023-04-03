@@ -345,7 +345,7 @@ class SkuController extends PaginatedControllerEx
      *
      * @return array|\api\modules\v1\models\sku\SkuEx
      */
-    public function actionFind()
+    public function actionFind(): array|\api\modules\v1\models\sku\SkuEx
     {
         $customerReference = $this->request->get('sku', null);
 

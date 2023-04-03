@@ -77,7 +77,7 @@ $this->registerJs('
                 ])->textInput([
                     'readonly' => $confirmed,
                     'class' => 'date',
-                    'value' => (isset($model->open_date)) ? $model->open_date : '',
+                    'value' => $model->open_date ?? '',
                 ])->label('Date and time to automatically change orders to Open'); ?>
             </div>
         </div>

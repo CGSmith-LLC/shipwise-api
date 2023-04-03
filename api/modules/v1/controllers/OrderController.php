@@ -204,7 +204,7 @@ class OrderController extends PaginatedControllerEx
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\db\Exception
      */
-    public function actionCreate()
+    public function actionCreate(): array|\api\modules\v1\models\order\OrderEx
     {
         // Build the Order Form with the attributes sent in request
         $orderForm           = new OrderForm();
@@ -267,7 +267,7 @@ class OrderController extends PaginatedControllerEx
      *
      * @return array|\api\modules\v1\models\order\OrderEx
      */
-    public function actionView($id)
+    public function actionView($id): array|\api\modules\v1\models\order\OrderEx
     {
         if (($order = OrderEx::find()
                 ->byId($id)
@@ -353,7 +353,7 @@ class OrderController extends PaginatedControllerEx
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\db\Exception
      */
-    public function actionUpdate($id)
+    public function actionUpdate($id): array|\api\modules\v1\models\order\OrderEx
     {
         // Build the Order Form with the attributes sent in request
         $orderForm           = new OrderForm();
@@ -455,11 +455,7 @@ class OrderController extends PaginatedControllerEx
 
             $transaction->commit();
 
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-
-            return $this->errorMessage(400, 'Could not delete order');
-        } catch (\Throwable $e) {
+        } catch (\Exception|\Throwable $e) {
             $transaction->rollBack();
 
             return $this->errorMessage(400, 'Could not delete order');
@@ -515,7 +511,6 @@ class OrderController extends PaginatedControllerEx
      *     }}
      * )
      */
-
     /**
      * Get items of a specific order
      *
@@ -523,7 +518,7 @@ class OrderController extends PaginatedControllerEx
      *
      * @return array|\api\modules\v1\models\order\ItemEx
      */
-    public function actionItems($id)
+    public function actionItems($id): array|\api\modules\v1\models\order\ItemEx
     {
         if (($order = OrderEx::find()
                 ->byId($id)
@@ -543,7 +538,7 @@ class OrderController extends PaginatedControllerEx
      *
      * @return array|\api\modules\v1\models\order\PackageEx
      */
-    public function actionPackages($id)
+    public function actionPackages($id): array|\api\modules\v1\models\order\PackageEx
     {
         if (($order = OrderEx::find()
                 ->byId($id)
@@ -902,7 +897,6 @@ class OrderController extends PaginatedControllerEx
      *     }}
      * )
      */
-
     /**
      * Find order by criteria
      *
@@ -911,7 +905,7 @@ class OrderController extends PaginatedControllerEx
      *
      * @return array|\api\modules\v1\models\order\OrderEx
      */
-    public function actionFind()
+    public function actionFind(): array|\api\modules\v1\models\order\OrderEx
     {
         $customerReference = $this->request->get('customer-reference', null);
 

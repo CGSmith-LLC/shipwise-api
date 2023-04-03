@@ -15,9 +15,9 @@ use common\models\base\BaseBulkItem;
 class BulkItem extends BaseBulkItem
 {
 
-    const STATUS_QUEUED = 0;
-    const STATUS_DONE   = 1;
-    const STATUS_ERROR  = 2;
+    final const STATUS_QUEUED = 0;
+    final const STATUS_DONE   = 1;
+    final const STATUS_ERROR  = 2;
 
     /**
      * @var array

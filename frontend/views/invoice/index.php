@@ -30,24 +30,18 @@ $this->params['breadcrumbs'][] = $this->title;
                 'customer_name',
                 [
                     'attribute' => 'amount',
-                    'value' => function ($model) {
-                        return Yii::$app->formatter->asCurrency($model->decimalAmount);
-                    },
+                    'value' => fn($model) => Yii::$app->formatter->asCurrency($model->decimalAmount),
                 ],
                 'due_date:date',
                 [
                     'attribute' => 'status',
                     'format' => 'raw',
-                    'value' => function($model) {
-                        return $model->getStatusLabel();
-                    }
+                    'value' => fn($model) => $model->getStatusLabel()
                 ],
                 [
                     'class' => 'yii\grid\ActionColumn',
                     'template' => '{view}',
-                    'urlCreator' => function($action, $model, $key, $index) {
-                        return \yii\helpers\Url::toRoute(['invoice/view', 'id' => $model->id]);
-                    },
+                    'urlCreator' => fn($action, $model, $key, $index) => \yii\helpers\Url::toRoute(['invoice/view', 'id' => $model->id]),
                 ],
             ],
         ]); ?>

@@ -10,11 +10,11 @@ namespace common\models\shipping;
 class PackageType
 {
 
-    const MY_PACKAGE = 'MyPackage';
-    const ENVELOPE   = 'Envelope';
-    const PAK        = 'Pak';
+    final const MY_PACKAGE = 'MyPackage';
+    final const ENVELOPE   = 'Envelope';
+    final const PAK        = 'Pak';
 
-    private static $list = [
+    private static array $list = [
         self::MY_PACKAGE => self::MY_PACKAGE,
         self::ENVELOPE   => self::ENVELOPE,
         self::PAK        => self::PAK,

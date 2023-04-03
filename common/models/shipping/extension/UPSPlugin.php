@@ -27,28 +27,28 @@ class UPSPlugin extends ShipmentPlugin
      *
      * @var string Constant
      */
-    const PLUGIN_NAME = "UPS";
+    final const PLUGIN_NAME = "UPS";
 
     /**
      * Development API url
      *
      * @var string
      */
-    private $urlDev = 'https://wwwcie.ups.com/webservices/';
+    private string $urlDev = 'https://wwwcie.ups.com/webservices/';
 
     /**
      * Production API url
      *
      * @var string
      */
-    private $urlProd = 'https://onlinetools.ups.com/webservices/';
+    private string $urlProd = 'https://onlinetools.ups.com/webservices/';
 
     /**
      * UPS security namespace
      *
      * @var string
      */
-    private $securityNamespace = 'http://www.ups.com/XMLSchema/XOLTWS/UPSS/v1.0';
+    private string $securityNamespace = 'http://www.ups.com/XMLSchema/XOLTWS/UPSS/v1.0';
 
     /**
      * Base Tracking URL
@@ -72,7 +72,7 @@ class UPSPlugin extends ShipmentPlugin
      *
      * @var string
      */
-    private $dropOffType = "REGULAR_PICKUP";
+    private string $dropOffType = "REGULAR_PICKUP";
 
     /**
      * Multiple piece shipment flag
@@ -587,29 +587,16 @@ class UPSPlugin extends ShipmentPlugin
     {
         $transitTime = 0;
 
-        switch ($code) {
-            case 'UPSNextDayAirEarlyAM':
-                $transitTime = $this->timeInTransitResponse['1DM'];
-                break;
-            case 'UPSNextDayAir':
-                $transitTime = $this->timeInTransitResponse['1DA'];
-                break;
-            case 'UPSNextDayAirSaver':
-                $transitTime = $this->timeInTransitResponse['1DP'];
-                break;
-            case 'UPS2ndDayAirAM':
-                $transitTime = $this->timeInTransitResponse['2DM'];
-                break;
-            case 'UPS2ndDayAir':
-                $transitTime = $this->timeInTransitResponse['2DA'];
-                break;
-            case 'UPSGround':
-                $transitTime = $this->timeInTransitResponse['GND'];
-                break;
-            case 'UPS3DaySelect':
-                $transitTime = $this->timeInTransitResponse['3DS'];
-                break;
-        }
+        $transitTime = match ($code) {
+            'UPSNextDayAirEarlyAM' => $this->timeInTransitResponse['1DM'],
+            'UPSNextDayAir' => $this->timeInTransitResponse['1DA'],
+            'UPSNextDayAirSaver' => $this->timeInTransitResponse['1DP'],
+            'UPS2ndDayAirAM' => $this->timeInTransitResponse['2DM'],
+            'UPS2ndDayAir' => $this->timeInTransitResponse['2DA'],
+            'UPSGround' => $this->timeInTransitResponse['GND'],
+            'UPS3DaySelect' => $this->timeInTransitResponse['3DS'],
+            default => $transitTime,
+        };
 
         return $transitTime;
     }

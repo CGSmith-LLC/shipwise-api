@@ -89,7 +89,7 @@ class ControllerEx extends Controller
             $order->requested_ship_date = $orderForm->requestedShipDate;
             $order->must_arrive_by_date = $orderForm->mustArriveByDate;
             $order->notes = $orderForm->notes;
-            $order->status_id = isset($orderForm->status) ? $orderForm->status : null;
+            $order->status_id = $orderForm->status ?? null;
             $order->address_id = $address->id;
             $order->transit = $orderForm->transit;
             $order->packagingNotes = $orderForm->packagingNotes;
@@ -198,11 +198,7 @@ class ControllerEx extends Controller
             // Commit DB transaction
             $transaction->commit();
 
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-
-            return $this->errorMessage(400, 'Could not save order');
-        } catch (\Throwable $e) {
+        } catch (\Exception|\Throwable $e) {
             $transaction->rollBack();
 
             return $this->errorMessage(400, 'Could not save order');
@@ -439,10 +435,7 @@ class ControllerEx extends Controller
             // Commit DB transaction
             $transaction->commit();
 
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            return $this->errorMessage(400, 'Could not save order', $e);
-        } catch (\Throwable $e) {
+        } catch (\Exception|\Throwable $e) {
             $transaction->rollBack();
             return $this->errorMessage(400, 'Could not save order', $e);
         }
@@ -515,12 +508,12 @@ class ControllerEx extends Controller
      *
      * @param int $code HTTP code
      * @param string $message Error message
-     * @param \Exception $exception
      *
      * @return array
      */
     public function errorMessage($code, string $message = 'Unknown Error', \Exception $exception = null)
     {
+        $return = [];
         $this->response->setStatusCode($code);
         $return['message'] = $message;
 

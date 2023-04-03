@@ -48,8 +48,8 @@ use yii\base\Model;
 class Dimensions extends Model
 {
 
-    const UNITS_IN = 'IN';
-    const UNITS_CM = 'CM';
+    final const UNITS_IN = 'IN';
+    final const UNITS_CM = 'CM';
 
     protected static $unitsTypes = [
         self::UNITS_IN => self::UNITS_IN,

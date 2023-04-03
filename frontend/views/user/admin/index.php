@@ -52,11 +52,9 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         [
             'attribute' => 'registration_ip',
-            'value' => function ($model) {
-                return $model->registration_ip == null
-                    ? '<span class="not-set">' . Yii::t('usuario', '(not set)') . '</span>'
-                    : $model->registration_ip;
-            },
+            'value' => fn($model) => $model->registration_ip == null
+                ? '<span class="not-set">' . Yii::t('usuario', '(not set)') . '</span>'
+                : $model->registration_ip,
             'format' => 'html',
         ],
         [

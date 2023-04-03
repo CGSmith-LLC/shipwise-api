@@ -40,9 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'name',
             [
                 'attribute' => 'amount',
-                'value' => function ($model) {
-                    return Yii::$app->formatter->asCurrency($model->decimalAmount);
-                }
+                'value' => fn($model) => Yii::$app->formatter->asCurrency($model->decimalAmount)
             ],
         ]
     ]) ?>

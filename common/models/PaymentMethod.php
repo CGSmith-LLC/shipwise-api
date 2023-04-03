@@ -26,8 +26,8 @@ class PaymentMethod extends \yii\db\ActiveRecord
 
     /**@var $setupIntent setupIntent */
     public $setupIntent;
-    const PRIMARY_PAYMENT_METHOD_NO = 0;
-    const PRIMARY_PAYMENT_METHOD_YES = 1;
+    final const PRIMARY_PAYMENT_METHOD_NO = 0;
+    final const PRIMARY_PAYMENT_METHOD_YES = 1;
 
 
     public function init()
@@ -126,8 +126,9 @@ class PaymentMethod extends \yii\db\ActiveRecord
      */
     public function stripeCreateSource($event)
     {
+        $source = null;
         /** @var $source Source */
-        $this->setAttribute('stripe_payment_method_id', isset($source->id) ? $source->id : null);
+        $this->setAttribute('stripe_payment_method_id', $source->id ?? null);
 
         // Credit card payment method
         try {
@@ -137,7 +138,7 @@ class PaymentMethod extends \yii\db\ActiveRecord
             $paymentMethod->attach(['customer' => $event->sender->customer->stripe_customer_token]);
 
             /** @var $paymentMethod \Stripe\PaymentMethod */
-            $this->setAttribute('stripe_token', isset($paymentMethod->id) ? $paymentMethod->id : null);
+            $this->setAttribute('stripe_token', $paymentMethod->id ?? null);
         } catch (ApiErrorException $e) {
             $event->sender->addError('cc', $e->getMessage());
             $event->isValid = false;

@@ -146,7 +146,7 @@ class SubscriptionForm extends Model
      */
     protected function getItem($key)
     {
-        $item = $key && strpos($key, 'new') === false ? SubscriptionItems::findOne($key) : false;
+        $item = $key && !str_contains((string) $key, 'new') ? SubscriptionItems::findOne($key) : false;
         if (!$item) {
             $item = new SubscriptionItems();
             $item->loadDefaultValues();
@@ -188,7 +188,7 @@ class SubscriptionForm extends Model
                 'header' => '<p>Please fix the following errors for <b>' . $id . '</b></p>',
                 'class'  => 'alert alert-danger',
             ]);
-            $errorList    = str_replace('<li></li>', '', $errorList); // remove the empty error
+            $errorList    = str_replace('<li></li>', '', (string) $errorList); // remove the empty error
             $errorLists[] = $errorList;
         }
 

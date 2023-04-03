@@ -1,7 +1,7 @@
 {
     "minimum-stability": "stable",
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "yiisoft/yii2": "~2.0.28",
         "yiisoft/yii2-bootstrap": "~2.0.10",
         "yiisoft/yii2-swiftmailer": "~2.1.0",
@@ -12,7 +12,7 @@
         "setasign/fpdf": "^1.8",
         "cgsmith/yii2-stripe": "dev-master",
         "serzh/amazon-mws-merchant-fulfillment": "^1.0",
-        "osiset/basic-shopify-api": "^9.1",
+        "gnikyt/basic-shopify-api": "^v10.0",
         "yii2tech/csv-grid": "^1.0",
         "bp-sys/yii2-aws-s3": "~2.0",
         "bilberrry/yii2-digitalocean-spaces": "^0.1.2",
@@ -30,12 +30,13 @@
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
         "yiisoft/yii2-gii": "~2.0.0",
-        "codeception/verify": "~0.3.1",
-        "codeception/codeception": "^4.1",
-        "codeception/module-phpbrowser": "^1.0.0",
-        "codeception/module-asserts": "^1.0.0",
+        "yiisoft/yii2-faker": "^2.0",
+        "codeception/codeception": "^5.0",
         "codeception/module-yii2": "^1.1",
-        "yiisoft/yii2-faker": "^2.0"
+        "codeception/module-asserts": "^3.0",
+        "codeception/verify": "^3.0",
+        "codeception/module-phpbrowser": "^3.0",
+        "vimeo/psalm": "^5.9"
     },
     "config": {
         "process-timeout": 1800,
@@ -43,7 +44,8 @@
             "enabled": false
         },
         "allow-plugins": {
-            "yiisoft/yii2-composer": true
+            "yiisoft/yii2-composer": true,
+            "php-http/discovery": true
         }
     },
     "repositories": [

@@ -8,8 +8,8 @@ use common\models\OrderHistory;
 
 class OrderViewedEvent extends Event
 {
-    public const EVENT_IS_ENABLED = false;
-    public const EVENT_ORDER_VIEWED = 'eventOrderViewed';
+    final public const EVENT_IS_ENABLED = false;
+    final public const EVENT_ORDER_VIEWED = 'eventOrderViewed';
 
     public Order $order;
 

@@ -59,6 +59,7 @@ class IntegrationForm extends \common\models\forms\BaseForm
 
     public function saveMeta()
     {
+        $metaDatum = null;
         $keep = [];
         /**  @var $metaDatum IntegrationMeta */
         foreach ($this->metaData as $metaDatum) {

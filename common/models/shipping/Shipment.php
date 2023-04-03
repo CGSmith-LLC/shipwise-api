@@ -24,10 +24,10 @@ use yii\db\Expression;
 class Shipment extends BaseShipment
 {
 
-    const WEIGHT_UNITS_LB = 'LB';
-    const WEIGHT_UNITS_KG = 'KG';
-    const DIM_UNITS_IN    = 'IN';
-    const DIM_UNITS_CM    = 'CM';
+    final const WEIGHT_UNITS_LB = 'LB';
+    final const WEIGHT_UNITS_KG = 'KG';
+    final const DIM_UNITS_IN    = 'IN';
+    final const DIM_UNITS_CM    = 'CM';
 
     /**
      * Carrier
@@ -69,7 +69,7 @@ class Shipment extends BaseShipment
      *
      * @var ShipmentRate[]
      */
-    private $_rates = [];
+    private array $_rates = [];
 
     /**
      * Packages
@@ -92,8 +92,8 @@ class Shipment extends BaseShipment
      */
     protected $plugin = null;
 
-    const ADDRESS_TYPE_BUSINESS    = 'business';
-    const ADDRESS_TYPE_RESIDENTIAL = 'residential';
+    final const ADDRESS_TYPE_BUSINESS    = 'business';
+    final const ADDRESS_TYPE_RESIDENTIAL = 'residential';
 
     /** @var array */
     protected static $addressTypes = [
@@ -129,8 +129,6 @@ class Shipment extends BaseShipment
 
     /**
      * Add package to shipment
-     *
-     * @param ShipmentPackage $package
      */
     public function addPackage(ShipmentPackage $package)
     {
@@ -181,10 +179,8 @@ class Shipment extends BaseShipment
 
     /**
      * Get warnings from shipping plugin
-     *
-     * @return array|bool
      */
-    public function getPluginWarnings()
+    public function getPluginWarnings(): array|bool
     {
         if ($this->plugin) {
             return $this->plugin->getWarnings();
@@ -263,7 +259,7 @@ class Shipment extends BaseShipment
      * @version 2019.12.20
      *
      */
-    public function rate()
+    public function rate(): \common\models\shipping\Shipment|string
     {
         if ($this->plugin === null) {
             $this->initCarrierPlugin();
@@ -312,7 +308,7 @@ class Shipment extends BaseShipment
      *
      * @return bool|array Array of warnings, grouped by plugin or false if none
      */
-    public function getWarnings()
+    public function getWarnings(): bool|array
     {
         $warnings = false;
         if ($this->plugin && ($pluginWarnings = $this->plugin->getWarnings()) !== false) {
@@ -384,7 +380,7 @@ class Shipment extends BaseShipment
      *
      *
      */
-    public function ship()
+    public function ship(): \common\models\shipping\Shipment|string
     {
         if ($this->plugin === null) {
             $this->initCarrierPlugin();
@@ -411,10 +407,8 @@ class Shipment extends BaseShipment
 
     /**
      * Get shipment master tracking number
-     *
-     * @return bool|string
      */
-    public function getMasterTracking()
+    public function getMasterTracking(): bool|string
     {
         if (!empty($this->masterTrackingNum)) {
             return $this->masterTrackingNum;

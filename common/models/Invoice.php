@@ -25,9 +25,9 @@ use frontend\models\PaymentIntent;
  */
 class Invoice extends \yii\db\ActiveRecord
 {
-    public const STATUS_UNPAID = 1;
-    public const STATUS_PAID   = 2;
-    public const STATUS_LATE   = 3;
+    final public const STATUS_UNPAID = 1;
+    final public const STATUS_PAID   = 2;
+    final public const STATUS_LATE   = 3;
 
     /**
      * {@inheritdoc}
@@ -43,7 +43,7 @@ class Invoice extends \yii\db\ActiveRecord
      */
     public static function find()
     {
-        return new InvoiceQuery(get_called_class());
+        return new InvoiceQuery(static::class);
     }
 
     /**
@@ -101,17 +101,12 @@ class Invoice extends \yii\db\ActiveRecord
     public function getStatusLabel($html = true)
     {
         $status = '';
-        switch ($this->status) {
-            case self::STATUS_UNPAID:
-                $status = $html ? '<p class="label label-primary">Unpaid</p>' : 'Unpaid';
-                break;
-            case self::STATUS_PAID:
-                $status = $html ? '<p class="label label-success">Paid</p>' : 'Paid';
-                break;
-            case self::STATUS_LATE:
-                $status = $html ? '<p class="label label-danger">Past Due</p>' : 'Past Due';
-                break;
-        }
+        $status = match ($this->status) {
+            self::STATUS_UNPAID => $html ? '<p class="label label-primary">Unpaid</p>' : 'Unpaid',
+            self::STATUS_PAID => $html ? '<p class="label label-success">Paid</p>' : 'Paid',
+            self::STATUS_LATE => $html ? '<p class="label label-danger">Past Due</p>' : 'Past Due',
+            default => $status,
+        };
 
         return $status;
     }

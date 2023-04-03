@@ -71,9 +71,7 @@ class Package extends Model
             [
                 ['weight', 'dimensions'],
                 'required',
-                'when'    => function ($model) {
-                    return $model->type == PackageType::MY_PACKAGE;
-                },
+                'when'    => fn($model) => $model->type == PackageType::MY_PACKAGE,
                 'message' => 'Package {attribute} is required.',
             ],
             [

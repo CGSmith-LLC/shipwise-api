@@ -34,8 +34,8 @@ use yii\base\Model;
 class Weight extends Model
 {
 
-    const UNITS_LB = 'LB';
-    const UNITS_KG = 'KG';
+    final const UNITS_LB = 'LB';
+    final const UNITS_KG = 'KG';
 
     protected static $unitsTypes = [
         self::UNITS_LB => self::UNITS_LB,

@@ -15,8 +15,8 @@ use Yii;
 class ApiConsumerEx extends ApiConsumer implements IdentityInterface
 {
 
-    const DATETIME_FORMAT    = 'Y-m-d H:i:s';
-    const EXPIRE_TOKEN_AFTER = 15; // Time in minutes after which the auth token will expire
+    final const DATETIME_FORMAT    = 'Y-m-d H:i:s';
+    final const EXPIRE_TOKEN_AFTER = 15; // Time in minutes after which the auth token will expire
 
     /** @inheritdoc */
     public static function findIdentity($id)
@@ -99,7 +99,7 @@ class ApiConsumerEx extends ApiConsumer implements IdentityInterface
      * @return string|\DateTime
      * @throws \Exception
      */
-    public function getTokenExpiration($formatted = true)
+    public function getTokenExpiration($formatted = true): string|\DateTime
     {
         $lastActivity = new \DateTime($this->last_activity, new \DateTimeZone("UTC"));
         $expiresOn    = $lastActivity->add(

@@ -18,16 +18,15 @@ class Carrier extends BaseCarrier
     protected const LIST_CACHE_KEY = 'carriers-list';
 
     /* Please keep synchronized with database IDs */
-    const FEDEX        = 1;
-    const UPS          = 2;
-    const USPS         = 3;
-    const DHL          = 4;
-    const AMAZON_UPS   = 5;
-    const AMAZON_FEDEX = 6;
-    const AMAZON_USPS  = 11;
+    final const FEDEX        = 1;
+    final const UPS          = 2;
+    final const USPS         = 3;
+    final const DHL          = 4;
+    final const AMAZON_UPS   = 5;
+    final const AMAZON_FEDEX = 6;
+    final const AMAZON_USPS  = 11;
 
-    /** @var array */
-    private static $shipwiseCodes = [
+    private static array $shipwiseCodes = [
         self::FEDEX        => 'FedEx',
         self::UPS          => 'UPS',
         self::USPS         => 'USPS',
@@ -37,8 +36,8 @@ class Carrier extends BaseCarrier
         self::AMAZON_USPS  => 'AMAZON_USPS',
     ];
 
-    const REPRINT_BEHAVIOUR_CREATE_NEW = 1;
-    const REPRINT_BEHAVIOUR_EXISTING   = 2;
+    final const REPRINT_BEHAVIOUR_CREATE_NEW = 1;
+    final const REPRINT_BEHAVIOUR_EXISTING   = 2;
 
     /**
      * Carriers with re-print behaviour of REPRINT_BEHAVIOUR_EXISTING.
@@ -49,7 +48,7 @@ class Carrier extends BaseCarrier
      *
      * @var int[]
      */
-    private static $reprintExisting = [
+    private static array $reprintExisting = [
         self::AMAZON_UPS,
         self::AMAZON_FEDEX,
         self::AMAZON_USPS,

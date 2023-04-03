@@ -8,8 +8,8 @@ use common\models\OrderHistory;
 
 class OrderItemChangedEvent extends Event
 {
-    public const EVENT_IS_ENABLED = true;
-    public const EVENT_ORDER_ITEM_CHANGED = 'eventOrderItemChanged';
+    final public const EVENT_IS_ENABLED = true;
+    final public const EVENT_ORDER_ITEM_CHANGED = 'eventOrderItemChanged';
 
     public Item $item;
     public array $changedAttributes;

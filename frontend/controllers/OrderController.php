@@ -406,6 +406,7 @@ class OrderController extends Controller
      */
     public function actionClone($id)
     {
+        $items = [];
         /** @var OrderForm */
         $orderToClone = Order::find()->where(['id' => $id])->one();
         $addressToClone = Address::find()->where(['id' => $orderToClone->address_id])->one();
@@ -448,6 +449,8 @@ class OrderController extends Controller
      */
     public function actionDelete($id)
     {
+        $model = null;
+        $transaction = null;
         $mailer = \Yii::$app->mailer;
         $mailer->viewPath = '@frontend/views/mail';
         $mailer->getView()->theme = \Yii::$app->view->theme;
@@ -540,7 +543,7 @@ class OrderController extends Controller
      *
      * @return array|string
      */
-    public function actionBulk()
+    public function actionBulk(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -772,7 +775,7 @@ class OrderController extends Controller
 
         $model = new OrderImport();
 
-        if (count($customers) === 1) {
+        if ((is_countable($customers) ? count($customers) : 0) === 1) {
             $model->customer = array_key_first($customers);
         }else {
             $model->load(Yii::$app->request->queryParams);
@@ -798,7 +801,7 @@ class OrderController extends Controller
                 'carriers' => Carrier::getShipwiseCodes(),
                 'services' => Service::getShipwiseCodes(),
                 'customers' => $customers,
-                'showSelectCustomer' => count($customers) > 1
+                'showSelectCustomer' => (is_countable($customers) ? count($customers) : 0) > 1
             ]
         );
     }

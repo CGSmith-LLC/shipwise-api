@@ -18,11 +18,11 @@ use yii\helpers\ArrayHelper;
 class Pagination extends Behavior
 {
 
-    const PAGE_NUMBER = 0;
-    const PAGE_SIZE   = 10;
+    final const PAGE_NUMBER = 0;
+    final const PAGE_SIZE   = 10;
 
-    CONST PAGE_SIZE_MIN = 0;
-    const PAGE_SIZE_MAX = 1000;
+    final CONST PAGE_SIZE_MIN = 0;
+    final const PAGE_SIZE_MAX = 1000;
 
     /** @var pagination */
     public $pagination;

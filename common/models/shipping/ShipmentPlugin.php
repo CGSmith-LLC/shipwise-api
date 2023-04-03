@@ -191,7 +191,7 @@ abstract class ShipmentPlugin extends ShipmentConnection
      *
      * @return array|bool Warnings, or false if none
      */
-    public function getWarnings()
+    public function getWarnings(): array|bool
     {
         return $this->warnings;
     }
@@ -205,9 +205,9 @@ abstract class ShipmentPlugin extends ShipmentConnection
      *
      * @return null
      */
-    protected function get(array $array, $key, $default = null)
+    protected function get(array $array, $key, mixed $default = null)
     {
-        return isset($array[$key]) ? $array[$key] : $default;
+        return $array[$key] ?? $default;
     }
 
     /**

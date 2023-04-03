@@ -21,12 +21,12 @@ class ShopifyService extends BaseEcommerceService
     /**
      * Meta data stored in IntegrationMeta
      */
-    public const META_URL = 'url';
-    public const META_API_KEY = 'api_key';
-    public const META_API_SECRET = 'api_secret';
+    final public const META_URL = 'url';
+    final public const META_API_KEY = 'api_key';
+    final public const META_API_SECRET = 'api_secret';
 
-    public const API_VERISON = "2021-04";
-    public const BASE_SHOPIFY_URL = 'admin/api/' . self::API_VERISON . '/';
+    final public const API_VERISON = "2021-04";
+    final public const BASE_SHOPIFY_URL = 'admin/api/' . self::API_VERISON . '/';
 
     /**
      * Ingest an array of the meta data for the service and apply to internal objects where needed

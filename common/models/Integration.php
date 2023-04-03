@@ -27,12 +27,12 @@ class Integration extends ActiveRecord
     /**
      * Add new status to generateActionList() method below
      */
-    const DISABLED = 0; // Disabled for billing
-    const PENDING = 1; // Have not connected yet but will attempt
-    const VERIFYING = 2; // currently verifying connection
-    const INACTIVE = 3; // customer disabled
-    const ERROR = 4; // could not connect
-    const ACTIVE = 5; // successfully connected and querying orders
+    final const DISABLED = 0; // Disabled for billing
+    final const PENDING = 1; // Have not connected yet but will attempt
+    final const VERIFYING = 2; // currently verifying connection
+    final const INACTIVE = 3; // customer disabled
+    final const ERROR = 4; // could not connect
+    final const ACTIVE = 5; // successfully connected and querying orders
 
     /** @inheritDoc */
     public static function tableName(): string

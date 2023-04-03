@@ -16,12 +16,12 @@ use Yii;
 class BulkAction extends BaseBulkAction
 {
 
-    const STATUS_PROCESSING = 0;
-    const STATUS_COMPLETED  = 1;
-    const STATUS_ERROR      = 2;
+    final const STATUS_PROCESSING = 0;
+    final const STATUS_COMPLETED  = 1;
+    final const STATUS_ERROR      = 2;
 
-    const PRINT_MODE_QZ  = 1; // Print using qz plugin (thermal printer)
-    const PRINT_MODE_PDF = 2; // Print as one combined PDF file
+    final const PRINT_MODE_QZ  = 1; // Print using qz plugin (thermal printer)
+    final const PRINT_MODE_PDF = 2; // Print as one combined PDF file
 
     /** @inheritdoc */
     public function beforeSave($insert)
@@ -96,10 +96,10 @@ class BulkAction extends BaseBulkAction
     }
 
     /**
-     * @return bool|\DateInterval
+     * @return \DateInterval
      * @throws \Exception
      */
-    public function processingSince()
+    public function processingSince(): \DateInterval
     {
         $startedAt = new \DateTime($this->created_on);
         return $startedAt->diff(new \DateTime("now"));

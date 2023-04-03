@@ -56,9 +56,7 @@ $this->registerJs('$(".masked-button").on("click", function(event){
             'endpoint',
             [
                 'attribute' => 'authentication_type',
-                'value' => function ($model) {
-                    return $model->authenticationOptions[$model->authentication_type];
-                }
+                'value' => fn($model) => $model->authenticationOptions[$model->authentication_type]
             ],
             [
                 'attribute' => 'triggers',
@@ -77,17 +75,15 @@ $this->registerJs('$(".masked-button").on("click", function(event){
             [
                 'attribute' => 'pass',
                 'format' => 'raw',
-                'value' => function ($model) {
-                    return Html::tag(
-                        'div',
-                        Html::tag('p', $model->getMasked('pass'), [
-                            'class' => 'masked',
-                            'data-mask' => $model->getMasked('pass'),
-                            'data-content' => $model->pass
-                        ]) . Html::button('Show', ['class' => 'btn btn-sm masked-button']),
-                        ['style' => ['display' => 'flex']]
-                    );
-                }
+                'value' => fn($model) => Html::tag(
+                    'div',
+                    Html::tag('p', $model->getMasked('pass'), [
+                        'class' => 'masked',
+                        'data-mask' => $model->getMasked('pass'),
+                        'data-content' => $model->pass
+                    ]) . Html::button('Show', ['class' => 'btn btn-sm masked-button']),
+                    ['style' => ['display' => 'flex']]
+                )
             ],
             [
                 'attribute' => 'signing_secret',
@@ -99,23 +95,19 @@ $this->registerJs('$(".masked-button").on("click", function(event){
                         ],
                     ]),
                 'format' => 'raw',
-                'value' => function ($model) {
-                    return Html::tag(
-                        'div',
-                        Html::tag('p', $model->getMasked('signing_secret'), [
-                            'class' => 'masked',
-                            'data-mask' => $model->getMasked('signing_secret'),
-                            'data-content' => $model->signing_secret
-                        ]) . Html::button('Show', ['class' => 'btn btn-sm masked-button']),
-                        ['style' => ['display' => 'flex']]
-                    );
-                }
+                'value' => fn($model) => Html::tag(
+                    'div',
+                    Html::tag('p', $model->getMasked('signing_secret'), [
+                        'class' => 'masked',
+                        'data-mask' => $model->getMasked('signing_secret'),
+                        'data-content' => $model->signing_secret
+                    ]) . Html::button('Show', ['class' => 'btn btn-sm masked-button']),
+                    ['style' => ['display' => 'flex']]
+                )
             ],
             [
                 'attribute' => 'active',
-                'value' => function ($model) {
-                    return ($model->active) ? 'Enabled' : 'Disabled';
-                }
+                'value' => fn($model) => ($model->active) ? 'Enabled' : 'Disabled'
             ],
             'created_at:datetime',
             'updated_at:datetime',
@@ -135,16 +127,12 @@ $this->registerJs('$(".masked-button").on("click", function(event){
             [
                 'attribute' => 'status_code',
                 'format' => 'raw',
-                'value' => function ($model) {
-                    return $model->getLabelFor('status_code');
-                }
+                'value' => fn($model) => $model->getLabelFor('status_code')
             ],
             [
                 'attribute' => 'response',
                 'format' => 'raw',
-                'value' => function ($model) {
-                    return $model->getModalForView();
-                }
+                'value' => fn($model) => $model->getModalForView()
             ],
         ]
     ]);

@@ -18,13 +18,13 @@ class Status extends BaseStatus
     protected const LIST_CACHE_KEY = 'statuses-list';
 
     /* Please keep synchronized with db values! */
-    const SHIPPED = 1;
-    const ON_HOLD = 6;
-    const CANCELLED = 7;
-    const PENDING = 8;
-    const OPEN = 9;
-    const WMS_ERROR = 10;
-    const COMPLETED = 11;
+    final const SHIPPED = 1;
+    final const ON_HOLD = 6;
+    final const CANCELLED = 7;
+    final const PENDING = 8;
+    final const OPEN = 9;
+    final const WMS_ERROR = 10;
+    final const COMPLETED = 11;
 
     public function init(): void
     {

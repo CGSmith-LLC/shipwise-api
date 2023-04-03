@@ -8,8 +8,8 @@ use common\models\OrderHistory;
 
 class OrderStatusChangedEvent extends Event
 {
-    public const EVENT_IS_ENABLED = true;
-    public const EVENT_ORDER_STATUS_CHANGED = 'eventOrderStatusChanged';
+    final public const EVENT_IS_ENABLED = true;
+    final public const EVENT_ORDER_STATUS_CHANGED = 'eventOrderStatusChanged';
 
     public Order $order;
     public int $oldStatusId;

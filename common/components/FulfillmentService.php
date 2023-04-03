@@ -8,9 +8,9 @@ use common\models\Order;
 
 class FulfillmentService extends \yii\base\Component
 {
-    const EVENT_BEFORE_FULFILLMENT_SEND = 'fulfillmentSend';
-    const EVENT_AFTER_FULFILLMENT_CREATE = 'fulfillmentCreate';
-    const EVENT_FULFILLMENT_ERROR = 'fulfillmentError';
+    final const EVENT_BEFORE_FULFILLMENT_SEND = 'fulfillmentSend';
+    final const EVENT_AFTER_FULFILLMENT_CREATE = 'fulfillmentCreate';
+    final const EVENT_FULFILLMENT_ERROR = 'fulfillmentError';
 
     public $api;
 
@@ -35,7 +35,7 @@ class FulfillmentService extends \yii\base\Component
         try {
             $this->api->send($order);
             $this->trigger(self::EVENT_AFTER_FULFILLMENT_CREATE);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $this->trigger(self::EVENT_FULFILLMENT_ERROR);
         }
     }

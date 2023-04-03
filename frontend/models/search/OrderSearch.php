@@ -144,7 +144,7 @@ class OrderSearch extends Order
         $this->load($params);
 
         // For a better DB query performance, only join relations if user is searching or sorting related models.
-        if ($this->address || (isset($params['sort']) && strpos($params['sort'], 'address') !== false)) {
+        if ($this->address || (isset($params['sort']) && str_contains((string) $params['sort'], 'address'))) {
             $query->joinWith(['address']);
         }
 

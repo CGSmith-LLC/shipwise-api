@@ -19,9 +19,9 @@ use yii\helpers\ArrayHelper;
 
 class DudaAdapter extends Component
 {
-    const EVENT_BEFORE_PARSE = 'beforeParse';
-    const EVENT_BEFORE_ITEM_PARSE = 'beforeItemParse';
-    const EVENT_AFTER_PARSE = 'afterParse';
+    final const EVENT_BEFORE_PARSE = 'beforeParse';
+    final const EVENT_BEFORE_ITEM_PARSE = 'beforeItemParse';
+    final const EVENT_AFTER_PARSE = 'afterParse';
 
     public int $customer_id;
 
@@ -31,7 +31,8 @@ class DudaAdapter extends Component
      */
     public function parseOrder($unparsedOrder)
     {
-        $unparsedOrder = json_decode($unparsedOrder, true);
+        $items = [];
+        $unparsedOrder = json_decode($unparsedOrder, true, 512, JSON_THROW_ON_ERROR);
         $model = new OrderForm();
         $model->order = new Order();
         $model->address = new Address();

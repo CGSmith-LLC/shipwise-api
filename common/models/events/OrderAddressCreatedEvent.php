@@ -8,8 +8,8 @@ use common\models\OrderHistory;
 
 class OrderAddressCreatedEvent extends Event
 {
-    public const EVENT_IS_ENABLED = true;
-    public const EVENT_ORDER_ADDRESS_CREATED = 'eventOrderAddressCreated';
+    final public const EVENT_IS_ENABLED = true;
+    final public const EVENT_ORDER_ADDRESS_CREATED = 'eventOrderAddressCreated';
 
     public Order $order;
 
