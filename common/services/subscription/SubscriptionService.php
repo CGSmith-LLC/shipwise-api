@@ -3,7 +3,8 @@
 namespace common\services\subscription;
 
 use Yii;
-use Stripe\StripeClient;
+use Stripe\Exception\SignatureVerificationException;
+use Stripe\{StripeClient, Stripe, Webhook};
 use common\models\Customer;
 
 /**
@@ -12,6 +13,8 @@ use common\models\Customer;
  */
 class SubscriptionService
 {
+    public const CHECKOUT_SESSION_COMPLETED_WEBHOOK_EVENT = 'checkout.session.completed';
+
     protected Customer $customer;
     protected StripeClient $stripeClient;
 
@@ -37,5 +40,22 @@ class SubscriptionService
     public function createStripeCustomer()
     {
 
+    }
+
+    ###############
+    ## Webhooks: ##
+    ###############
+
+    /**
+     * @throws SignatureVerificationException
+     */
+    public static function isWebhookVerified(string $payload, string $signatureHeader): bool
+    {
+        Stripe::setApiKey(Yii::$app->params['stripe']['secret_key']);
+        $endpointSecret = Yii::$app->params['stripe']['webhook_signing_secret'];
+
+        $event = Webhook::constructEvent($payload, $signatureHeader, $endpointSecret);
+
+        return (bool)$event;
     }
 }
