@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\services\subscription\SubscriptionService;
+use console\jobs\subscription\stripe\StripeCheckoutSessionCompletedJob;
 use Stripe\Exception\SignatureVerificationException;
 use Yii;
 use yii\web\{Response, BadRequestHttpException, ServerErrorHttpException};
@@ -24,6 +25,19 @@ class SubscriptionWebhookController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         return parent::beforeAction($action);
     }
+
+//    public function actionTest()
+//    {
+//        $wh = SubscriptionWebhook::findOne(6);
+//        $arrayPayload = Json::decode($wh->payload);
+//
+//        \Yii::$app->queue->push(
+//            new StripeCheckoutSessionCompletedJob([
+//                'payload' => $arrayPayload,
+//                'subscriptionWebhookId' => $wh->id
+//            ])
+//        );
+//    }
 
     /**
      * @throws ServerErrorHttpException
@@ -47,7 +61,7 @@ class SubscriptionWebhookController extends Controller
             throw new ServerErrorHttpException('Event type is not valid.');
         }
 
-        $subscriptionWebhook = $this->getNewSubscriptionWebhookObject(SubscriptionWebhook::PAYMENT_METHOD_STRIPE);
+        $subscriptionWebhook = $this->getNewSubscriptionWebhookObject(SubscriptionService::PAYMENT_METHOD_STRIPE);
         $subscriptionWebhook->event = $data['type'];
         $subscriptionWebhook->payload = Yii::$app->request->rawBody;
 

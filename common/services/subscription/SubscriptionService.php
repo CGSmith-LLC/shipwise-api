@@ -4,8 +4,9 @@ namespace common\services\subscription;
 
 use Yii;
 use Stripe\Exception\SignatureVerificationException;
-use Stripe\{StripeClient, Stripe, Webhook};
-use common\models\Customer;
+use Stripe\{Exception\ApiErrorException, Product, StripeClient, Stripe, Subscription, Webhook};
+use frontend\models\Customer;
+use common\models\SubscriptionHistory;
 
 /**
  * Class SubscriptionService
@@ -13,6 +14,7 @@ use common\models\Customer;
  */
 class SubscriptionService
 {
+    public const PAYMENT_METHOD_STRIPE = 'stripe';
     public const CHECKOUT_SESSION_COMPLETED_WEBHOOK_EVENT = 'checkout.session.completed';
 
     protected Customer $customer;
@@ -24,6 +26,10 @@ class SubscriptionService
         $this->stripeClient = new StripeClient(Yii::$app->params['stripe']['secret_key']);
     }
 
+    ###########################
+    ## Getters and checkers: ##
+    ###########################
+
     public function getCustomer(): Customer
     {
         return $this->customer;
@@ -34,12 +40,36 @@ class SubscriptionService
         return 0;
     }
 
-    /**
-     * @see https://stripe.com/docs/billing/subscriptions/build-subscriptions?ui=elements#create-customer
-     */
-    public function createStripeCustomer()
+    public function getActiveSubscription()
     {
+        return SubscriptionHistory::find()
+            ->where([
+                'payment_method' => SubscriptionService::PAYMENT_METHOD_STRIPE,
+                'customer_id' => $this->customer->id,
+                'is_active' => SubscriptionHistory::IS_TRUE
+            ])
+            ->orderBy(['id' => SORT_DESC])
+            ->one();
+    }
 
+    ##########
+    ## API: ##
+    ##########
+
+    /**
+     * @throws ApiErrorException
+     */
+    public function getProductObjectById(string $id): Product
+    {
+        return $this->stripeClient->products->retrieve($id);
+    }
+
+    /**
+     * @throws ApiErrorException
+     */
+    public function getSubscriptionObjectById(string $id): Subscription
+    {
+        return $this->stripeClient->subscriptions->retrieve($id);
     }
 
     ###############
@@ -57,5 +87,15 @@ class SubscriptionService
         $event = Webhook::constructEvent($payload, $signatureHeader, $endpointSecret);
 
         return (bool)$event;
+    }
+
+    ##############
+    ## History: ##
+    ##############
+
+    public function addSubscriptionHistory(array $params): bool
+    {
+        $subscriptionHistory = new SubscriptionHistory($params);
+        return $subscriptionHistory->save();
     }
 }

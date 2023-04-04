@@ -2,19 +2,8 @@
 
 namespace common\models\base;
 
-use Aws\Result;
-use common\models\Customer;
-use Stripe\Event;
-use Stripe\Exception\ApiErrorException;
-use Stripe\Stripe;
 use Yii;
-use yii\base\ErrorException;
-use yii\db\StaleObjectException;
-use yii\web\NotFoundHttpException;
-use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
-use \bpsys\yii2\aws\s3\traits\S3MediaTrait;
-
 
 /**
  * This is the model class for table "customers".
@@ -51,69 +40,7 @@ class BaseCustomer extends \yii\db\ActiveRecord
     public function init()
     {
         parent::init();
-
-//        if (!YII_ENV_DEV) {
-//             Configure events to call Stripe
-        $this->on(self::EVENT_BEFORE_INSERT, [$this, 'stripeCreate']);
-        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'stripeUpdate']);
-        $this->on(self::EVENT_BEFORE_DELETE, [$this, 'stripeDelete']);
-    }
-//    }
-
-    /**
-     * Call stripe to create the customer and set our attribute to the stripe token
-     *
-     * @return void
-     * @throws \Stripe\Exception\ApiErrorException
-     */
-    public function stripeCreate($event)
-    {
-        try {
-            $customer = \Stripe\Customer::create([
-                'name' => $event->sender->name,
-            ]);
-
-            /** @var $customer Customer */
-            $this->setAttribute('stripe_customer_id', $customer->id);
-        } catch (ErrorException $e) {
-            Yii::error($e);
-            throw new ServerErrorHttpException('Failed to create stripe customer');
-
-        }
-    }
-
-    /**
-     * @param $event Event
-     * @throws ApiErrorException
-     */
-    public function stripeUpdate($event)
-    {
-        try {
-            \Stripe\Customer::update(
-                $event->sender->stripe_customer_id,
-                [
-                    'name' => $event->sender->name,
-                ]);
-        } catch (ErrorException $e) {
-            Yii::error($e);
-            throw new ServerErrorHttpException('Customer not updated on stripe');
-        }
-    }
-
-
-    /**
-     * @param $event Event
-     * @throws ApiErrorException
-     */
-    public function stripeDelete($event)
-    {
-        try {
-            $customer = \Stripe\Customer::retrieve($event->sender->stripe_customer_id);
-            $customer->delete();
-        } catch (ErrorException $e) {
-            Yii::error($e);
-            throw new NotFoundHttpException('Customer not found on stripe');
-        }
+        // ...
     }
 
     /**

@@ -9,8 +9,6 @@ use yii\helpers\Json;
 
 class SubscriptionWebhook extends BaseSubscriptionWebhook
 {
-    public const PAYMENT_METHOD_STRIPE = 'stripe';
-
     public const STATUS_RECEIVED = 'received';
     public const STATUS_PROCESSING = 'processing';
     public const STATUS_SUCCESS = 'success';
@@ -83,9 +81,10 @@ class SubscriptionWebhook extends BaseSubscriptionWebhook
         }
     }
 
-    public function setFailed(bool $withSave = true): void
+    public function setFailed(bool $withSave = true, string $meta = null): void
     {
         $this->status = self::STATUS_FAILED;
+        $this->meta = $meta;
 
         if ($withSave) {
             $this->save();
