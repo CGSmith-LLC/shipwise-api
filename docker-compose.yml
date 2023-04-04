@@ -4,50 +4,35 @@ services:
 
   frontend:
     build: frontend
-    ports:
-      - 30000:80
+    environment:
+      COMPOSER_HOME: /opt/composer
+      PHP_ENABLE_XDEBUG: 1
     volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
       # Mount source-code for development
       - ./:/app
 
   api:
     build: api
-    ports:
-      - 30001:80
+    environment:
+      COMPOSER_HOME: /opt/composer
+      PHP_ENABLE_XDEBUG: 1
     volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      # Mount source-code for development
-      - ./:/app
-
-  shopify:
-    build: shopify
-    ports:
-      - 30004:80
-    volumes:
-      # Re-use local composer cache via host-volume
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
       # Mount source-code for development
       - ./:/app
 
   mysql:
     image: mysql:8
+    entrypoint: ['docker-entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
     environment:
       MYSQL_ROOT_PASSWORD: 123
       MYSQL_DATABASE: cgsmpoim_shipwise
       MYSQL_USER: app
       MYSQL_PASSWORD: 123
-    ports:
-      - "30002:3306"
     volumes:
       - ./mysql-data/var/lib/mysql:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    ports:
-      - '30003:80'
     environment:
       PMA_HOST: mysql
       PMA_USER: app

@@ -6,8 +6,11 @@
 # Remove this suite if you don't use frameworks
 
 actor: FunctionalTester
+bootstrap: bootstrap.php
 modules:
     enabled:
-        # add a framework module here
+        - Db
+        # Yii2 module must be loaded after Db module to make sure fixtures are not overwritten by Db dump
+        - Yii2
         - \Helper\Functional
     step_decorators: ~        

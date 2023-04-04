@@ -1,8 +1,8 @@
 <?php
 
-namespace tests\acceptance;
+namespace tests\functional;
 
-use AcceptanceTester;
+use FunctionalTester;
 
 /**
  * Class NotSignedInCest
@@ -60,17 +60,20 @@ class NotSignedInCest
         '/order/bulk',
     ];
 
-    public function _before(AcceptanceTester $i)
+    public function _before(FunctionalTester $i)
     {
     }
 
     // tests
-    public function tryToTest(AcceptanceTester $i)
+    public function tryToTestPagesRequireLogin(FunctionalTester $i)
     {
         foreach (self::$urls as $url) {
             $i->amOnPage($url);
             $i->see('Sign in');
         }
+
+        $i->haveInDatabase('country', ['name' => "Di", 'abbreviation' => 'D1']);
+        $i->seeInDatabase('country', ['abbreviation' => 'D1']);
     }
 
 }

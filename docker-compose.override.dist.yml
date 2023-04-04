@@ -1,0 +1,43 @@
+version: '3.2'
+
+services:
+
+  frontend:
+    ports:
+      - 30000:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/opt/composer/cache:delegated
+    extra_hosts: # https://stackoverflow.com/a/67158212/1106908
+      - "host.docker.internal:host-gateway"
+
+  api:
+    ports:
+      - 30001:80
+    volumes:
+      # Re-use local composer cache via host-volume
+      - ~/.composer-docker/cache:/opt/composer/cache:delegated
+    extra_hosts: # https://stackoverflow.com/a/67158212/1106908
+      - "host.docker.internal:host-gateway"
+
+
+  mysql:
+    ports:
+      - "30002:3306"
+
+  phpmyadmin:
+    ports:
+      - '30003:80'
+
+  selenium:
+    # image: selenium/standalone-firefox:3.141.59-iron
+    image: selenium/standalone-firefox-debug:3.141.59-iron # use the debug image to enable VNC viewer
+    expose:
+      - 4444 # selenium server
+      - 5900 # VNC, connect to  localhost:35900  to view the selenium browser in VNC, password: secret
+    #timeout 10s sh -c "while ! nc -z localhost 4444; do sleep 0.1 ; done"
+    ports:
+      - 35900:5900
+    shm_size: 2G
+    tmpfs:
+      - /tmp
