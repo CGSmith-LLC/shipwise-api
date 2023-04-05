@@ -5,6 +5,7 @@ namespace common\models;
 use common\models\base\BaseSubscriptionWebhook;
 use common\services\subscription\SubscriptionService;
 use console\jobs\subscription\stripe\StripeCheckoutSessionCompletedJob;
+use console\jobs\subscription\stripe\StripeCustomerSubscriptionDeletedJob;
 use yii\helpers\Json;
 
 class SubscriptionWebhook extends BaseSubscriptionWebhook
@@ -97,15 +98,20 @@ class SubscriptionWebhook extends BaseSubscriptionWebhook
 
     protected function createJob(): void
     {
-        $arrayPayload = Json::decode($this->payload);
+        $jobDataArray = [
+            'payload' => Json::decode($this->payload),
+            'subscriptionWebhookId' => $this->id
+        ];
 
         switch ($this->event) {
             case SubscriptionService::CHECKOUT_SESSION_COMPLETED_WEBHOOK_EVENT:
                 \Yii::$app->queue->push(
-                    new StripeCheckoutSessionCompletedJob([
-                        'payload' => $arrayPayload,
-                        'subscriptionWebhookId' => $this->id
-                    ])
+                    new StripeCheckoutSessionCompletedJob($jobDataArray)
+                );
+                break;
+            case SubscriptionService::CUSTOMER_SUBSCRIPTION_DELETED_WEBHOOK_EVENT:
+                \Yii::$app->queue->push(
+                    new StripeCustomerSubscriptionDeletedJob($jobDataArray)
                 );
                 break;
         }

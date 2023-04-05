@@ -9,6 +9,8 @@ Once you have a **[Customer](https://stripe.com/docs/api/customers/object)** tha
 Instead, separately, you can let your existing customers manage their subscriptions with the **Customer Portal** [here](https://stripe.com/docs/customer-management) which has a full Stripe redirect page.
 You can [pass](https://stripe.com/docs/api/customer_portal/configurations/create#create_portal_configuration-features-subscription_update-products-prices) the **list of Price ids** when creating the portal configuration so your customers can upgrade or downgrade to different prices.
 
+Set the page `/subscription?action=subscribed` as the **page for redirect** from Stripe after a successful subscription.
+
 ## How to test webhooks:
 
 1. Download **Stripe CLI** to your local machine. See [stripe.com/docs/stripe-cli](https://stripe.com/docs/stripe-cli).
@@ -42,14 +44,6 @@ Choose the **following events**:
 - customer.subscription.paused
 - customer.subscription.resumed
 - customer.subscription.updated
-- invoice.created
-- invoice.finalized
-- invoice.finalization_failed
-- invoice.paid
-- invoice.payment_action_required
-- invoice.payment_failed
-- invoice.upcoming
-- invoice.updated
 - payment_intent.created
 - payment_intent.succeeded
 
@@ -79,6 +73,10 @@ See [stripe.com/docs/testing](https://stripe.com/docs/testing).
 
 - https://github.com/stripe/stripe-php
 - https://stripe.com/docs/api?lang=php
+- https://stripe.com/docs/api/products/object
+- https://stripe.com/docs/api/checkout/sessions/object
+- https://stripe.com/docs/api/subscriptions/object
+- https://stripe.com/docs/api/plans/object
 
 *Common:*
 
