@@ -11,7 +11,11 @@
 ?>
 
 <div>
-    <?php if (!$subscriptionService->hasActiveSubscription()) { ?>
+    <?php if (Yii::$app->request->get('action') == 'subscribed') { ?>
+        <?= $this->render('_thanks') ?>
+    <?php } ?>
+
+    <?php if (!$subscriptionService->getActiveSubscription()) { ?>
         <?= $this->render('_stripe-widget', [
             'subscriptionService' => $subscriptionService,
         ]) ?>

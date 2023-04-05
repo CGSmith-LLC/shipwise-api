@@ -40,17 +40,21 @@ class StripeCheckoutSessionCompletedJob extends BaseObject implements RetryableJ
         if ($this->subscriptionWebhook->isReceived()) {
             $this->subscriptionWebhook->setProcessing();
 
-            try {
-                $this->setCustomer();
-                $this->setSubscriptionService();
+            if ($this->isPaid()) {
+                try {
+                    $this->setCustomer();
+                    $this->setSubscriptionService();
 
-                $this->updateStripeCustomerId();
-                $this->addSubscriptionHistory();
+                    $this->updateStripeCustomerId();
+                    $this->addSubscription();
 
-                $this->subscriptionWebhook->setSuccess();
-            } catch (\Exception $e) {
-                $error = serialize($e);
-                $this->subscriptionWebhook->setFailed(true, $error);
+                    $this->subscriptionWebhook->setSuccess();
+                } catch (\Exception $e) {
+                    $error = serialize($e);
+                    $this->subscriptionWebhook->setFailed(true, $error);
+                }
+            } else {
+                $this->subscriptionWebhook->setFailed(true, 'payment_status != paid');
             }
         }
     }
@@ -88,6 +92,11 @@ class StripeCheckoutSessionCompletedJob extends BaseObject implements RetryableJ
         $this->subscriptionService = new SubscriptionService($this->customer);
     }
 
+    protected function isPaid(): bool
+    {
+        return $this->payload['data']['object']['payment_status'] == 'paid';
+    }
+
     protected function updateStripeCustomerId(): void
     {
         $this->customer->stripe_customer_id = $this->payload['data']['object']['customer'];
@@ -98,7 +107,7 @@ class StripeCheckoutSessionCompletedJob extends BaseObject implements RetryableJ
      * @throws ServerErrorHttpException
      * @throws ApiErrorException
      */
-    protected function addSubscriptionHistory(): void
+    protected function addSubscription(): void
     {
         /**
          * @var $stripeSubscriptionObject Subscription
@@ -112,7 +121,7 @@ class StripeCheckoutSessionCompletedJob extends BaseObject implements RetryableJ
         $product = $this->subscriptionService->getProductObjectById($plan->product);
         $price = $subscription->price;
 
-        $res = $this->subscriptionService->addSubscriptionHistory([
+        $activeSubscription = $this->subscriptionService->addSubscription([
             'customer_id' => $this->customer->id,
             'payment_method' => SubscriptionService::PAYMENT_METHOD_STRIPE,
             'payment_method_subscription_id' => $stripeSubscriptionObject->id,
@@ -128,9 +137,11 @@ class StripeCheckoutSessionCompletedJob extends BaseObject implements RetryableJ
             'meta' => $stripeSubscriptionObject->toJSON()
         ]);
 
-        if (!$res) {
+        if (!$activeSubscription) {
             throw new ServerErrorHttpException('Subscription history not saved.');
         }
+
+        $this->subscriptionService->makeSubscriptionsInactive($activeSubscription);
     }
 
     public function canRetry($attempt, $error): bool
