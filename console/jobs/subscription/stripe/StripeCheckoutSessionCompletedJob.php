@@ -2,13 +2,11 @@
 
 namespace console\jobs\subscription\stripe;
 
-use yii\base\BaseObject;
-use yii\queue\RetryableJobInterface;
 use Stripe\Exception\ApiErrorException;
 use frontend\models\Customer;
 use common\services\subscription\SubscriptionService;
 use Stripe\{Plan, Price, Subscription, SubscriptionItem};
-use common\models\{SubscriptionWebhook, SubscriptionHistory};
+use common\models\SubscriptionHistory;
 use yii\web\{ServerErrorHttpException, NotFoundHttpException};
 
 /**
@@ -21,25 +19,16 @@ use yii\web\{ServerErrorHttpException, NotFoundHttpException};
  * @see https://stripe.com/docs/payments/checkout/fulfill-orders#fulfill
  * @see https://stripe.com/docs/no-code/pricing-table#handle-fulfillment-with-the-stripe-api
  */
-class StripeCheckoutSessionCompletedJob extends BaseObject implements RetryableJobInterface
+class StripeCheckoutSessionCompletedJob extends BaseStripeJob
 {
-    public array $payload;
-    public int $subscriptionWebhookId;
-
-    protected ?SubscriptionWebhook $subscriptionWebhook = null;
     protected ?Customer $customer = null;
     protected ?SubscriptionService $subscriptionService = null;
 
-    /**
-     * @throws NotFoundHttpException
-     */
     public function execute($queue): void
     {
-        $this->setSubscriptionWebhook();
+        parent::execute($queue);
 
-        if ($this->subscriptionWebhook->isReceived()) {
-            $this->subscriptionWebhook->setProcessing();
-
+        if ($this->isExecutable()) {
             if ($this->isPaid()) {
                 try {
                     $this->setCustomer();
@@ -57,20 +46,6 @@ class StripeCheckoutSessionCompletedJob extends BaseObject implements RetryableJ
                 $this->subscriptionWebhook->setFailed(true, 'payment_status != paid');
             }
         }
-    }
-
-    /**
-     * @throws NotFoundHttpException
-     */
-    protected function setSubscriptionWebhook(): void
-    {
-        $subscriptionWebhook = SubscriptionWebhook::findOne($this->subscriptionWebhookId);
-
-        if (!$subscriptionWebhook) {
-            throw new NotFoundHttpException('Subscription webhook not found.');
-        }
-
-        $this->subscriptionWebhook = $subscriptionWebhook;
     }
 
     /**
@@ -142,15 +117,5 @@ class StripeCheckoutSessionCompletedJob extends BaseObject implements RetryableJ
         }
 
         $this->subscriptionService->makeSubscriptionsInactive($activeSubscription);
-    }
-
-    public function canRetry($attempt, $error): bool
-    {
-        return ($attempt < 3);
-    }
-
-    public function getTtr(): int
-    {
-        return 5 * 60;
     }
 }
