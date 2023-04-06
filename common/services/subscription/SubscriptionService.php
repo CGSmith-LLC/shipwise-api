@@ -41,17 +41,6 @@ class SubscriptionService
         return $this->customer;
     }
 
-    public function getAllSubscriptions(array $orderBy = ['id' => SORT_DESC]): array|null
-    {
-        return SubscriptionHistory::find()
-            ->where([
-                'payment_method' => SubscriptionService::PAYMENT_METHOD_STRIPE,
-                'customer_id' => $this->customer->id
-            ])
-            ->orderBy($orderBy)
-            ->all();
-    }
-
     public function getActiveSubscription(): SubscriptionHistory|null
     {
         if (!$this->activeSubscription) {
@@ -66,6 +55,76 @@ class SubscriptionService
         }
 
         return $this->activeSubscription;
+    }
+
+    public function getSubscriptionByPaymentMethodSubscriptionId(string $paymentMethodSubscriptionId): bool|SubscriptionHistory
+    {
+        /**
+         * @var $subscription SubscriptionHistory
+         */
+        $subscription = SubscriptionHistory::find()
+            ->where([
+                'payment_method_subscription_id' => $paymentMethodSubscriptionId,
+                'customer_id' => $this->customer->id
+            ])
+            ->one();
+
+        return $subscription;
+    }
+
+    public function getAllSubscriptions(array $orderBy = ['id' => SORT_DESC]): array|null
+    {
+        return SubscriptionHistory::find()
+            ->where([
+                'payment_method' => SubscriptionService::PAYMENT_METHOD_STRIPE,
+                'customer_id' => $this->customer->id
+            ])
+            ->orderBy($orderBy)
+            ->all();
+    }
+
+    ##############
+    ## History: ##
+    ##############
+
+    public function addSubscription(array $params): bool|SubscriptionHistory
+    {
+        $subscription = new SubscriptionHistory($params);
+        return ($subscription->save()) ? $subscription : false;
+    }
+
+    public function updateSubscription(string $paymentMethodSubscriptionId, array $params): bool|SubscriptionHistory
+    {
+        /**
+         * @var $subscription SubscriptionHistory
+         */
+        $subscription = SubscriptionHistory::find()
+            ->where([
+                'payment_method_subscription_id' => $paymentMethodSubscriptionId,
+                'customer_id' => $this->customer->id
+            ])
+            ->one();
+
+        if ($subscription) {
+            $subscription->attributes = $params;
+            return ($subscription->save()) ? $subscription : false;
+        }
+
+        return false;
+    }
+
+    public function makeSubscriptionsInactive(?SubscriptionHistory $currentActiveSubscription = null): void
+    {
+        $allSubscriptions = $this->getAllSubscriptions();
+
+        /**
+         * @var $subscription SubscriptionHistory
+         */
+        foreach ($allSubscriptions as $subscription) {
+            if ($currentActiveSubscription && $subscription->id != $currentActiveSubscription->id) {
+                $subscription->makeInactive();
+            }
+        }
     }
 
     ##########
@@ -111,29 +170,5 @@ class SubscriptionService
         $event = Webhook::constructEvent($payload, $signatureHeader, $endpointSecret);
 
         return (bool)$event;
-    }
-
-    ##############
-    ## History: ##
-    ##############
-
-    public function addSubscription(array $params): bool|SubscriptionHistory
-    {
-        $subscription = new SubscriptionHistory($params);
-        return ($subscription->save()) ? $subscription : false;
-    }
-
-    public function makeSubscriptionsInactive(?SubscriptionHistory $currentActiveSubscription = null): void
-    {
-        $allSubscriptions = $this->getAllSubscriptions();
-
-        /**
-         * @var $subscription SubscriptionHistory
-         */
-        foreach ($allSubscriptions as $subscription) {
-            if ($currentActiveSubscription && $subscription->id != $currentActiveSubscription->id) {
-                $subscription->makeInactive();
-            }
-        }
     }
 }
