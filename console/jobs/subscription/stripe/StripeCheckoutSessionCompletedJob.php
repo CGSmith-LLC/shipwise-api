@@ -2,12 +2,11 @@
 
 namespace console\jobs\subscription\stripe;
 
-use Stripe\Exception\ApiErrorException;
-use frontend\models\Customer;
 use common\services\subscription\SubscriptionService;
 use Stripe\{Plan, Price, Subscription, SubscriptionItem};
 use common\models\SubscriptionHistory;
-use yii\web\{ServerErrorHttpException, NotFoundHttpException};
+use yii\web\ServerErrorHttpException;
+use Stripe\Exception\ApiErrorException;
 
 /**
  * Class StripeCheckoutSessionCompletedJob
@@ -21,21 +20,15 @@ use yii\web\{ServerErrorHttpException, NotFoundHttpException};
  */
 class StripeCheckoutSessionCompletedJob extends BaseStripeJob
 {
-    protected ?Customer $customer = null;
-    protected ?SubscriptionService $subscriptionService = null;
-
     public function execute($queue): void
     {
         parent::execute($queue);
 
-        if ($this->isExecutable()) {
+        if ($this->isExecutable) {
             if ($this->isPaid()) {
                 try {
-                    $this->setCustomer();
-                    $this->setSubscriptionService();
-
                     $this->updateStripeCustomerId();
-                    $this->addSubscription();
+                    $this->updateSubscription();
 
                     $this->subscriptionWebhook->setSuccess();
                 } catch (\Exception $e) {
@@ -46,25 +39,6 @@ class StripeCheckoutSessionCompletedJob extends BaseStripeJob
                 $this->subscriptionWebhook->setFailed(true, 'payment_status != paid');
             }
         }
-    }
-
-    /**
-     * @throws NotFoundHttpException
-     */
-    protected function setCustomer(): void
-    {
-        $customer = Customer::findOne((int)$this->payload['data']['object']['client_reference_id']);
-
-        if (!$customer) {
-            throw new NotFoundHttpException('Customer not found.');
-        }
-
-        $this->customer = $customer;
-    }
-
-    protected function setSubscriptionService(): void
-    {
-        $this->subscriptionService = new SubscriptionService($this->customer);
     }
 
     protected function isPaid(): bool
@@ -82,7 +56,7 @@ class StripeCheckoutSessionCompletedJob extends BaseStripeJob
      * @throws ServerErrorHttpException
      * @throws ApiErrorException
      */
-    protected function addSubscription(): void
+    protected function updateSubscription(): void
     {
         /**
          * @var $stripeSubscriptionObject Subscription
@@ -96,7 +70,7 @@ class StripeCheckoutSessionCompletedJob extends BaseStripeJob
         $product = $this->subscriptionService->getProductObjectById($plan->product);
         $price = $subscription->price;
 
-        $activeSubscription = $this->subscriptionService->addSubscription([
+        $params = [
             'customer_id' => $this->customer->id,
             'payment_method' => SubscriptionService::PAYMENT_METHOD_STRIPE,
             'payment_method_subscription_id' => $stripeSubscriptionObject->id,
@@ -110,7 +84,15 @@ class StripeCheckoutSessionCompletedJob extends BaseStripeJob
             'plan_period_start' => date("Y-m-d H:i:s", $stripeSubscriptionObject->current_period_start),
             'plan_period_end' => date("Y-m-d H:i:s", $stripeSubscriptionObject->current_period_end),
             'meta' => $stripeSubscriptionObject->toJSON()
-        ]);
+        ];
+
+        $activeSubscription = $this->subscriptionService->getSubscriptionByPaymentMethodSubscriptionId($stripeSubscriptionObject->id);
+
+        if (!$activeSubscription) {
+            $activeSubscription = $this->subscriptionService->addSubscription($params);
+        } else {
+            $activeSubscription = $this->subscriptionService->updateSubscription($stripeSubscriptionObject->id, $params);
+        }
 
         if (!$activeSubscription) {
             throw new ServerErrorHttpException('Subscription history not saved.');

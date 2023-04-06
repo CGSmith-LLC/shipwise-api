@@ -7,6 +7,7 @@ use yii\helpers\Json;
 use common\models\base\BaseSubscriptionWebhook;
 use common\services\subscription\SubscriptionService;
 use console\jobs\subscription\stripe\{StripeCheckoutSessionCompletedJob,
+    StripeCustomerDeletedJob,
     StripeCustomerSubscriptionDeletedJob,
     StripeCustomerSubscriptionPausedJob,
     StripeCustomerSubscriptionResumedJob,
@@ -113,6 +114,7 @@ class SubscriptionWebhook extends BaseSubscriptionWebhook
             SubscriptionService::CUSTOMER_SUBSCRIPTION_PAUSED_WEBHOOK_EVENT => new StripeCustomerSubscriptionPausedJob($jobDataArray),
             SubscriptionService::CUSTOMER_SUBSCRIPTION_RESUMED_WEBHOOK_EVENT => new StripeCustomerSubscriptionResumedJob($jobDataArray),
             SubscriptionService::CUSTOMER_SUBSCRIPTION_UPDATED_WEBHOOK_EVENT => new StripeCustomerSubscriptionUpdatedJob($jobDataArray),
+            SubscriptionService::CUSTOMER_DELETED_WEBHOOK_EVENT => new StripeCustomerDeletedJob($jobDataArray),
             default => null,
         };
 
