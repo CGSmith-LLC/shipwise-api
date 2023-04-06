@@ -2,11 +2,15 @@
 
 namespace common\models;
 
+use Yii;
+use yii\helpers\Json;
 use common\models\base\BaseSubscriptionWebhook;
 use common\services\subscription\SubscriptionService;
-use console\jobs\subscription\stripe\StripeCheckoutSessionCompletedJob;
-use console\jobs\subscription\stripe\StripeCustomerSubscriptionDeletedJob;
-use yii\helpers\Json;
+use console\jobs\subscription\stripe\{StripeCheckoutSessionCompletedJob,
+    StripeCustomerSubscriptionDeletedJob,
+    StripeCustomerSubscriptionPausedJob,
+    StripeCustomerSubscriptionResumedJob,
+    StripeCustomerSubscriptionUpdatedJob};
 
 class SubscriptionWebhook extends BaseSubscriptionWebhook
 {
@@ -103,17 +107,17 @@ class SubscriptionWebhook extends BaseSubscriptionWebhook
             'subscriptionWebhookId' => $this->id
         ];
 
-        switch ($this->event) {
-            case SubscriptionService::CHECKOUT_SESSION_COMPLETED_WEBHOOK_EVENT:
-                \Yii::$app->queue->push(
-                    new StripeCheckoutSessionCompletedJob($jobDataArray)
-                );
-                break;
-            case SubscriptionService::CUSTOMER_SUBSCRIPTION_DELETED_WEBHOOK_EVENT:
-                \Yii::$app->queue->push(
-                    new StripeCustomerSubscriptionDeletedJob($jobDataArray)
-                );
-                break;
+        $jobObject = match ($this->event) {
+            SubscriptionService::CHECKOUT_SESSION_COMPLETED_WEBHOOK_EVENT => new StripeCheckoutSessionCompletedJob($jobDataArray),
+            SubscriptionService::CUSTOMER_SUBSCRIPTION_DELETED_WEBHOOK_EVENT => new StripeCustomerSubscriptionDeletedJob($jobDataArray),
+            SubscriptionService::CUSTOMER_SUBSCRIPTION_PAUSED_WEBHOOK_EVENT => new StripeCustomerSubscriptionPausedJob($jobDataArray),
+            SubscriptionService::CUSTOMER_SUBSCRIPTION_RESUMED_WEBHOOK_EVENT => new StripeCustomerSubscriptionResumedJob($jobDataArray),
+            SubscriptionService::CUSTOMER_SUBSCRIPTION_UPDATED_WEBHOOK_EVENT => new StripeCustomerSubscriptionUpdatedJob($jobDataArray),
+            default => null,
+        };
+
+        if ($jobObject) {
+            Yii::$app->queue->push($jobObject);
         }
     }
 }

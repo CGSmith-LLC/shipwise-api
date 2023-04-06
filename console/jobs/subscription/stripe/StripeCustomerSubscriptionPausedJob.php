@@ -3,13 +3,12 @@
 namespace console\jobs\subscription\stripe;
 
 /**
- * Class StripeCustomerSubscriptionDeletedJob
+ * Class StripeCustomerSubscriptionPausedJob
  * @package console\jobs\subscription\stripe
  *
- * @see https://stripe.com/docs/api/events/types#event_types-customer.subscription.deleted
- * @see https://stripe.com/docs/billing/subscriptions/cancel
+ * @see https://stripe.com/docs/api/events/types#event_types-customer.subscription.paused
  */
-class StripeCustomerSubscriptionDeletedJob extends BaseStripeJob
+class StripeCustomerSubscriptionPausedJob extends BaseStripeJob
 {
     public function execute($queue): void
     {
