@@ -36,7 +36,7 @@ For instance, the command to simulate the event that occurs when a customer paym
 Use the **production URL** in live mode.
 Choose the **following events**: 
    
-- customer.created
+- customer.deleted
 - checkout.session.completed
 - customer.subscription.created
 - customer.subscription.trial_will_end
@@ -44,8 +44,6 @@ Choose the **following events**:
 - customer.subscription.paused
 - customer.subscription.resumed
 - customer.subscription.updated
-- payment_intent.created
-- payment_intent.succeeded
 
 4. Once the previous step is completed, **copy** `Webhook ID` and `Signing secret` and **paste** them into `common\config\params-local.php`.
 

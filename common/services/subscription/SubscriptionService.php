@@ -20,6 +20,7 @@ class SubscriptionService
     public const CUSTOMER_SUBSCRIPTION_PAUSED_WEBHOOK_EVENT = 'customer.subscription.paused';
     public const CUSTOMER_SUBSCRIPTION_RESUMED_WEBHOOK_EVENT = 'customer.subscription.resumed';
     public const CUSTOMER_SUBSCRIPTION_UPDATED_WEBHOOK_EVENT = 'customer.subscription.updated';
+    public const CUSTOMER_DELETED_WEBHOOK_EVENT = 'customer.deleted';
 
     protected Customer $customer;
     protected StripeClient $stripeClient;
@@ -57,7 +58,7 @@ class SubscriptionService
         return $this->activeSubscription;
     }
 
-    public function getSubscriptionByPaymentMethodSubscriptionId(string $paymentMethodSubscriptionId): bool|SubscriptionHistory
+    public function getSubscriptionByPaymentMethodSubscriptionId(string $paymentMethodSubscriptionId): SubscriptionHistory|null
     {
         /**
          * @var $subscription SubscriptionHistory

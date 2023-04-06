@@ -2,6 +2,8 @@
 
 namespace console\jobs\subscription\stripe;
 
+use yii\web\ServerErrorHttpException;
+
 /**
  * Class StripeCustomerSubscriptionDeletedJob
  * @package console\jobs\subscription\stripe
@@ -15,9 +17,9 @@ class StripeCustomerSubscriptionDeletedJob extends BaseStripeJob
     {
         parent::execute($queue);
 
-        if ($this->isExecutable()) {
+        if ($this->isExecutable) {
             try {
-                $this->updateSubscription();
+                $this->deleteSubscription();
                 $this->subscriptionWebhook->setSuccess();
             } catch (\Exception $e) {
                 $error = serialize($e);
@@ -26,8 +28,15 @@ class StripeCustomerSubscriptionDeletedJob extends BaseStripeJob
         }
     }
 
-    protected function updateSubscription(): void
+    protected function deleteSubscription(): void
     {
+        $activeSubscription = $this->subscriptionService
+            ->getSubscriptionByPaymentMethodSubscriptionId($this->payload['data']['object']['id']);
 
+        if (!$activeSubscription) {
+            throw new ServerErrorHttpException('Subscription not found.');
+        }
+
+        $activeSubscription->delete();
     }
 }

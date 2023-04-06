@@ -7,6 +7,7 @@ namespace console\jobs\subscription\stripe;
  * @package console\jobs\subscription\stripe
  *
  * @see https://stripe.com/docs/api/events/types#event_types-customer.subscription.updated
+ * @see https://stripe.com/docs/api/subscriptions/object
  */
 class StripeCustomerSubscriptionUpdatedJob extends BaseStripeJob
 {
@@ -14,7 +15,7 @@ class StripeCustomerSubscriptionUpdatedJob extends BaseStripeJob
     {
         parent::execute($queue);
 
-        if ($this->isExecutable()) {
+        if ($this->isExecutable) {
             try {
                 $this->updateSubscription();
                 $this->subscriptionWebhook->setSuccess();
