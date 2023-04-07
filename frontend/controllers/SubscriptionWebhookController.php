@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\services\subscription\SubscriptionService;
 use console\jobs\subscription\stripe\StripeCheckoutSessionCompletedJob;
 use console\jobs\subscription\stripe\StripeCustomerSubscriptionDeletedJob;
+use console\jobs\subscription\stripe\StripeCustomerSubscriptionUpdatedJob;
 use Stripe\Exception\SignatureVerificationException;
 use Yii;
 use yii\web\{Response, BadRequestHttpException, ServerErrorHttpException};
@@ -29,11 +30,11 @@ class SubscriptionWebhookController extends Controller
 
 //    public function actionTest()
 //    {
-//        $wh = SubscriptionWebhook::findOne(8);
+//        $wh = SubscriptionWebhook::findOne(3);
 //        $arrayPayload = Json::decode($wh->payload);
 //
 //        \Yii::$app->queue->push(
-//            new StripeCustomerSubscriptionDeletedJob([
+//            new StripeCustomerSubscriptionUpdatedJob([
 //                'payload' => $arrayPayload,
 //                'subscriptionWebhookId' => $wh->id
 //            ])

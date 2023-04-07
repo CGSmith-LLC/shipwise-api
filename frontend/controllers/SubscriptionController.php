@@ -3,7 +3,7 @@
 namespace frontend\controllers;
 
 use yii\web\{NotFoundHttpException, Response};
-use common\models\SubscriptionHistory;
+use common\models\Subscription;
 use Stripe\Exception\ApiErrorException;
 use frontend\models\Customer;
 use common\services\subscription\SubscriptionService;
@@ -49,7 +49,7 @@ class SubscriptionController extends Controller
     public function actionInvoice(int $id): Response
     {
         $customer = $this->getCustomer();
-        $subscription = SubscriptionHistory::findOne($id);
+        $subscription = Subscription::findOne($id);
 
         if (!$subscription || $subscription->customer_id != $customer->id) {
             throw new NotFoundHttpException('Invoice not found.');

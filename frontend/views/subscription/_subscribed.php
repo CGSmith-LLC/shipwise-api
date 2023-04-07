@@ -13,12 +13,9 @@
     <table class="table table-bordered">
         <tr>
             <td class="col-xs-6">
-                Status: <span class="text-muted"><?= ucfirst($subscriptionService->getActiveSubscription()->status) ?></span>
-                <br>
-                Paid: <span class="text-muted"><?= $subscriptionService->getActiveSubscription()->paid_amount ?>
-                    <?= mb_strtoupper($subscriptionService->getActiveSubscription()->paid_currency) ?></span>
-                <br>
                 Plan name: <span class="text-muted"><?= ucfirst($subscriptionService->getActiveSubscription()->plan_name) ?></span>
+                <br>
+                Status: <span class="text-muted"><?= ucfirst($subscriptionService->getActiveSubscription()->status) ?></span>
             </td>
             <td class="col-xs-6">
                 Interval: <span class="text-muted"><?= ucfirst($subscriptionService->getActiveSubscription()->plan_interval) ?></span>
