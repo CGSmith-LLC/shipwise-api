@@ -80,8 +80,8 @@ class StripeCheckoutSessionCompletedJob extends BaseStripeJob
             'status' => $stripeSubscriptionObject->status,
             'plan_name' => $product->name,
             'plan_interval' => $plan->interval,
-            'plan_period_start' => date("Y-m-d H:i:s", $stripeSubscriptionObject->current_period_start),
-            'plan_period_end' => date("Y-m-d H:i:s", $stripeSubscriptionObject->current_period_end),
+            'current_period_start' => date("Y-m-d H:i:s", $stripeSubscriptionObject->current_period_start),
+            'current_period_end' => date("Y-m-d H:i:s", $stripeSubscriptionObject->current_period_end),
             'meta' => $stripeSubscriptionObject->toJSON()
         ];
 

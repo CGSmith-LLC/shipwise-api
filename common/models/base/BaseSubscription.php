@@ -19,8 +19,8 @@ use frontend\models\Customer;
  * @property string $plan_name
  * @property string $plan_info
  * @property string $plan_interval
- * @property string $plan_period_start
- * @property string $plan_period_end
+ * @property string $current_period_start
+ * @property string $current_period_end
  * @property string $meta
  * @property string $created_date
  * @property string $updated_date
@@ -43,9 +43,10 @@ class BaseSubscription extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['customer_id', 'payment_method', 'payment_method_subscription_id', 'is_trial', 'status', 'plan_interval', 'plan_period_start', 'plan_period_end'], 'required'],
+            [['customer_id', 'payment_method', 'payment_method_subscription_id', 'is_trial', 'status',
+                'plan_interval', 'current_period_start', 'current_period_end'], 'required'],
             [['customer_id', 'is_active', 'is_trial'], 'integer'],
-            [['plan_period_start', 'plan_period_end', 'created_date', 'updated_date'], 'safe'],
+            [['current_period_start', 'current_period_end', 'created_date', 'updated_date'], 'safe'],
             [['meta'], 'string'],
             [['payment_method', 'status'], 'string', 'max' => 64],
             [['payment_method_subscription_id', 'plan_name'], 'string', 'max' => 128],
@@ -71,8 +72,8 @@ class BaseSubscription extends ActiveRecord
             'plan_name' => 'Plan Name',
             'plan_info' => 'Plan Info',
             'plan_interval' => 'Plan Interval',
-            'plan_period_start' => 'Plan Period Start',
-            'plan_period_end' => 'Plan Period End',
+            'current_period_start' => 'Current Period Start',
+            'current_period_end' => 'Current Period End',
             'meta' => 'Meta',
             'created_date' => 'Created Date',
             'updated_date' => 'Updated Date',

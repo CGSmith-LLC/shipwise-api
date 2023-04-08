@@ -52,8 +52,8 @@
             <td class="col-xs-6">
                 Current period:
                 <span class="text-muted">
-                    <?= Yii::$app->formatter->asDate($subscriptionService->getActiveSubscription()->plan_period_start) ?>
-                    - <?= Yii::$app->formatter->asDate($subscriptionService->getActiveSubscription()->plan_period_end) ?>
+                    <?= Yii::$app->formatter->asDate($subscriptionService->getActiveSubscription()->current_period_start) ?>
+                    - <?= Yii::$app->formatter->asDate($subscriptionService->getActiveSubscription()->current_period_end) ?>
                 </span>
                 <?php if (isset($meta['cancel_at_period_end']) && (bool)$meta['cancel_at_period_end'] == true) { ?>
                     <br>
