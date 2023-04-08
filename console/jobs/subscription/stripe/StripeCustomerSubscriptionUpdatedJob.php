@@ -47,11 +47,11 @@ class StripeCustomerSubscriptionUpdatedJob extends BaseStripeJob
         // Subscription period:
 
         if (isset($previousAttributes['current_period_start'])) {
-            $subscription->plan_period_start = date("Y-m-d H:i:s", $this->payload['data']['object']['current_period_start']);
+            $subscription->current_period_start = date("Y-m-d H:i:s", $this->payload['data']['object']['current_period_start']);
         }
 
         if (isset($previousAttributes['current_period_end'])) {
-            $subscription->plan_period_end = date("Y-m-d H:i:s", $this->payload['data']['object']['current_period_end']);
+            $subscription->current_period_end = date("Y-m-d H:i:s", $this->payload['data']['object']['current_period_end']);
         }
 
         // Subscription status:
