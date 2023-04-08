@@ -6,10 +6,12 @@ use common\models\BulkAction;
 use common\models\FulfillmentMeta;
 use common\models\Order;
 use common\models\ScheduledOrder;
+use common\services\subscription\SubscriptionService;
 use console\jobs\orders\FetchJob;
 use console\jobs\orders\SendTo3PLJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
+use frontend\models\Customer;
 use yii\db\Exception;
 
 // To create/edit crontab file: crontab -e
@@ -66,8 +68,29 @@ class CronController extends Controller
          */
         $this->runIntegrations(Integration::ACTIVE);
         $this->runScheduledOrders();
+        $this->pastDueSubscriptions();
 
         return ExitCode::OK;
+    }
+
+    /**
+     * Get all active subscriptions and check if they're past due.
+     * If yes, make them inactive.
+     */
+    protected function pastDueSubscriptions()
+    {
+        $customers = Customer::find()
+            ->where("stripe_customer_id IS NOT NULL")
+            ->all();
+
+        foreach ($customers as $customer) {
+            $subscriptionService = new SubscriptionService($customer);
+            $activeSubscription = $subscriptionService->getActiveSubscription();
+
+            if ($activeSubscription && $activeSubscription->isPastDue() && $activeSubscription->isActive()) {
+                $activeSubscription->makeInactive();
+            }
+        }
     }
 
     public function runIntegrations($status)
