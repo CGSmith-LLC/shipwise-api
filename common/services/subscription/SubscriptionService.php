@@ -20,8 +20,6 @@ class SubscriptionService
     public const CHECKOUT_SESSION_COMPLETED_WEBHOOK_EVENT = 'checkout.session.completed';
     public const CUSTOMER_SUBSCRIPTION_CREATED_WEBHOOK_EVENT = 'customer.subscription.created';
     public const CUSTOMER_SUBSCRIPTION_DELETED_WEBHOOK_EVENT = 'customer.subscription.deleted';
-    public const CUSTOMER_SUBSCRIPTION_PAUSED_WEBHOOK_EVENT = 'customer.subscription.paused';
-    public const CUSTOMER_SUBSCRIPTION_RESUMED_WEBHOOK_EVENT = 'customer.subscription.resumed';
     public const CUSTOMER_SUBSCRIPTION_UPDATED_WEBHOOK_EVENT = 'customer.subscription.updated';
     public const CUSTOMER_SUBSCRIPTION_TRIAL_WILL_END = 'customer.subscription.trial_will_end';
     public const CUSTOMER_DELETED_WEBHOOK_EVENT = 'customer.deleted';

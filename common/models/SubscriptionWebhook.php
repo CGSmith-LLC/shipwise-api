@@ -114,8 +114,6 @@ class SubscriptionWebhook extends BaseSubscriptionWebhook
             SubscriptionService::CUSTOMER_SUBSCRIPTION_CREATED_WEBHOOK_EVENT => new StripeCustomerSubscriptionCreatedJob($jobDataArray),
             SubscriptionService::CHECKOUT_SESSION_COMPLETED_WEBHOOK_EVENT => new StripeCheckoutSessionCompletedJob($jobDataArray),
             SubscriptionService::CUSTOMER_SUBSCRIPTION_DELETED_WEBHOOK_EVENT => new StripeCustomerSubscriptionDeletedJob($jobDataArray),
-            SubscriptionService::CUSTOMER_SUBSCRIPTION_PAUSED_WEBHOOK_EVENT => new StripeCustomerSubscriptionPausedJob($jobDataArray),
-            SubscriptionService::CUSTOMER_SUBSCRIPTION_RESUMED_WEBHOOK_EVENT => new StripeCustomerSubscriptionResumedJob($jobDataArray),
             SubscriptionService::CUSTOMER_SUBSCRIPTION_UPDATED_WEBHOOK_EVENT => new StripeCustomerSubscriptionUpdatedJob($jobDataArray),
             SubscriptionService::CUSTOMER_DELETED_WEBHOOK_EVENT => new StripeCustomerDeletedJob($jobDataArray),
             SubscriptionService::CUSTOMER_SUBSCRIPTION_TRIAL_WILL_END => new StripeCustomerSubscriptionTrialWillEndJob($jobDataArray),

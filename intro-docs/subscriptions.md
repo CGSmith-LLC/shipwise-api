@@ -41,8 +41,6 @@ Choose the **following events**:
 - customer.subscription.created
 - customer.subscription.trial_will_end
 - customer.subscription.deleted
-- customer.subscription.paused
-- customer.subscription.resumed
 - customer.subscription.updated
 
 4. Once the previous step is completed, **copy** `Webhook ID` and `Signing secret` and **paste** them into `common\config\params-local.php`.
