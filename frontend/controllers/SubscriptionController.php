@@ -62,6 +62,10 @@ class SubscriptionController extends Controller
             throw new NotFoundHttpException('Invoice not found.');
         }
 
+        if (!$stripeInvoice['hosted_invoice_url']) {
+            throw new NotFoundHttpException('Invoice is not available at the moment.');
+        }
+
         return $this->redirect($stripeInvoice['hosted_invoice_url']);
     }
 
