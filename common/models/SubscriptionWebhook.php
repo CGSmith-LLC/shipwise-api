@@ -8,6 +8,7 @@ use common\models\base\BaseSubscriptionWebhook;
 use common\services\subscription\SubscriptionService;
 use console\jobs\subscription\stripe\{StripeCheckoutSessionCompletedJob,
     StripeCustomerDeletedJob,
+    StripeCustomerSubscriptionCreatedJob,
     StripeCustomerSubscriptionDeletedJob,
     StripeCustomerSubscriptionPausedJob,
     StripeCustomerSubscriptionResumedJob,
@@ -110,6 +111,7 @@ class SubscriptionWebhook extends BaseSubscriptionWebhook
         ];
 
         $jobObject = match ($this->event) {
+            SubscriptionService::CUSTOMER_SUBSCRIPTION_CREATED_WEBHOOK_EVENT => new StripeCustomerSubscriptionCreatedJob($jobDataArray),
             SubscriptionService::CHECKOUT_SESSION_COMPLETED_WEBHOOK_EVENT => new StripeCheckoutSessionCompletedJob($jobDataArray),
             SubscriptionService::CUSTOMER_SUBSCRIPTION_DELETED_WEBHOOK_EVENT => new StripeCustomerSubscriptionDeletedJob($jobDataArray),
             SubscriptionService::CUSTOMER_SUBSCRIPTION_PAUSED_WEBHOOK_EVENT => new StripeCustomerSubscriptionPausedJob($jobDataArray),

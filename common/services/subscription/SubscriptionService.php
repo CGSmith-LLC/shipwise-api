@@ -18,6 +18,7 @@ class SubscriptionService
     public const PAYMENT_METHOD_STRIPE = 'stripe';
 
     public const CHECKOUT_SESSION_COMPLETED_WEBHOOK_EVENT = 'checkout.session.completed';
+    public const CUSTOMER_SUBSCRIPTION_CREATED_WEBHOOK_EVENT = 'customer.subscription.created';
     public const CUSTOMER_SUBSCRIPTION_DELETED_WEBHOOK_EVENT = 'customer.subscription.deleted';
     public const CUSTOMER_SUBSCRIPTION_PAUSED_WEBHOOK_EVENT = 'customer.subscription.paused';
     public const CUSTOMER_SUBSCRIPTION_RESUMED_WEBHOOK_EVENT = 'customer.subscription.resumed';
