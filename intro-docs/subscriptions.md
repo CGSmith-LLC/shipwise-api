@@ -53,6 +53,17 @@ Choose the **following events**:
 > php yii queue/listen --verbose
 
 
+## Cron:
+
+See `console\controllers\CronController.php` -> `pastDueSubscriptions()`.
+We need this method to get all active subscriptions and check if they're past due.
+If yes, make them inactive.
+
+In fact, the status and update of a subscription are handled via Stripe webhooks (and our Jobs),
+we need this check in case anything is wrong with Stripe webhooks processing.
+
+> php yii cron/frequent
+
 ## Test payment details:
 
 Card number: `4242 4242 4242 4242`  

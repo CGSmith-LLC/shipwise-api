@@ -86,9 +86,9 @@ class SubscriptionService
             ->all();
     }
 
-    ##############
-    ## History: ##
-    ##############
+    ####################
+    ## Subscriptions: ##
+    ####################
 
     public function addSubscription(array $params): bool|Subscription
     {
