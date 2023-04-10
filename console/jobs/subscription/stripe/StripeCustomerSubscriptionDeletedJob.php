@@ -2,6 +2,7 @@
 
 namespace console\jobs\subscription\stripe;
 
+use yii\helpers\Json;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -22,8 +23,7 @@ class StripeCustomerSubscriptionDeletedJob extends BaseStripeJob
                 $this->deleteSubscription();
                 $this->subscriptionWebhook->setSuccess();
             } catch (\Exception $e) {
-                $error = serialize($e);
-                $this->subscriptionWebhook->setFailed(true, $error);
+                $this->subscriptionWebhook->setFailed(true, Json::encode(['error' => $e->getMessage()]));
             }
         }
     }
