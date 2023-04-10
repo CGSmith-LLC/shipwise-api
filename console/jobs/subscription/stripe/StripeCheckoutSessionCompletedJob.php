@@ -6,6 +6,7 @@ use common\services\subscription\SubscriptionService;
 use Stripe\{Plan, Price, SubscriptionItem};
 use Stripe\Subscription as StripeSubscription;
 use common\models\Subscription;
+use yii\helpers\Json;
 use yii\web\ServerErrorHttpException;
 use Stripe\Exception\ApiErrorException;
 
@@ -33,8 +34,7 @@ class StripeCheckoutSessionCompletedJob extends BaseStripeJob
 
                     $this->subscriptionWebhook->setSuccess();
                 } catch (\Exception $e) {
-                    $error = serialize($e);
-                    $this->subscriptionWebhook->setFailed(true, $error);
+                    $this->subscriptionWebhook->setFailed(true, Json::encode(['error' => $e->getMessage()]));
                 }
             } else {
                 $this->subscriptionWebhook->setFailed(true, 'payment_status != paid');

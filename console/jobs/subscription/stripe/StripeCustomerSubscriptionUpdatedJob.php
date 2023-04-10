@@ -24,8 +24,7 @@ class StripeCustomerSubscriptionUpdatedJob extends BaseStripeJob
                 $this->updateSubscription();
                 $this->subscriptionWebhook->setSuccess();
             } catch (\Exception $e) {
-                $error = serialize($e);
-                $this->subscriptionWebhook->setFailed(true, $error);
+                $this->subscriptionWebhook->setFailed(true, Json::encode(['error' => $e->getMessage()]));
             }
         }
     }

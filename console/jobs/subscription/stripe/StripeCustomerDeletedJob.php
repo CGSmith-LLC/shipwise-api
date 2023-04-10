@@ -2,6 +2,8 @@
 
 namespace console\jobs\subscription\stripe;
 
+use yii\helpers\Json;
+
 /**
  * Class StripeCustomerDeletedJob
  * @package console\jobs\subscription\stripe
@@ -20,8 +22,7 @@ class StripeCustomerDeletedJob extends BaseStripeJob
                 $this->deleteStripeCustomerId();
                 $this->subscriptionWebhook->setSuccess();
             } catch (\Exception $e) {
-                $error = serialize($e);
-                $this->subscriptionWebhook->setFailed(true, $error);
+                $this->subscriptionWebhook->setFailed(true, Json::encode(['error' => $e->getMessage()]));
             }
         }
     }

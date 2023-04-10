@@ -2,6 +2,8 @@
 
 namespace console\jobs\subscription\stripe;
 
+use yii\helpers\Json;
+
 /**
  * Class StripeCustomerSubscriptionPausedJob
  * @package console\jobs\subscription\stripe
@@ -14,13 +16,12 @@ class StripeCustomerSubscriptionPausedJob extends BaseStripeJob
     {
         parent::execute($queue);
 
-        if ($this->isExecutable()) {
+        if ($this->isExecutable) {
             try {
                 $this->updateSubscription();
                 $this->subscriptionWebhook->setSuccess();
             } catch (\Exception $e) {
-                $error = serialize($e);
-                $this->subscriptionWebhook->setFailed(true, $error);
+                $this->subscriptionWebhook->setFailed(true, Json::encode(['error' => $e->getMessage()]));
             }
         }
     }
