@@ -178,8 +178,8 @@ $this->beginBody() ?>
                 ['label' => 'Items', 'url' => ['/sku']],
 
                 [
-                    'label' => 'Billing',
-                    'url' => ['/billing'],
+                    'label' => 'Subscription',
+                    'url' => ['/subscription'],
                     'visible' => Yii::$app->user->identity->isDirectCustomer()
                 ],
                 [
