@@ -94,7 +94,7 @@ class StripeCheckoutSessionCompletedJob extends BaseStripeJob
         }
 
         if (!$activeSubscription) {
-            throw new ServerErrorHttpException('Subscription history not saved.');
+            throw new ServerErrorHttpException('Subscription not saved.');
         }
 
         $this->subscriptionService->makeSubscriptionsInactive($activeSubscription);
