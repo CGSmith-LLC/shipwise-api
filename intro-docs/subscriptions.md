@@ -45,6 +45,11 @@ Choose the **following events**:
 
 4. Once the previous step is completed, **copy** `Webhook ID` and `Signing secret` and **paste** them into `common\config\params-local.php`.
 
+## SubscriptionService:
+
+The class `common\services\subscription\SubscriptionService.php` is used to encapsulate the main logic related to Stripe.
+
+
 ## Jobs:
 
 1. Jobs are located here - `console\jobs\subscription\stripe`.

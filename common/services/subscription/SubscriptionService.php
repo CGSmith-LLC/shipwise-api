@@ -2,7 +2,6 @@
 
 namespace common\services\subscription;
 
-use console\jobs\subscription\stripe\StripeSubscriptionUpdateUsageJob;
 use Yii;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\{Exception\ApiErrorException, Invoice, Product, StripeClient, Stripe, UsageRecord, Webhook};
