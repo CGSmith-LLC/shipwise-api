@@ -21,6 +21,7 @@ use frontend\models\Customer;
  * @property string $plan_interval
  * @property string $current_period_start
  * @property string $current_period_end
+ * @property int $unsync_usage_quantity
  * @property string $meta
  * @property string $created_date
  * @property string $updated_date
@@ -45,7 +46,7 @@ class BaseSubscription extends ActiveRecord
         return [
             [['customer_id', 'payment_method', 'payment_method_subscription_id', 'is_trial', 'status',
                 'plan_interval', 'current_period_start', 'current_period_end'], 'required'],
-            [['customer_id', 'is_active', 'is_trial'], 'integer'],
+            [['customer_id', 'is_active', 'is_trial', 'unsync_usage_quantity'], 'integer'],
             [['current_period_start', 'current_period_end', 'created_date', 'updated_date'], 'safe'],
             [['meta'], 'string'],
             [['payment_method', 'status'], 'string', 'max' => 64],
@@ -74,6 +75,7 @@ class BaseSubscription extends ActiveRecord
             'plan_interval' => 'Plan Interval',
             'current_period_start' => 'Current Period Start',
             'current_period_end' => 'Current Period End',
+            'unsync_usage_quantity' => 'Unsyced Usage Quantity',
             'meta' => 'Meta',
             'created_date' => 'Created Date',
             'updated_date' => 'Updated Date',
