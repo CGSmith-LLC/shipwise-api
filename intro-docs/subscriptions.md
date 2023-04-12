@@ -55,14 +55,22 @@ Choose the **following events**:
 
 ## Cron:
 
-See `console\controllers\CronController.php` -> `pastDueSubscriptions()`.
+1. See `console\controllers\CronController.php` -> `pastDueSubscriptions()`.
 We need this method to get all active subscriptions and check if they're past due.
 If yes, make them inactive.
 
 In fact, the status and update of a subscription are handled via Stripe webhooks (and our Jobs),
 we need this check in case anything is wrong with Stripe webhooks processing.
 
-> php yii cron/frequent
+> php yii cron/hourly
+
+2. See `console\controllers\CronController.php` -> `updateSubscriptionsUsage()`.
+We need this method to update subscription usage records (to sync with Stripe).
+Read [stripe.com/docs/products-prices/pricing-models#reporting-usage](https://stripe.com/docs/products-prices/pricing-models#reporting-usage)
+   
+The method creates a new `StripeSubscriptionUpdateUsageJob` for each subscription.
+
+> php yii cron/hourly
 
 ## Test payment details:
 
@@ -84,6 +92,8 @@ See [stripe.com/docs/testing](https://stripe.com/docs/testing).
 - https://stripe.com/docs/api/checkout/sessions/object
 - https://stripe.com/docs/api/subscriptions/object
 - https://stripe.com/docs/api/plans/object
+- https://stripe.com/docs/products-prices/pricing-models#reporting-usage
+- https://stripe.com/docs/api/usage_records
 
 *Common:*
 

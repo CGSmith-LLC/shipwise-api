@@ -2,12 +2,14 @@
 
 namespace common\services\subscription;
 
+use console\jobs\subscription\stripe\StripeSubscriptionUpdateUsageJob;
 use Yii;
 use Stripe\Exception\SignatureVerificationException;
-use Stripe\{Exception\ApiErrorException, Invoice, Product, StripeClient, Stripe, Webhook};
+use Stripe\{Exception\ApiErrorException, Invoice, Product, StripeClient, Stripe, UsageRecord, Webhook};
 use Stripe\Subscription as StripeSubscription;
 use frontend\models\Customer;
 use common\models\Subscription;
+use yii\web\ServerErrorHttpException;
 
 /**
  * Class SubscriptionService
@@ -156,6 +158,32 @@ class SubscriptionService
     public function getInvoiceObjectById(string $id): Invoice
     {
         return $this->stripeClient->invoices->retrieve($id);
+    }
+
+    /**
+     * @throws ApiErrorException
+     * @throws ServerErrorHttpException
+     */
+    public function updateSubscriptionUsage(Subscription $subscription): UsageRecord
+    {
+        if (isset($subscription->array_meta_data['items']['data'][0])) {
+            $id = $subscription->array_meta_data['items']['data'][0]['id'];
+            $params = [
+                'quantity' => $subscription->unsync_usage_quantity,
+                'timestamp' => time(),
+                'action' => 'increment',
+            ];
+
+            $res = $this->stripeClient->subscriptionItems->createUsageRecord($id, $params);
+
+            if ($res) {
+                $subscription->resetUnsyncedUsageQuantity();
+            }
+
+            return $res;
+        } else {
+            throw new ServerErrorHttpException('Subscription item is invalid.');
+        }
     }
 
     ###############

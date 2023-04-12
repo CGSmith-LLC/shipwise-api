@@ -36,6 +36,10 @@ class m230404_111402_subscription_table extends Migration
         ");
 
         $this->execute("
+            ALTER TABLE `subscription` ADD `unsync_usage_quantity` INT NOT NULL DEFAULT '0' AFTER `current_period_end`;
+        ");
+
+        $this->execute("
             ALTER TABLE `subscription` 
                 CHANGE `updated_date` `updated_date` DATETIME on update CURRENT_TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;
         ");

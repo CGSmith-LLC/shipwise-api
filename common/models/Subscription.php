@@ -2,8 +2,9 @@
 
 namespace common\models;
 
-use common\models\base\BaseSubscription;
 use yii\helpers\Json;
+use common\models\base\BaseSubscription;
+use common\models\query\SubscriptionQuery;
 
 /**
  * Class SubscriptionHistory
@@ -26,6 +27,11 @@ class Subscription extends BaseSubscription
     public const STATUS_UNPAID = 'unpaid';
 
     public array $array_meta_data = [];
+
+    public static function find(): SubscriptionQuery
+    {
+        return new SubscriptionQuery(get_called_class());
+    }
 
     public function init(): void
     {
@@ -74,6 +80,24 @@ class Subscription extends BaseSubscription
     public function makeActive(bool $withSave = true): void
     {
         $this->is_active = self::IS_TRUE;
+
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    public function incrementUnsyncedUsageQuantity(bool $withSave = true): void
+    {
+        $this->unsync_usage_quantity += 1;
+
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    public function resetUnsyncedUsageQuantity(bool $withSave = true): void
+    {
+        $this->unsync_usage_quantity = 0;
 
         if ($withSave) {
             $this->save();
