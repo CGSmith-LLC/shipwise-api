@@ -10,9 +10,6 @@ use console\jobs\subscription\stripe\{StripeCheckoutSessionCompletedJob,
     StripeCustomerDeletedJob,
     StripeCustomerSubscriptionCreatedJob,
     StripeCustomerSubscriptionDeletedJob,
-    StripeCustomerSubscriptionPausedJob,
-    StripeCustomerSubscriptionResumedJob,
-    StripeCustomerSubscriptionTrialWillEndJob,
     StripeCustomerSubscriptionUpdatedJob};
 
 class SubscriptionWebhook extends BaseSubscriptionWebhook
@@ -116,7 +113,6 @@ class SubscriptionWebhook extends BaseSubscriptionWebhook
             SubscriptionService::CUSTOMER_SUBSCRIPTION_DELETED_WEBHOOK_EVENT => new StripeCustomerSubscriptionDeletedJob($jobDataArray),
             SubscriptionService::CUSTOMER_SUBSCRIPTION_UPDATED_WEBHOOK_EVENT => new StripeCustomerSubscriptionUpdatedJob($jobDataArray),
             SubscriptionService::CUSTOMER_DELETED_WEBHOOK_EVENT => new StripeCustomerDeletedJob($jobDataArray),
-            SubscriptionService::CUSTOMER_SUBSCRIPTION_TRIAL_WILL_END => new StripeCustomerSubscriptionTrialWillEndJob($jobDataArray),
             default => null,
         };
 

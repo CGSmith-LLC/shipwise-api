@@ -1,5 +1,6 @@
 <?php
     use yii\web\View;
+    use yii\helpers\Html;
     use common\services\subscription\SubscriptionService;
 
     /* @var $this View */
@@ -9,8 +10,8 @@
 <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
 
 <stripe-pricing-table
-        pricing-table-id="<?= Yii::$app->params['stripe']['pricing_table_id'] ?>"
-        publishable-key="<?= Yii::$app->params['stripe']['publishable_key'] ?>"
-        client-reference-id="<?= $subscriptionService->getCustomer()->id ?>"
-        customer-email="<?= $subscriptionService->getCustomer()->email ?>"
+        pricing-table-id="<?= Html::encode(Yii::$app->params['stripe']['pricing_table_id']) ?>"
+        publishable-key="<?= Html::encode(Yii::$app->params['stripe']['publishable_key']) ?>"
+        client-reference-id="<?= (int)$subscriptionService->getCustomer()->id ?>"
+        customer-email="<?= Html::encode($subscriptionService->getCustomer()->email) ?>"
 </stripe-pricing-table>

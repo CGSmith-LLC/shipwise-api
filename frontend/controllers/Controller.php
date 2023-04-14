@@ -19,6 +19,9 @@ use Da\User\Module as DaModule;
  */
 class Controller extends \yii\web\Controller
 {
+    /**
+     * @var string[] $excludedRoutes List of excluded routes from being redirected to the subscription page.
+     */
     protected array $excludedRoutes = [
         'user/login',
         'user/register',

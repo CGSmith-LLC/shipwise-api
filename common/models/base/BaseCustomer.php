@@ -37,12 +37,6 @@ class BaseCustomer extends \yii\db\ActiveRecord
         return 'customers';
     }
 
-    public function init()
-    {
-        parent::init();
-        // ...
-    }
-
     /**
      * {@inheritdoc}
      */

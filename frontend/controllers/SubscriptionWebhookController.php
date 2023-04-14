@@ -28,27 +28,12 @@ class SubscriptionWebhookController extends Controller
         return parent::beforeAction($action);
     }
 
-//    public function actionTest()
-//    {
-//        $wh = SubscriptionWebhook::findOne(3);
-//        $arrayPayload = Json::decode($wh->payload);
-//
-//        \Yii::$app->queue->push(
-//            new StripeCustomerSubscriptionUpdatedJob([
-//                'payload' => $arrayPayload,
-//                'subscriptionWebhookId' => $wh->id
-//            ])
-//        );
-//    }
-
     /**
      * @throws ServerErrorHttpException
      * @throws SignatureVerificationException
      */
     public function actionStripe(): array
     {
-        //file_put_contents('stripe.txt', Yii::$app->request->rawBody, FILE_APPEND);
-
         if (!Yii::$app->request->rawBody) {
             throw new ServerErrorHttpException('No request body.');
         }

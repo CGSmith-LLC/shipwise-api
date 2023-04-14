@@ -52,7 +52,7 @@ class SubscriptionService
                 ->where([
                     'payment_method' => SubscriptionService::PAYMENT_METHOD_STRIPE,
                     'customer_id' => $this->customer->id,
-                    'is_active' => Subscription::IS_TRUE
+                    'is_active' => 1
                 ])
                 ->orderBy(['id' => SORT_DESC])
                 ->one();

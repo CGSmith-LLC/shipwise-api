@@ -12,9 +12,6 @@ use common\models\query\SubscriptionQuery;
  */
 class Subscription extends BaseSubscription
 {
-    public const IS_TRUE = 1;
-    public const IS_FALSE = 0;
-
     /**
      * @see https://stripe.com/docs/api/subscriptions/object#subscription_object-status
      */
@@ -46,7 +43,7 @@ class Subscription extends BaseSubscription
 
     public function isActive(): bool
     {
-        return $this->is_active == self::IS_TRUE;
+        return (bool) $this->is_active;
     }
 
     public function isTrial(): bool

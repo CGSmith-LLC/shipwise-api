@@ -56,26 +56,10 @@ class StripeCustomerSubscriptionUpdatedJob extends BaseStripeJob
         // Subscription status:
 
         if (isset($previousAttributes['status'])) {
-            $subscription->status = $this->payload['data']['object']['status'];
-
-            switch ($this->payload['data']['object']['status']) {
-                case Subscription::STATUS_ACTIVE:
-                    $subscription->is_trial = Subscription::IS_FALSE;
-                    $subscription->is_active = Subscription::IS_TRUE;
-                    break;
-                case Subscription::STATUS_TRIAL:
-                    $subscription->is_trial = Subscription::IS_TRUE;
-                    $subscription->is_active = Subscription::IS_TRUE;
-                    break;
-                case Subscription::STATUS_CANCELED:
-                case Subscription::STATUS_INCOMPLETE:
-                case Subscription::STATUS_INCOMPLETE_EXPIRED:
-                case Subscription::STATUS_PAST_DUE:
-                case Subscription::STATUS_UNPAID:
-                    $subscription->is_trial = Subscription::IS_FALSE;
-                    $subscription->is_active = Subscription::IS_FALSE;
-                    break;
-            }
+            $status = $this->payload['data']['object']['status'];
+            $subscription->status = $status;
+            $subscription->is_trial = ($status == Subscription::STATUS_TRIAL);
+            $subscription->is_active = (in_array($status, [Subscription::STATUS_TRIAL, Subscription::STATUS_ACTIVE]));
         }
 
         // Plan changed:

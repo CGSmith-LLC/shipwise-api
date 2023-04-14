@@ -42,9 +42,8 @@ class StripeCustomerSubscriptionCreatedJob extends BaseStripeJob
             'customer_id' => $this->customer->id,
             'payment_method' => SubscriptionService::PAYMENT_METHOD_STRIPE,
             'payment_method_subscription_id' => $subscriptionObject['id'],
-            'is_active' => (in_array($subscriptionObject['status'], [Subscription::STATUS_ACTIVE, Subscription::STATUS_TRIAL]))
-                ? Subscription::IS_TRUE : Subscription::IS_FALSE,
-            'is_trial' => (bool) $subscriptionObject['trial_start']),
+            'is_active' => in_array($subscriptionObject['status'], [Subscription::STATUS_ACTIVE, Subscription::STATUS_TRIAL]),
+            'is_trial' => (bool) $subscriptionObject['trial_start'],
             'status' => $subscriptionObject['status'],
             'plan_name' => $subscriptionObject['plan']['name'],
             'plan_interval' => $subscriptionObject['plan']['interval'],

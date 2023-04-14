@@ -39,7 +39,6 @@ Choose the **following events**:
 - customer.deleted
 - checkout.session.completed
 - customer.subscription.created
-- customer.subscription.trial_will_end
 - customer.subscription.deleted
 - customer.subscription.updated
 
