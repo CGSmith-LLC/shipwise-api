@@ -75,7 +75,7 @@ class StripeCheckoutSessionCompletedJob extends BaseStripeJob
             'customer_id' => $this->customer->id,
             'payment_method' => SubscriptionService::PAYMENT_METHOD_STRIPE,
             'payment_method_subscription_id' => $stripeSubscriptionObject->id,
-            'is_active' => Subscription::IS_TRUE,
+            'is_active' => 1,
             'is_trial' => ($stripeSubscriptionObject->trial_start) ? Subscription::IS_TRUE : Subscription::IS_FALSE,
             'status' => $stripeSubscriptionObject->status,
             'plan_name' => $product->name,
