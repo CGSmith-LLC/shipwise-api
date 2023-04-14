@@ -9,7 +9,7 @@ class SubscriptionQuery extends ActiveQuery
 {
     public function isActive(): SubscriptionQuery
     {
-        return $this->andOnCondition(['is_active' => Subscription::IS_TRUE]);
+        return $this->andOnCondition(['is_active' => 1]);
     }
 
     public function isNotActive(): SubscriptionQuery
