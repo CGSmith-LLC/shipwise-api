@@ -70,7 +70,7 @@ class Subscription extends BaseSubscription
 
     public function makeInactive(bool $withSave = true): void
     {
-        $this->is_active = self::IS_FALSE;
+        $this->is_active = 0;
 
         if ($withSave) {
             $this->save();
