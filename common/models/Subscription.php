@@ -51,7 +51,7 @@ class Subscription extends BaseSubscription
 
     public function isTrial(): bool
     {
-        return $this->is_trial == self::IS_TRUE;
+        return (bool) $this->is_trial;
     }
 
     public function isPastDue(): bool
