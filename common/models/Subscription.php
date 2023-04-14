@@ -56,16 +56,9 @@ class Subscription extends BaseSubscription
 
     public function isPastDue(): bool
     {
-        $result = false;
-
-        if (isset($this->array_meta_data['cancel_at_period_end'])
-            && (bool)$this->array_meta_data['cancel_at_period_end'] == true
-            && isset($this->array_meta_data['cancel_at']) && $this->array_meta_data['cancel_at']) {
-            $cancelAt = (int)$this->array_meta_data['cancel_at'];
-            $result = ($cancelAt < time());
-        }
-
-        return $result;
+        return !empty($this->array_meta_data['cancel_at_period_end'])
+            && !empty($this->array_meta_data['cancel_at'])
+            && (int)$this->array_meta_data['cancel_at'] < time();
     }
 
     public function makeInactive(bool $withSave = true): void
