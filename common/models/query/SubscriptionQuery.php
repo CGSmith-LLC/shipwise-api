@@ -24,7 +24,7 @@ class SubscriptionQuery extends ActiveQuery
 
     public function isNotTrial(): SubscriptionQuery
     {
-        return $this->andOnCondition(['is_trial' => Subscription::IS_FALSE]);
+        return $this->andOnCondition(['is_trial' => 0]);
     }
 
     public function isNotSynced(): SubscriptionQuery
