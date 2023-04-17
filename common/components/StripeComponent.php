@@ -4,7 +4,7 @@ namespace common\components;
 
 use yii\base\Component;
 use yii\base\Exception;
-use Stripe\{Exception\ApiErrorException, Invoice, Product, StripeClient, Stripe, UsageRecord, Webhook};
+use Stripe\StripeClient;
 
 /**
  * Class StripeComponent
