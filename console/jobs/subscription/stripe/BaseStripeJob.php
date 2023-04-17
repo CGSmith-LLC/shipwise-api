@@ -5,6 +5,7 @@ namespace console\jobs\subscription\stripe;
 use common\services\subscription\SubscriptionService;
 use frontend\models\Customer;
 use yii\base\BaseObject;
+use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
 use yii\queue\RetryableJobInterface;
 use common\models\SubscriptionWebhook;
@@ -33,8 +34,13 @@ class BaseStripeJob extends BaseObject implements RetryableJobInterface
 
         if ($this->isExecutable) {
             $this->subscriptionWebhook->setProcessing();
-            $this->setCustomer();
-            $this->setSubscriptionService();
+
+            try {
+                $this->setCustomer();
+                $this->setSubscriptionService();
+            }  catch (\Exception $e) {
+                $this->subscriptionWebhook->setFailed(true, Json::encode(['error' => $e->getMessage()]));
+            }
         }
     }
 

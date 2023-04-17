@@ -67,7 +67,7 @@
                 <a href="<?= Url::to(['/subscription/invoice', 'id' => $subscriptionService->getActiveSubscription()->id]) ?>" target="_blank">Latest invoice</a>
                 <br>
                 <i class="glyphicon glyphicon-cog"></i>
-                <a href="<?= Yii::$app->params['stripe']['customer_portal_url'] ?>" target="_blank">Manage subscription</a>
+                <a href="<?= Yii::$app->stripe->customerPortalUrl ?>" target="_blank">Manage subscription</a>
             </td>
         </tr>
     </table>

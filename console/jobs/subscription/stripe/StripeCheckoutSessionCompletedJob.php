@@ -3,12 +3,10 @@
 namespace console\jobs\subscription\stripe;
 
 use common\services\subscription\SubscriptionService;
-use Stripe\{Plan, Price, SubscriptionItem};
+use Stripe\{Plan, SubscriptionItem};
 use Stripe\Subscription as StripeSubscription;
-use common\models\Subscription;
 use yii\helpers\Json;
 use yii\web\ServerErrorHttpException;
-use Stripe\Exception\ApiErrorException;
 
 /**
  * Class StripeCheckoutSessionCompletedJob
@@ -55,7 +53,6 @@ class StripeCheckoutSessionCompletedJob extends BaseStripeJob
 
     /**
      * @throws ServerErrorHttpException
-     * @throws ApiErrorException
      */
     protected function updateSubscription(): void
     {
@@ -63,20 +60,18 @@ class StripeCheckoutSessionCompletedJob extends BaseStripeJob
          * @var $stripeSubscriptionObject StripeSubscription
          * @var $subscription SubscriptionItem
          * @var $plan Plan
-         * @var $price Price
          */
         $stripeSubscriptionObject = $this->subscriptionService->getSubscriptionObjectById($this->payload['data']['object']['subscription']);
         $subscription = $stripeSubscriptionObject->items->data[0];
         $plan = $subscription->plan;
         $product = $this->subscriptionService->getProductObjectById($plan->product);
-        $price = $subscription->price;
 
         $params = [
             'customer_id' => $this->customer->id,
             'payment_method' => SubscriptionService::PAYMENT_METHOD_STRIPE,
             'payment_method_subscription_id' => $stripeSubscriptionObject->id,
             'is_active' => 1,
-            'is_trial' => (bool) $stripeSubscriptionObject->trial_start),
+            'is_trial' => (bool) $stripeSubscriptionObject->trial_start,
             'status' => $stripeSubscriptionObject->status,
             'plan_name' => $product->name,
             'plan_interval' => $plan->interval,

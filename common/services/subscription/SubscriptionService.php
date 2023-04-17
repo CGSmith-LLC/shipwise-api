@@ -4,7 +4,7 @@ namespace common\services\subscription;
 
 use Yii;
 use Stripe\Exception\SignatureVerificationException;
-use Stripe\{Exception\ApiErrorException, Invoice, Product, StripeClient, Stripe, UsageRecord, Webhook};
+use Stripe\{Invoice, Product, Stripe, UsageRecord, Webhook};
 use Stripe\Subscription as StripeSubscription;
 use frontend\models\Customer;
 use common\models\Subscription;
@@ -22,18 +22,15 @@ class SubscriptionService
     public const CUSTOMER_SUBSCRIPTION_CREATED_WEBHOOK_EVENT = 'customer.subscription.created';
     public const CUSTOMER_SUBSCRIPTION_DELETED_WEBHOOK_EVENT = 'customer.subscription.deleted';
     public const CUSTOMER_SUBSCRIPTION_UPDATED_WEBHOOK_EVENT = 'customer.subscription.updated';
-    public const CUSTOMER_SUBSCRIPTION_TRIAL_WILL_END = 'customer.subscription.trial_will_end';
     public const CUSTOMER_DELETED_WEBHOOK_EVENT = 'customer.deleted';
 
     protected Customer $customer;
-    protected StripeClient $stripeClient;
 
     protected ?Subscription $activeSubscription = null;
 
     public function __construct(Customer $customer)
     {
         $this->customer = $customer;
-        $this->stripeClient = new StripeClient(Yii::$app->params['stripe']['secret_key']);
     }
 
     ###############
@@ -91,6 +88,13 @@ class SubscriptionService
     ## Subscriptions: ##
     ####################
 
+    public function isSubscriptionExists(string $paymentMethodSubscriptionId): bool
+    {
+        return Subscription::find()->where([
+            'payment_method_subscription_id' => $paymentMethodSubscriptionId
+        ])->exists();
+    }
+
     public function addSubscription(array $params): bool|Subscription
     {
         $subscription = new Subscription($params);
@@ -131,36 +135,26 @@ class SubscriptionService
         }
     }
 
-    ##########
-    ## API: ##
-    ##########
+    #################
+    ## Stripe API: ##
+    #################
 
-    /**
-     * @throws ApiErrorException
-     */
     public function getProductObjectById(string $id): Product
     {
-        return $this->stripeClient->products->retrieve($id);
+        return Yii::$app->stripe->client->products->retrieve($id);
     }
 
-    /**
-     * @throws ApiErrorException
-     */
     public function getSubscriptionObjectById(string $id): StripeSubscription
     {
-        return $this->stripeClient->subscriptions->retrieve($id);
+        return Yii::$app->stripe->client->subscriptions->retrieve($id);
     }
 
-    /**
-     * @throws ApiErrorException
-     */
     public function getInvoiceObjectById(string $id): Invoice
     {
-        return $this->stripeClient->invoices->retrieve($id);
+        return Yii::$app->stripe->client->invoices->retrieve($id);
     }
 
     /**
-     * @throws ApiErrorException
      * @throws ServerErrorHttpException
      */
     public function updateSubscriptionUsage(Subscription $subscription): UsageRecord
@@ -173,7 +167,7 @@ class SubscriptionService
                 'action' => 'increment',
             ];
 
-            $res = $this->stripeClient->subscriptionItems->createUsageRecord($id, $params);
+            $res = Yii::$app->stripe->client->subscriptionItems->createUsageRecord($id, $params);
 
             if ($res) {
                 $subscription->resetUnsyncedUsageQuantity();
@@ -194,8 +188,8 @@ class SubscriptionService
      */
     public static function isWebhookVerified(string $payload, string $signatureHeader): bool
     {
-        Stripe::setApiKey(Yii::$app->params['stripe']['secret_key']);
-        $endpointSecret = Yii::$app->params['stripe']['webhook_signing_secret'];
+        Stripe::setApiKey(Yii::$app->stripe->secretKey);
+        $endpointSecret = Yii::$app->stripe->webhookSigningSecret;
 
         $event = Webhook::constructEvent($payload, $signatureHeader, $endpointSecret);
 

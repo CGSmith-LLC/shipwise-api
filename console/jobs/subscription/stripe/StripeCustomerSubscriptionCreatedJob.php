@@ -38,6 +38,11 @@ class StripeCustomerSubscriptionCreatedJob extends BaseStripeJob
     {
         $subscriptionObject = $this->payload['data']['object'];
 
+        // If a subscription with this ID exists, the `StripeCustomerSubscriptionUpdatedJob` will be used:
+        if ($this->subscriptionService->isSubscriptionExists($subscriptionObject['id'])) {
+            return;
+        }
+
         $params = [
             'customer_id' => $this->customer->id,
             'payment_method' => SubscriptionService::PAYMENT_METHOD_STRIPE,

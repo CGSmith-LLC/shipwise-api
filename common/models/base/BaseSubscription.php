@@ -46,7 +46,8 @@ class BaseSubscription extends ActiveRecord
         return [
             [['customer_id', 'payment_method', 'payment_method_subscription_id', 'is_trial', 'status',
                 'plan_interval', 'current_period_start', 'current_period_end'], 'required'],
-            [['customer_id', 'is_active', 'is_trial', 'unsync_usage_quantity'], 'integer'],
+            [['customer_id', 'unsync_usage_quantity'], 'integer'],
+            [['is_active', 'is_trial'], 'boolean'],
             [['current_period_start', 'current_period_end', 'created_date', 'updated_date'], 'safe'],
             [['meta'], 'string'],
             [['payment_method', 'status'], 'string', 'max' => 64],
