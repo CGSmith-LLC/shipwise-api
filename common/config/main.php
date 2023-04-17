@@ -35,8 +35,8 @@ return [
         ],
         'stripe' => [
             'class' => 'common\components\StripeComponent',
-            'publishableKey' => $params['stripe']['publishable_key'],
-            'secretKey' => $params['stripe']['secret_key'],
+            'publicKey' => $params['stripe']['publishable_key'],
+            'privateKey' => $params['stripe']['secret_key'],
             'pricingTableId' => $params['stripe']['pricing_table_id'],
             'customerPortalUrl' => $params['stripe']['customer_portal_url'],
             'webhookKey' => $params['stripe']['webhook_key'],

@@ -11,7 +11,7 @@
 
 <stripe-pricing-table
         pricing-table-id="<?= Html::encode(Yii::$app->stripe->pricingTableId) ?>"
-        publishable-key="<?= Html::encode(Yii::$app->stripe->publishableKey) ?>"
+        publishable-key="<?= Html::encode(Yii::$app->stripe->publicKey) ?>"
         client-reference-id="<?= (int)$subscriptionService->getCustomer()->id ?>"
         customer-email="<?= Html::encode($subscriptionService->getCustomer()->email) ?>"
 </stripe-pricing-table>

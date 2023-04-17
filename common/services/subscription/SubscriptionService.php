@@ -188,7 +188,7 @@ class SubscriptionService
      */
     public static function isWebhookVerified(string $payload, string $signatureHeader): bool
     {
-        Stripe::setApiKey(Yii::$app->stripe->secretKey);
+        Stripe::setApiKey(Yii::$app->stripe->privateKey);
         $endpointSecret = Yii::$app->stripe->webhookSigningSecret;
 
         $event = Webhook::constructEvent($payload, $signatureHeader, $endpointSecret);
