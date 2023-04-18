@@ -12,8 +12,8 @@ use Stripe\StripeClient;
  */
 class StripeComponent extends Component
 {
-    public string $publicKey;
-    public string $privateKey;
+    public string $publishableKey;
+    public string $secretKey;
     public string $pricingTableId;
     public string $customerPortalUrl;
     public string $webhookKey;
@@ -28,12 +28,12 @@ class StripeComponent extends Component
     {
         parent::init();
 
-        if (!$this->publicKey) {
-            throw new Exception('Stripe component needs `publicKey` set for initializing.');
+        if (!$this->publishableKey) {
+            throw new Exception('Stripe component needs `publishableKey` set for initializing.');
         }
 
-        if (!$this->privateKey) {
-            throw new Exception('Stripe component needs `privateKey` set for initializing.');
+        if (!$this->secretKey) {
+            throw new Exception('Stripe component needs `secretKey` set for initializing.');
         }
 
         if (!$this->pricingTableId) {
@@ -52,6 +52,6 @@ class StripeComponent extends Component
             throw new Exception('Stripe component needs `webhookSigningSecret` set for initializing.');
         }
 
-        $this->client = new StripeClient($this->privateKey);
+        $this->client = new StripeClient($this->secretKey);
     }
 }
