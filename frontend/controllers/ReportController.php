@@ -3,10 +3,8 @@
 namespace frontend\controllers;
 
 use Yii;
-use console\jobs\CreateReportJob;
-use frontend\models\Customer;
 use frontend\models\forms\ReportForm;
-use frontend\models\User;
+use yii\filters\AccessControl;
 
 /**
  * Class ReportController
@@ -20,7 +18,7 @@ class ReportController extends Controller
     {
         return [
             'access' => [
-                'class' => 'yii\filters\AccessControl',
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -34,40 +32,37 @@ class ReportController extends Controller
     /**
      * Index for creating CSV report
      *
-     * @return string|void
      * @throws \yii\base\InvalidConfigException
      */
-    public function actionIndex()
+    public function actionIndex($scenario = null)
     {
         $model = new ReportForm();
 
-        // Generate Report
-        if (Yii::$app->request->post()) {
-            $model->load(Yii::$app->request->post());
-            // Always set for beginning of day and end of day for query
-            $model->start_date = Yii::$app->formatter->asDate($model->start_date, 'php:Y-m-d 00:00:00');
-            $model->end_date   = Yii::$app->formatter->asDate($model->end_date, 'php:Y-m-d 23:59:59');
-
-            Yii::$app->queue->push(new CreateReportJob([
-                'customer' => $model->customer,
-                'user_id' => Yii::$app->user->id,
-                'user_email' => User::findone(['id' => Yii::$app->user->id])->email,
-                'start_date' => $model->start_date,
-                'end_date' => $model->end_date,
-                'items' => $model->items,
-            ]));
-
-            Yii::$app->getSession()->setFlash('success', 'The report is being generated. Please check your email in a few minutes.');
+        // select model scenario from GET or POST
+        $model->scenario = ReportForm::SCENARIO_BY_DATE;
+        $scenario = $this->request->post('scenario', $scenario);
+        if (in_array($scenario, [ReportForm::SCENARIO_BY_DATE, ReportForm::SCENARIO_BY_ORDER_NR])) {
+            $model->scenario = $scenario;
         }
 
+        // Generate Report
+        if ($this->request->post()) {
+            $model->load(Yii::$app->request->post());
+
+            if ($model->validate()) {
+
+                $model->pushReportQueueJob();
+
+                Yii::$app->getSession()->setFlash('success', 'The report is being generated. Please check your email in a few minutes.');
+                return $this->redirect(['report/index', 'scenario' => $model->scenario]);
+            }
+        }
 
         return $this->render(
             'index',
             [
                 'model'     => $model,
-                'customers' => Yii::$app->user->identity->isAdmin
-                    ? Customer::getList()
-                    : Yii::$app->user->identity->getCustomerList(),
+                'customers' => $model->getCustomerList(),
             ]
         );
     }
