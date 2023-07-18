@@ -42,6 +42,10 @@ class CsvBox extends Model
     public string $user_id = '';
     public string $destination_type;
     public string $customer_id = '';
+    public array $raw_columns;
+    public int $external_validation;
+    public bool $ev_failed;
+    public int $external_validations_failed_requests;
 
     /** @var array Orders uploaded or errored */
     public array $orders = [];
