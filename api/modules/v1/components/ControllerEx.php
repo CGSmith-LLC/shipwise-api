@@ -22,6 +22,9 @@ use Yii;
  */
 class ControllerEx extends Controller
 {
+    public static array $allowedCorsOriginDomains = ['https://app.csvbox.io', 'https://app.getshipwise.com'];
+    public static array $allowedCorsAccessControlRequestMethods = ['GET', 'HEAD', 'OPTIONS'];
+
     /**
      * API Consumer
      *

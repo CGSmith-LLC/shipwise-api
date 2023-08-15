@@ -2,6 +2,7 @@
 
 namespace api\modules\v1\controllers;
 
+use api\modules\v1\components\ControllerEx;
 use api\modules\v1\components\PaginatedControllerEx;
 use api\modules\v1\models\core\CarrierEx;
 use yii\data\ArrayDataProvider;
@@ -33,8 +34,8 @@ class CarrierController extends PaginatedControllerEx
             [
                 'class' => Cors::class,
                 'cors' => [
-                    'Origin' => ['https://app.csvbox.io', 'https://app.getshipwise.com'],
-                    'Access-Control-Request-Method' => ['GET', 'HEAD', 'OPTIONS'],
+                    'Origin' => ControllerEx::$allowedCorsOriginDomains,
+                    'Access-Control-Request-Method' => ControllerEx::$allowedCorsAccessControlRequestMethods,
                 ],
             ],
         ];
