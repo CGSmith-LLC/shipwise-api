@@ -1,12 +1,10 @@
 <?php
-use yii\helpers\Html;
-use yii\helpers\Url;
+use yii\helpers\{Html, HtmlPurifier, Url};
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
 use common\models\Status;
-use yii\helpers\HtmlPurifier;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Order */
@@ -145,6 +143,20 @@ $this->registerJs($js);
                     [
                         'attribute' => 'packagingNotes',
                         'visible' => !$simple,
+                    ],
+                    [
+                        'attribute' => 'order_attributes',
+                        'visible' => !$simple,
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            if ($model->order_attributes_array) {
+                                return implode(', ', array_map(function ($attr) {
+                                    return Html::a(Html::encode($attr), Url::to(['index', 'OrderSearch[order_attributes]' => Html::encode($attr)]));
+                                }, $model->order_attributes_array));
+                            }
+
+                            return null;
+                        },
                     ],
                 ],
             ]) ?>

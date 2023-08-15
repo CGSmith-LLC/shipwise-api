@@ -93,6 +93,7 @@ class ControllerEx extends Controller
             $order->address_id = $address->id;
             $order->transit = $orderForm->transit;
             $order->packagingNotes = $orderForm->packagingNotes;
+            $order->order_attributes = $orderForm->orderAttributes;
 
             // Validate the order model itself
             if (!$order->validate()) {
@@ -357,6 +358,7 @@ class ControllerEx extends Controller
             $order->status_id = $orderForm->status;
             $order->transit = $orderForm->transit;
             $order->packagingNotes = $orderForm->packagingNotes;
+            $order->order_attributes = $orderForm->orderAttributes;
 
             // Validate the order model itself
             if (!$order->validate()) {

@@ -3,7 +3,7 @@
 namespace common\models;
 
 use Yii;
-use common\behaviors\OrderEventsBehavior;
+use common\behaviors\{OrderEventsBehavior, JsonAttributeBehavior};
 use api\modules\v1\models\core\AddressEx;
 use common\models\base\BaseOrder;
 use common\models\query\OrderQuery;
@@ -24,14 +24,27 @@ use console\jobs\webhooks\OrderWebhook;
  * @property OrderHistory[] $history
  * @property Carrier        $carrier
  * @property Service        $service
+ *
+ * @property array          $order_attributes_array
  */
 class Order extends BaseOrder
 {
+    /**
+     * The property is used for storing the `order_attributes` attribute converted from JSON everytime the model is found.
+     * @var array
+     */
+    public array $order_attributes_array = [];
+
     public function behaviors(): array
     {
         return [
             [
                 'class' => OrderEventsBehavior::class,
+            ],
+            [
+                'class' => JsonAttributeBehavior::class,
+                'jsonAttributes' => ['order_attributes'],
+                'convertFromJsonAttributes' => ['order_attributes_array' => 'order_attributes'],
             ],
         ];
     }

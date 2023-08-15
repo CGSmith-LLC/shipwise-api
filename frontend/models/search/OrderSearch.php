@@ -67,6 +67,7 @@ class OrderSearch extends Order
                     'created_date',
                     'updated_date',
                     'notes',
+                    'order_attributes',
                     'uuid',
                     'requested_ship_date',
                     'origin',
@@ -170,6 +171,7 @@ class OrderSearch extends Order
         $query->andFilterWhere(['like', 'order_reference', $this->order_reference])
             ->andFilterWhere(['like', 'tracking', $this->tracking])
             ->andFilterWhere(['like', 'orders.notes', $this->notes])
+            ->andFilterWhere(['like', 'order_attributes', $this->order_attributes])
             ->andFilterWhere(['like', 'uuid', $this->uuid])
             ->andFilterWhere(['like', 'origin', $this->origin])
             ->andFilterWhere(['like', Address::tableName() . '.name', $this->address]);
