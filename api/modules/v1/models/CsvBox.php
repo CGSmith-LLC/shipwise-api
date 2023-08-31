@@ -93,6 +93,7 @@ class CsvBox extends Model
             $stmt = Statement::create();
             $records = $stmt->process($csv);
             foreach ($records as $key => $record) {
+                \Yii::debug($record);
                 $orderNo = trim($record['Order Reference']);
 
                 // if order exists in database, abort and show message to user
@@ -152,6 +153,13 @@ class CsvBox extends Model
                     $carrier = CarrierEx::find()->where(['name' => $record['Carrier']])->one();
                     $service = ServiceEx::find()->where(['name' => $record['Service']])->one();
 
+                    if ($carrier === null) {
+                        $this->addError('order.carrier_id', 'Carrier "'.$record['Carrier'].'" could not be found');
+                    }
+                    if ($service === null) {
+                        $this->addError('order.service_id', 'Service "'.$record['Service'].'" could not be found');
+                    }
+
                     $requestedShipDate = date("Y-m-d", strtotime(trim($record['Requested Ship Date'])));
                     $mustArriveByDate = ($record['Must Arrive By Date']) ? date("Y-m-d", strtotime(trim($record['Must Arrive By Date']))) : null;
 
@@ -165,11 +173,10 @@ class CsvBox extends Model
                     $order->must_arrive_by_date = $mustArriveByDate;
                     $order->service_id = $service->id;
                     $order->carrier_id = $carrier->id;
-
                     // Validate and save Order object
                     if ($order->save()) {
-                        $processedOrders[$orderNo] = $order->id;
                         \Yii::debug($record);
+                        $processedOrders[$orderNo] = $order->id;
                     } else {
                         \Yii::debug($order->getErrorSummary(true));
                         foreach ($order->getErrors() as $attr => $error) {
