@@ -2,68 +2,95 @@
 
 namespace common\models;
 
-use Yii;
+use yii\helpers\Json;
+use common\models\base\BaseSubscription;
+use common\models\query\SubscriptionQuery;
 
 /**
- * This is the model class for table "subscription".
- *
- * @property int $id
- * @property int $customer_id Reference to customer
- * @property string $next_invoice The Next Date to generate an invoice
- * @property int $months_to_recur How many months will be used to calculate the next invoice
+ * Class SubscriptionHistory
+ * @package common\models
  */
-class Subscription extends \yii\db\ActiveRecord
+class Subscription extends BaseSubscription
 {
     /**
-     * {@inheritdoc}
+     * @see https://stripe.com/docs/api/subscriptions/object#subscription_object-status
      */
-    public static function tableName()
+    public const STATUS_TRIAL = 'trialing';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_INCOMPLETE = 'incomplete';
+    public const STATUS_INCOMPLETE_EXPIRED = 'incomplete_expired';
+    public const STATUS_PAST_DUE = 'past_due';
+    public const STATUS_CANCELED = 'canceled';
+    public const STATUS_UNPAID = 'unpaid';
+
+    public array $array_meta_data = [];
+
+    public static function find(): SubscriptionQuery
     {
-        return 'subscription';
+        return new SubscriptionQuery(get_called_class());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function init(): void
     {
-        return [
-            [['customer_id', 'next_invoice', 'months_to_recur'], 'required'],
-            [['customer_id'], 'integer'],
-            [['months_to_recur'], 'integer'
-            ,'message' => 'Can not recur in partial months. Please select full months.'],
-            [['next_invoice'], 'safe'],
-        ];
+        $this->on(self::EVENT_AFTER_FIND, function () {
+            if ($this->meta) {
+                $this->array_meta_data = Json::decode($this->meta);
+            }
+        });
+
+        parent::init();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function isActive(): bool
     {
-        return [
-            'id' => 'ID',
-            'customer_id' => 'Customer ID',
-            'next_invoice' => 'Next Invoice',
-            'months_to_recur' => 'Months To Recur',
-        ];
+        return (bool) $this->is_active;
     }
 
-    /**
-     * Customer relation
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCustomer()
+    public function isTrial(): bool
     {
-        return $this->hasOne(Customer::class, ['id' => 'customer_id']);
+        return (bool) $this->is_trial;
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getItems()
+    public function isPastDue(): bool
     {
-        return $this->hasMany(SubscriptionItems::class, ['subscription_id' => 'id']);
+        return !empty($this->array_meta_data['cancel_at_period_end'])
+            && !empty($this->array_meta_data['cancel_at'])
+            && (int)$this->array_meta_data['cancel_at'] < time();
+    }
+
+    public function makeInactive(bool $withSave = true): void
+    {
+        $this->is_active = 0;
+
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    public function makeActive(bool $withSave = true): void
+    {
+        $this->is_active = 1;
+
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    public function incrementUnsyncedUsageQuantity(bool $withSave = true): void
+    {
+        $this->unsync_usage_quantity += 1;
+
+        if ($withSave) {
+            $this->save();
+        }
+    }
+
+    public function resetUnsyncedUsageQuantity(bool $withSave = true): void
+    {
+        $this->unsync_usage_quantity = 0;
+
+        if ($withSave) {
+            $this->save();
+        }
     }
 }

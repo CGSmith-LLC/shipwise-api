@@ -6,10 +6,14 @@ use common\models\BulkAction;
 use common\models\FulfillmentMeta;
 use common\models\Order;
 use common\models\ScheduledOrder;
+use common\models\Subscription;
+use common\services\subscription\SubscriptionService;
 use console\jobs\orders\FetchJob;
 use console\jobs\orders\SendTo3PLJob;
+use console\jobs\subscription\stripe\StripeSubscriptionUpdateUsageJob;
 use yii\console\{Controller, ExitCode};
 use common\models\Integration;
+use frontend\models\Customer;
 use yii\db\Exception;
 
 // To create/edit crontab file: crontab -e
@@ -160,6 +164,9 @@ class CronController extends Controller
      */
     public function actionHourly()
     {
+        $this->pastDueSubscriptions();
+        $this->updateSubscriptionsUsage();
+
         /**
          * every hour
          */
@@ -180,6 +187,45 @@ class CronController extends Controller
         }
 
         return ExitCode::OK;
+    }
+
+    /**
+     * Get all active subscriptions and check if they're past due.
+     * If yes, make them inactive.
+     */
+    protected function pastDueSubscriptions()
+    {
+        $customers = Customer::find()
+            ->where("stripe_customer_id IS NOT NULL")
+            ->all();
+
+        foreach ($customers as $customer) {
+            $subscriptionService = new SubscriptionService($customer);
+            $activeSubscription = $subscriptionService->getActiveSubscription();
+
+            if ($activeSubscription && $activeSubscription->isPastDue() && $activeSubscription->isActive()) {
+                $activeSubscription->makeInactive();
+            }
+        }
+    }
+
+    /**
+     * Updates subscription usage records.
+     * @see https://stripe.com/docs/products-prices/pricing-models#reporting-usage
+     */
+    protected function updateSubscriptionsUsage()
+    {
+        $subscriptions = Subscription::find()
+            ->isActive()
+            ->isNotTrial()
+            ->isNotSynced()
+            ->all();
+
+        foreach ($subscriptions as $subscription) {
+            \Yii::$app->queue->push(new StripeSubscriptionUpdateUsageJob([
+                'subscriptionId' => $subscription->id,
+            ]));
+        }
     }
 
     /**

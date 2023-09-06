@@ -1,48 +1,27 @@
 <?php
+    use yii\web\View;
+    use common\services\subscription\SubscriptionService;
 
-use yii\helpers\Html;
-use yii\grid\GridView;
+    /* @var $this View */
+    /* @var $subscriptionService SubscriptionService */
 
-/* @var $this yii\web\View */
-/* @var $dataProvider yii\data\ActiveDataProvider */
-
-$this->title = 'Subscriptions';
-$this->params['breadcrumbs'][] = $this->title;
+    $title = 'Subscription';
+    $this->params['breadcrumbs'][] = $title;
+    $this->title = $title . ' - ' . Yii::$app->name;
 ?>
-<div class="subscription-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+<div>
+    <?php if (Yii::$app->request->get('action') == 'subscribed') { ?>
+        <?= $this->render('_thanks') ?>
+    <?php } ?>
 
-    <p>
-        <?= Html::a('Create Subscription', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'showFooter' => true,
-        'columns' => [
-            [
-                'attribute' => 'customer_id',
-                'value' => function ($model) {
-                    return $model->customer->name;
-                }
-            ],
-            'next_invoice',
-            'months_to_recur',
-            [
-                'label' => 'Monthly Value',
-                'value' => function ($model) {
-                    /** @var \frontend\models\Subscription $model */
-                    $total = $model->getItems()->sum('amount');
-                    if ($model->months_to_recur > 1) {
-                        $total = $total / $model->months_to_recur;
-                    }
-                    return ($total / 100);
-                },
-                'format' => 'currency',
-                'footer' => Yii::$app->formatter->asCurrency(\frontend\models\Subscription::getTotal($dataProvider->models, 'amount')),
-            ],
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
+    <?php if (!$subscriptionService->getActiveSubscription()) { ?>
+        <?= $this->render('_stripe-widget', [
+            'subscriptionService' => $subscriptionService,
+        ]) ?>
+    <?php } else { ?>
+        <?= $this->render('_subscribed', [
+            'subscriptionService' => $subscriptionService,
+        ]) ?>
+    <?php } ?>
 </div>

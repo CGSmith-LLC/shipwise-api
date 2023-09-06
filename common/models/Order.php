@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\services\subscription\SubscriptionService;
 use Yii;
 use common\behaviors\OrderEventsBehavior;
 use api\modules\v1\models\core\AddressEx;
@@ -40,6 +41,7 @@ class Order extends BaseOrder
     {
         $this->on(self::EVENT_AFTER_UPDATE, [$this, 'createJobIfNeeded']);
         $this->on(self::EVENT_AFTER_INSERT, [$this, 'createJobIfNeeded']);
+        $this->on(self::EVENT_AFTER_INSERT, [$this, 'updateSubscription']);
 
         parent::init();
     }
@@ -341,6 +343,16 @@ class Order extends BaseOrder
                 $this->label_type = null;
                 $this->save(false);
             }
+        }
+    }
+
+    protected function updateSubscription(): void
+    {
+        $subscriptionService = new SubscriptionService(\frontend\models\Customer::findOne($this->customer_id));
+        $activeSubscription = $subscriptionService->getActiveSubscription();
+
+        if ($activeSubscription) {
+            $activeSubscription->incrementUnsyncedUsageQuantity();
         }
     }
 }
