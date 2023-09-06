@@ -150,8 +150,14 @@ class CsvBox extends Model
                     }
 
                     // Order
-                    $carrier = CarrierEx::find()->where(['name' => $record['Carrier']])->one();
-                    $service = ServiceEx::find()->where(['name' => $record['Service']])->one();
+                    $carrier = CarrierEx::findOne(['id' => $record['Carrier']]);
+                    $serviceByID = ServiceEx::findOne(['id' => $record['Service']]);
+
+                    // This checks the carrier and service. The service is limited to carrier_id here.
+                    $service = ServiceEx::find()->where(['carrier_id' => $carrier->id, 'name' => $serviceByID->name])->one();
+                    \Yii::debug($carrier);
+                    \Yii::debug($serviceByID);
+                    \Yii::debug($service);
 
                     if ($carrier === null) {
                         $this->addError('order.carrier_id', 'Carrier "'.$record['Carrier'].'" could not be found');
