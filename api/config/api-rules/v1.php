@@ -60,6 +60,12 @@ return [
         "controller" => ["$version/carrier"],
     ],
 
+    // Country
+    [
+        "class" => 'yii\rest\UrlRule',
+        "controller" => ["$version/country"],
+    ],
+
     // Aliases
     "GET $version/aliases" => "$version/alias",
 
