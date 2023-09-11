@@ -2,19 +2,19 @@
 
 namespace api\modules\v1\models\core;
 
-use common\models\State;
+use common\models\Country;
 
 /**
  * Class StateEx
  *
  * @package api\modules\v1\models\core
  */
-class StateEx extends State
+class CountryEx extends Country
 {
 
     /**
      * @SWG\Definition(
-     *     definition = "State",
+     *     definition = "Country",
      *
      *     @SWG\Property( property = "id",   type = "integer", description = "State ID" ),
      *     @SWG\Property( property = "name", type = "string", description = "State name" ),
@@ -32,14 +32,16 @@ class StateEx extends State
     }
 
 
-    public static function getListForCsvBox($dependentId)
+    public static function getListForCsvBox($id = null)
     {
-        $list = self::getStatesData(keyField: 'abbreviation', valueField: 'abbreviation', additionalField: $dependentId);
+        $list = self::getList(keyField: 'abbreviation', valueField: 'abbreviation');
         $newArray = [];
+        \Yii::debug($list);
 
-        foreach ($list as $id => $name) {
-            $newArray[] = ['value' => (string) $id, 'display_label' => $name];
+        foreach ($list as $id => $abbreviation) {
+            $newArray[] = ['value' => (string) $id, 'display_label' => $abbreviation, 'dependents' => StateEx::getListForCsvBox($id)];
         }
+
         return $newArray;
     }
 }

@@ -49,6 +49,10 @@ trait CacheableListTrait
         $isCacheable = (is_null($keyField) && is_null($valueField) && !$additionalField);
         $data = null;
 
+        // If Key or value is set override default values
+        $defaultKeyField = is_null($keyField) ? $defaultKeyField : $keyField;
+        $defaultValueField = is_null($valueField) ? $defaultValueField : $valueField;
+
         if ($isCacheable) {
             $data = Yii::$app->cache->get(self::LIST_CACHE_KEY);
         }
