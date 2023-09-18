@@ -33,4 +33,13 @@ class AliasParentQuery extends BaseQuery
     {
         return parent::one($db);
     }
+
+    /**
+     * @param int $id
+     * @return AliasParentQuery
+     */
+    public function byId(int $id)
+    {
+        return $this->andWhere([AliasParent::tableName() . '.id' => (int)$id]);
+    }
 }
