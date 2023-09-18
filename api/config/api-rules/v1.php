@@ -67,7 +67,13 @@ return [
     ],
 
     // Aliases
-    "GET $version/aliases" => "$version/alias",
+    [
+        "class" => 'yii\rest\UrlRule',
+        "controller" => ["$version/alias"],
+        "extraPatterns" => [
+            "DELETE purge"    => "purge",
+        ]
+    ],
 
     "POST $version/inventory" => "$version/inventory/create",
     "POST $version/webhook" => "$version/webhook",
