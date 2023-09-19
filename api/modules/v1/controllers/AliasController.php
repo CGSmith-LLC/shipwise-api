@@ -108,7 +108,7 @@ class AliasController extends PaginatedControllerEx
         $provider = new ActiveDataProvider(
             [
                 'query' => AliasEx::find()->forCustomer($this->apiConsumer->customer->id)->active(),
-                'pagination' => false,
+                'pagination' => $this->pagination,
             ]
         );
 
