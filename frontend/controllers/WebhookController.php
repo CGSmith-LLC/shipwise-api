@@ -49,7 +49,7 @@ class WebhookController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Webhook::find()->with(['webhookTrigger']),
+            'query' => Webhook::find()->with(['lastWebhookLog', 'customer']),
         ]);
 
 
@@ -181,7 +181,7 @@ class WebhookController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Webhook::findOne($id)) !== null) {
+        if (($model = Webhook::find()->where(['id' => $id])->with(['webhookTrigger', 'customer'])->one()) !== null) {
             return $model;
         }
 

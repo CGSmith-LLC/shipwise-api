@@ -38,9 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'recentStatusCode',
                 'format' => 'raw',
                 'value' => function ($model) {
-                    $log = WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(
-                        ['id' => SORT_DESC]
-                    )->one();
+                    $log = $model->lastWebhookLog;
                     if ($log) {
                         return $log->getLabelFor('status_code');
                     } else {
@@ -52,9 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'recentResponse',
                 'format' => 'raw',
                 'value' => function ($model) {
-                    $log = WebhookLog::find()->where(['webhook_id' => $model->id])->orderBy(
-                        ['id' => SORT_DESC]
-                    )->one();
+                    $log = $model->lastWebhookLog;
                     if ($log) {
                         return $log->getModalForView();
                     } else {

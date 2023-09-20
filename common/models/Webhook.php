@@ -137,12 +137,6 @@ class Webhook extends \yii\db\ActiveRecord
         ];
     }
 
-    public function afterFind()
-    {
-        $this->triggers = ArrayHelper::map($this->getWebhookTrigger()->all(), 'id', 'status_id');
-        parent::afterFind();
-    }
-
     /**
      * Creates new relations after deleting old ones
      * @return void
@@ -202,6 +196,12 @@ class Webhook extends \yii\db\ActiveRecord
     public function getWebhookLog()
     {
         return $this->hasMany(WebhookLog::class, ['webhook_id' => 'id']);
+    }
+
+    public function getLastWebhookLog()
+    {
+        return $this->hasOne(WebhookLog::class, ['webhook_id' => 'id'])
+            ->orderBy(['id' => SORT_DESC]);
     }
 
     public function getLabelFor($attribute)
