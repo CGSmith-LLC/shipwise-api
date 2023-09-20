@@ -47,18 +47,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             [
-                'attribute' => 'recentResponse',
-                'format' => 'raw',
-                'value' => function ($model) {
-                    $log = $model->lastWebhookLog;
-                    if ($log) {
-                        return $log->getModalForView();
-                    } else {
-                        return '';
-                    }
-                }
-            ],
-            [
                 'attribute' => 'active',
                 'value' => function ($model) { return $model->getLabelFor('active');},
                 'format' => 'raw',
