@@ -225,6 +225,23 @@ $this->registerJs($js);
                         ]])
                 ?>
 
+                <h2>Additional Info</h2>
+                <?=
+                    DetailView::widget([
+                        'model' => $model,
+                        'attributes' => [
+                            [
+                                'format' => 'raw',
+                                'attribute' => 'execution_log',
+                            ],
+                            [
+                                'format' => 'raw',
+                                'attribute' => 'error_log',
+                            ],
+                        ],
+                    ])
+                ?>
+
                 <h2>Order History</h2>
 
                 <?=

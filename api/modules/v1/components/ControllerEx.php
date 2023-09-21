@@ -93,6 +93,8 @@ class ControllerEx extends Controller
             $order->address_id = $address->id;
             $order->transit = $orderForm->transit;
             $order->packagingNotes = $orderForm->packagingNotes;
+            $order->execution_log = $orderForm->execution_log;
+            $order->error_log = $orderForm->error_log;
 
             // Validate the order model itself
             if (!$order->validate()) {

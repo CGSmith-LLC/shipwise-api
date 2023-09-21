@@ -35,6 +35,8 @@ namespace common\models\base;
  * @property string $ship_from_email
  * @property int $transit
  * @property string $packagingNotes
+ * @property string $execution_log
+ * @property string $error_log
  */
 class BaseOrder extends \yii\db\ActiveRecord
 {
@@ -59,6 +61,7 @@ class BaseOrder extends \yii\db\ActiveRecord
             [['order_reference', 'tracking'], 'string', 'max' => 45],
             [['customer_reference', 'origin', 'uuid'], 'string', 'max' => 64],
             [['notes', 'packagingNotes'], 'string', 'max' => 6000],
+            [['execution_log', 'error_log'], 'string', 'max' => 500],
             [['po_number'], 'string', 'max' => 64],
             [['label_data'], 'string'],
             [['label_type'], 'string', 'max' => 6],

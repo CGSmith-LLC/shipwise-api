@@ -152,7 +152,10 @@ class OrderForm extends Model
     public $transit;
     /** @var string  */
     public $packagingNotes;
-
+    /** @var string */
+    public $execution_log;
+    /** @var string */
+    public $error_log;
 
     /**
      * {@inheritdoc}
@@ -168,6 +171,7 @@ class OrderForm extends Model
             [['poNumber', 'uuid', 'origin', 'customerReference', 'packagingNotes'], 'string', 'length' => [1, 64]],
             ['orderReference', 'string', 'length' => [1, 45]],
             ['notes', 'string', 'length' => [1, 6000]],
+            [['execution_log', 'error_log'], 'string', 'max' => 500],
             ['transit', 'integer'],
             [['requestedShipDate', 'mustArriveByDate'], 'date', 'format' => 'php:Y-m-d'],
             ['status', 'required', 'on' => self::SCENARIO_UPDATE, 'message' => '{attribute} is required.'],
