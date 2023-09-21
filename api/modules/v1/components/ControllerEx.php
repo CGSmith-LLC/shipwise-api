@@ -303,6 +303,17 @@ class ControllerEx extends Controller
             }
 
             /**
+             * Update log if assigned
+             */
+            if (!empty($orderForm->execution_log)) {
+                $order->execution_log = $orderForm->execution_log;
+            }
+
+            if (!empty($orderForm->error_log)) {
+                $order->error_log = $orderForm->error_log;
+            }
+
+            /**
              * Update TrackingInfo.
              * At this stage the required tracking object should be fully validated.
              */
