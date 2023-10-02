@@ -72,6 +72,11 @@ class WebhookTrigger extends \yii\db\ActiveRecord
         return $this->hasOne(Status::class, ['id' => 'status_id']);
     }
 
+    public function getName()
+    {
+        return $this->getStatus()->one()->name;
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

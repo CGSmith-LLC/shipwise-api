@@ -8,6 +8,8 @@ use frontend\models\Customer;
 use Yii;
 use common\models\Webhook;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -101,6 +103,7 @@ class WebhookController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->triggers = ArrayHelper::map($model->getWebhookTrigger()->all(), 'id', 'status_id');
 
         if ($model->load(Yii::$app->request->post())) {
             $model->save();
@@ -176,12 +179,12 @@ class WebhookController extends Controller
      * Finds the Webhook model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Webhook the loaded model
+     * @return Webhook|ActiveRecord the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Webhook::find()->where(['id' => $id])->with(['webhookTrigger', 'customer'])->one()) !== null) {
+        if (($model = Webhook::find()->where(['id' => $id])->with(['webhookTrigger', 'customer', 'webhookTrigger'])->one()) !== null) {
             return $model;
         }
 
