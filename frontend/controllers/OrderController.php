@@ -448,20 +448,6 @@ class OrderController extends Controller
      */
     public function actionDelete($id)
     {
-        $mailer = \Yii::$app->mailer;
-        $mailer->viewPath = '@frontend/views/mail';
-        $mailer->getView()->theme = \Yii::$app->view->theme;
-        $mailer->compose(['html' => 'notification'], [
-            'title' => 'delete attempt',
-            'url' => 'delete',
-            'urlText' => 'delete',
-            'message' => Yii::$app->user->identity->email,
-        ])
-            ->setFrom(Yii::$app->params['senderEmail'])
-            ->setTo(Yii::$app->params['senderEmail'])
-            ->setSubject('delete attempt')
-            ->send();
-        throw new ServerErrorHttpException('Problem with the action - please contact support.');
         $model = $this->findModel($id);
 
         $transaction = Yii::$app->db->beginTransaction();
