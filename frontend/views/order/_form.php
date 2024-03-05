@@ -95,6 +95,8 @@ $item->loadDefaultValues();
                             'value' => ($model->order->must_arrive_by_date) ? Yii::$app->formatter->asDate($model->order->must_arrive_by_date) : null,
                         ]) ?>
 
+                        <?= $form->field($model->order, 'notes')->label('Order notes')->textInput(['maxlength' => true]) ?>
+
                     </div>
                 </div>
             </div>
