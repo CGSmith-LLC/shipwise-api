@@ -44,24 +44,6 @@ class User extends \common\models\User
         return ArrayHelper::map($data, $keyField, $valueField);
     }
 
-    /**
-     * Return the customer stripe id token from the first model
-     *
-     * @return string
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function getCustomerStripeId()
-    {
-        /** @var Customer $customer */
-        $customer = \frontend\models\Customer::findOne($this->customer_id);
-        return $customer->stripe_customer_id;
-    }
-
-    public function hasPaymentMethod()
-    {
-        return PaymentMethod::find()->where(['customer_id' => $this->customer_id])->exists();
-    }
-
     public function isDirectCustomer()
     {
         /**

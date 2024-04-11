@@ -50,10 +50,6 @@ $this->beginPage() ?>
 
       gtag('config', 'G-QWCXL2NN10');
     </script>
-    <script src="https://js.stripe.com/v3/"></script>
-    <script type="application/javascript">
-        var stripe = Stripe('<?=Yii::$app->stripe->publicKey?>');
-    </script>
     <script>
         (function (h, o, t, j, a, r) {
             h.hj = h.hj || function () {
@@ -163,9 +159,6 @@ $this->beginBody() ?>
                     ['label' => 'Status', 'url' => ['/status']],
                     ['label' => 'Customers', 'url' => ['/customer']],
                     ['label' => 'Users', 'url' => ['/user/admin/']],
-                    ['label' => 'Subscriptions', 'url' => ['/subscription']],
-                    ['label' => 'One-Time Charges', 'url' => ['/one-time-charge']],
-                    ['label' => 'Invoices', 'url' => ['/invoice']],
                     ['label' => 'Integrations', 'url' => ['/integration']],
                     ['label' => 'Behaviors', 'url' => ['/behavior']],
                     ['label' => 'Jobs', 'url' => ['/monitor/jobs']],
@@ -185,8 +178,8 @@ $this->beginBody() ?>
                 ['label' => 'Items', 'url' => ['/sku']],
 
                 [
-                    'label' => 'Billing',
-                    'url' => ['/billing'],
+                    'label' => 'Subscription',
+                    'url' => ['/subscription'],
                     'visible' => Yii::$app->user->identity->isDirectCustomer()
                 ],
                 [

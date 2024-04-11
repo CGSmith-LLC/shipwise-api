@@ -2,177 +2,85 @@
 
 namespace frontend\controllers;
 
-use common\models\SubscriptionItems;
-use frontend\models\forms\SubscriptionForm;
-use Yii;
-use frontend\models\Subscription;
-use yii\data\ActiveDataProvider;
+use yii\web\{NotFoundHttpException, Response};
+use common\models\Subscription;
+use Stripe\Exception\ApiErrorException;
+use frontend\models\Customer;
+use common\services\subscription\SubscriptionService;
 use yii\filters\AccessControl;
-use yii\web\Controller;
-use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use Da\User\Filter\AccessRuleFilter;
 
-/**
- * SubscriptionController implements the CRUD actions for Subscription model.
- */
-class SubscriptionController extends \frontend\controllers\Controller
+class SubscriptionController extends Controller
 {
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'ruleConfig' => [
-                    'class' => AccessRuleFilter::class,
-                ],
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'roles' => ['@'],
                     ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'delete' => ['POST'],
                 ],
             ],
         ];
     }
 
     /**
-     * Lists all Subscription models.
-     * @return mixed
+     * @throws NotFoundHttpException
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Subscription::find(),
-        ]);
+        $customer = $this->getCustomer();
+        $subscriptionService = new SubscriptionService($customer);
 
         return $this->render('index', [
-            'dataProvider' => $dataProvider,
+            'subscriptionService' => $subscriptionService,
         ]);
     }
 
     /**
-     * Displays a single Subscription model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws NotFoundHttpException
+     * @throws ApiErrorException
      */
-    public function actionView($id)
+    public function actionInvoice(int $id): Response
     {
-        $model = $this->findModel($id);
-        $dataProvider = new ActiveDataProvider([
-            'query' => SubscriptionItems::find()->where(['subscription_id' => $model->id])
-        ]);
+        $customer = $this->getCustomer();
+        $subscription = Subscription::findOne($id);
 
-        return $this->render('view', [
-            'dataProvider' => $dataProvider,
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Creates a new Subscription model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     * @throws \yii\db\Exception
-     * @throws \Throwable
-     */
-    public function actionCreate()
-    {
-        /**@var SubscriptionForm */
-        $model = new SubscriptionForm();
-        $model->subscription = new Subscription();
-        $model->subscription->loadDefaultValues();
-
-        $model->setAttributes(Yii::$app->request->post());
-        if (Yii::$app->request->post() && $model->validate() && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->subscription->id]);
+        if (!$subscription || $subscription->customer_id != $customer->id) {
+            throw new NotFoundHttpException('Invoice not found.');
         }
 
+        $subscriptionService = new SubscriptionService($customer);
+        $stripeInvoice = $subscriptionService->getInvoiceObjectById($subscription->array_meta_data['latest_invoice']);
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        if (!$stripeInvoice) {
+            throw new NotFoundHttpException('Invoice not found.');
+        }
 
+        if (!$stripeInvoice['hosted_invoice_url']) {
+            throw new NotFoundHttpException('Invoice is not available at the moment.');
+        }
 
+        return $this->redirect($stripeInvoice['hosted_invoice_url']);
     }
 
     /**
-     * Updates an existing Subscription model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * TODO: implement the logic
+     * @throws NotFoundHttpException
      */
-    public function actionUpdate($id)
+    protected function getCustomer(): ?Customer
     {
-        $model = new SubscriptionForm();
-        $model->subscription = $this->findModel($id);
-        $model->setAttributes(Yii::$app->request->post());
+        $customer = Customer::findOne(1);
 
-        if (Yii::$app->request->post() && $model->validate() && $model->save()) {
-            Yii::$app->getSession()->setFlash('success', 'Subscription has been updated.');
-
-            return $this->redirect(['view', 'id' => $model->subscription->id]);
+        if (!$customer) {
+            throw new NotFoundHttpException('Customer not found.');
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Deletes an existing Subscription model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        // Deletes subscription model
-        $this->findModel($id)->delete();
-
-        /**
-         * Also find items and delete
-         */
-        $items = SubscriptionItems::find()->where(['subscription_id' => $id])->all();
-
-        /** @var SubscriptionItems $item */
-        foreach ($items as $item) {
-            $item->delete();
-        }
-
-        return $this->redirect(['index']);
-    }
-
-    public function actionOneTime()
-    {
-        return $this->render('one-time');
-    }
-
-    /**
-     * Finds the Subscription model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Subscription the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Subscription::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
+        return $customer;
     }
 }
