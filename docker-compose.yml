@@ -1,4 +1,4 @@
-version: '3.2'
+version: '3.8'
 
 services:
 
@@ -31,12 +31,3 @@ services:
     volumes:
       - ./mysql-data/var/lib/mysql:/var/lib/mysql
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    environment:
-      PMA_HOST: mysql
-      PMA_USER: app
-      PMA_PASSWORD: 123
-      PMA_ARBITRARY: 1
-    depends_on:
-      - mysql

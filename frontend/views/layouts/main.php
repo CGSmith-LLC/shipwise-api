@@ -99,7 +99,19 @@ $this->beginPage() ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 
 </head>
-<body>
+<body class="">
+<div class="container">
+
+</div>
+
+<div class="drawer">
+<input id="my-drawer" type="checkbox" class="drawer-toggle" />
+<ul class="menu p-4 w-80 bg-base-100 text-base-content">
+<li>hey</li>
+</ul>
+
+</div>
+
 <?php
 $this->beginBody() ?>
 

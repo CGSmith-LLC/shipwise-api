@@ -77,6 +77,7 @@ return [
             ],
         ]
     ],
+    'layout' => 'main2',
     'params' => $params,
     'modules' => [
         'monitor' => [

@@ -23,7 +23,7 @@ class AliasController extends Controller
     {
         return [
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -38,8 +38,8 @@ class AliasController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-                                                   'query' => AliasParent::find(),
-                                               ]);
+            'query' => AliasParent::find(),
+        ]);
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
