@@ -83,6 +83,7 @@ class CronController extends Controller
     public function actionScheduledOrders()
     {
         $date = new \DateTime();
+        echo 'Searching for <= scheduled_date ' . $date->format('Y-m-d H:i:s') . ' ...' . PHP_EOL;
         foreach (ScheduledOrder::find()->where(['<=', 'scheduled_date', $date->format('Y-m-d')])->all() as $scheduledOrder) {
             $order = Order::findOne($scheduledOrder->order_id);
             $order->status_id = $scheduledOrder->status_id;
