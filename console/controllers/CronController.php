@@ -83,12 +83,16 @@ class CronController extends Controller
     public function actionScheduledOrders()
     {
         $date = new \DateTime();
-        echo 'Searching for <= scheduled_date ' . $date->format('Y-m-d H:i:s') . ' ...' . PHP_EOL;
+        $this->stdout('Searching for <= scheduled_date ' . $date->format('Y-m-d H:i:s') . ' ...');
         foreach (ScheduledOrder::find()->where(['<=', 'scheduled_date', $date->format('Y-m-d H:i:s')])->all() as $scheduledOrder) {
             $order = Order::findOne($scheduledOrder->order_id);
+            $this->stdout('Found order ' . $order->customer_reference);
             $order->status_id = $scheduledOrder->status_id;
             if ($order->save()) {
+                $this->stdout('Finished scheduled order ' . $order->customer_reference);
                 $scheduledOrder->delete();
+            } else {
+                $this->stderr('Failed to update scheduled order');
             }
         }
     }
