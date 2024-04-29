@@ -65,7 +65,7 @@ class CronController extends Controller
          *          - call parseOrder
          */
         $this->runIntegrations(Integration::ACTIVE);
-        $this->runScheduledOrders();
+        $this->actionScheduledOrders();
 
         return ExitCode::OK;
     }
@@ -80,7 +80,7 @@ class CronController extends Controller
         }
     }
 
-    public function runScheduledOrders()
+    public function actionScheduledOrders()
     {
         $date = new \DateTime();
         foreach (ScheduledOrder::find()->where(['<=', 'scheduled_date', $date->format('Y-m-d')])->all() as $scheduledOrder) {
