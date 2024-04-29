@@ -3,7 +3,6 @@
 namespace common\models;
 
 use Yii;
-use common\behaviors\OrderEventsBehavior;
 use api\modules\v1\models\core\AddressEx;
 use common\models\base\BaseOrder;
 use common\models\query\OrderQuery;
@@ -27,14 +26,6 @@ use console\jobs\webhooks\OrderWebhook;
  */
 class Order extends BaseOrder
 {
-    public function behaviors(): array
-    {
-        return [
-            [
-                'class' => OrderEventsBehavior::class,
-            ],
-        ];
-    }
 
     public function init(): void
     {

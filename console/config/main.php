@@ -57,8 +57,6 @@ return [
         'user' => [
             'class' => 'yii\web\User',
             'identityClass' => 'app\models\User',
-            'enableSession' => false,
-            'enableAutoLogin' => false,
         ],
     ],
     'params' => $params,
