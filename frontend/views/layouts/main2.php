@@ -27,7 +27,7 @@ $this->beginPage() ?>
     <ul class="menu p-4 w-80 bg-base-100 text-base-content">
         <li>hey</li>
     </ul>
-
+    <button class="btn-primary">test</button>
 </div>
 <div class="wrap">
 
